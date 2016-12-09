@@ -1,0 +1,32 @@
+# bonobo (see github.com/python-edgy/project)
+
+name = 'bonobo'
+description = ''
+license = 'Apache License, Version 2.0'
+
+url = ''
+download_url = ''
+
+author = ''
+author_email = ''
+
+enable_features = {
+    'make',
+    'pytest',
+    'git',
+    'pylint',
+    'python',
+}
+
+extras_require = {
+    'dev': [
+        'coverage >=4.0,<4.2',
+        'mock >=2.0,<2.1',
+        'nose >=1.3,<1.4',
+        'pylint >=1.6,<1.7',
+        'pytest >=2.9,<2.10',
+        'pytest-cov >=2.3,<2.4',
+        'sphinx',
+        'sphinx_rtd_theme',
+    ],
+}
