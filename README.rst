@@ -23,3 +23,7 @@ Release announcements: http://eepurl.com/csHFKL
 .. image:: https://img.shields.io/github/downloads/python-bonobo/bonobo/total.svg
     :target: https://github.com/python-bonobo/bonobo/releases
     :alt: Downloads
+
+.. image:: https://img.shields.io/pypi/dm/Django.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: Python Package on PyPI
