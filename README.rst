@@ -16,7 +16,7 @@ Release announcements: http://eepurl.com/csHFKL
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=master
     :alt: Coverage Status
 
-.. image:: https://readthedocs.org/projects/pythonbonobo/badge/?version=latest
-    :target: http://pythonbonobo.readthedocs.org/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/bonobo/badge/?version=latest
+    :target: http://bonobo.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
