@@ -17,7 +17,7 @@ except:
 
 setup(
     name = 'bonobo',
-    description = '',
+    description = 'Bonobo',
     license = 'Apache License, Version 2.0',
     install_requires = [],
     version = version,
@@ -33,6 +33,6 @@ setup(
          'pytest-cov >=2.4,<2.5',
          'sphinx',
          'sphinx_rtd_theme']},
-    url = '',
-    download_url = ''.format(version=version),
+    url = 'https://github.com/hartym/bonobo',
+    download_url = 'https://github.com/hartym/bonobo'.format(version=version),
 )

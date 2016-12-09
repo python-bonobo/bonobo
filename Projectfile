@@ -1,14 +1,14 @@
 # bonobo (see github.com/python-edgy/project)
 
 name = 'bonobo'
-description = ''
+description = 'Bonobo'
 license = 'Apache License, Version 2.0'
 
-url = ''
-download_url = ''
+url = 'https://github.com/hartym/bonobo'
+download_url = 'https://github.com/hartym/bonobo'
 
-author = ''
-author_email = ''
+author = 'Romain Dorgueil'
+author_email = 'romain@dorgueil.net'
 
 enable_features = {
     'make',
