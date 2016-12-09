@@ -12,7 +12,8 @@ Release announcements: http://eepurl.com/csHFKL
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration
 
-.. image:: https://coveralls.io/repos/github/python-bonobo/bonobo/badge.svg?branch=master
+.. image::    :target: 
+.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=master
     :alt: Coverage
 
