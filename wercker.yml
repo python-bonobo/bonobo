@@ -4,6 +4,8 @@ build:
     - virtualenv:
         name: setup virtual environment
         install_wheel: true
+        python_location: /usr/bin/python3.5
+
 
     - pip-install
 
