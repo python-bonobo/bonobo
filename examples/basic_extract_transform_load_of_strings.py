@@ -1,6 +1,5 @@
-from bonobo.strategy import NaiveStrategy, ExecutorStrategy
-
 from bonobo.core.graph import Graph
+from bonobo.core.strategy import NaiveStrategy, ExecutorStrategy
 
 
 def extract():
@@ -26,5 +25,3 @@ if __name__ == '__main__':
 
     s = ExecutorStrategy()
     s.execute(etl)
-
-

@@ -43,6 +43,7 @@ class ExecutorStrategy(Strategy):
         return self.context_type(graph)
 
     def execute(self, graph, *args, **kwargs):
+        raise NotImplementedError()
         context = self.create_context(graph)
 
         for i in graph.outputs_of(BEGIN):
@@ -54,6 +55,8 @@ class ExecutorStrategy(Strategy):
 
         f = self.executor.submit(self.components[idx], *args, **kwargs)
         self.running.add(f)
+
+        idx = i
 
         @f.add_done_callback
         def on_component_done(f):
