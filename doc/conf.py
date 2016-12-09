@@ -82,6 +82,8 @@ html_theme_options = {
     'github_repo': 'bonobo',
 }
 
+html_show_sphinx = False
+
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
