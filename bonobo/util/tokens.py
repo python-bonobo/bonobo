@@ -10,3 +10,6 @@ class Token:
 
 BEGIN = Token('Begin')
 END = Token('End')
+NEW = Token('New')
+RUNNING = Token('Running')
+TERMINATED = Token('Terminated')

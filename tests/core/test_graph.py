@@ -1,7 +1,7 @@
 import pytest
 
-from bonobo.core.graph import Graph
-from bonobo.core.tokens import BEGIN
+from bonobo.core.graphs import Graph
+from bonobo.util.tokens import BEGIN
 
 identity = lambda x: x
 

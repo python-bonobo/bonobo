@@ -18,7 +18,8 @@ from abc import ABCMeta, abstractmethod
 from queue import Queue
 
 from bonobo.core.errors import AbstractError, InactiveWritableError, InactiveReadableError
-from bonobo.core.tokens import BEGIN, END
+from bonobo.util import noop
+from bonobo.util.tokens import BEGIN, END
 
 BUFFER_SIZE = 8192
 
@@ -47,12 +48,18 @@ class Input(Queue, Readable, Writable):
 
         self._runlevel = 0
         self._writable_runlevel = 0
+        self.on_begin = noop
+        self.on_end = noop
 
     def put(self, data, block=True, timeout=None):
         # Begin token is a metadata to raise the input runlevel.
         if data == BEGIN:
             self._runlevel += 1
             self._writable_runlevel += 1
+
+            # callback
+            self.on_begin()
+
             return
 
         # Check we are actually able to receive data.
@@ -72,6 +79,10 @@ class Input(Queue, Readable, Writable):
 
         if data == END:
             self._runlevel -= 1
+
+            # callback
+            self.on_end()
+
             if not self.alive:
                 raise InactiveReadableError(
                     'Cannot get() on an inactive {} (runlevel just reached 0).'.format(Readable.__name__))

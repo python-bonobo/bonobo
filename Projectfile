@@ -19,7 +19,15 @@ enable_features = {
     'python',
 }
 
+install_requires = [
+    'psutil >=5.0,<5.1',
+]
+
 extras_require = {
+    'jupyter': [
+        'jupyter >=1.0,<1.1',
+        'ipywidgets >=6.0.0.beta5'
+    ],
     'dev': [
         'coverage >=4.2,<4.3',
         'mock >=2.0,<2.1',
@@ -32,3 +40,11 @@ extras_require = {
 
     ],
 }
+
+data_files = [
+    ('share/jupyter/nbextensions/bonobo-jupyter', [
+        'bonobo/ext/jupyter/static/extension.js',
+        'bonobo/ext/jupyter/static/index.js',
+        'bonobo/ext/jupyter/static/index.js.map',
+    ]),
+]

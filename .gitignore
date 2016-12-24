@@ -23,6 +23,7 @@
 .webassets-cache
 /.idea
 /bonobo.iml
+/bonobo/ext/jupyter/js/node_modules/
 /build/
 /coverage.xml
 /develop-eggs/

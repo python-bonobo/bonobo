@@ -19,8 +19,8 @@ from queue import Empty
 import pytest
 
 from bonobo.core.errors import InactiveWritableError, InactiveReadableError
-from bonobo.core.io import Input
-from bonobo.core.tokens import BEGIN, END
+from bonobo.core.inputs import Input
+from bonobo.util.tokens import BEGIN, END
 
 
 def test_input_runlevels():
