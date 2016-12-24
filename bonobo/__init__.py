@@ -13,3 +13,5 @@ __all__ = [
     inject,
     service,
 ]
+
+__version__ = '0.0.0'
