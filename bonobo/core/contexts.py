@@ -105,10 +105,15 @@ class ComponentExecutionContext(WithStatistics):
 
     def get_stats(self, *args, **kwargs):
         return (
-            ('in', self.stats['in'],),
-            ('out', self.stats['out'],),
-            ('err', self.stats['err'],),
-        )
+            (
+                'in',
+                self.stats['in'], ),
+            (
+                'out',
+                self.stats['out'], ),
+            (
+                'err',
+                self.stats['err'], ), )
 
     def impulse(self):
         self.input.put(None)
@@ -130,14 +135,13 @@ class ComponentExecutionContext(WithStatistics):
         # timer = Timer()
         # with timer:
 
-        args = () if row is None else (row,)
+        args = () if row is None else (row, )
         if getattr(self.component, '_with_context', False):
             return self.component(self, *args)
         return self.component(*args)
 
     def step(self, finalize=False):
         # Pull data from the first available input channel.
-
         """Runs a transformation callable with given args/kwargs and flush the result into the right
         output channel."""
 

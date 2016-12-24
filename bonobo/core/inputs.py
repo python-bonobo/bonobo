@@ -84,8 +84,8 @@ class Input(Queue, Readable, Writable):
             self.on_end()
 
             if not self.alive:
-                raise InactiveReadableError(
-                    'Cannot get() on an inactive {} (runlevel just reached 0).'.format(Readable.__name__))
+                raise InactiveReadableError('Cannot get() on an inactive {} (runlevel just reached 0).'.format(
+                    Readable.__name__))
             return self.get(block, timeout)
 
         return data

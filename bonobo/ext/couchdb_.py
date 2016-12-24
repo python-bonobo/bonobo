@@ -17,7 +17,9 @@ from bonobo import service
 @service
 def client(username, password):
     client = couchdb.Server()
-    client.resource.credentials = (username, password,)
+    client.resource.credentials = (
+        username,
+        password, )
     return client
 
 

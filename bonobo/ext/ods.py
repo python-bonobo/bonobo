@@ -4,7 +4,9 @@ import requests  # todo: make this a service so we can substitute it ?
 
 
 def extract_ods(url, dataset, rows=100, **kwargs):
-    params = (('dataset', dataset), ('rows', rows),) + tuple(sorted(kwargs.items()))
+    params = (
+        ('dataset', dataset),
+        ('rows', rows), ) + tuple(sorted(kwargs.items()))
     base_url = url + '?' + urlencode(params)
 
     def _extract_ods():
@@ -18,10 +20,7 @@ def extract_ods(url, dataset, rows=100, **kwargs):
                 break
 
             for row in records:
-                yield {
-                    **row.get('fields', {}),
-                    'geometry': row.get('geometry', {})
-                }
+                yield { ** row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
             start += rows
 

@@ -23,9 +23,7 @@ class service:
         return item
 
     def define(self, *args, **kwargs):
-        new_service = type(self)(
-            partial(self.factory, *args, **kwargs)
-        )
+        new_service = type(self)(partial(self.factory, *args, **kwargs))
         self.children.add(new_service)
         return new_service
 
@@ -47,13 +45,9 @@ def inject(*iargs, **ikwargs):
     def wrapper(target):
         @functools.wraps(target)
         def wrapped(*args, **kwargs):
-            return target(
-                *itertools.chain(map(resolve, iargs), args),
-                **{
-                    **kwargs,
-                    **{k: resolve(v) for k, v in ikwargs.items()}
-                }
-            )
+            return target(*itertools.chain(map(resolve, iargs), args),
+                          **{ ** kwargs, ** {k: resolve(v)
+                                             for k, v in ikwargs.items()}})
 
         return wrapped
 

@@ -12,7 +12,7 @@ class NaiveStrategy(Strategy):
         for i, component in enumerate(context.graph.components):
             while True:
                 try:
-                    args = (input_queues[i].get(block=False),) if i else ()
+                    args = (input_queues[i].get(block=False), ) if i else ()
                     for row in force_iterator(component(*args)):
                         input_queues[i + 1].put(row)
                     if not i:

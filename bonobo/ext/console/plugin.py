@@ -26,12 +26,13 @@ t = blessings.Terminal()
 @lru_cache(1)
 def memory_usage():
     process = psutil.Process(os.getpid())
-    return process.get_memory_info()[0] / float(2 ** 20)
+    return process.get_memory_info()[0] / float(2**20)
 
 
 # @lru_cache(64)
 # def execution_time(harness):
 #    return datetime.datetime.now() - harness._started_at
+
 
 class ConsoleOutputPlugin:
     """
@@ -50,10 +51,9 @@ class ConsoleOutputPlugin:
     def _write(self, context, rewind):
         profile, debug = False, False
         if profile:
-            append = (
-                ('Memory', '{0:.2f} Mb'.format(memory_usage())),
-                # ('Total time', '{0} s'.format(execution_time(harness))),
-            )
+            append = (('Memory', '{0:.2f} Mb'.format(memory_usage())),
+                      # ('Total time', '{0} s'.format(execution_time(harness))),
+                      )
         else:
             append = ()
         self.write(context, prefix=self.prefix, append=append, debug=debug, profile=profile, rewind=rewind)
@@ -76,24 +76,24 @@ class ConsoleOutputPlugin:
         for i, component in enumerate(context):
             if component.running:
                 _line = ''.join((
-                    t.black('({})'.format(i+1)),
+                    t.black('({})'.format(i + 1)),
                     ' ',
                     t.bold(t.white('+')),
                     ' ',
                     component.name,
                     ' ',
-                    component.get_stats_as_string(debug=debug, profile=profile),
-                    ' ',
-                ))
+                    component.get_stats_as_string(
+                        debug=debug, profile=profile),
+                    ' ', ))
             else:
                 _line = t.black(''.join((
-                    '({})'.format(i+1),
+                    '({})'.format(i + 1),
                     ' - ',
                     component.name,
                     ' ',
-                    component.get_stats_as_string(debug=debug, profile=profile),
-                    ' ',
-                )))
+                    component.get_stats_as_string(
+                        debug=debug, profile=profile),
+                    ' ', )))
             print(prefix + _line + t.clear_eol)
 
         if append:

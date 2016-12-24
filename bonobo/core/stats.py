@@ -25,6 +25,4 @@ class WithStatistics(metaclass=ABCMeta):
         raise AbstractError(self.get_stats)
 
     def get_stats_as_string(self, *args, **kwargs):
-        return ' '.join(
-            ('{0}={1}'.format(name, cnt) for name, cnt in self.get_stats(*args, **kwargs) if cnt > 0)
-        )
+        return ' '.join(('{0}={1}'.format(name, cnt) for name, cnt in self.get_stats(*args, **kwargs) if cnt > 0))
