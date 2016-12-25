@@ -137,7 +137,7 @@ class ComponentExecutionContext(WithStatistics):
         self.stats['in'] += 1
         return self.input.get(timeout=1)
 
-    def _call(self, bag_or_arg):
+    def _call(self, bag):
         # todo add timer
         if getattr(self.component, '_with_context', False):
             return bag.apply(self.component, self)
