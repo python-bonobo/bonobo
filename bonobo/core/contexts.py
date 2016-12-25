@@ -35,6 +35,12 @@ class ExecutionContext:
     def __iter__(self):
         yield from self.components
 
+    def impulse(self):
+        for i in self.graph.outputs_of(Begin):
+            self[i].recv(Begin)
+            self[i].recv(Bag())
+            self[i].recv(End)
+
     @property
     def running(self):
         return any(component.running for component in self.components)
@@ -75,6 +81,23 @@ def _iter(x):
     if isinstance(x, (dict, list, str)):
         raise TypeError(type(x).__name__)
     return iter(x)
+
+
+def _resolve(input_bag, output):
+    # NotModified means to send the input unmodified to output.
+    if output is NotModified:
+        return input_bag
+
+    # If it does not look like a bag, let's create one for easier manipulation
+    if hasattr(output, 'apply'):
+        # Already a bag? Check if we need to set parent.
+        if InheritInputFlag in output.flags:
+            output.set_parent(input_bag)
+    else:
+        # Not a bag? Let's encapsulate it.
+        output = Bag(output)
+
+    return output
 
 
 class ComponentExecutionContext(WithStatistics):
@@ -149,34 +172,15 @@ class ComponentExecutionContext(WithStatistics):
         output channel."""
 
         input_bag = self.get()
-
-        def _resolve(output):
-            nonlocal input_bag
-
-            # NotModified means to send the input unmodified to output.
-            if output is NotModified:
-                return input_bag
-
-            # If it does not look like a bag, let's create one for easier manipulation
-            if hasattr(output, 'apply'):
-                # Already a bag? Check if we need to set parent.
-                if InheritInputFlag in output.flags:
-                    output.set_parent(input_bag)
-            else:
-                # Not a bag? Let's encapsulate it.
-                output = Bag(result)
-
-            return output
-
-        results = self._call(input_bag)
+        outputs = self._call(input_bag)
 
         # self._exec_time += timer.duration
         # Put data onto output channels
         try:
-            results = _iter(results)
+            outputs = _iter(outputs)
         except TypeError:
-            if results:
-                self.send(_resolve(results))
+            if outputs:
+                self.send(_resolve(input_bag, outputs))
             else:
                 # case with no result, an execution went through anyway, use for stats.
                 # self._exec_count += 1
@@ -184,10 +188,10 @@ class ComponentExecutionContext(WithStatistics):
         else:
             while True:
                 try:
-                    result = next(results)
+                    output = next(outputs)
                 except StopIteration as e:
                     break
-                self.send(_resolve(result))
+                self.send(_resolve(input_bag, output))
 
     def run(self):
         assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at the '

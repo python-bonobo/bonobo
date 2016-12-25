@@ -18,12 +18,9 @@ class ExecutorStrategy(Strategy):
 
     def execute(self, graph, *args, plugins=None, **kwargs):
         context = self.create_context(graph, plugins=plugins)
-        executor = self.executor_factory()
+        context.impulse()
 
-        for i in graph.outputs_of(Begin):
-            context[i].recv(Begin)
-            context[i].recv(Bag())
-            context[i].recv(End)
+        executor = self.executor_factory()
 
         futures = []
 
@@ -41,8 +38,7 @@ class ExecutorStrategy(Strategy):
 
         executor.shutdown()
 
-        #for component_context in context.components:
-        #    print(component_context)
+        return context
 
 
 class ThreadPoolExecutorStrategy(ExecutorStrategy):
