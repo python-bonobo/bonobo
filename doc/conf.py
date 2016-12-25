@@ -13,13 +13,8 @@ from bonobo import __version__
 # -- General configuration ------------------------------------------------
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage',
+    'sphinx.ext.ifconfig', 'sphinx.ext.viewcode'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -86,7 +81,12 @@ html_theme_options = {
 
 html_sidebars = {
     '**': [
-        'sidebarlogo.html', 'localtoc.html', 'relations.html', 'searchbox.html', 'sidebarinfos.html', 'sourcelink.html',
+        'sidebarlogo.html',
+        'localtoc.html',
+        'relations.html',
+        'searchbox.html',
+        'sidebarinfos.html',
+        'sourcelink.html',
     ]
 }
 
@@ -124,30 +124,21 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'Bonobo.tex', 'Bonobo Documentation',
-     'Romain Dorgueil', 'manual'),
-]
+latex_documents = [(master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual'), ]
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'bonobo', 'Bonobo Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'bonobo', 'Bonobo Documentation', [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'Bonobo', 'Bonobo Documentation',
-     author, 'Bonobo', 'One line description of project.',
-     'Miscellaneous'),
-]
+texinfo_documents = [(master_doc, 'Bonobo', 'Bonobo Documentation', author, 'Bonobo',
+                      'One line description of project.', 'Miscellaneous'), ]
 
 # -- Options for Epub output ----------------------------------------------
 

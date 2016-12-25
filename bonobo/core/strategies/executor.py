@@ -3,8 +3,9 @@ from concurrent.futures import Executor
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 
+from bonobo.core.bags import Bag
 from bonobo.core.strategies.base import Strategy
-from bonobo.util.tokens import BEGIN, END
+from bonobo.util.tokens import Begin, End
 
 
 class ExecutorStrategy(Strategy):
@@ -19,10 +20,10 @@ class ExecutorStrategy(Strategy):
         context = self.create_context(graph, plugins=plugins)
         executor = self.executor_factory()
 
-        for i in graph.outputs_of(BEGIN):
-            context[i].recv(BEGIN)
-            context[i].recv(None)
-            context[i].recv(END)
+        for i in graph.outputs_of(Begin):
+            context[i].recv(Begin)
+            context[i].recv(Bag())
+            context[i].recv(End)
 
         futures = []
 

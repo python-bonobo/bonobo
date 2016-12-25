@@ -5,8 +5,7 @@ class MyThingWithStats(WithStatistics):
     def get_stats(self, *args, **kwargs):
         return (
             ('foo', 42),
-            ('bar', 69),
-        )
+            ('bar', 69), )
 
 
 def test_with_statistics():

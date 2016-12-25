@@ -19,7 +19,7 @@ from queue import Queue
 
 from bonobo.core.errors import AbstractError, InactiveWritableError, InactiveReadableError
 from bonobo.util import noop
-from bonobo.util.tokens import BEGIN, END
+from bonobo.util.tokens import Begin, End
 
 BUFFER_SIZE = 8192
 
@@ -53,7 +53,7 @@ class Input(Queue, Readable, Writable):
 
     def put(self, data, block=True, timeout=None):
         # Begin token is a metadata to raise the input runlevel.
-        if data == BEGIN:
+        if data == Begin:
             self._runlevel += 1
             self._writable_runlevel += 1
 
@@ -66,7 +66,7 @@ class Input(Queue, Readable, Writable):
         if self._writable_runlevel < 1:
             raise InactiveWritableError('Cannot put() on an inactive {}.'.format(Writable.__name__))
 
-        if data == END:
+        if data == End:
             self._writable_runlevel -= 1
 
         return Queue.put(self, data, block, timeout)
@@ -77,7 +77,7 @@ class Input(Queue, Readable, Writable):
 
         data = Queue.get(self, block, timeout)
 
-        if data == END:
+        if data == End:
             self._runlevel -= 1
 
             # callback
@@ -92,7 +92,7 @@ class Input(Queue, Readable, Writable):
 
     def empty(self):
         self.mutex.acquire()
-        while self._qsize() and self.queue[0] == END:
+        while self._qsize() and self.queue[0] == End:
             self._runlevel -= 1
             Queue._get(self)
         self.mutex.release()

@@ -8,8 +8,11 @@ class Token:
         return '<{}>'.format(self.__name__)
 
 
-BEGIN = Token('Begin')
-END = Token('End')
-NEW = Token('New')
-RUNNING = Token('Running')
-TERMINATED = Token('Terminated')
+Begin = Token('Begin')
+End = Token('End')
+
+New = Token('New')
+Running = Token('Running')
+Terminated = Token('Terminated')
+
+NotModified = Token('NotModified')

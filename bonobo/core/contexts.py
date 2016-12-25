@@ -3,11 +3,12 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
+from bonobo.core.bags import Bag
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.stats import WithStatistics
 from bonobo.util.lifecycle import get_initializer, get_finalizer
-from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED
+from bonobo.util.tokens import Begin, End, New, Running, Terminated, NotModified
 
 
 class ExecutionContext:
@@ -22,8 +23,8 @@ class ExecutionContext:
                 component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             except KeyError as e:
                 continue
-            component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
-            component_context.input.on_end = partial(component_context.send, END, _control=True)
+            component_context.input.on_begin = partial(component_context.send, Begin, _control=True)
+            component_context.input.on_end = partial(component_context.send, End, _control=True)
 
     def __getitem__(self, item):
         return self.components[item]
@@ -94,7 +95,7 @@ class ComponentExecutionContext(WithStatistics):
         self.component = component
         self.input = Input()
         self.outputs = []
-        self.state = NEW
+        self.state = New
         self.stats = {
             'in': 0,
             'out': 0,
@@ -132,27 +133,33 @@ class ComponentExecutionContext(WithStatistics):
         self.input.put(value)
 
     def get(self):
-        row = self.input.get(timeout=1)
-        return row
+        # todo XXX if timeout, in stat is erroneous
+        self.stats['in'] += 1
+        return self.input.get(timeout=1)
 
-    def _call(self, row):
-        # timer = Timer()
-        # with timer:
-
-        args = () if row is None else (row, )
+    def _call(self, bag_or_arg):
+        # todo add timer
+        bag = bag_or_arg if hasattr(bag_or_arg, 'apply') else Bag(bag_or_arg)
         if getattr(self.component, '_with_context', False):
-            return self.component(self, *args)
-        return self.component(*args)
+            return bag.apply(self.component, self)
+        return bag.apply(self.component)
 
     def step(self):
         # Pull data from the first available input channel.
         """Runs a transformation callable with given args/kwargs and flush the result into the right
         output channel."""
 
-        row = self.get()
-        self.stats['in'] += 1
+        input_row = self.get()
 
-        results = self._call(row)
+        def _resolve(result):
+            nonlocal input_row
+            if result is NotModified:
+                return input_row
+            if hasattr(result, 'override'):
+                return result.override(input_row)
+            return result
+
+        results = self._call(input_row)
 
         # self._exec_time += timer.duration
         # Put data onto output channels
@@ -160,7 +167,7 @@ class ComponentExecutionContext(WithStatistics):
             results = iterable(results)
         except TypeError:
             if results:
-                self.send(results)
+                self.send(_resolve(results))
             else:
                 # case with no result, an execution went through anyway, use for stats.
                 # self._exec_count += 1
@@ -171,13 +178,13 @@ class ComponentExecutionContext(WithStatistics):
                     result = next(results)
                 except StopIteration as e:
                     break
-                self.send(result)
+                self.send(_resolve(result))
 
     def run(self):
-        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at the '
-                                   'beginning of a run().').format(type(self).__name__, NEW)
+        assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at the '
+                                   'beginning of a run().').format(type(self).__name__, New)
 
-        self.state = RUNNING
+        self.state = Running
         try:
             get_initializer(self.component)(self)
         except Exception as e:
@@ -197,10 +204,10 @@ class ComponentExecutionContext(WithStatistics):
             except Exception as e:
                 self.handle_error(e, traceback.format_exc())
 
-        assert self.state is RUNNING, ('A {} must be in {} state when finalization starts.').format(
-            type(self).__name__, RUNNING)
+        assert self.state is Running, ('A {} must be in {} state when finalization starts.').format(
+            type(self).__name__, Running)
 
-        self.state = TERMINATED
+        self.state = Terminated
         try:
             get_finalizer(self.component)(self)
         except Exception as e:

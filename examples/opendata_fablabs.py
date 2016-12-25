@@ -22,7 +22,8 @@ def _getlink(x):
 
 def normalize(row):
     result = {
-        **row,
+        **
+        row,
         'links': list(filter(None, map(_getlink, json.loads(row.get('links'))))),
         'country': countries.get(alpha_2=row.get('country_code', '').upper()).name,
     }
@@ -37,11 +38,11 @@ def filter_france(row):
 def display(row):
     print(t.bold(row.get('name')))
 
-    address = list(filter(None, (
-        ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
-        row.get('county', None),
-        row.get('country'),
-    )))
+    address = list(
+        filter(None, (
+            ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
+            row.get('county', None),
+            row.get('country'), )))
 
     print('  - {}: {address}'.format(t.blue('address'), address=', '.join(address)))
     print('  - {}: {links}'.format(t.blue('links'), links=', '.join(row['links'])))
@@ -51,10 +52,10 @@ def display(row):
 
 if __name__ == '__main__':
     console_run(
-        extract_ods(SEARCH_URL, DATASET, timezone='Europe/Paris'),
+        extract_ods(
+            SEARCH_URL, DATASET, timezone='Europe/Paris'),
         normalize,
         filter_france,
         tee(display),
         to_json('fablabs.json'),
-        output=True,
-    )
+        output=True, )

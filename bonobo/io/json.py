@@ -2,6 +2,8 @@ import json
 
 from bonobo.util.lifecycle import with_context, set_initializer, set_finalizer
 
+__all__ = ['to_json', ]
+
 
 def to_json(path_or_buf):
     # todo different cases + documentation

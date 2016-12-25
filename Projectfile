@@ -37,7 +37,7 @@ extras_require = {
         'pytest-cov >=2.4,<2.5',
         'sphinx',
         'sphinx_rtd_theme',
-
+        'yapf',
     ],
 }
 

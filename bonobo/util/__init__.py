@@ -1,6 +1,16 @@
 import functools
 import pprint
 
+from .tokens import NotModified
+
+__all__ = [
+    'NotModified',
+    'head',
+    'log',
+    'noop',
+    'tee',
+]
+
 
 def head(n=10):
     i = 0
