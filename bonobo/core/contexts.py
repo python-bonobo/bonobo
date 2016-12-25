@@ -3,7 +3,7 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
-from bonobo.core.bags import Bag
+from bonobo.core.bags import Bag, InheritInputFlag
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.stats import WithStatistics
@@ -139,7 +139,6 @@ class ComponentExecutionContext(WithStatistics):
 
     def _call(self, bag_or_arg):
         # todo add timer
-        bag = bag_or_arg if hasattr(bag_or_arg, 'apply') else Bag(bag_or_arg)
         if getattr(self.component, '_with_context', False):
             return bag.apply(self.component, self)
         return bag.apply(self.component)
@@ -149,17 +148,27 @@ class ComponentExecutionContext(WithStatistics):
         """Runs a transformation callable with given args/kwargs and flush the result into the right
         output channel."""
 
-        input_row = self.get()
+        input_bag = self.get()
 
-        def _resolve(result):
-            nonlocal input_row
-            if result is NotModified:
-                return input_row
-            if hasattr(result, 'override'):
-                return result.override(input_row)
-            return result
+        def _resolve(output):
+            nonlocal input_bag
 
-        results = self._call(input_row)
+            # NotModified means to send the input unmodified to output.
+            if output is NotModified:
+                return input_bag
+
+            # If it does not look like a bag, let's create one for easier manipulation
+            if hasattr(output, 'apply'):
+                # Already a bag? Check if we need to set parent.
+                if InheritInputFlag in output.flags:
+                    output.set_parent(input_bag)
+            else:
+                # Not a bag? Let's encapsulate it.
+                output = Bag(result)
+
+            return output
+
+        results = self._call(input_bag)
 
         # self._exec_time += timer.duration
         # Put data onto output channels

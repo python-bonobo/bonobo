@@ -21,7 +21,10 @@ setup(
     name='bonobo',
     description='Bonobo',
     license='Apache License, Version 2.0',
-    install_requires=['psutil >=5.0,<5.1', ],
+    install_requires=[
+        'psutil >=5.0,<5.1',
+        'blessings >=1.6,<1.7',
+    ],
     version=version,
     long_description=read('README.rst'),
     classifiers=read('classifiers.txt', tolines),
