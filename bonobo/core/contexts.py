@@ -71,7 +71,7 @@ class PluginExecutionContext:
         self.alive = False
 
 
-def iterable(x):
+def _iter(x):
     if isinstance(x, (dict, list, str)):
         raise TypeError(type(x).__name__)
     return iter(x)
@@ -173,7 +173,7 @@ class ComponentExecutionContext(WithStatistics):
         # self._exec_time += timer.duration
         # Put data onto output channels
         try:
-            results = iterable(results)
+            results = _iter(results)
         except TypeError:
             if results:
                 self.send(_resolve(results))
