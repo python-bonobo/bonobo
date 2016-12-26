@@ -1,7 +1,17 @@
-def force_iterator(x):
-    if isinstance(x, str):
-        return [x]
+""" Iterator utilities """
+
+
+def force_iterator(mixed):
+    """Sudo make me an iterator.
+
+    Deprecated.
+
+    :param mixed:
+    :return: Iterator, baby.
+    """
+    if isinstance(mixed, str):
+        return [mixed]
     try:
-        return iter(x)
-    except Exception as e:
-        return [x] if x else []
+        return iter(mixed)
+    except TypeError:
+        return [mixed] if mixed else []
