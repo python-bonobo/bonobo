@@ -12,7 +12,10 @@ MIGRATION IN PROGRESS FROM RDC.ETL - PYTHON 3.5+
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration
 
-.. image::    :target: 
+.. image:: https://landscape.io/github/python-bonobo/bonobo/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/python-bonobo/bonobo/master
+   :alt: Code Health
+
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=master
     :alt: Coverage
