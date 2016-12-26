@@ -26,6 +26,7 @@ Read more at http://docs.bonobo-project.org/
 '''
 
 import sys
+
 from .core import *
 from .io import *
 from .util import *
@@ -38,5 +39,21 @@ assert PY35, 'Python 3.5+ is required to use Bonobo.'
 try:
     with open('../version.txt') as f:
         __version__ = f.read().strip()
-except Exception as e:
+except Exception as exc:
     __version__ = 'dev'
+
+__all__ = [
+    'Bag',
+    'Graph',
+    'NaiveStrategy',
+    'NotModified',
+    'ProcessPoolExecutorStrategy',
+    'ThreadPoolExecutorStrategy',
+    'head',
+    'inject',
+    'log',
+    'noop',
+    'service',
+    'tee',
+    'to_json',
+]
