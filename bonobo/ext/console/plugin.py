@@ -20,6 +20,8 @@ import blessings
 
 import psutil
 
+from bonobo.core.plugins import Plugin
+
 t = blessings.Terminal()
 
 
@@ -34,7 +36,7 @@ def memory_usage():
 #    return datetime.datetime.now() - harness._started_at
 
 
-class ConsoleOutputPlugin:
+class ConsoleOutputPlugin(Plugin):
     """
     Outputs status information to the connected stdout. Can be a TTY, with or without support for colors/cursor
     movements, or a non tty (pipe, file, ...). The features are adapted to terminal capabilities.

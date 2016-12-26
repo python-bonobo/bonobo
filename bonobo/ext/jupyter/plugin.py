@@ -3,7 +3,7 @@ from IPython.core.display import display
 from bonobo.ext.jupyter.widget import BonoboWidget
 
 
-class JupyterOutputPlugin:
+class JupyterOutputPlugin(Plugin):
     def initialize(self, context):
         self.widget = BonoboWidget()
         display(self.widget)
