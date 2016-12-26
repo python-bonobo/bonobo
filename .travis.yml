@@ -9,6 +9,6 @@ install:
   - make install-dev
   - pip install coveralls
 script:
-  - make clean doc test
+  - make clean docs test
 after_success:
   - coveralls
