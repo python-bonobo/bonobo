@@ -74,8 +74,8 @@ class PluginExecutionContext:
 
             try:
                 self.plugin.run(self)
-            except Exception as exc:
-                print('error', type(exc), exc)
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
 
             sleep(0.25)
 
