@@ -20,8 +20,8 @@ class Graph:
         self.components.append(c)
         return i
 
-    def add_chain(self, *components, input=Begin):
+    def add_chain(self, *components, _input=Begin):
         for component in components:
-            next = self.add_component(component)
-            self.outputs_of(input, create=True).add(next)
-            input = next
+            _next = self.add_component(component)
+            self.outputs_of(_input, create=True).add(_next)
+            _input = _next

@@ -224,9 +224,9 @@ class ComponentExecutionContext(WithStatistics):
         while True:
             try:
                 self.step()
-            except KeyboardInterrupt as e:
+            except KeyboardInterrupt:
                 raise
-            except InactiveReadableError as e:
+            except InactiveReadableError:
                 sleep(1)
                 # Terminated, exit loop.
                 break  # BREAK !!!
