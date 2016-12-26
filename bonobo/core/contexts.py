@@ -53,12 +53,14 @@ class PluginExecutionContext:
         self.alive = True
 
     def initialize(self):
+        # pylint: disable=broad-except
         try:
             get_initializer(self.plugin)(self)
         except Exception as exc:
             self.handle_error(exc, traceback.format_exc())
 
     def finalize(self):
+        # pylint: disable=broad-except
         try:
             get_finalizer(self.plugin)(self)
         except Exception as exc:
@@ -214,6 +216,7 @@ class ComponentExecutionContext(WithStatistics):
                 self.send(_resolve(input_bag, output))
 
     def initialize(self):
+        # pylint: disable=broad-except
         assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
                                    'initialization time.').format(type(self).__name__, NEW)
         self.state = RUNNING
@@ -224,6 +227,7 @@ class ComponentExecutionContext(WithStatistics):
             self.handle_error(exc, traceback.format_exc())
 
     def finalize(self):
+        # pylint: disable=broad-except
         assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
             type(self).__name__, RUNNING)
         self.state = TERMINATED
