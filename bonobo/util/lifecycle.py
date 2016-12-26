@@ -25,6 +25,6 @@ get_initializer, set_initializer = _create_lifecycle_functions('initializer', 'i
 get_finalizer, set_finalizer = _create_lifecycle_functions('finalizer', 'finalize')
 
 
-def with_context(f):
-    f._with_context = True
-    return f
+def with_context(func):
+    func._with_context = True
+    return func

@@ -3,12 +3,12 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
-from bonobo.core.bags import Bag, InheritInputFlag
+from bonobo.core.bags import Bag, INHERIT_INPUT
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.stats import WithStatistics
 from bonobo.util.lifecycle import get_initializer, get_finalizer
-from bonobo.util.tokens import Begin, End, New, Running, Terminated, NotModified
+from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
 
 
 class ExecutionContext:
@@ -23,8 +23,8 @@ class ExecutionContext:
                 component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             except KeyError:
                 continue
-            component_context.input.on_begin = partial(component_context.send, Begin, _control=True)
-            component_context.input.on_end = partial(component_context.send, End, _control=True)
+            component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
+            component_context.input.on_end = partial(component_context.send, END, _control=True)
 
     def __getitem__(self, item):
         return self.components[item]
@@ -36,10 +36,10 @@ class ExecutionContext:
         yield from self.components
 
     def impulse(self):
-        for i in self.graph.outputs_of(Begin):
-            self[i].recv(Begin)
+        for i in self.graph.outputs_of(BEGIN):
+            self[i].recv(BEGIN)
             self[i].recv(Bag())
-            self[i].recv(End)
+            self[i].recv(END)
 
     @property
     def running(self):
@@ -52,46 +52,58 @@ class PluginExecutionContext:
         self.plugin = plugin
         self.alive = True
 
-    def run(self):
+    def initialize(self):
+        # pylint: disable=broad-except
         try:
             get_initializer(self.plugin)(self)
         except Exception as exc:
-            print('error in initializer', type(exc), exc)
+            self.handle_error(exc, traceback.format_exc())
+
+    def finalize(self):
+        # pylint: disable=broad-except
+        try:
+            get_finalizer(self.plugin)(self)
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
+
+    def run(self):
+        self.initialize()
 
         while self.alive:
             # todo with wrap_errors ....
 
             try:
                 self.plugin.run(self)
-            except Exception as exc:
-                print('error', type(exc), exc)
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
 
             sleep(0.25)
 
-        try:
-            get_finalizer(self.plugin)(self)
-        except Exception as exc:
-            print('error in finalizer', type(exc), exc)
+        self.finalize()
 
     def shutdown(self):
         self.alive = False
 
+    def handle_error(self, exc, trace):
+        print('\U0001F4A3 {} in plugin {}'.format(type(exc).__name__, self.plugin))
+        print(trace)
 
-def _iter(x):
-    if isinstance(x, (dict, list, str)):
-        raise TypeError(type(x).__name__)
-    return iter(x)
+
+def _iter(mixed):
+    if isinstance(mixed, (dict, list, str)):
+        raise TypeError(type(mixed).__name__)
+    return iter(mixed)
 
 
 def _resolve(input_bag, output):
     # NotModified means to send the input unmodified to output.
-    if output is NotModified:
+    if output is NOT_MODIFIED:
         return input_bag
 
     # If it does not look like a bag, let's create one for easier manipulation
     if hasattr(output, 'apply'):
         # Already a bag? Check if we need to set parent.
-        if InheritInputFlag in output.flags:
+        if INHERIT_INPUT in output.flags:
             output.set_parent(input_bag)
     else:
         # Not a bag? Let's encapsulate it.
@@ -118,7 +130,7 @@ class ComponentExecutionContext(WithStatistics):
         self.component = component
         self.input = Input()
         self.outputs = []
-        self.state = New
+        self.state = NEW
         self.stats = {
             'in': 0,
             'out': 0,
@@ -198,25 +210,26 @@ class ComponentExecutionContext(WithStatistics):
                 self.send(_resolve(input_bag, output))
 
     def initialize(self):
-        assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at '
-                                   'initialization time.').format(type(self).__name__, New)
-
-        self.state = Running
+        # pylint: disable=broad-except
+        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
+                                   'initialization time.').format(type(self).__name__, NEW)
+        self.state = RUNNING
 
         try:
             get_initializer(self.component)(self)
-        except Exception as e:
-            self.handle_error(e, traceback.format_exc())
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
 
     def finalize(self):
-        assert self.state is Running, ('A {} must be in {} state at finalization time.').format(
-            type(self).__name__, Running)
+        # pylint: disable=broad-except
+        assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
+            type(self).__name__, RUNNING)
+        self.state = TERMINATED
 
-        self.state = Terminated
         try:
             get_finalizer(self.component)(self)
-        except Exception as e:
-            self.handle_error(e, traceback.format_exc())
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
 
     def run(self):
         self.initialize()
@@ -230,14 +243,14 @@ class ComponentExecutionContext(WithStatistics):
                 sleep(1)
                 # Terminated, exit loop.
                 break  # BREAK !!!
-            except Empty as e:
+            except Empty:
                 continue
-            except Exception as e:
-                self.handle_error(e, traceback.format_exc())
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
 
         self.finalize()
 
-    def handle_error(self, exc, tb):
+    def handle_error(self, exc, trace):
         self.stats['err'] += 1
         print('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.component))
-        print(tb)
+        print(trace)

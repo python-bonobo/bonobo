@@ -38,7 +38,7 @@ __all__ = [
     'Bag',
     'Graph',
     'NaiveStrategy',
-    'NotModified',
+    'NOT_MODIFIED',
     'ProcessPoolExecutorStrategy',
     'ThreadPoolExecutorStrategy',
     'head',

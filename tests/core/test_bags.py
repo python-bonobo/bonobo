@@ -1,7 +1,7 @@
 from mock import Mock
 
 from bonobo import Bag
-from bonobo.core.bags import InheritInputFlag
+from bonobo.core.bags import INHERIT_INPUT
 
 args = (
     'foo',
@@ -42,7 +42,7 @@ def test_inherit():
         'a',
         'b', )
     assert bag2.kwargs == {'a': 1, 'b': 2}
-    assert InheritInputFlag in bag2.flags
+    assert INHERIT_INPUT in bag2.flags
 
     assert bag3.args == (
         'a',
