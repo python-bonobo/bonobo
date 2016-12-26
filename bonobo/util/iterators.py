@@ -1,10 +1,10 @@
-""" Iterator utilities """
+""" Iterator utilities. """
 
 
 def force_iterator(mixed):
     """Sudo make me an iterator.
 
-    Deprecated.
+    Deprecated?
 
     :param mixed:
     :return: Iterator, baby.
