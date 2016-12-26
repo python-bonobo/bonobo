@@ -1,5 +1,3 @@
-from operator import attrgetter
-
 import itertools
 
 from bonobo.util.tokens import Token

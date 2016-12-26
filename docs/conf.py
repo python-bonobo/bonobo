@@ -30,7 +30,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Bonobo'
-copyright = '2016, Romain Dorgueil'
+copyright = '2012-2017, Romain Dorgueil'
 author = 'Romain Dorgueil'
 
 # The version info for the project you're documenting, acts as replacement for
