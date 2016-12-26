@@ -8,3 +8,7 @@ python-targets:
 ignore-paths:
   - docs
   - examples
+pep257:
+  disable:
+    - D205
+    - D210

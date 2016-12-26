@@ -1,3 +1,5 @@
+""" Core required libraries. """
+
 from .bags import Bag
 from .graphs import Graph
 from .services import inject, service

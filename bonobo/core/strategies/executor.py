@@ -3,9 +3,7 @@ from concurrent.futures import Executor
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 
-from bonobo.core.bags import Bag
 from bonobo.core.strategies.base import Strategy
-from bonobo.util.tokens import Begin, End
 
 
 class ExecutorStrategy(Strategy):

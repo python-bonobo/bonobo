@@ -6,26 +6,26 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/601.4.
 
 
 def create_profile(use_tor=False):
-    profile = webdriver.FirefoxProfile()
-    profile.set_preference("toolkit.startup.max_resumed_crashes", "-1")
+    _profile = webdriver.FirefoxProfile()
+    _profile.set_preference("toolkit.startup.max_resumed_crashes", "-1")
 
     if use_tor:
         # tor connection
-        profile.set_preference('network.proxy.type', 1)
-        profile.set_preference('network.proxy.socks', '127.0.0.1')
-        profile.set_preference('network.proxy.socks_port', 9050)
+        _profile.set_preference('network.proxy.type', 1)
+        _profile.set_preference('network.proxy.socks', '127.0.0.1')
+        _profile.set_preference('network.proxy.socks_port', 9050)
 
     # user agent
-    profile.set_preference("general.useragent.override", USER_AGENT)
+    _profile.set_preference("general.useragent.override", USER_AGENT)
 
-    return profile
+    return _profile
 
 
 def create_browser(profile):
-    browser = webdriver.Firefox(profile)
-    browser.implicitly_wait(10)
-    browser.set_page_load_timeout(10)
-    return browser
+    _browser = webdriver.Firefox(profile)
+    _browser.implicitly_wait(10)
+    _browser.set_page_load_timeout(10)
+    return _browser
 
 
 @service
