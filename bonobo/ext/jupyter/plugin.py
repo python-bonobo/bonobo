@@ -1,5 +1,6 @@
 from IPython.core.display import display
 
+from bonobo.core.plugins import Plugin
 from bonobo.ext.jupyter.widget import BonoboWidget
 
 

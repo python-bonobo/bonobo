@@ -7,7 +7,6 @@ def _jupyter_nbextension_paths():
 
 
 __all__ = [
-    JupyterOutputPlugin,
-    _jupyter_nbextension_paths,
-    jupyter_run,
+    'JupyterOutputPlugin',
+    'jupyter_run',
 ]
