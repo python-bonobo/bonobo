@@ -18,7 +18,7 @@ Release announcements: http://eepurl.com/csHFKL
     :alt: Coverage
 
 .. image:: https://readthedocs.org/projects/bonobo/badge/?version=latest
-    :target: http://bonobo.readthedocs.org/en/latest/?badge=latest
+    :target: http://docs.bonobo-project.org/
     :alt: Documentation
 
 .. image:: https://img.shields.io/github/downloads/python-bonobo/bonobo/total.svg
