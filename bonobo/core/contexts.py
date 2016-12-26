@@ -67,10 +67,7 @@ class PluginExecutionContext:
             self.handle_error(exc, traceback.format_exc())
 
     def run(self):
-        try:
-            get_initializer(self.plugin)(self)
-        except Exception as exc:
-            print('error in initializer', type(exc), exc)
+        self.initialize()
 
         while self.alive:
             # todo with wrap_errors ....
@@ -82,10 +79,7 @@ class PluginExecutionContext:
 
             sleep(0.25)
 
-        try:
-            get_finalizer(self.plugin)(self)
-        except Exception as exc:
-            print('error in finalizer', type(exc), exc)
+        self.finalize()
 
     def shutdown(self):
         self.alive = False
@@ -251,7 +245,7 @@ class ComponentExecutionContext(WithStatistics):
                 break  # BREAK !!!
             except Empty:
                 continue
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-except
                 self.handle_error(exc, traceback.format_exc())
 
         self.finalize()
