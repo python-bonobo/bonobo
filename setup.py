@@ -16,10 +16,10 @@ except:
     version = 'dev'
 
 setup(
-    description = 'Bonobo',
-    install_requires = ['blessings >=1.6,<1.7', 'psutil >=5.0,<5.1'],
-    license = 'Apache License, Version 2.0',
     name = 'bonobo',
+    description = 'Bonobo',
+    license = 'Apache License, Version 2.0',
+    install_requires = ['blessings >=1.6,<1.7', 'psutil >=5.0,<5.1'],
     version = version,
     long_description = read('README.rst'),
     classifiers = read('classifiers.txt', tolines),
