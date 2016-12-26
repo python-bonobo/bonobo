@@ -10,4 +10,5 @@ ignore-paths:
   - examples
 pep257:
   disable:
+    - D205
     - D210
