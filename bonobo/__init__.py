@@ -19,7 +19,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 """
-
+import os
 import sys
 
 from .core import *
@@ -31,11 +31,8 @@ PY35 = (sys.version_info >= (3, 5))
 assert PY35, 'Python 3.5+ is required to use Bonobo.'
 
 # Version infos
-try:
-    with open('../version.txt') as f:
-        __version__ = f.read().strip()
-except Exception as exc:
-    __version__ = 'dev'
+with open(os.path.realpath(os.path.join(os.path.dirname(__file__), '../version.txt'))) as f:
+    __version__ = f.read().strip()
 
 __all__ = [
     'Bag',
