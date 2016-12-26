@@ -21,7 +21,7 @@ class ExecutionContext:
         for i, component_context in enumerate(self):
             try:
                 component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
-            except KeyError as e:
+            except KeyError:
                 continue
             component_context.input.on_begin = partial(component_context.send, Begin, _control=True)
             component_context.input.on_end = partial(component_context.send, End, _control=True)
@@ -55,23 +55,23 @@ class PluginExecutionContext:
     def run(self):
         try:
             get_initializer(self.plugin)(self)
-        except Exception as e:
-            print('error in initializer', type(e), e)
+        except Exception as exc:
+            print('error in initializer', type(exc), exc)
 
         while self.alive:
             # todo with wrap_errors ....
 
             try:
                 self.plugin.run(self)
-            except Exception as e:
-                print('error', type(e), e)
+            except Exception as exc:
+                print('error', type(exc), exc)
 
             sleep(0.25)
 
         try:
             get_finalizer(self.plugin)(self)
-        except Exception as e:
-            print('error in finalizer', type(e), e)
+        except Exception as exc:
+            print('error in finalizer', type(exc), exc)
 
     def shutdown(self):
         self.alive = False
@@ -193,19 +193,33 @@ class ComponentExecutionContext(WithStatistics):
             while True:
                 try:
                     output = next(outputs)
-                except StopIteration as e:
+                except StopIteration:
                     break
                 self.send(_resolve(input_bag, output))
 
-    def run(self):
-        assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at the '
-                                   'beginning of a run().').format(type(self).__name__, New)
+    def initialize(self):
+        assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at '
+                                   'initialization time.').format(type(self).__name__, New)
 
         self.state = Running
+
         try:
             get_initializer(self.component)(self)
         except Exception as e:
             self.handle_error(e, traceback.format_exc())
+
+    def finalize(self):
+        assert self.state is Running, ('A {} must be in {} state at finalization time.').format(
+            type(self).__name__, Running)
+
+        self.state = Terminated
+        try:
+            get_finalizer(self.component)(self)
+        except Exception as e:
+            self.handle_error(e, traceback.format_exc())
+
+    def run(self):
+        self.initialize()
 
         while True:
             try:
@@ -221,14 +235,7 @@ class ComponentExecutionContext(WithStatistics):
             except Exception as e:
                 self.handle_error(e, traceback.format_exc())
 
-        assert self.state is Running, ('A {} must be in {} state when finalization starts.').format(
-            type(self).__name__, Running)
-
-        self.state = Terminated
-        try:
-            get_finalizer(self.component)(self)
-        except Exception as e:
-            self.handle_error(e, traceback.format_exc())
+        self.finalize()
 
     def handle_error(self, exc, tb):
         self.stats['err'] += 1

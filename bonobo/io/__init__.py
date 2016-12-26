@@ -2,6 +2,4 @@
 
 from .json import *
 
-__all__ = [
-    'to_json',
-]
+__all__ = ['to_json', ]
