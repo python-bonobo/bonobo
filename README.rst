@@ -1,11 +1,11 @@
 bonobo
 ======
 
-modernization of rdc.etl, work in progress.
-python 3.5+ only
+MIGRATION IN PROGRESS FROM RDC.ETL - PYTHON 3.5+
 
 
-Release announcements: http://eepurl.com/csHFKL 
+* Documentation: http://docs.bonobo-project.org/
+* Release announcements: http://eepurl.com/csHFKL
 
 
 .. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=master
@@ -28,3 +28,8 @@ Release announcements: http://eepurl.com/csHFKL
 .. image:: https://img.shields.io/pypi/dm/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Python Package on PyPI
+
+----
+
+Made with ♥ by `Romain Dorgueil <https://twitter.com/rdorgueil>`_ and `contributors <https://github.com/python-bonobo/bonobo/graphs/contributors>`_.
+
