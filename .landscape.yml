@@ -8,6 +8,7 @@ python-targets:
 ignore-paths:
   - docs
   - examples
+  - tests
 pep257:
   disable:
     - D205
