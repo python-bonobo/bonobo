@@ -14,7 +14,7 @@ def read(filename, flt=None):
 
 try:
     version = read('version.txt')
-except:
+except:  # pylint: disable=bare-except
     version = 'dev'
 
 setup(
