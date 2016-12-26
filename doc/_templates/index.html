@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% set title = _('Overview') %}
+{% block body %}
+
+    <h1>{{ _('Welcome to Bonobo\'s Documentation') }}</h1>
+
+    <div style="text-align: center;">
+        <img class="logo" src="{{ pathto('_static/bonobo.png', 1) }}" title="Bonobo"
+             style=" width: 128px; height: 128px;"/>
+    </div>
+
+    <p>
+        {% trans %}
+            Bonobo is a line-by-line data-processing toolkit for python 3.5+ emphasizing simplicity and atomicity of
+            data transformations using a simple directed graph of python callables.
+        {% endtrans %}
+    </p>
+
+    <p>
+        {% trans %}
+            It was originally created as a programmatic ETL (extract transform load) python 2.7+ library called rdc.etl,
+            to process tenth of millions of retail stock informations, and served this purpose for years.
+        {% endtrans %}
+    </p>
+
+    <p>
+        {% trans %}
+            Bonobo is a clean full-rewrite of rdc.etl, for python 3.5+, and is now used for many ETL as well as non-ETL
+            use cases. For examples, it's pretty easy to write selenium based web crawlers, or twitter bots. As long as
+            a use case can be represented as a graph of callables interracting, Bonobo can be used.
+        {% endtrans %}
+    </p>
+
+    <h2>Features</h2>
+
+
+    <ul>
+        <li>
+            {% trans %}
+                <b>10 minutes to get started:</b> Know some python? Writing your first data processor is an affair
+                of minutes.
+            {% endtrans %}
+        </li>
+        <li>
+            {% trans %}
+                <b>Data sources and targets:</b> HTML, JSON, XML, SQL databases, NoSQL databases, HTTP/REST APIs,
+                streaming APIs, python objects...
+            {% endtrans %}
+        </li>
+        <li>
+            {% trans %}
+                <b>Dependency injection:</b> Abstract the transformation dependencies to easily switch data sources and
+                used libraries, allowing to easily test your transformations.
+            {% endtrans %}
+        </li>
+        <li>
+            {% trans %}
+                <b>Plugins:</b> Easily add features to all your transformations by using builtin plugins (Jupyter,
+                Console, ...) or write your own.
+            {% endtrans %}
+        </li>
+    </ul>
+
+
+    <h2 style="margin-bottom: 0">{% trans %}Documentation{% endtrans %}</h2>
+
+    <table class="contentstable">
+        <tr>
+            <td>
+                <p class="biglink"><a class="biglink" href="{{ pathto("tutorial") }}">{% trans %}First steps with
+                    Bonobo{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}overview of basic features{% endtrans %}</span></p>
+            </td>
+            <td>
+                {%- if hasdoc('search') %}
+                    <p class="biglink"><a class="biglink" href="{{ pathto("search") }}">{% trans %}
+                        Search{% endtrans %}</a><br/>
+                        <span class="linkdescr">{% trans %}search the documentation{% endtrans %}</span></p>{%- endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class="biglink"><a class="biglink" href="{{ pathto("contents") }}">{% trans %}
+                    Guides{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}for a complete overview{% endtrans %}</span>
+                </p>
+            </td>
+            <td>
+                {%- if hasdoc('genindex') %}
+                    <p class="biglink"><a class="biglink" href="{{ pathto("genindex") }}">{% trans %}References{% endtrans %}</a>
+                        <br/>
+                        <span class="linkdescr">{% trans %}all functions, classes, terms{% endtrans %}</span>
+                    </p>{%- endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class="biglink"><a class="biglink" href="{{ pathto("changes") }}">{% trans %}
+                    Cookbook{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}examples and recipes{% endtrans %}</span></p>
+            </td>
+            <td>
+                <p class="biglink"><a class="biglink" href="{{ pathto("changes") }}">{% trans %}
+                    Contribute{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}contributor guide{% endtrans %}</span></p>
+            </td>
+        </tr>
+    </table>
+
+    <p>{% trans %}
+        You can also download PDF/EPUB versions of the Bonobo documentation:
+        <a href="http://readthedocs.org/projects/bonobo/downloads/pdf/stable/">PDF version</a>,
+        <a href="http://readthedocs.org/projects/bonobo/downloads/epub/stable/">EPUB version</a>.
+    {% endtrans %}
+    </p>
+
+{% endblock %}
