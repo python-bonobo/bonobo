@@ -10,7 +10,7 @@ class ContextMock:
 
 def test_write_json_to_file(tmpdir):
     file = tmpdir.join('output.json')
-    json_writer = to_json(file)
+    json_writer = to_json(str(file))
     context = ContextMock()
 
     get_initializer(json_writer)(context)
@@ -30,7 +30,7 @@ def test_write_json_to_file(tmpdir):
 
 def test_write_json_without_initializer_should_not_work(tmpdir):
     file = tmpdir.join('output.json')
-    json_writer = to_json(file)
+    json_writer = to_json(str(file))
 
     context = ContextMock()
     with pytest.raises(AttributeError):
