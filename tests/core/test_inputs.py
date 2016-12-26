@@ -20,7 +20,7 @@ import pytest
 
 from bonobo.core.errors import InactiveWritableError, InactiveReadableError
 from bonobo.core.inputs import Input
-from bonobo.util.tokens import Begin, End
+from bonobo.util.tokens import BEGIN, END
 
 
 def test_input_runlevels():
@@ -32,15 +32,15 @@ def test_input_runlevels():
         q.put('hello, unborn queue.')
 
     # Begin
-    q.put(Begin)
+    q.put(BEGIN)
     assert q.alive and q._runlevel == 1
     q.put('foo')
 
     # Second Begin
-    q.put(Begin)
+    q.put(BEGIN)
     assert q.alive and q._runlevel == 2
     q.put('bar')
-    q.put(End)
+    q.put(END)
 
     # FIFO
     assert q.get() == 'foo'
@@ -56,7 +56,7 @@ def test_input_runlevels():
     q.put('baz')
 
     # Now kill the queue...
-    q.put(End)
+    q.put(END)
     with pytest.raises(InactiveWritableError):
         q.put('foo')
 

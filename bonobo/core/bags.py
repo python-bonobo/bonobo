@@ -6,7 +6,7 @@ from bonobo.util.tokens import Token
 
 _get_args = attrgetter('args')
 
-InheritInputFlag = Token('InheritInputFlag')
+INHERIT_INPUT = Token('InheritInput')
 
 
 class Bag:
@@ -37,8 +37,8 @@ class Bag:
     def flags(self):
         return self._flags
 
-    def apply(self, f, *args, **kwargs):
-        return f(*args, *self.args, **kwargs, **self.kwargs)
+    def apply(self, func, *args, **kwargs):
+        return func(*args, *self.args, **kwargs, **self.kwargs)
 
     def extend(self, *args, **kwargs):
         return type(self)(*args, _parent=self, **kwargs)
@@ -48,7 +48,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(InheritInputFlag, ), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __repr__(self):
         return '<{} ({})>'.format(

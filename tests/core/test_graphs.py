@@ -1,7 +1,7 @@
 import pytest
 
 from bonobo.core.graphs import Graph
-from bonobo.util.tokens import Begin
+from bonobo.util.tokens import BEGIN
 
 identity = lambda x: x
 
@@ -10,7 +10,7 @@ def test_graph_outputs_of():
     g = Graph()
 
     # default graph only node
-    assert len(g.outputs_of(Begin)) == 0
+    assert len(g.outputs_of(BEGIN)) == 0
 
     # unexisting node
     with pytest.raises(KeyError):
@@ -40,4 +40,4 @@ def test_graph_add_chain():
 
     g.add_chain(identity, identity, identity)
     assert len(g.components) == 3
-    assert len(g.outputs_of(Begin)) == 1
+    assert len(g.outputs_of(BEGIN)) == 1

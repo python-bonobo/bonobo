@@ -3,12 +3,12 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
-from bonobo.core.bags import Bag, InheritInputFlag
+from bonobo.core.bags import Bag, INHERIT_INPUT
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.stats import WithStatistics
 from bonobo.util.lifecycle import get_initializer, get_finalizer
-from bonobo.util.tokens import Begin, End, New, Running, Terminated, NotModified
+from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
 
 
 class ExecutionContext:
@@ -23,8 +23,8 @@ class ExecutionContext:
                 component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             except KeyError:
                 continue
-            component_context.input.on_begin = partial(component_context.send, Begin, _control=True)
-            component_context.input.on_end = partial(component_context.send, End, _control=True)
+            component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
+            component_context.input.on_end = partial(component_context.send, END, _control=True)
 
     def __getitem__(self, item):
         return self.components[item]
@@ -36,10 +36,10 @@ class ExecutionContext:
         yield from self.components
 
     def impulse(self):
-        for i in self.graph.outputs_of(Begin):
-            self[i].recv(Begin)
+        for i in self.graph.outputs_of(BEGIN):
+            self[i].recv(BEGIN)
             self[i].recv(Bag())
-            self[i].recv(End)
+            self[i].recv(END)
 
     @property
     def running(self):
@@ -85,13 +85,13 @@ def _iter(x):
 
 def _resolve(input_bag, output):
     # NotModified means to send the input unmodified to output.
-    if output is NotModified:
+    if output is NOT_MODIFIED:
         return input_bag
 
     # If it does not look like a bag, let's create one for easier manipulation
     if hasattr(output, 'apply'):
         # Already a bag? Check if we need to set parent.
-        if InheritInputFlag in output.flags:
+        if INHERIT_INPUT in output.flags:
             output.set_parent(input_bag)
     else:
         # Not a bag? Let's encapsulate it.
@@ -118,7 +118,7 @@ class ComponentExecutionContext(WithStatistics):
         self.component = component
         self.input = Input()
         self.outputs = []
-        self.state = New
+        self.state = NEW
         self.stats = {
             'in': 0,
             'out': 0,
@@ -198,10 +198,10 @@ class ComponentExecutionContext(WithStatistics):
                 self.send(_resolve(input_bag, output))
 
     def initialize(self):
-        assert self.state is New, ('A {} can only be run once, and thus is expected to be in {} state at '
-                                   'initialization time.').format(type(self).__name__, New)
+        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
+                                   'initialization time.').format(type(self).__name__, NEW)
 
-        self.state = Running
+        self.state = RUNNING
 
         try:
             get_initializer(self.component)(self)
@@ -209,10 +209,10 @@ class ComponentExecutionContext(WithStatistics):
             self.handle_error(e, traceback.format_exc())
 
     def finalize(self):
-        assert self.state is Running, ('A {} must be in {} state at finalization time.').format(
-            type(self).__name__, Running)
+        assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
+            type(self).__name__, RUNNING)
 
-        self.state = Terminated
+        self.state = TERMINATED
         try:
             get_finalizer(self.component)(self)
         except Exception as e:

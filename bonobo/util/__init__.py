@@ -3,10 +3,10 @@
 import functools
 import pprint
 
-from .tokens import NotModified
+from .tokens import NOT_MODIFIED
 
 __all__ = [
-    'NotModified',
+    'NOT_MODIFIED',
     'head',
     'log',
     'noop',

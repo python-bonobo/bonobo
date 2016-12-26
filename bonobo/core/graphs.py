@@ -1,4 +1,4 @@
-from bonobo.util.tokens import Begin
+from bonobo.util.tokens import BEGIN
 
 
 class Graph:
@@ -8,7 +8,7 @@ class Graph:
 
     def __init__(self):
         self.components = []
-        self.graph = {Begin: set()}
+        self.graph = {BEGIN: set()}
 
     def outputs_of(self, idx, create=False):
         if create and not idx in self.graph:
@@ -20,7 +20,7 @@ class Graph:
         self.components.append(c)
         return i
 
-    def add_chain(self, *components, _input=Begin):
+    def add_chain(self, *components, _input=BEGIN):
         for component in components:
             _next = self.add_component(component)
             self.outputs_of(_input, create=True).add(_next)
