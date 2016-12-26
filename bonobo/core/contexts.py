@@ -52,6 +52,18 @@ class PluginExecutionContext:
         self.plugin = plugin
         self.alive = True
 
+    def initialize(self):
+        try:
+            get_initializer(self.plugin)(self)
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
+
+    def finalize(self):
+        try:
+            get_finalizer(self.plugin)(self)
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
+
     def run(self):
         try:
             get_initializer(self.plugin)(self)
@@ -76,11 +88,15 @@ class PluginExecutionContext:
     def shutdown(self):
         self.alive = False
 
+    def handle_error(self, exc, trace):
+        print('\U0001F4A3 {} in plugin {}'.format(type(exc).__name__, self.plugin))
+        print(trace)
 
-def _iter(x):
-    if isinstance(x, (dict, list, str)):
-        raise TypeError(type(x).__name__)
-    return iter(x)
+
+def _iter(mixed):
+    if isinstance(mixed, (dict, list, str)):
+        raise TypeError(type(mixed).__name__)
+    return iter(mixed)
 
 
 def _resolve(input_bag, output):
@@ -200,23 +216,22 @@ class ComponentExecutionContext(WithStatistics):
     def initialize(self):
         assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
                                    'initialization time.').format(type(self).__name__, NEW)
-
         self.state = RUNNING
 
         try:
             get_initializer(self.component)(self)
-        except Exception as e:
-            self.handle_error(e, traceback.format_exc())
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
 
     def finalize(self):
         assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
             type(self).__name__, RUNNING)
-
         self.state = TERMINATED
+
         try:
             get_finalizer(self.component)(self)
-        except Exception as e:
-            self.handle_error(e, traceback.format_exc())
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
 
     def run(self):
         self.initialize()
@@ -237,7 +252,7 @@ class ComponentExecutionContext(WithStatistics):
 
         self.finalize()
 
-    def handle_error(self, exc, tb):
+    def handle_error(self, exc, trace):
         self.stats['err'] += 1
         print('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.component))
-        print(tb)
+        print(trace)
