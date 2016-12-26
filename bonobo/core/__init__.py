@@ -1,7 +1,4 @@
-""" bonobo.core
-    ===========
-
-    Core required libraries.
+""" Core required libraries.
 """
 
 from .bags import Bag

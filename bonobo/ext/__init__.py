@@ -1,5 +1,2 @@
-""" bonobo.ext
-    ==========
-
-    Extensions, not required.
+""" Extensions, not required.
 """

@@ -1,5 +1,4 @@
-""" Bonobo
-    ======
+""" Bonobo data-processing toolkit.
 
     Bonobo is a line-by-line data-processing toolkit for python 3.5+ emphasizing simplicity and atomicity of data
     transformations using a simple directed graph of python callables.

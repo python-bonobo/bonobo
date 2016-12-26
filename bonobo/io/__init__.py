@@ -1,7 +1,4 @@
-""" bonobo.io
-    =========
-
-    Readers and writers for common file formats.
+""" Readers and writers for common file formats.
 """
 
 from .json import *

@@ -1,7 +1,4 @@
-""" bonobo.util
-    ===========
-
-    Various utilities.
+""" Various simple utilities.
 """
 
 import functools
