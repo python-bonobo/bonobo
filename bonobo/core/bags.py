@@ -4,8 +4,6 @@ import itertools
 
 from bonobo.util.tokens import Token
 
-_get_args = attrgetter('args')
-
 INHERIT_INPUT = Token('InheritInput')
 
 
