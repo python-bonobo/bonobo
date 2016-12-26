@@ -1,5 +1,4 @@
-""" Various simple utilities.
-"""
+""" Various simple utilities. """
 
 import functools
 import pprint

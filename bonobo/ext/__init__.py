@@ -1,2 +1,1 @@
-""" Extensions, not required.
-"""
+""" Extensions, not required. """
