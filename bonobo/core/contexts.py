@@ -230,10 +230,10 @@ class ComponentExecutionContext(WithStatistics):
                 sleep(1)
                 # Terminated, exit loop.
                 break  # BREAK !!!
-            except Empty as e:
+            except Empty:
                 continue
-            except Exception as e:
-                self.handle_error(e, traceback.format_exc())
+            except Exception as exc:
+                self.handle_error(exc, traceback.format_exc())
 
         self.finalize()
 
