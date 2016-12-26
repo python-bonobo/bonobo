@@ -1,28 +1,26 @@
 import time
 from random import randint
 
+from bonobo import Bag
 from bonobo.core.graphs import Graph
 from bonobo.core.strategies.executor import ThreadPoolExecutorStrategy
 from bonobo.ext.console import ConsoleOutputPlugin
 
 
 def extract():
-    yield {'topic': 'foo'}
-    yield {'topic': 'bar'}
-    yield {'topic': 'baz'}
+    yield Bag(topic='foo')
+    yield Bag(topic='bar')
+    yield Bag(topic='baz')
 
 
-def transform(row):
+def transform(topic: str):
     wait = randint(0, 1)
     time.sleep(wait)
-    return {
-        'topic': row['topic'].title(),
-        'wait': wait,
-    }
+    return Bag.inherit(title=topic.title(), wait=wait)
 
 
-def load(s):
-    print(s)
+def load(topic: str, title: str, wait: int):
+    print('{} ({}) wait={}'.format(title, topic, wait))
 
 
 Strategy = ThreadPoolExecutorStrategy

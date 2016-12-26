@@ -156,9 +156,13 @@ class ComponentExecutionContext(WithStatistics):
         self.input.put(value)
 
     def get(self):
-        # todo XXX if timeout, in stat is erroneous
+        """
+        Get from the queue first, then increment stats, so if Queue raise Timeout or Empty, stat won't be changed.
+
+        """
+        row = self.input.get(timeout=1)
         self.stats['in'] += 1
-        return self.input.get(timeout=1)
+        return row
 
     def _call(self, bag):
         # todo add timer
