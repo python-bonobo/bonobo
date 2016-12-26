@@ -11,5 +11,5 @@ assert PY35, 'Python 3.5+ is required to use Bonobo.'
 try:
     with open('../version.txt') as f:
         __version__ = f.read().strip()
-except:
+except Exception as e:
     __version__ = 'dev'
