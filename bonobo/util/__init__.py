@@ -4,12 +4,16 @@ import functools
 import pprint
 
 from .tokens import NOT_MODIFIED
+from .helpers import run, console_run, jupyter_run
 
 __all__ = [
     'NOT_MODIFIED',
+    'console_run',
     'head',
+    'jupyter_run',
     'log',
     'noop',
+    'run',
     'tee',
 ]
 

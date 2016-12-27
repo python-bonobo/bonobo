@@ -128,7 +128,7 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
 
     @property
     def name(self):
-        return self.component.__name__
+        return getattr(self.component, '__name__', getattr(type(self.component), '__name__', repr(self.component)))
 
     def __init__(self, component, parent):
         self.parent = parent

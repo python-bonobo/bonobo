@@ -1,22 +1,20 @@
 {% extends "layout.html" %}
-{% set title = _('Overview') %}
+{% set title = _('Bonobo — Data processing for humans') %}
 {% block body %}
 
-    <div style="border: 2px solid red; font-weight: bold;">
-        Migration in progress, things may be broken for now. Please give us some time to finish painting the walls.
+    <div style="border: 2px solid red; font-weight: bold; margin: 1em; padding: 1em">
+        Rewrite in progress, things may be broken for now. Please give us some time to finish painting the walls.
     </div>
 
-    <h1>{{ _('Welcome to Bonobo\'s Documentation') }}</h1>
-
-    <div style="text-align: center;">
-        <img class="logo" src="{{ pathto('_static/bonobo.png', 1) }}" title="Bonobo"
+    <h1 style="text-align: center">
+        <img class="logo" src="{{ pathto('_static/bonobo.png', 1) }}" title="Bonobo" alt="Bonobo"
              style=" width: 128px; height: 128px;"/>
-    </div>
+    </h1>
 
     <p>
         {% trans %}
-            Bonobo is a line-by-line data-processing toolkit for python 3.5+ emphasizing simplicity and atomicity of
-            data transformations using a simple directed graph of python callables.
+            <strong>Bonobo</strong> is a line-by-line data-processing toolkit for python 3.5+ emphasizing simple and
+            atomic data transformations defined using a directed graph of plain old python callables.
         {% endtrans %}
     </p>
 
@@ -71,9 +69,8 @@
     <table class="contentstable">
         <tr>
             <td>
-                <p class="biglink"><a class="biglink" href="{{ pathto("tutorial") }}">{% trans %}First steps with
-                    Bonobo{% endtrans %}</a><br/>
-                    <span class="linkdescr">{% trans %}overview of basic features{% endtrans %}</span></p>
+                <p class="biglink"><a class="biglink" href="{{ pathto("tutorial/basics") }}">{% trans %}First steps{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}quick overview of basic features{% endtrans %}</span></p>
             </td>
             <td>
                 {%- if hasdoc('search') %}

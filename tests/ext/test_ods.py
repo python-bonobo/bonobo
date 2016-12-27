@@ -1,6 +1,6 @@
 from mock import patch
 
-from bonobo.ext.ods import extract_ods
+from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 
 class ResponseMock:
@@ -17,7 +17,7 @@ class ResponseMock:
 
 
 def test_read_from_opendatasoft_api():
-    extract = extract_ods('http://example.com/', 'test-a-set')
+    extract = from_opendatasoft_api('http://example.com/', 'test-a-set')
     with patch(
             'requests.get', return_value=ResponseMock([
                 {
