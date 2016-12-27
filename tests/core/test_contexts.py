@@ -1,6 +1,7 @@
-from bonobo import Graph, NaiveStrategy
+from bonobo import Graph, NaiveStrategy, Bag
 from bonobo.core.contexts import ExecutionContext
 from bonobo.util.lifecycle import with_context
+from bonobo.util.tokens import BEGIN, END
 
 
 def generate_integers():
@@ -28,7 +29,7 @@ def test_empty_execution_context():
     assert not len(ctx.components)
     assert not len(ctx.plugins)
 
-    assert not ctx.running
+    assert not ctx.alive
 
 
 def test_execution():
@@ -52,8 +53,8 @@ def test_simple_execution_context():
     for i, component in enumerate(chain):
         assert ctx[i].component is component
 
-    assert not ctx.running
+    assert not ctx.alive
 
-    ctx.impulse()
+    ctx.recv(BEGIN, Bag(), END)
 
-    assert ctx.running
+    assert ctx.alive

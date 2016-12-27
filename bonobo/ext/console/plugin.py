@@ -76,7 +76,7 @@ class ConsoleOutputPlugin(Plugin):
         t_cnt = len(context)
 
         for i, component in enumerate(context):
-            if component.running:
+            if component.alive:
                 _line = ''.join((
                     t.black('({})'.format(i + 1)),
                     ' ',

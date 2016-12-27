@@ -4,6 +4,9 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 
 from bonobo.core.strategies.base import Strategy
+from bonobo.util.tokens import BEGIN, END
+
+from ..bags import Bag
 
 
 class ExecutorStrategy(Strategy):
@@ -16,7 +19,7 @@ class ExecutorStrategy(Strategy):
 
     def execute(self, graph, *args, plugins=None, **kwargs):
         context = self.create_context(graph, plugins=plugins)
-        context.impulse()
+        context.recv(BEGIN, Bag(), END)
 
         executor = self.executor_factory()
 
@@ -28,7 +31,7 @@ class ExecutorStrategy(Strategy):
         for component_context in context.components:
             futures.append(executor.submit(component_context.run))
 
-        while context.running:
+        while context.alive:
             time.sleep(0.2)
 
         for plugin_context in context.plugins:
