@@ -33,8 +33,8 @@ class Bag:
     def flags(self):
         return self._flags
 
-    def apply(self, func, *args, **kwargs):
-        return func(*args, *self.args, **kwargs, **self.kwargs)
+    def apply(self, func_or_iter, *args, **kwargs):
+        return func_or_iter(*args, *self.args, **kwargs, **self.kwargs)
 
     def extend(self, *args, **kwargs):
         return type(self)(*args, _parent=self, **kwargs)

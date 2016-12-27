@@ -3,11 +3,18 @@ from urllib.parse import urlencode
 import requests  # todo: make this a service so we can substitute it ?
 
 
-def extract_ods(url, dataset, rows=100, **kwargs):
+def from_opendatasoft_api(dataset=None,
+                          endpoint='{scheme}://{netloc}{path}',
+                          scheme='https',
+                          netloc='data.opendatasoft.com',
+                          path='/api/records/1.0/search/',
+                          rows=100,
+                          **kwargs):
+    path = path if path.startswith('/') else '/' + path
     params = (
         ('dataset', dataset),
         ('rows', rows), ) + tuple(sorted(kwargs.items()))
-    base_url = url + '?' + urlencode(params)
+    base_url = endpoint.format(scheme=scheme, netloc=netloc, path=path) + '?' + urlencode(params)
 
     def _extract_ods():
         nonlocal base_url, rows

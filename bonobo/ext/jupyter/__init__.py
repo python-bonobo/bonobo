@@ -1,4 +1,4 @@
-from .helpers import jupyter_run
+from bonobo.util.helpers import jupyter_run
 from .plugin import JupyterOutputPlugin
 
 
@@ -6,7 +6,4 @@ def _jupyter_nbextension_paths():
     return [{'section': 'notebook', 'src': 'static', 'dest': 'bonobo-jupyter', 'require': 'bonobo-jupyter/extension'}]
 
 
-__all__ = [
-    'JupyterOutputPlugin',
-    'jupyter_run',
-]
+__all__ = ['JupyterOutputPlugin', ]

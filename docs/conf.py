@@ -12,8 +12,14 @@ import bonobo
 # -- General configuration ------------------------------------------------
 
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage',
-    'sphinx.ext.ifconfig', 'sphinx.ext.viewcode'
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.graphviz',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -76,13 +82,23 @@ html_theme_options = {
 }
 
 html_sidebars = {
-    '**': [
+    'index': [
         'sidebarlogo.html',
+        'navigation.html',
         'localtoc.html',
-        'relations.html',
+        'sidebarintro.html',
+        'sourcelink.html',
         'searchbox.html',
         'sidebarinfos.html',
+    ],
+    '**': [
+        'sidebarlogo.html',
+        'navigation.html',
+        'localtoc.html',
+        'relations.html',
         'sourcelink.html',
+        'searchbox.html',
+        'sidebarinfos.html',
     ]
 }
 
@@ -94,6 +110,8 @@ html_additional_pages = {'index': 'index.html'}
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_show_sphinx = False
+
+graphviz_output_format = 'svg'
 
 # -- Options for HTMLHelp output ------------------------------------------
 

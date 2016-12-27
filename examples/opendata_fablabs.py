@@ -1,16 +1,17 @@
 import json
 
 from blessings import Terminal
-from pycountry import countries
 
-from bonobo.ext.console import console_run
-from bonobo.ext.ods import extract_ods
-from bonobo.util import tee
-from bonobo.io.json import to_json
+from bonobo import console_run, tee, JsonFileWriter
+from bonobo.ext.opendatasoft import from_opendatasoft_api
 
-DATASET = 'fablabs-in-the-world'
-SEARCH_URL = 'https://datanova.laposte.fr/api/records/1.0/search/'
-URL = SEARCH_URL + '?dataset=' + DATASET
+try:
+    import pycountry
+except ImportError as exc:
+    raise ImportError('You must install package "pycountry" to run this example.') from exc
+
+API_DATASET = 'fablabs-in-the-world'
+API_NETLOC = 'datanova.laposte.fr'
 ROWS = 100
 
 t = Terminal()
@@ -25,7 +26,7 @@ def normalize(row):
         **
         row,
         'links': list(filter(None, map(_getlink, json.loads(row.get('links'))))),
-        'country': countries.get(alpha_2=row.get('country_code', '').upper()).name,
+        'country': pycountry.countries.get(alpha_2=row.get('country_code', '').upper()).name,
     }
     return result
 
@@ -47,15 +48,15 @@ def display(row):
     print('  - {}: {address}'.format(t.blue('address'), address=', '.join(address)))
     print('  - {}: {links}'.format(t.blue('links'), links=', '.join(row['links'])))
     print('  - {}: {geometry}'.format(t.blue('geometry'), **row))
-    print('  - {}: {source}'.format(t.blue('source'), source='datanova/' + DATASET))
+    print('  - {}: {source}'.format(t.blue('source'), source='datanova/' + API_DATASET))
 
 
 if __name__ == '__main__':
     console_run(
-        extract_ods(
-            SEARCH_URL, DATASET, timezone='Europe/Paris'),
+        from_opendatasoft_api(
+            API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
         normalize,
         filter_france,
         tee(display),
-        to_json('fablabs.json'),
+        JsonFileWriter('fablabs.json'),
         output=True, )

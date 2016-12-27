@@ -6,9 +6,10 @@ class Graph:
     Represents a coherent directed acyclic graph (DAG) of components.
     """
 
-    def __init__(self):
+    def __init__(self, *chain):
         self.components = []
         self.graph = {BEGIN: set()}
+        self.add_chain(*chain)
 
     def outputs_of(self, idx, create=False):
         if create and not idx in self.graph:

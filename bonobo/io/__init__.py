@@ -1,5 +1,9 @@
 """ Readers and writers for common file formats. """
 
-from .json import *
+from .file import FileWriter
+from .json import JsonFileWriter
 
-__all__ = ['to_json', ]
+__all__ = [
+    'FileWriter',
+    'JsonFileWriter',
+]

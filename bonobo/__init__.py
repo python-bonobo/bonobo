@@ -36,16 +36,20 @@ with open(os.path.realpath(os.path.join(os.path.dirname(__file__), '../version.t
 
 __all__ = [
     'Bag',
+    'FileWriter',
     'Graph',
-    'NaiveStrategy',
+    'JsonFileWriter',
     'NOT_MODIFIED',
+    'NaiveStrategy',
     'ProcessPoolExecutorStrategy',
     'ThreadPoolExecutorStrategy',
+    'console_run',
     'head',
     'inject',
+    'jupyter_run',
     'log',
     'noop',
+    'run',
     'service',
     'tee',
-    'to_json',
 ]

@@ -3,9 +3,11 @@ Bonobo
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   install
+   tutorial/index
+   guide/index
+   reference/index
+   genindex
+   modindex
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
