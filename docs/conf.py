@@ -4,7 +4,7 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('_themes'))
 
 import bonobo
@@ -82,13 +82,23 @@ html_theme_options = {
 }
 
 html_sidebars = {
-    '**': [
+    'index': [
         'sidebarlogo.html',
+        'navigation.html',
         'localtoc.html',
-        'relations.html',
+        'sidebarintro.html',
+        'sourcelink.html',
         'searchbox.html',
         'sidebarinfos.html',
+    ],
+    '**': [
+        'sidebarlogo.html',
+        'navigation.html',
+        'localtoc.html',
+        'relations.html',
         'sourcelink.html',
+        'searchbox.html',
+        'sidebarinfos.html',
     ]
 }
 

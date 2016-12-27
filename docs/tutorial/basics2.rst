@@ -1,5 +1,5 @@
-First steps - Working with files
-================================
+Working with files
+==================
 
 Bonobo would not be of any use if the aim was to uppercase small lists of strings. In fact, Bonobo should not be used
 if you don't expect any gain from parralelization of tasks.
