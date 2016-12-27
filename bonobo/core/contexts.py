@@ -35,95 +35,100 @@ class ExecutionContext:
     def __iter__(self):
         yield from self.components
 
-    def impulse(self):
+    def recv(self, *messages):
+        """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
+        our graph."""
+
         for i in self.graph.outputs_of(BEGIN):
-            self[i].recv(BEGIN)
-            self[i].recv(Bag())
-            self[i].recv(END)
+            for message in messages:
+                self[i].recv(message)
 
     @property
-    def running(self):
-        return any(component.running for component in self.components)
+    def alive(self):
+        return any(component.alive for component in self.components)
 
 
-class PluginExecutionContext:
-    def __init__(self, plugin, parent):
-        self.parent = parent
-        self.plugin = plugin
-        self.alive = True
+class AbstractLoopContext:
+    alive = True
+    PERIOD = 0.25
+
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+
+    def run(self):
+        self.initialize()
+        self.loop()
+        self.finalize()
 
     def initialize(self):
         # pylint: disable=broad-except
         try:
-            get_initializer(self.plugin)(self)
+            get_initializer(self.wrapped)(self)
         except Exception as exc:
             self.handle_error(exc, traceback.format_exc())
+
+    def loop(self):
+        """Generic loop. A bit boring. """
+        while self.alive:
+            self._loop()
+            sleep(self.PERIOD)
+
+    def _loop(self):
+        """
+        TODO xxx this is a step, not a loop
+        """
+        raise NotImplementedError('Abstract.')
 
     def finalize(self):
+        """Generic finalizer. """
         # pylint: disable=broad-except
         try:
-            get_finalizer(self.plugin)(self)
+            get_finalizer(self.wrapped)(self)
         except Exception as exc:
             self.handle_error(exc, traceback.format_exc())
 
-    def run(self):
-        self.initialize()
+    def handle_error(self, exc, trace):
+        """
+        Error handler. Whatever happens in a plugin or component, if it looks like an exception, taste like an exception
+        or somehow make me think it is an exception, I'll handle it.
 
-        while self.alive:
-            # todo with wrap_errors ....
+        :param exc: the culprit
+        :param trace: Hercule Poirot's logbook.
+        :return: to hell
+        """
+        print('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))
+        print(trace)
 
-            try:
-                self.plugin.run(self)
-            except Exception as exc:  # pylint: disable=broad-except
-                self.handle_error(exc, traceback.format_exc())
 
-            sleep(0.25)
-
-        self.finalize()
+class PluginExecutionContext(AbstractLoopContext):
+    def __init__(self, plugin, parent):
+        self.plugin = plugin
+        self.parent = parent
+        super().__init__(self.plugin)
 
     def shutdown(self):
         self.alive = False
 
-    def handle_error(self, exc, trace):
-        print('\U0001F4A3 {} in plugin {}'.format(type(exc).__name__, self.plugin))
-        print(trace)
+    def _loop(self):
+        try:
+            self.wrapped.run(self)
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
 
 
-def _iter(mixed):
-    if isinstance(mixed, (dict, list, str)):
-        raise TypeError(type(mixed).__name__)
-    return iter(mixed)
-
-
-def _resolve(input_bag, output):
-    # NotModified means to send the input unmodified to output.
-    if output is NOT_MODIFIED:
-        return input_bag
-
-    # If it does not look like a bag, let's create one for easier manipulation
-    if hasattr(output, 'apply'):
-        # Already a bag? Check if we need to set parent.
-        if INHERIT_INPUT in output.flags:
-            output.set_parent(input_bag)
-    else:
-        # Not a bag? Let's encapsulate it.
-        output = Bag(output)
-
-    return output
-
-
-class ComponentExecutionContext(WithStatistics):
+class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
     """
     todo: make the counter dependant of parent context?
     """
 
     @property
-    def name(self):
-        return self.component.__name__
+    def alive(self):
+        """todo check if this is right, and where it is used"""
+        return self.input.alive
 
     @property
-    def running(self):
-        return self.input.alive
+    def name(self):
+        return self.component.__name__
 
     def __init__(self, component, parent):
         self.parent = parent
@@ -139,9 +144,11 @@ class ComponentExecutionContext(WithStatistics):
             'write': 0,
         }
 
+        super().__init__(self.component)
+
     def __repr__(self):
         """Adds "alive" information to the transform representation."""
-        return ('+' if self.running else '-') + ' ' + self.name + ' ' + self.get_stats_as_string()
+        return ('+' if self.alive else '-') + ' ' + self.name + ' ' + self.get_stats_as_string()
 
     def get_stats(self, *args, **kwargs):
         return (
@@ -155,24 +162,33 @@ class ComponentExecutionContext(WithStatistics):
                 'err',
                 self.stats['err'], ), )
 
-    def impulse(self):
-        self.input.put(None)
+    def recv(self, *messages):
+        """
+        Push a message list to this context's input queue.
+
+        :param mixed value: message
+        """
+        for message in messages:
+            self.input.put(message)
 
     def send(self, value, _control=False):
+        """
+        Sends a message to all of this context's outputs.
+
+        :param mixed value: message
+        :param _control: if true, won't count in statistics.
+        """
         if not _control:
             self.stats['out'] += 1
         for output in self.outputs:
             output.put(value)
-
-    def recv(self, value):
-        self.input.put(value)
 
     def get(self):
         """
         Get from the queue first, then increment stats, so if Queue raise Timeout or Empty, stat won't be changed.
 
         """
-        row = self.input.get(timeout=1)
+        row = self.input.get(timeout=self.PERIOD)
         self.stats['in'] += 1
         return row
 
@@ -181,6 +197,27 @@ class ComponentExecutionContext(WithStatistics):
         if getattr(self.component, '_with_context', False):
             return bag.apply(self.component, self)
         return bag.apply(self.component)
+
+    def initialize(self):
+        # pylint: disable=broad-except
+        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
+                                   'initialization time.').format(type(self).__name__, NEW)
+        self.state = RUNNING
+        super().initialize()
+
+    def loop(self):
+        while True:
+            try:
+                self.step()
+            except KeyboardInterrupt:
+                raise
+            except InactiveReadableError:
+                break
+            except Empty:
+                sleep(self.PERIOD)
+                continue
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
 
     def step(self):
         # Pull data from the first available input channel.
@@ -209,48 +246,33 @@ class ComponentExecutionContext(WithStatistics):
                     break
                 self.send(_resolve(input_bag, output))
 
-    def initialize(self):
-        # pylint: disable=broad-except
-        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
-                                   'initialization time.').format(type(self).__name__, NEW)
-        self.state = RUNNING
-
-        try:
-            get_initializer(self.component)(self)
-        except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
-
     def finalize(self):
         # pylint: disable=broad-except
         assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
             type(self).__name__, RUNNING)
         self.state = TERMINATED
 
-        try:
-            get_finalizer(self.component)(self)
-        except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
+        super().finalize()
 
-    def run(self):
-        self.initialize()
 
-        while True:
-            try:
-                self.step()
-            except KeyboardInterrupt:
-                raise
-            except InactiveReadableError:
-                sleep(1)
-                # Terminated, exit loop.
-                break  # BREAK !!!
-            except Empty:
-                continue
-            except Exception as exc:  # pylint: disable=broad-except
-                self.handle_error(exc, traceback.format_exc())
+def _iter(mixed):
+    if isinstance(mixed, (dict, list, str)):
+        raise TypeError(type(mixed).__name__)
+    return iter(mixed)
 
-        self.finalize()
 
-    def handle_error(self, exc, trace):
-        self.stats['err'] += 1
-        print('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.component))
-        print(trace)
+def _resolve(input_bag, output):
+    # NotModified means to send the input unmodified to output.
+    if output is NOT_MODIFIED:
+        return input_bag
+
+    # If it does not look like a bag, let's create one for easier manipulation
+    if hasattr(output, 'apply'):
+        # Already a bag? Check if we need to set parent.
+        if INHERIT_INPUT in output.flags:
+            output.set_parent(input_bag)
+    else:
+        # Not a bag? Let's encapsulate it.
+        output = Bag(output)
+
+    return output

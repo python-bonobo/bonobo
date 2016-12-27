@@ -1,21 +1,19 @@
 import pytest
 
-from bonobo import to_json
-from bonobo.util.lifecycle import get_initializer, get_finalizer
-
-
-class ContextMock:
-    pass
+from bonobo import to_json, Bag
+from bonobo.core.contexts import ComponentExecutionContext
+from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_json_to_file(tmpdir):
     file = tmpdir.join('output.json')
     json_writer = to_json(str(file))
-    context = ContextMock()
+    context = ComponentExecutionContext(json_writer, None)
 
-    get_initializer(json_writer)(context)
-    json_writer(context, {'foo': 'bar'})
-    get_finalizer(json_writer)(context)
+    context.initialize()
+    context.recv(BEGIN, Bag({'foo': 'bar'}), END)
+    context.step()
+    context.finalize()
 
     assert file.read() == '''[
 {"foo": "bar"}
@@ -32,6 +30,6 @@ def test_write_json_without_initializer_should_not_work(tmpdir):
     file = tmpdir.join('output.json')
     json_writer = to_json(str(file))
 
-    context = ContextMock()
+    context = ComponentExecutionContext(json_writer, None)
     with pytest.raises(AttributeError):
         json_writer(context, {'foo': 'bar'})
