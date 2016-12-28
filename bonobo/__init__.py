@@ -23,7 +23,7 @@ import os
 import sys
 
 from .core import *
-from .io import *
+from .io import FileReader, FileWriter, JsonReader, JsonWriter
 from .util import *
 
 PY35 = (sys.version_info >= (3, 5))
@@ -36,8 +36,10 @@ with open(os.path.realpath(os.path.join(os.path.dirname(__file__), '../version.t
 
 __all__ = [
     'Bag',
+    'FileReader',
     'FileWriter',
     'Graph',
+    'JsonReader',
     'JsonWriter',
     'NOT_MODIFIED',
     'NaiveStrategy',

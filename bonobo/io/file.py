@@ -1,14 +1,14 @@
 from bonobo.util.lifecycle import with_context
 
 __all__ = [
-    'Handler',
+    'FileHandler',
     'FileReader',
     'FileWriter',
 ]
 
 
 @with_context
-class Handler:
+class FileHandler:
     """
     Abstract component factory for file-related components.
 
@@ -44,7 +44,7 @@ class Handler:
         del ctx.file
 
 
-class Reader(Handler):
+class Reader(FileHandler):
     def __call__(self, ctx):
         yield from self.handle(ctx)
 
@@ -52,7 +52,7 @@ class Reader(Handler):
         raise NotImplementedError('Abstract.')
 
 
-class Writer(Handler):
+class Writer(FileHandler):
     def __call__(self, ctx, row):
         return self.handle(ctx, row)
 

@@ -1,6 +1,6 @@
 import json
 
-from .file import FileWriter
+from .file import FileWriter, FileReader
 
 __all__ = ['JsonWriter', ]
 
@@ -9,9 +9,14 @@ class JsonHandler:
     eol = ',\n'
 
 
+class JsonReader(JsonHandler, FileReader):
+    def handle(self, ctx):
+        for line in json.load(ctx.file):
+            yield line
+
+
 class JsonWriter(JsonHandler, FileWriter):
     def initialize(self, ctx):
-        print('EOL', self.eol)
         super().initialize(ctx)
         ctx.file.write('[\n')
 

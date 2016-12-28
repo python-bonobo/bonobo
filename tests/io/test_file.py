@@ -1,13 +1,9 @@
 import pytest
-from mock import MagicMock
 
 from bonobo import FileWriter, Bag, FileReader
 from bonobo.core.contexts import ComponentExecutionContext
+from bonobo.util.testing import CapturingComponentExecutionContext
 from bonobo.util.tokens import BEGIN, END
-
-
-class CapturingComponentExecutionContext(ComponentExecutionContext):
-    send = MagicMock()
 
 
 @pytest.mark.parametrize(
