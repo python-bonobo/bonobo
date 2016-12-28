@@ -46,17 +46,17 @@ class FileHandler:
 
 class Reader(FileHandler):
     def __call__(self, ctx):
-        yield from self.handle(ctx)
+        yield from self.read(ctx)
 
-    def handle(self, ctx):
+    def read(self, ctx):
         raise NotImplementedError('Abstract.')
 
 
 class Writer(FileHandler):
     def __call__(self, ctx, row):
-        return self.handle(ctx, row)
+        return self.write(ctx, row)
 
-    def handle(self, ctx, row):
+    def write(self, ctx, row):
         raise NotImplementedError('Abstract.')
 
 
@@ -71,7 +71,7 @@ class FileReader(Reader):
 
     mode = 'r'
 
-    def handle(self, ctx):
+    def read(self, ctx):
         """
         Write a row on the next line of file pointed by `ctx.file`.
         Prefix is used for newlines.
@@ -98,7 +98,7 @@ class FileWriter(Writer):
         super().initialize(ctx)
         ctx.line = 0
 
-    def handle(self, ctx, row):
+    def write(self, ctx, row):
         """
         Write a row on the next line of opened file in context.
 
@@ -106,10 +106,10 @@ class FileWriter(Writer):
         :param str row:
         :param str prefix:
         """
-        self.write(ctx.file, (self.eol if ctx.line else '') + row)
+        self._write_line(ctx.file, (self.eol if ctx.line else '') + row)
         ctx.line += 1
 
-    def write(self, fp, line):
+    def _write_line(self, fp, line):
         return fp.write(line)
 
     def finalize(self, ctx):

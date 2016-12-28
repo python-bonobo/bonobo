@@ -10,7 +10,7 @@ class JsonHandler:
 
 
 class JsonReader(JsonHandler, FileReader):
-    def handle(self, ctx):
+    def read(self, ctx):
         for line in json.load(ctx.file):
             yield line
 
@@ -20,14 +20,14 @@ class JsonWriter(JsonHandler, FileWriter):
         super().initialize(ctx)
         ctx.file.write('[\n')
 
-    def handle(self, ctx, row):
+    def write(self, ctx, row):
         """
         Write a json row on the next line of file pointed by ctx.file.
 
         :param ctx:
         :param row:
         """
-        return super().handle(ctx, json.dumps(row))
+        return super().write(ctx, json.dumps(row))
 
     def finalize(self, ctx):
         ctx.file.write('\n]')
