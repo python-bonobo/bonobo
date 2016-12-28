@@ -1,26 +1,25 @@
-from functools import partial
-
 from bonobo.util.lifecycle import with_context
 
 __all__ = [
-    'FileHandler',
+    'Handler',
     'FileReader',
     'FileWriter',
 ]
 
 
 @with_context
-class FileHandler:
+class Handler:
     """
     Abstract component factory for file-related components.
 
     """
 
+    eol = '\n'
     mode = None
 
-    def __init__(self, path_or_buf, eol='\n'):
+    def __init__(self, path_or_buf, eol=None):
         self.path_or_buf = path_or_buf
-        self.eol = eol
+        self.eol = eol or self.eol
 
     def open(self):
         return open(self.path_or_buf, self.mode)
@@ -40,26 +39,28 @@ class FileHandler:
         assert not hasattr(ctx, 'file'), 'A file pointer is already in the context... I do not know what to say...'
         ctx.file = self.open()
 
-    def __call__(self, ctx, *args):
-        """
-        :param ComponentExecutionContext ctx:
-        :param mixed row:
-        """
-        result = self.handle(ctx, *args)
-        try:
-            yield from result
-        except TypeError:
-            return
-
-    def handle(self, ctx, *args):
-        raise NotImplementedError('Abstract.')
-
     def finalize(self, ctx):
         self.close(ctx.file)
         del ctx.file
 
 
-class FileReader(FileHandler):
+class Reader(Handler):
+    def __call__(self, ctx):
+        yield from self.handle(ctx)
+
+    def handle(self, ctx):
+        raise NotImplementedError('Abstract.')
+
+
+class Writer(Handler):
+    def __call__(self, ctx, row):
+        return self.handle(ctx, row)
+
+    def handle(self, ctx, row):
+        raise NotImplementedError('Abstract.')
+
+
+class FileReader(Reader):
     """
     Component factory for file-like readers.
 
@@ -70,7 +71,7 @@ class FileReader(FileHandler):
 
     mode = 'r'
 
-    def handle(self, ctx, *args):
+    def handle(self, ctx):
         """
         Write a row on the next line of file pointed by `ctx.file`.
         Prefix is used for newlines.
@@ -78,12 +79,11 @@ class FileReader(FileHandler):
         :param ctx:
         :param row:
         """
-        assert not len(args)
         for line in ctx.file:
             yield line.rstrip(self.eol)
 
 
-class FileWriter(FileHandler):
+class FileWriter(Writer):
     """
     Component factory for file or file-like writers.
 
@@ -100,13 +100,12 @@ class FileWriter(FileHandler):
 
     def handle(self, ctx, row):
         """
-        Write a row on the next line of file pointed by fp. Prefix is used for newlines.
+        Write a row on the next line of opened file in context.
 
         :param file fp:
         :param str row:
         :param str prefix:
         """
-
         self.write(ctx.file, (self.eol if ctx.line else '') + row)
         ctx.line += 1
 

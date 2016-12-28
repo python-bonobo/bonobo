@@ -20,7 +20,7 @@ def test_write_json_to_file(tmpdir):
 ]'''
 
     with pytest.raises(AttributeError):
-        getattr(context, 'fp')
+        getattr(context, 'file')
 
     with pytest.raises(AttributeError):
         getattr(context, 'first')

@@ -1,23 +1,29 @@
 import json
 
 from .file import FileWriter
-from bonobo.util.lifecycle import with_context
 
 __all__ = ['JsonWriter', ]
 
 
-@with_context
-class JsonWriter(FileWriter):
-    def __init__(self, path_or_buf):
-        super().__init__(path_or_buf, eol=',\n')
+class JsonHandler:
+    eol = ',\n'
 
+
+class JsonWriter(JsonHandler, FileWriter):
     def initialize(self, ctx):
+        print('EOL', self.eol)
         super().initialize(ctx)
-        ctx.fp.write('[\n')
+        ctx.file.write('[\n')
 
-    def write(self, fp, line, prefix=''):
-        fp.write(prefix + json.dumps(line))
+    def handle(self, ctx, row):
+        """
+        Write a json row on the next line of file pointed by ctx.file.
+
+        :param ctx:
+        :param row:
+        """
+        return super().handle(ctx, json.dumps(row))
 
     def finalize(self, ctx):
-        ctx.fp.write('\n]')
+        ctx.file.write('\n]')
         super().finalize(ctx)
