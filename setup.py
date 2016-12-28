@@ -38,5 +38,5 @@ setup(
         ],
         'jupyter': ['jupyter >=1.0,<1.1', 'ipywidgets >=6.0.0.beta5']
     },
-    url='https://github.com/python-bonobo/bonobo',
+    url='https://bonobo-project.org/',
     download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.format(version=version), )
