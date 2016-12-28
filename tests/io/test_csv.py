@@ -1,8 +1,7 @@
 import pytest
 
-from bonobo import Bag
+from bonobo import Bag, CsvReader, CsvWriter
 from bonobo.core.contexts import ComponentExecutionContext
-from bonobo.io.csv import CsvReader, CsvWriter
 from bonobo.util.testing import CapturingComponentExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
