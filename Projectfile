@@ -17,6 +17,7 @@ enable_features = {
     'git',
     'pylint',
     'python',
+    'yapf',
 }
 
 install_requires = [

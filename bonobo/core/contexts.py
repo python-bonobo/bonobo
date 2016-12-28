@@ -10,6 +10,7 @@ from bonobo.core.stats import WithStatistics
 from bonobo.util.lifecycle import get_initializer, get_finalizer
 from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
 
+
 class ExecutionContext:
     def __init__(self, graph, plugins=None):
         self.graph = graph
