@@ -3,11 +3,11 @@ import json
 from .file import FileWriter
 from bonobo.util.lifecycle import with_context
 
-__all__ = ['JsonFileWriter', ]
+__all__ = ['JsonWriter', ]
 
 
 @with_context
-class JsonFileWriter(FileWriter):
+class JsonWriter(FileWriter):
     def __init__(self, path_or_buf):
         super().__init__(path_or_buf, eol=',\n')
 

@@ -2,7 +2,7 @@ import json
 
 from blessings import Terminal
 
-from bonobo import console_run, tee, JsonFileWriter
+from bonobo import console_run, tee, JsonWriter
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 try:
@@ -58,5 +58,5 @@ if __name__ == '__main__':
         normalize,
         filter_france,
         tee(display),
-        JsonFileWriter('fablabs.json'),
+        JsonWriter('fablabs.json'),
         output=True, )

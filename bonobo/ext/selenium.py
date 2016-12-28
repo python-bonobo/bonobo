@@ -1,4 +1,12 @@
-from selenium import webdriver
+try:
+    import selenium
+except ImportError as e:
+    import logging
+
+    logging.exception(
+        'You must install selenium to use the bonobo selenium extension. Easiest way is to install the '
+        'optional "selenium" dependencies with «pip install bonobo[selenium]», but you can also install a '
+        'specific version by yourself.')
 
 from bonobo import service
 
@@ -6,7 +14,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/601.4.
 
 
 def create_profile(use_tor=False):
-    _profile = webdriver.FirefoxProfile()
+    _profile = selenium.webdriver.FirefoxProfile()
     _profile.set_preference("toolkit.startup.max_resumed_crashes", "-1")
 
     if use_tor:
@@ -22,7 +30,7 @@ def create_profile(use_tor=False):
 
 
 def create_browser(profile):
-    _browser = webdriver.Firefox(profile)
+    _browser = selenium.webdriver.Firefox(profile)
     _browser.implicitly_wait(10)
     _browser.set_page_load_timeout(10)
     return _browser

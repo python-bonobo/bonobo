@@ -1,7 +1,7 @@
-from bonobo import FileWriter, JsonFileWriter
+from bonobo import FileWriter, JsonWriter
 
 to_file = FileWriter
-to_json = JsonFileWriter
+to_json = JsonWriter
 
 __all__ = [
     'to_json',

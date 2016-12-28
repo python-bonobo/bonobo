@@ -1,13 +1,13 @@
 import pytest
 
-from bonobo import Bag, JsonFileWriter
+from bonobo import Bag, JsonWriter
 from bonobo.core.contexts import ComponentExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_json_to_file(tmpdir):
     file = tmpdir.join('output.json')
-    json_writer = JsonFileWriter(str(file))
+    json_writer = JsonWriter(str(file))
     context = ComponentExecutionContext(json_writer, None)
 
     context.initialize()
@@ -28,7 +28,7 @@ def test_write_json_to_file(tmpdir):
 
 def test_write_json_without_initializer_should_not_work(tmpdir):
     file = tmpdir.join('output.json')
-    json_writer = JsonFileWriter(str(file))
+    json_writer = JsonWriter(str(file))
 
     context = ComponentExecutionContext(json_writer, None)
     with pytest.raises(AttributeError):

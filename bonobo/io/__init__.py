@@ -1,9 +1,11 @@
 """ Readers and writers for common file formats. """
 
-from .file import FileWriter
-from .json import JsonFileWriter
+from .file import FileHandler, FileReader, FileWriter
+from .json import JsonWriter
 
 __all__ = [
+    'FileHandler',
+    'FileReader',
     'FileWriter',
-    'JsonFileWriter',
+    'JsonWriter',
 ]

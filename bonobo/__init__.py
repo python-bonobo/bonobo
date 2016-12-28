@@ -38,7 +38,7 @@ __all__ = [
     'Bag',
     'FileWriter',
     'Graph',
-    'JsonFileWriter',
+    'JsonWriter',
     'NOT_MODIFIED',
     'NaiveStrategy',
     'ProcessPoolExecutorStrategy',
