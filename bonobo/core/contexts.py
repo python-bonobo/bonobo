@@ -10,7 +10,6 @@ from bonobo.core.stats import WithStatistics
 from bonobo.util.lifecycle import get_initializer, get_finalizer
 from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
 
-
 class ExecutionContext:
     def __init__(self, graph, plugins=None):
         self.graph = graph
@@ -96,7 +95,10 @@ class AbstractLoopContext:
         :param trace: Hercule Poirot's logbook.
         :return: to hell
         """
-        print('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))
+
+        from blessings import Terminal
+        term = Terminal()
+        print(term.bold(term.red('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))))
         print(trace)
 
 
