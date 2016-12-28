@@ -1,4 +1,3 @@
-from bonobo.util.helpers import jupyter_run
 from .plugin import JupyterOutputPlugin
 
 
