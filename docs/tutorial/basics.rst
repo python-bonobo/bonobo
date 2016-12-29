@@ -58,7 +58,10 @@ Let's chain the three components together and run the transformation:
 
     digraph {
         rankdir = LR;
-        "generate_data" -> "uppercase" -> "output";
+        stylesheet = "../_static/graphs.css";
+
+        BEGIN [shape="point"];
+        BEGIN -> "generate_data" -> "uppercase" -> "output";
     }
 
 We use the :func:`bonobo.run` helper that hides the underlying object composition necessary to actually run the

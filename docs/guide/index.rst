@@ -1,4 +1,8 @@
 Guides
 ======
 
-.. todo:: write the fucking doc!
+.. toctree::
+    :maxdepth: 2
+
+    purity
+    crawlers

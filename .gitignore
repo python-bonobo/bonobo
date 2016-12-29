@@ -9,6 +9,7 @@
 *.py[cod]
 *.so
 *.spec
+.*.sw?
 .Python
 .cache
 .coverage

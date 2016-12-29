@@ -19,20 +19,14 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 """
-import os
 import sys
 
+assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
+
+from ._version import __version__
 from .core import *
 from .io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
 from .util import *
-
-PY35 = (sys.version_info >= (3, 5))
-
-assert PY35, 'Python 3.5+ is required to use Bonobo.'
-
-# Version infos
-with open(os.path.realpath(os.path.join(os.path.dirname(__file__), '../version.txt'))) as f:
-    __version__ = f.read().strip()
 
 __all__ = [
     'Bag',
@@ -47,6 +41,7 @@ __all__ = [
     'NaiveStrategy',
     'ProcessPoolExecutorStrategy',
     'ThreadPoolExecutorStrategy',
+    '__version__',
     'console_run',
     'head',
     'inject',
