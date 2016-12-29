@@ -1,7 +1,7 @@
 # This file has been auto-generated.
 # All changes will be lost, see Projectfile.
 #
-# Updated at 2016-12-29 17:04:15.403353
+# Updated at 2016-12-29 17:33:45.585172
 
 PYTHON ?= $(shell which python)
 PYTHON_BASENAME ?= $(shell basename $(PYTHON))
@@ -41,7 +41,7 @@ clean:
 # Setup the local virtualenv, or use the one provided by the current environment.
 $(VIRTUAL_ENV):
 	virtualenv -p $(PYTHON) $(VIRTUAL_ENV)
-	$(PIP) install -U pip\>=8.1.2,\<9 wheel\>=0.29,\<1.0
+	$(PIP) install -U pip\>=9,\<10 wheel\>=0.29,\<1.0
 	ln -fs $(VIRTUAL_ENV)/bin/activate activate-$(PYTHON_BASENAME)
 
 lint: install-dev
