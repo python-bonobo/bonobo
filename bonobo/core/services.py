@@ -45,9 +45,11 @@ def inject(*iargs, **ikwargs):
     def wrapper(target):
         @functools.wraps(target)
         def wrapped(*args, **kwargs):
-            return target(*itertools.chain(map(resolve, iargs), args),
-                          **{ ** kwargs, ** {k: resolve(v)
-                                             for k, v in ikwargs.items()}})
+            return target(
+                *itertools.chain(map(resolve, iargs), args),
+                **{ ** kwargs, ** {k: resolve(v)
+                                   for k, v in ikwargs.items()}}
+            )
 
         return wrapped
 

@@ -59,7 +59,8 @@ class CsvReader(CsvHandler, FileReader):
             if len(row) != field_count:
                 raise ValueError('Got a line with %d fields, expecting %d.' % (
                     len(row),
-                    field_count, ))
+                    field_count,
+                ))
 
             yield dict(zip(headers, row))
 

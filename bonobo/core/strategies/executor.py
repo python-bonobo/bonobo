@@ -2,10 +2,10 @@ import time
 from concurrent.futures import Executor
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 
 from bonobo.core.strategies.base import Strategy
 from bonobo.util.tokens import BEGIN, END
-
 from ..bags import Bag
 
 
@@ -48,3 +48,31 @@ class ThreadPoolExecutorStrategy(ExecutorStrategy):
 
 class ProcessPoolExecutorStrategy(ExecutorStrategy):
     executor_factory = ProcessPoolExecutor
+
+
+class ThreadCollectionStrategy(Strategy):
+    def execute(self, graph, *args, plugins=None, **kwargs):
+        context = self.create_context(graph, plugins=plugins)
+        context.recv(BEGIN, Bag(), END)
+
+        threads = []
+
+        # for plugin_context in context.plugins:
+        #    threads.append(executor.submit(plugin_context.run))
+
+        for component_context in context.components:
+            thread = Thread(target=component_context.run)
+            threads.append(thread)
+            thread.start()
+
+        # XXX TODO PLUGINS
+        while context.alive and len(threads):
+            time.sleep(0.1)
+            threads = list(filter(lambda thread: thread.is_alive, threads))
+
+        # for plugin_context in context.plugins:
+        #    plugin_context.shutdown()
+
+        # executor.shutdown()
+
+        return context

@@ -3,7 +3,7 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
-from bonobo.core.bags import Bag, INHERIT_INPUT
+from bonobo.core.bags import Bag, INHERIT_INPUT, ErrorBag
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.stats import WithStatistics
@@ -11,11 +11,31 @@ from bonobo.util.lifecycle import get_initializer, get_finalizer
 from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
 
 
+def get_name(mixed):
+    try:
+        return mixed.__name__
+    except AttributeError:
+        return type(mixed).__name__
+
+
+def create_component_context(component, parent):
+    try:
+        CustomComponentContext = component.Context
+    except AttributeError:
+        return ComponentExecutionContext(component, parent=parent)
+
+    if ComponentExecutionContext in CustomComponentContext.__mro__:
+        bases = (CustomComponentContext, )
+    else:
+        bases = (CustomComponentContext, ComponentExecutionContext)
+
+    return type(get_name(component).title() + 'ExecutionContext', bases, {})(component, parent=parent)
+
+
 class ExecutionContext:
     def __init__(self, graph, plugins=None):
         self.graph = graph
-        self.components = [ComponentExecutionContext(component, self) for component in self.graph.components]
-
+        self.components = [create_component_context(component, parent=self) for component in self.graph.components]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
 
         for i, component_context in enumerate(self):
@@ -23,8 +43,10 @@ class ExecutionContext:
                 component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             except KeyError:
                 continue
+
             component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
             component_context.input.on_end = partial(component_context.send, END, _control=True)
+            component_context.input.on_finalize = partial(component_context.finalize)
 
     def __getitem__(self, item):
         return self.components[item]
@@ -63,17 +85,19 @@ class AbstractLoopContext:
     def initialize(self):
         # pylint: disable=broad-except
         try:
-            get_initializer(self.wrapped)(self)
+            initializer = get_initializer(self.wrapped)
         except Exception as exc:
             self.handle_error(exc, traceback.format_exc())
+        else:
+            return initializer(self)
 
     def loop(self):
         """Generic loop. A bit boring. """
         while self.alive:
-            self._loop()
+            self.step()
             sleep(self.PERIOD)
 
-    def _loop(self):
+    def step(self):
         """
         TODO xxx this is a step, not a loop
         """
@@ -83,9 +107,11 @@ class AbstractLoopContext:
         """Generic finalizer. """
         # pylint: disable=broad-except
         try:
-            get_finalizer(self.wrapped)(self)
+            finalizer = get_finalizer(self.wrapped)
         except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
+            return self.handle_error(exc, traceback.format_exc())
+        else:
+            return finalizer(self)
 
     def handle_error(self, exc, trace):
         """
@@ -112,7 +138,7 @@ class PluginExecutionContext(AbstractLoopContext):
     def shutdown(self):
         self.alive = False
 
-    def _loop(self):
+    def step(self):
         try:
             self.wrapped.run(self)
         except Exception as exc:  # pylint: disable=broad-except
@@ -157,13 +183,17 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         return (
             (
                 'in',
-                self.stats['in'], ),
+                self.stats['in'],
+            ),
             (
                 'out',
-                self.stats['out'], ),
+                self.stats['out'],
+            ),
             (
                 'err',
-                self.stats['err'], ), )
+                self.stats['err'],
+            ),
+        )
 
     def recv(self, *messages):
         """
@@ -195,7 +225,7 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         self.stats['in'] += 1
         return row
 
-    def _call(self, bag):
+    def apply_on(self, bag):
         # todo add timer
         if getattr(self.component, '_with_context', False):
             return bag.apply(self.component, self)
@@ -203,10 +233,29 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
 
     def initialize(self):
         # pylint: disable=broad-except
-        assert self.state is NEW, ('A {} can only be run once, and thus is expected to be in {} state at '
-                                   'initialization time.').format(type(self).__name__, NEW)
+        assert self.state is NEW, (
+            'A {} can only be run once, and thus is expected to be in {} state at '
+            'initialization time.'
+        ).format(type(self).__name__, NEW)
         self.state = RUNNING
-        super().initialize()
+
+        try:
+            initializer_outputs = super().initialize()
+            self.handle(None, initializer_outputs)
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
+
+    def finalize(self):
+        # pylint: disable=broad-except
+        assert self.state is RUNNING, ('A {} must be in {} state at finalization time.'
+                                       ).format(type(self).__name__, RUNNING)
+        self.state = TERMINATED
+
+        try:
+            finalizer_outputs = super().finalize()
+            self.handle(None, finalizer_outputs)
+        except Exception as exc:
+            self.handle_error(exc, traceback.format_exc())
 
     def loop(self):
         while True:
@@ -228,34 +277,39 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         output channel."""
 
         input_bag = self.get()
-        outputs = self._call(input_bag)
+        outputs = self.apply_on(input_bag)
+        self.handle(input_bag, outputs)
 
+    def run(self):
+        self.initialize()
+        self.loop()
+
+    def handle(self, input_bag, outputs):
         # self._exec_time += timer.duration
         # Put data onto output channels
         try:
             outputs = _iter(outputs)
-        except TypeError:
+        except TypeError:  # not an iterator
             if outputs:
-                self.send(_resolve(input_bag, outputs))
+                if isinstance(outputs, ErrorBag):
+                    outputs.apply(self.handle_error)
+                else:
+                    self.send(_resolve(input_bag, outputs))
             else:
                 # case with no result, an execution went through anyway, use for stats.
                 # self._exec_count += 1
                 pass
         else:
-            while True:
+            while True:  # iterator
                 try:
                     output = next(outputs)
                 except StopIteration:
                     break
-                self.send(_resolve(input_bag, output))
-
-    def finalize(self):
-        # pylint: disable=broad-except
-        assert self.state is RUNNING, ('A {} must be in {} state at finalization time.').format(
-            type(self).__name__, RUNNING)
-        self.state = TERMINATED
-
-        super().finalize()
+                else:
+                    if isinstance(output, ErrorBag):
+                        output.apply(self.handle_error)
+                    else:
+                        self.send(_resolve(input_bag, output))
 
 
 def _iter(mixed):

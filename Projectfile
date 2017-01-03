@@ -23,6 +23,7 @@ enable_features = {
 install_requires = [
     'blessings >=1.6,<1.7',
     'psutil >=5.0,<5.1',
+    'toolz >=0.8,<0.9',
 ]
 
 extras_require = {

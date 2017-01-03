@@ -40,10 +40,14 @@ def display(row):
     print(t.bold(row.get('name')))
 
     address = list(
-        filter(None, (
-            ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
-            row.get('county', None),
-            row.get('country'), )))
+        filter(
+            None, (
+                ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
+                row.get('county', None),
+                row.get('country'),
+            )
+        )
+    )
 
     print('  - {}: {address}'.format(t.blue('address'), address=', '.join(address)))
     print('  - {}: {links}'.format(t.blue('links'), links=', '.join(row['links'])))
@@ -54,9 +58,11 @@ def display(row):
 if __name__ == '__main__':
     console_run(
         from_opendatasoft_api(
-            API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
+            API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
+        ),
         normalize,
         filter_france,
         tee(display),
         JsonWriter('fablabs.json'),
-        output=True, )
+        output=True,
+    )

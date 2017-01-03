@@ -19,17 +19,18 @@ class ResponseMock:
 def test_read_from_opendatasoft_api():
     extract = from_opendatasoft_api('http://example.com/', 'test-a-set')
     with patch(
-            'requests.get', return_value=ResponseMock([
-                {
-                    'fields': {
-                        'foo': 'bar'
-                    }
-                },
-                {
-                    'fields': {
-                        'foo': 'zab'
-                    }
-                },
-            ])):
+        'requests.get', return_value=ResponseMock([
+            {
+                'fields': {
+                    'foo': 'bar'
+                }
+            },
+            {
+                'fields': {
+                    'foo': 'zab'
+                }
+            },
+        ])
+    ):
         for line in extract():
             assert 'foo' in line

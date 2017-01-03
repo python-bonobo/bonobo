@@ -1,20 +1,20 @@
-def run(*chain, plugins=None):
+def run(*chain, plugins=None, strategy=None):
     from bonobo import Graph, ThreadPoolExecutorStrategy
 
     graph = Graph()
     graph.add_chain(*chain)
 
-    executor = ThreadPoolExecutorStrategy()
+    executor = (strategy or ThreadPoolExecutorStrategy)()
     return executor.execute(graph, plugins=plugins or [])
 
 
-def console_run(*chain, output=True, plugins=None):
+def console_run(*chain, output=True, plugins=None, strategy=None):
     from bonobo.ext.console import ConsoleOutputPlugin
 
-    return run(*chain, plugins=(plugins or []) + [ConsoleOutputPlugin()] if output else [])
+    return run(*chain, plugins=(plugins or []) + [ConsoleOutputPlugin()] if output else [], strategy=strategy)
 
 
-def jupyter_run(*chain, plugins=None):
+def jupyter_run(*chain, plugins=None, strategy=None):
     from bonobo.ext.jupyter import JupyterOutputPlugin
 
-    return run(*chain, plugins=(plugins or []) + [JupyterOutputPlugin()])
+    return run(*chain, plugins=(plugins or []) + [JupyterOutputPlugin()], strategy=strategy)
