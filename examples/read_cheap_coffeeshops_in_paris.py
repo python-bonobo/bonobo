@@ -8,8 +8,10 @@ OUTPUT_FILENAME = realpath(join(dirname(__file__), 'datasets/cheap_coffeeshops_i
 
 console_run(
     from_opendatasoft_api(
-        'liste-des-cafes-a-un-euro', netloc='opendata.paris.fr'),
+        'liste-des-cafes-a-un-euro', netloc='opendata.paris.fr'
+    ),
     lambda row: '{nom_du_cafe}, {adresse}, {arrondissement} Paris, France'.format(**row),
-    FileWriter(OUTPUT_FILENAME), )
+    FileWriter(OUTPUT_FILENAME),
+)
 
 print('Import done, read {} for results.'.format(OUTPUT_FILENAME))

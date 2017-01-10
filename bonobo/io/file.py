@@ -36,6 +36,7 @@ class FileHandler:
         :param ctx:
         :return:
         """
+
         assert not hasattr(ctx, 'file'), 'A file pointer is already in the context... I do not know what to say...'
         ctx.file = self.open()
 
@@ -95,8 +96,8 @@ class FileWriter(Writer):
     mode = 'w+'
 
     def initialize(self, ctx):
-        super().initialize(ctx)
         ctx.line = 0
+        return super().initialize(ctx)
 
     def write(self, ctx, row):
         """
@@ -114,4 +115,4 @@ class FileWriter(Writer):
 
     def finalize(self, ctx):
         del ctx.line
-        super().finalize(ctx)
+        return super().finalize(ctx)

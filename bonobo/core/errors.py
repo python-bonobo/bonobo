@@ -20,9 +20,12 @@ class AbstractError(NotImplementedError):
     """Abstract error is a convenient error to declare a method as "being left as an exercise for the reader"."""
 
     def __init__(self, method):
-        super().__init__('Call to abstract method {class_name}.{method_name}(...): missing implementation.'.format(
-            class_name=method.__self__.__name__,
-            method_name=method.__name__, ))
+        super().__init__(
+            'Call to abstract method {class_name}.{method_name}(...): missing implementation.'.format(
+                class_name=method.__self__.__name__,
+                method_name=method.__name__,
+            )
+        )
 
 
 class InactiveIOError(IOError):
@@ -39,9 +42,12 @@ class InactiveWritableError(InactiveIOError):
 
 class ValidationError(RuntimeError):
     def __init__(self, inst, message):
-        super(ValidationError, self).__init__('Validation error in {class_name}: {message}'.format(
-            class_name=type(inst).__name__,
-            message=message, ))
+        super(ValidationError, self).__init__(
+            'Validation error in {class_name}: {message}'.format(
+                class_name=type(inst).__name__,
+                message=message,
+            )
+        )
 
 
 class ProhibitedOperationError(RuntimeError):

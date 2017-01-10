@@ -48,12 +48,17 @@ class Input(Queue, Readable, Writable):
 
         self._runlevel = 0
         self._writable_runlevel = 0
+        self.on_initialize = noop
         self.on_begin = noop
         self.on_end = noop
+        self.on_finalize = noop
 
     def put(self, data, block=True, timeout=None):
         # Begin token is a metadata to raise the input runlevel.
         if data == BEGIN:
+            if not self._runlevel:
+                self.on_initialize()
+
             self._runlevel += 1
             self._writable_runlevel += 1
 
@@ -78,14 +83,18 @@ class Input(Queue, Readable, Writable):
         data = Queue.get(self, block, timeout)
 
         if data == END:
+            if self._runlevel == 1:
+                self.on_finalize()
+
             self._runlevel -= 1
 
             # callback
             self.on_end()
 
             if not self.alive:
-                raise InactiveReadableError('Cannot get() on an inactive {} (runlevel just reached 0).'.format(
-                    Readable.__name__))
+                raise InactiveReadableError(
+                    'Cannot get() on an inactive {} (runlevel just reached 0).'.format(Readable.__name__)
+                )
             return self.get(block, timeout)
 
         return data

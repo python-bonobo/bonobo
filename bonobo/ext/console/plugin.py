@@ -53,9 +53,10 @@ class ConsoleOutputPlugin(Plugin):
     def _write(self, context, rewind):
         profile, debug = False, False
         if profile:
-            append = (('Memory', '{0:.2f} Mb'.format(memory_usage())),
-                      # ('Total time', '{0} s'.format(execution_time(harness))),
-                      )
+            append = (
+                ('Memory', '{0:.2f} Mb'.format(memory_usage())),
+                # ('Total time', '{0} s'.format(execution_time(harness))),
+            )
         else:
             append = ()
         self.write(context, prefix=self.prefix, append=append, debug=debug, profile=profile, rewind=rewind)
@@ -77,25 +78,35 @@ class ConsoleOutputPlugin(Plugin):
 
         for i, component in enumerate(context):
             if component.alive:
-                _line = ''.join((
-                    t.black('({})'.format(i + 1)),
-                    ' ',
-                    t.bold(t.white('+')),
-                    ' ',
-                    component.name,
-                    ' ',
-                    component.get_stats_as_string(
-                        debug=debug, profile=profile),
-                    ' ', ))
+                _line = ''.join(
+                    (
+                        t.black('({})'.format(i + 1)),
+                        ' ',
+                        t.bold(t.white('+')),
+                        ' ',
+                        component.name,
+                        ' ',
+                        component.get_stats_as_string(
+                            debug=debug, profile=profile
+                        ),
+                        ' ',
+                    )
+                )
             else:
-                _line = t.black(''.join((
-                    '({})'.format(i + 1),
-                    ' - ',
-                    component.name,
-                    ' ',
-                    component.get_stats_as_string(
-                        debug=debug, profile=profile),
-                    ' ', )))
+                _line = t.black(
+                    ''.join(
+                        (
+                            '({})'.format(i + 1),
+                            ' - ',
+                            component.name,
+                            ' ',
+                            component.get_stats_as_string(
+                                debug=debug, profile=profile
+                            ),
+                            ' ',
+                        )
+                    )
+                )
             print(prefix + _line + t.clear_eol)
 
         if append:

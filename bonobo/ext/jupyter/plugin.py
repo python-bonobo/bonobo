@@ -6,9 +6,11 @@ try:
 except ImportError as e:
     import logging
 
-    logging.exception('You must install Jupyter to use the bonobo Jupyter extension. Easiest way is to install the '
-                      'optional "jupyter" dependencies with «pip install bonobo[jupyter]», but you can also install a '
-                      'specific version by yourself.')
+    logging.exception(
+        'You must install Jupyter to use the bonobo Jupyter extension. Easiest way is to install the '
+        'optional "jupyter" dependencies with «pip install bonobo[jupyter]», but you can also install a '
+        'specific version by yourself.'
+    )
 
 
 class JupyterOutputPlugin(Plugin):

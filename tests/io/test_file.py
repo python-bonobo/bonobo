@@ -11,7 +11,8 @@ from bonobo.util.tokens import BEGIN, END
     [
         (('ACME', ), 'ACME'),  # one line...
         (('Foo', 'Bar', 'Baz'), 'Foo\nBar\nBaz'),  # more than one line...
-    ])
+    ]
+)
 def test_file_writer_in_context(tmpdir, lines, output):
     file = tmpdir.join('output.txt')
 

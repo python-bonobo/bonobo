@@ -9,7 +9,8 @@ def yield_from(*args):
 graph = Graph(
     lambda: (x for x in ('foo', 'bar', 'baz')),
     str.upper,
-    print, )
+    print,
+)
 
 # Use a thread pool.
 executor = ThreadPoolExecutorStrategy()

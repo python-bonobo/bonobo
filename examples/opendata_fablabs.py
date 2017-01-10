@@ -2,7 +2,7 @@ import json
 
 from blessings import Terminal
 
-from bonobo import console_run, tee, JsonWriter
+from bonobo import console_run, tee, JsonWriter, Graph
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 try:
@@ -40,10 +40,14 @@ def display(row):
     print(t.bold(row.get('name')))
 
     address = list(
-        filter(None, (
-            ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
-            row.get('county', None),
-            row.get('country'), )))
+        filter(
+            None, (
+                ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
+                row.get('county', None),
+                row.get('country'),
+            )
+        )
+    )
 
     print('  - {}: {address}'.format(t.blue('address'), address=', '.join(address)))
     print('  - {}: {links}'.format(t.blue('links'), links=', '.join(row['links'])))
@@ -51,12 +55,15 @@ def display(row):
     print('  - {}: {source}'.format(t.blue('source'), source='datanova/' + API_DATASET))
 
 
+graph = Graph(
+    from_opendatasoft_api(
+        API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
+    ),
+    normalize,
+    filter_france,
+    tee(display),
+    JsonWriter('fablabs.json'),
+)
+
 if __name__ == '__main__':
-    console_run(
-        from_opendatasoft_api(
-            API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
-        normalize,
-        filter_france,
-        tee(display),
-        JsonWriter('fablabs.json'),
-        output=True, )
+    console_run(graph, output=True)
