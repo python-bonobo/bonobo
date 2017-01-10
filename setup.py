@@ -33,7 +33,7 @@ setup(
     name='bonobo',
     description='Bonobo',
     license='Apache License, Version 2.0',
-    install_requires=['blessings >=1.6,<1.7', 'psutil >=5.0,<5.1', 'toolz >=0.8,<0.9'],
+    install_requires=['blessings >=1.6,<1.7', 'psutil >=5.0,<5.1', 'stevedore >=1.19,<1.20', 'toolz >=0.8,<0.9'],
     version=version,
     long_description=read('README.rst'),
     classifiers=read('classifiers.txt', tolines),
@@ -49,10 +49,16 @@ setup(
     ],
     extras_require={
         'dev': [
-            'coverage >=4.2,<4.3', 'mock >=2.0,<2.1', 'nose >=1.3,<1.4', 'pylint >=1.6,<1.7', 'pytest >=3,<4',
+            'coverage >=4.3,<4.4', 'mock >=2.0,<2.1', 'nose >=1.3,<1.4', 'pylint >=1.6,<1.7', 'pytest >=3,<4',
             'pytest-cov >=2.4,<2.5', 'sphinx', 'sphinx_rtd_theme', 'yapf'
         ],
         'jupyter': ['jupyter >=1.0,<1.1', 'ipywidgets >=6.0.0.beta5']
+    },
+    entry_points={
+        'bonobo.commands': ['init = bonobo.commands.init:register', 'run = bonobo.commands.run:register'],
+        'console_scripts': ['bonobo = bonobo.commands:entrypoint'],
+        'edgy.project.features': ['bonobo = '
+                                  'bonobo.ext.edgy.project.feature:BonoboFeature']
     },
     url='https://bonobo-project.org/',
     download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.format(version=version),

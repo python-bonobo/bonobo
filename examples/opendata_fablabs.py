@@ -2,7 +2,7 @@ import json
 
 from blessings import Terminal
 
-from bonobo import console_run, tee, JsonWriter
+from bonobo import console_run, tee, JsonWriter, Graph
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 try:
@@ -55,14 +55,15 @@ def display(row):
     print('  - {}: {source}'.format(t.blue('source'), source='datanova/' + API_DATASET))
 
 
+graph = Graph(
+    from_opendatasoft_api(
+        API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
+    ),
+    normalize,
+    filter_france,
+    tee(display),
+    JsonWriter('fablabs.json'),
+)
+
 if __name__ == '__main__':
-    console_run(
-        from_opendatasoft_api(
-            API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
-        ),
-        normalize,
-        filter_france,
-        tee(display),
-        JsonWriter('fablabs.json'),
-        output=True,
-    )
+    console_run(graph, output=True)

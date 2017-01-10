@@ -1,8 +1,13 @@
 def run(*chain, plugins=None, strategy=None):
     from bonobo import Graph, ThreadPoolExecutorStrategy
 
-    graph = Graph()
-    graph.add_chain(*chain)
+    if len(chain) == 1 and isinstance(chain[0], Graph):
+        graph = chain[0]
+    elif len(chain) >= 1:
+        graph = Graph()
+        graph.add_chain(*chain)
+    else:
+        raise RuntimeError('Empty chain.')
 
     executor = (strategy or ThreadPoolExecutorStrategy)()
     return executor.execute(graph, plugins=plugins or [])
