@@ -32,6 +32,7 @@ __all__ = [
     'Bag',
     'CsvReader',
     'CsvWriter',
+    'Configurable',
     'FileReader',
     'FileWriter',
     'Graph',
@@ -39,6 +40,7 @@ __all__ = [
     'JsonWriter',
     'NOT_MODIFIED',
     'NaiveStrategy',
+    'Option',
     'ProcessPoolExecutorStrategy',
     'ThreadPoolExecutorStrategy',
     '__version__',
@@ -53,3 +55,5 @@ __all__ = [
     'service',
     'tee',
 ]
+
+del sys

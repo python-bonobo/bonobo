@@ -7,8 +7,11 @@ import blessings
 
 from .helpers import run, console_run, jupyter_run
 from .tokens import NOT_MODIFIED
+from .options import Configurable, Option
 
 __all__ = [
+    'Configurable',
+    'Option',
     'NOT_MODIFIED',
     'console_run',
     'jupyter_run',
