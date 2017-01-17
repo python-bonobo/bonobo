@@ -59,9 +59,7 @@ def display(row):
 
 graph = Graph(
     from_opendatasoft_api(
-        API_DATASET,
-        netloc=API_NETLOC,
-        timezone='Europe/Paris'
+        API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
     ),
     normalize,
     filter_france,
