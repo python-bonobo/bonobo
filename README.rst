@@ -1,11 +1,26 @@
 bonobo
 ======
 
-MIGRATION IN PROGRESS FROM RDC.ETL - PYTHON 3.5+
+Data-processing. By monkeys. For humans.
 
+Bonobo is a data-processing library for python 3.5+ that emphasis writing
+simple, atomic, plain old python functions and chaining them using a basic
+acyclic graph. The nodes will need a bit of plumbery to be runnable in
+different means (iteratively, in threads, in processes, on different machines
+...) but that should be as transparent as possible.
+
+The only thing asked to the developer is to either write "pure" functions to
+process data (create a new dict, don't change in place, etc.), and everything
+should be fine from this point.
+
+It's a young rewrite of an old python2.7 tool that ran millions of
+transformations per day for years on production, so as though it may not yet 
+be complete or fully stable (please, allow us to reach 1.0), the underlying
+concepts work.
 
 * Documentation: http://docs.bonobo-project.org/
 * Release announcements: http://eepurl.com/csHFKL
+* Old project (for reference, don't use anymore, instead, help us recode the missing parts in bonobo): http://etl.rdc.li/
 
 
 .. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.2
@@ -35,4 +50,76 @@ MIGRATION IN PROGRESS FROM RDC.ETL - PYTHON 3.5+
 ----
 
 Made with ♥ by `Romain Dorgueil <https://twitter.com/rdorgueil>`_ and `contributors <https://github.com/python-bonobo/bonobo/graphs/contributors>`_.
+
+----
+
+Roadmap (in progress)
+:::::::::::::::::::::
+
+Bonobo is young. This roadmap is alive, and will evolve. Its only purpose is to
+write down incoming things somewhere.
+
+Version 0.2
+-----------
+
+* Changelog
+* Migration guide
+* Update documentation
+* Threaded does not terminate anymore
+* More tests
+
+Configuration
+.............
+
+* Support for position arguments (options), required options are good candidates.
+
+Context processors
+..................
+
+* Be careful with order, especially with python 3.5. (done)
+* @contextual decorator is not clean enough. Once the behavior is right, find a
+  way to use regular inheritance, without meta.
+* ValueHolder API not clean. Find a better way.
+
+Random thoughts and things to do
+................................
+
+* Class-tree for Graph and Nodes
+
+* Class-tree for execution contexts:
+
+  * GraphExecutionContext
+  * NodeExecutionContext
+  * PluginExecutionContext
+
+* Class-tree for ExecutionStrategies
+
+  * NaiveStrategy
+  * PoolExecutionStrategy
+    * ThreadPoolExecutionStrategy
+    * ProcesPoolExecutionStrategy
+  * ThreadExecutionStrategy
+  * ProcessExecutionStrategy
+
+* Class-tree for bags
+
+  * Bag
+  * ErrorBag
+  * InheritingBag
+
+* Co-routines: for unordered, or even ordered but long io.
+
+* "context processors": replace initialize/finalize by a generator that yields only once
+
+
+* "execute" function:
+
+    .. code-block:: python
+
+        def execute(graph: Graph, *, strategy: ExecutionStrategy, plugins: List[Plugin]) -> Execution:
+            pass
+
+
+
+
 
