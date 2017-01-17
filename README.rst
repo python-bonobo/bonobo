@@ -8,19 +8,19 @@ MIGRATION IN PROGRESS FROM RDC.ETL - PYTHON 3.5+
 * Release announcements: http://eepurl.com/csHFKL
 
 
-.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=master
+.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.2
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration
 
-.. image:: https://landscape.io/github/python-bonobo/bonobo/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/python-bonobo/bonobo/master
+.. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
+   :target: https://landscape.io/github/python-bonobo/bonobo/0.2
    :alt: Code Health
 
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
-    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=master
+    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
 
-.. image:: https://readthedocs.org/projects/bonobo/badge/?version=latest
+.. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.2
     :target: http://docs.bonobo-project.org/
     :alt: Documentation
 
