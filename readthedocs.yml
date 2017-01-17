@@ -1,2 +1,5 @@
 conda:
-    file: config/conda.yml
+  file: config/conda.yml
+python:
+  extra_requirements:
+    - dev
