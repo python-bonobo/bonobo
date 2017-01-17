@@ -1,2 +1,3 @@
+requirements_file: requirements-dev.txt
 conda:
     file: config/conda.yml

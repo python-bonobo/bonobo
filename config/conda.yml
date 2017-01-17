@@ -6,4 +6,3 @@ dependencies:
 - wheel=0.29.0=py35_0
 - pip:
   - psycopg2>=2.6.1
-  - -e ..[dev]
