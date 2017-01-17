@@ -1,5 +1,6 @@
 import json
 
+from bonobo import ContextProcessor, contextual
 from .file import FileWriter, FileReader
 
 __all__ = ['JsonWriter', ]
@@ -10,25 +11,24 @@ class JsonHandler:
 
 
 class JsonReader(JsonHandler, FileReader):
-    def read(self, ctx):
-        for line in json.load(ctx.file):
+    def read(self, file):
+        for line in json.load(file):
             yield line
 
 
+@contextual
 class JsonWriter(JsonHandler, FileWriter):
-    def initialize(self, ctx):
-        super().initialize(ctx)
-        ctx.file.write('[\n')
+    @ContextProcessor
+    def envelope(self, context, file, lineno):
+        file.write('[\n')
+        yield
+        file.write('\n]')
 
-    def write(self, ctx, row):
+    def write(self, file, lineno, row):
         """
         Write a json row on the next line of file pointed by ctx.file.
 
         :param ctx:
         :param row:
         """
-        return super().write(ctx, json.dumps(row))
-
-    def finalize(self, ctx):
-        ctx.file.write('\n]')
-        super().finalize(ctx)
+        return super().write(file, lineno, json.dumps(row))

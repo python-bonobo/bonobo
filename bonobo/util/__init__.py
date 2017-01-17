@@ -5,13 +5,10 @@ from pprint import pprint as _pprint
 
 import blessings
 
-from .helpers import run, console_run, jupyter_run
+from .helpers import console_run, jupyter_run
 from .tokens import NOT_MODIFIED
-from .options import Configurable, Option
 
 __all__ = [
-    'Configurable',
-    'Option',
     'NOT_MODIFIED',
     'console_run',
     'jupyter_run',
@@ -19,7 +16,6 @@ __all__ = [
     'log',
     'noop',
     'pprint',
-    'run',
     'tee',
 ]
 

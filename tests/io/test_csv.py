@@ -1,21 +1,22 @@
 import pytest
 
 from bonobo import Bag, CsvReader, CsvWriter
-from bonobo.core.contexts import ComponentExecutionContext
-from bonobo.util.testing import CapturingComponentExecutionContext
+from bonobo.context.execution import NodeExecutionContext
+from bonobo.util.testing import CapturingNodeExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_csv_to_file(tmpdir):
     file = tmpdir.join('output.json')
-    writer = CsvWriter(str(file))
-    context = ComponentExecutionContext(writer, None)
+    writer = CsvWriter(path=str(file))
+    context = NodeExecutionContext(writer, None)
 
-    context.initialize()
     context.recv(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
+
+    context.start()
     context.step()
     context.step()
-    context.finalize()
+    context.stop()
 
     assert file.read() == 'foo\nbar\nbaz\n'
 
@@ -23,27 +24,18 @@ def test_write_csv_to_file(tmpdir):
         getattr(context, 'file')
 
 
-def test_write_json_without_initializer_should_not_work(tmpdir):
-    file = tmpdir.join('output.json')
-    writer = CsvWriter(str(file))
-
-    context = ComponentExecutionContext(writer, None)
-    with pytest.raises(AttributeError):
-        writer(context, {'foo': 'bar'})
-
-
 def test_read_csv_from_file(tmpdir):
     file = tmpdir.join('input.csv')
     file.write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
 
-    reader = CsvReader(str(file), delimiter=',')
+    reader = CsvReader(path=str(file), delimiter=',')
 
-    context = CapturingComponentExecutionContext(reader, None)
+    context = CapturingNodeExecutionContext(reader, None)
 
-    context.initialize()
+    context.start()
     context.recv(BEGIN, Bag(), END)
     context.step()
-    context.finalize()
+    context.stop()
 
     assert len(context.send.mock_calls) == 2
 

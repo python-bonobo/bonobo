@@ -3,11 +3,11 @@ from bonobo.util.tokens import BEGIN
 
 class Graph:
     """
-    Represents a coherent directed acyclic graph (DAG) of components.
+    Represents a coherent directed acyclic graph of components.
     """
 
     def __init__(self, *chain):
-        self.components = []
+        self.nodes = []
         self.graph = {BEGIN: set()}
         self.add_chain(*chain)
 
@@ -16,13 +16,13 @@ class Graph:
             self.graph[idx] = set()
         return self.graph[idx]
 
-    def add_component(self, c):
-        i = len(self.components)
-        self.components.append(c)
+    def add_node(self, c):
+        i = len(self.nodes)
+        self.nodes.append(c)
         return i
 
-    def add_chain(self, *components, _input=BEGIN):
-        for component in components:
-            _next = self.add_component(component)
+    def add_chain(self, *nodes, _input=BEGIN):
+        for node in nodes:
+            _next = self.add_node(node)
             self.outputs_of(_input, create=True).add(_next)
             _input = _next

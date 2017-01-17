@@ -1,4 +1,4 @@
-from bonobo.core.contexts import ExecutionContext
+from bonobo.context.execution import GraphExecutionContext
 
 
 class Strategy:
@@ -6,10 +6,10 @@ class Strategy:
     Base class for execution strategies.
 
     """
-    context_type = ExecutionContext
+    graph_execution_context_factory = GraphExecutionContext
 
-    def create_context(self, graph, *args, **kwargs):
-        return self.context_type(graph, *args, **kwargs)
+    def create_graph_execution_context(self, graph, *args, **kwargs):
+        return self.graph_execution_context_factory(graph, *args, **kwargs)
 
     def execute(self, graph, *args, **kwargs):
         raise NotImplementedError

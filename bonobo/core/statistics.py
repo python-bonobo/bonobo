@@ -14,15 +14,17 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
-from abc import ABCMeta, abstractmethod
 
-from bonobo.core.errors import AbstractError
+class WithStatistics:
+    def __init__(self, *names):
+        self.statistics_names = names
+        self.statistics = {name: 0 for name in names}
 
+    def get_statistics(self, *args, **kwargs):
+        return ((name, self.statistics[name]) for name in self.statistics_names)
 
-class WithStatistics(metaclass=ABCMeta):
-    @abstractmethod
-    def get_stats(self, *args, **kwargs):
-        raise AbstractError(self.get_stats)
+    def get_statistics_as_string(self, *args, **kwargs):
+        return ' '.join(('{0}={1}'.format(name, cnt) for name, cnt in self.get_statistics(*args, **kwargs) if cnt > 0))
 
-    def get_stats_as_string(self, *args, **kwargs):
-        return ' '.join(('{0}={1}'.format(name, cnt) for name, cnt in self.get_stats(*args, **kwargs) if cnt > 0))
+    def increment(self, name):
+        self.statistics[name] += 1

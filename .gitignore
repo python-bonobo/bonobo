@@ -23,6 +23,7 @@
 .tox/
 .webassets-cache
 /.idea
+/.release
 /bonobo.iml
 /bonobo/ext/jupyter/js/node_modules/
 /build/

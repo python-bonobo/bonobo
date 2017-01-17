@@ -86,7 +86,7 @@ class ConsoleOutputPlugin(Plugin):
                         ' ',
                         component.name,
                         ' ',
-                        component.get_stats_as_string(
+                        component.get_statistics_as_string(
                             debug=debug, profile=profile
                         ),
                         ' ',
@@ -100,7 +100,7 @@ class ConsoleOutputPlugin(Plugin):
                             ' - ',
                             component.name,
                             ' ',
-                            component.get_stats_as_string(
+                            component.get_statistics_as_string(
                                 debug=debug, profile=profile
                             ),
                             ' ',

@@ -1,63 +1,47 @@
-from bonobo.util.lifecycle import with_context
+from bonobo.config import Configurable, Option
+from bonobo.context import ContextProcessor
+from bonobo.context.processors import contextual
+from bonobo.util.objects import ValueHolder
 
 __all__ = [
-    'FileHandler',
     'FileReader',
     'FileWriter',
 ]
 
 
-@with_context
-class FileHandler:
+@contextual
+class FileHandler(Configurable):
     """
     Abstract component factory for file-related components.
 
     """
 
-    eol = '\n'
-    mode = None
+    path = Option(str, required=True)
+    eol = Option(str, default='\n')
+    mode = Option(str)
 
-    def __init__(self, path_or_buf, eol=None):
-        self.path_or_buf = path_or_buf
-        self.eol = eol or self.eol
+    @ContextProcessor
+    def file(self, context):
+        with self.open() as file:
+            yield file
 
     def open(self):
-        return open(self.path_or_buf, self.mode)
-
-    def close(self, fp):
-        """
-        :param file fp:
-        """
-        fp.close()
-
-    def initialize(self, ctx):
-        """
-        Initialize a
-        :param ctx:
-        :return:
-        """
-
-        assert not hasattr(ctx, 'file'), 'A file pointer is already in the context... I do not know what to say...'
-        ctx.file = self.open()
-
-    def finalize(self, ctx):
-        self.close(ctx.file)
-        del ctx.file
+        return open(self.path, self.mode)
 
 
 class Reader(FileHandler):
-    def __call__(self, ctx):
-        yield from self.read(ctx)
+    def __call__(self, *args):
+        yield from self.read(*args)
 
-    def read(self, ctx):
+    def read(self, *args):
         raise NotImplementedError('Abstract.')
 
 
 class Writer(FileHandler):
-    def __call__(self, ctx, row):
-        return self.write(ctx, row)
+    def __call__(self, *args):
+        return self.write(*args)
 
-    def write(self, ctx, row):
+    def write(self, *args):
         raise NotImplementedError('Abstract.')
 
 
@@ -70,20 +54,21 @@ class FileReader(Reader):
 
     """
 
-    mode = 'r'
+    mode = Option(str, default='r')
 
-    def read(self, ctx):
+    def read(self, file):
         """
-        Write a row on the next line of file pointed by `ctx.file`.
+        Write a row on the next line of given file.
         Prefix is used for newlines.
 
         :param ctx:
         :param row:
         """
-        for line in ctx.file:
+        for line in file:
             yield line.rstrip(self.eol)
 
 
+@contextual
 class FileWriter(Writer):
     """
     Component factory for file or file-like writers.
@@ -93,13 +78,14 @@ class FileWriter(Writer):
 
     """
 
-    mode = 'w+'
+    mode = Option(str, default='w+')
 
-    def initialize(self, ctx):
-        ctx.line = 0
-        return super().initialize(ctx)
+    @ContextProcessor
+    def lineno(self, context, file):
+        lineno = ValueHolder(0, type=int)
+        yield lineno
 
-    def write(self, ctx, row):
+    def write(self, file, lineno, row):
         """
         Write a row on the next line of opened file in context.
 
@@ -107,12 +93,8 @@ class FileWriter(Writer):
         :param str row:
         :param str prefix:
         """
-        self._write_line(ctx.file, (self.eol if ctx.line else '') + row)
-        ctx.line += 1
+        self._write_line(file, (self.eol if lineno.value else '') + row)
+        lineno.value += 1
 
-    def _write_line(self, fp, line):
-        return fp.write(line)
-
-    def finalize(self, ctx):
-        del ctx.line
-        return super().finalize(ctx)
+    def _write_line(self, file, line):
+        return file.write(line)

@@ -24,20 +24,20 @@ def test_graph_outputs_of():
 def test_graph_add_component():
     g = Graph()
 
-    assert len(g.components) == 0
+    assert len(g.nodes) == 0
 
-    g.add_component(identity)
-    assert len(g.components) == 1
+    g.add_node(identity)
+    assert len(g.nodes) == 1
 
-    g.add_component(identity)
-    assert len(g.components) == 2
+    g.add_node(identity)
+    assert len(g.nodes) == 2
 
 
 def test_graph_add_chain():
     g = Graph()
 
-    assert len(g.components) == 0
+    assert len(g.nodes) == 0
 
     g.add_chain(identity, identity, identity)
-    assert len(g.components) == 3
+    assert len(g.nodes) == 3
     assert len(g.outputs_of(BEGIN)) == 1

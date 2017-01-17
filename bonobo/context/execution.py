@@ -3,39 +3,31 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
+from bonobo.context.processors import get_context_processors
 from bonobo.core.bags import Bag, INHERIT_INPUT, ErrorBag
 from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
-from bonobo.core.stats import WithStatistics
-from bonobo.util.lifecycle import get_initializer, get_finalizer
-from bonobo.util.tokens import BEGIN, END, NEW, RUNNING, TERMINATED, NOT_MODIFIED
+from bonobo.core.statistics import WithStatistics
+from bonobo.util.objects import Wrapper
+from bonobo.util.tokens import BEGIN, END, NOT_MODIFIED
 
 
-def get_name(mixed):
-    try:
-        return mixed.__name__
-    except AttributeError:
-        return type(mixed).__name__
+class GraphExecutionContext:
+    @property
+    def started(self):
+        return any(node.started for node in self.nodes)
 
+    @property
+    def stopped(self):
+        return all(node.started and node.stopped for node in self.nodes)
 
-def create_component_context(component, parent):
-    try:
-        CustomComponentContext = component.Context
-    except AttributeError:
-        return ComponentExecutionContext(component, parent=parent)
+    @property
+    def alive(self):
+        return self.started and not self.stopped
 
-    if ComponentExecutionContext in CustomComponentContext.__mro__:
-        bases = (CustomComponentContext, )
-    else:
-        bases = (CustomComponentContext, ComponentExecutionContext)
-
-    return type(get_name(component).title() + 'ExecutionContext', bases, {})(component, parent=parent)
-
-
-class ExecutionContext:
     def __init__(self, graph, plugins=None):
         self.graph = graph
-        self.components = [create_component_context(component, parent=self) for component in self.graph.components]
+        self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph.nodes]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
 
         for i, component_context in enumerate(self):
@@ -46,16 +38,16 @@ class ExecutionContext:
 
             component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
             component_context.input.on_end = partial(component_context.send, END, _control=True)
-            component_context.input.on_finalize = partial(component_context.finalize)
+            component_context.input.on_finalize = partial(component_context.stop)
 
     def __getitem__(self, item):
-        return self.components[item]
+        return self.nodes[item]
 
     def __len__(self):
-        return len(self.components)
+        return len(self.nodes)
 
     def __iter__(self):
-        yield from self.components
+        yield from self.nodes
 
     def recv(self, *messages):
         """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
@@ -65,31 +57,67 @@ class ExecutionContext:
             for message in messages:
                 self[i].recv(message)
 
-    @property
-    def alive(self):
-        return any(component.alive for component in self.components)
+    def start(self):
+        # todo use strategy
+        for node in self.nodes:
+            node.start()
+
+    def loop(self):
+        # todo use strategy
+        for node in self.nodes:
+            node.loop()
+
+    def stop(self):
+        # todo use strategy
+        for node in self.nodes:
+            node.stop()
 
 
-class AbstractLoopContext:
+def ensure_tuple(tuple_or_mixed):
+    if isinstance(tuple_or_mixed, tuple):
+        return tuple_or_mixed
+    return (tuple_or_mixed, )
+
+
+class LoopingExecutionContext(Wrapper):
     alive = True
     PERIOD = 0.25
 
-    def __init__(self, wrapped):
-        self.wrapped = wrapped
+    @property
+    def state(self):
+        return self._started, self._stopped
 
-    def run(self):
-        self.initialize()
-        self.loop()
-        self.finalize()
+    @property
+    def started(self):
+        return self._started
 
-    def initialize(self):
-        # pylint: disable=broad-except
-        try:
-            initializer = get_initializer(self.wrapped)
-        except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
-        else:
-            return initializer(self)
+    @property
+    def stopped(self):
+        return self._stopped
+
+    def __init__(self, wrapped, parent):
+        super().__init__(wrapped)
+        self.parent = parent
+        self._started, self._stopped, self._context, self._stack = False, False, None, []
+
+    def start(self):
+        assert self.state == (False, False), ('{}.start() can only be called on a new node.'
+                                              ).format(type(self).__name__)
+        assert self._context is None
+
+        self._started = True
+        self._context = ()
+        for processor in get_context_processors(self.wrapped):
+            _processed = processor(self.wrapped, self, *self._context)
+            try:
+                # todo yield from ?
+                _append_to_context = next(_processed)
+                if _append_to_context is not None:
+                    self._context += ensure_tuple(_append_to_context)
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
+                raise
+            self._stack.append(_processed)
 
     def loop(self):
         """Generic loop. A bit boring. """
@@ -103,15 +131,28 @@ class AbstractLoopContext:
         """
         raise NotImplementedError('Abstract.')
 
-    def finalize(self):
-        """Generic finalizer. """
-        # pylint: disable=broad-except
-        try:
-            finalizer = get_finalizer(self.wrapped)
-        except Exception as exc:
-            return self.handle_error(exc, traceback.format_exc())
-        else:
-            return finalizer(self)
+    def stop(self):
+        assert self._started, ('{}.stop() can only be called on a previously started node.').format(type(self).__name__)
+        if self._stopped:
+            return
+
+        assert self._context is not None
+
+        self._stopped = True
+        while len(self._stack):
+            processor = self._stack.pop()
+            try:
+                # todo yield from ? how to ?
+                next(processor)
+            except StopIteration as exc:
+                # This is normal, and wanted.
+                pass
+            except Exception as exc:  # pylint: disable=broad-except
+                self.handle_error(exc, traceback.format_exc())
+                raise
+            else:
+                # No error ? We should have had StopIteration ...
+                raise RuntimeError('Context processors should not yield more than once.')
 
     def handle_error(self, exc, trace):
         """
@@ -129,11 +170,9 @@ class AbstractLoopContext:
         print(trace)
 
 
-class PluginExecutionContext(AbstractLoopContext):
-    def __init__(self, plugin, parent):
-        self.plugin = plugin
-        self.parent = parent
-        super().__init__(self.plugin)
+class PluginExecutionContext(LoopingExecutionContext):
+    def __init__(self, wrapped, parent):
+        LoopingExecutionContext.__init__(self, wrapped, parent)
 
     def shutdown(self):
         self.alive = False
@@ -145,7 +184,7 @@ class PluginExecutionContext(AbstractLoopContext):
             self.handle_error(exc, traceback.format_exc())
 
 
-class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
+class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     """
     todo: make the counter dependant of parent context?
     """
@@ -153,47 +192,20 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
     @property
     def alive(self):
         """todo check if this is right, and where it is used"""
-        return self.input.alive
+        return self.input.alive and self._started and not self._stopped
 
-    @property
-    def name(self):
-        return getattr(self.component, '__name__', getattr(type(self.component), '__name__', repr(self.component)))
+    def __init__(self, wrapped, parent):
+        LoopingExecutionContext.__init__(self, wrapped, parent)
+        WithStatistics.__init__(self, 'in', 'out', 'err')
 
-    def __init__(self, component, parent):
-        self.parent = parent
-        self.component = component
         self.input = Input()
         self.outputs = []
-        self.state = NEW
-        self.stats = {
-            'in': 0,
-            'out': 0,
-            'err': 0,
-            'read': 0,
-            'write': 0,
-        }
 
-        super().__init__(self.component)
+    def __str__(self):
+        return (('+' if self.alive else '-') + ' ' + self.__name__ + ' ' + self.get_statistics_as_string()).strip()
 
     def __repr__(self):
-        """Adds "alive" information to the transform representation."""
-        return ('+' if self.alive else '-') + ' ' + self.name + ' ' + self.get_stats_as_string()
-
-    def get_stats(self, *args, **kwargs):
-        return (
-            (
-                'in',
-                self.stats['in'],
-            ),
-            (
-                'out',
-                self.stats['out'],
-            ),
-            (
-                'err',
-                self.stats['err'],
-            ),
-        )
+        return '<' + self.__str__() + '>'
 
     def recv(self, *messages):
         """
@@ -212,7 +224,7 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         :param _control: if true, won't count in statistics.
         """
         if not _control:
-            self.stats['out'] += 1
+            self.increment('out')
         for output in self.outputs:
             output.put(value)
 
@@ -222,40 +234,8 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
 
         """
         row = self.input.get(timeout=self.PERIOD)
-        self.stats['in'] += 1
+        self.increment('in')
         return row
-
-    def apply_on(self, bag):
-        # todo add timer
-        if getattr(self.component, '_with_context', False):
-            return bag.apply(self.component, self)
-        return bag.apply(self.component)
-
-    def initialize(self):
-        # pylint: disable=broad-except
-        assert self.state is NEW, (
-            'A {} can only be run once, and thus is expected to be in {} state at '
-            'initialization time.'
-        ).format(type(self).__name__, NEW)
-        self.state = RUNNING
-
-        try:
-            initializer_outputs = super().initialize()
-            self.handle(None, initializer_outputs)
-        except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
-
-    def finalize(self):
-        # pylint: disable=broad-except
-        assert self.state is RUNNING, ('A {} must be in {} state at finalization time.'
-                                       ).format(type(self).__name__, RUNNING)
-        self.state = TERMINATED
-
-        try:
-            finalizer_outputs = super().finalize()
-            self.handle(None, finalizer_outputs)
-        except Exception as exc:
-            self.handle_error(exc, traceback.format_exc())
 
     def loop(self):
         while True:
@@ -277,24 +257,21 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         output channel."""
 
         input_bag = self.get()
-        outputs = self.apply_on(input_bag)
-        self.handle(input_bag, outputs)
 
-    def run(self):
-        self.initialize()
-        self.loop()
+        # todo add timer
+        self.handle_results(input_bag, input_bag.apply(self.wrapped, *self._context))
 
-    def handle(self, input_bag, outputs):
+    def handle_results(self, input_bag, results):
         # self._exec_time += timer.duration
         # Put data onto output channels
         try:
-            outputs = _iter(outputs)
+            results = _iter(results)
         except TypeError:  # not an iterator
-            if outputs:
-                if isinstance(outputs, ErrorBag):
-                    outputs.apply(self.handle_error)
+            if results:
+                if isinstance(results, ErrorBag):
+                    results.apply(self.handle_error)
                 else:
-                    self.send(_resolve(input_bag, outputs))
+                    self.send(_resolve(input_bag, results))
             else:
                 # case with no result, an execution went through anyway, use for stats.
                 # self._exec_count += 1
@@ -302,7 +279,7 @@ class ComponentExecutionContext(WithStatistics, AbstractLoopContext):
         else:
             while True:  # iterator
                 try:
-                    output = next(outputs)
+                    output = next(results)
                 except StopIteration:
                     break
                 else:

@@ -1,8 +1,8 @@
 import pytest
 
 from bonobo import FileWriter, Bag, FileReader
-from bonobo.core.contexts import ComponentExecutionContext
-from bonobo.util.testing import CapturingComponentExecutionContext
+from bonobo.context.execution import NodeExecutionContext
+from bonobo.util.testing import CapturingNodeExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
 
@@ -16,27 +16,24 @@ from bonobo.util.tokens import BEGIN, END
 def test_file_writer_in_context(tmpdir, lines, output):
     file = tmpdir.join('output.txt')
 
-    writer = FileWriter(str(file))
-    context = ComponentExecutionContext(writer, None)
+    writer = FileWriter(path=str(file))
+    context = NodeExecutionContext(writer, None)
 
-    context.initialize()
+    context.start()
     context.recv(BEGIN, *map(Bag, lines), END)
     for i in range(len(lines)):
         context.step()
-    context.finalize()
+    context.stop()
 
     assert file.read() == output
-
-    with pytest.raises(AttributeError):
-        getattr(context, 'file')
 
 
 def test_file_writer_out_of_context(tmpdir):
     file = tmpdir.join('output.txt')
-    writer = FileWriter(str(file))
-    fp = writer.open()
-    fp.write('Yosh!')
-    writer.close(fp)
+    writer = FileWriter(path=str(file))
+
+    with writer.open() as fp:
+        fp.write('Yosh!')
 
     assert file.read() == 'Yosh!'
 
@@ -45,13 +42,13 @@ def test_file_reader_in_context(tmpdir):
     file = tmpdir.join('input.txt')
     file.write('Hello\nWorld\n')
 
-    reader = FileReader(str(file))
-    context = CapturingComponentExecutionContext(reader, None)
+    reader = FileReader(path=str(file))
+    context = CapturingNodeExecutionContext(reader, None)
 
-    context.initialize()
+    context.start()
     context.recv(BEGIN, Bag(), END)
     context.step()
-    context.finalize()
+    context.stop()
 
     assert len(context.send.mock_calls) == 2
 

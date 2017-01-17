@@ -1,18 +1,12 @@
 import csv
-from copy import copy
 
+from bonobo import Option, ContextProcessor, contextual
+from bonobo.util.objects import ValueHolder
 from .file import FileReader, FileWriter, FileHandler
 
 
 class CsvHandler(FileHandler):
-    delimiter = ';'
-    quotechar = '"'
-    headers = None
-
-
-class CsvReader(CsvHandler, FileReader):
     """
-    Reads a CSV and yield the values as dicts.
 
     .. attribute:: delimiter
 
@@ -26,30 +20,33 @@ class CsvReader(CsvHandler, FileReader):
 
         The list of column names, if the CSV does not contain it as its first line.
 
+    """
+    delimiter = Option(str, default=';')
+    quotechar = Option(str, default='"')
+    headers = Option(tuple)
+
+
+@contextual
+class CsvReader(CsvHandler, FileReader):
+    """
+    Reads a CSV and yield the values as dicts.
+
     .. attribute:: skip
 
         The amount of lines to skip before it actually yield output.
 
     """
 
-    skip = 0
+    skip = Option(int, default=0)
 
-    def __init__(self, path_or_buf, delimiter=None, quotechar=None, headers=None, skip=None):
-        super().__init__(path_or_buf)
+    @ContextProcessor
+    def csv_headers(self, context, file):
+        yield ValueHolder(self.headers)
 
-        self.delimiter = str(delimiter or self.delimiter)
-        self.quotechar = quotechar or self.quotechar
-        self.headers = headers or self.headers
-        self.skip = skip or self.skip
-
-    @property
-    def has_headers(self):
-        return bool(self.headers)
-
-    def read(self, ctx):
-        reader = csv.reader(ctx.file, delimiter=self.delimiter, quotechar=self.quotechar)
-        headers = self.has_headers and self.headers or next(reader)
-        field_count = len(headers)
+    def read(self, file, headers):
+        reader = csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
+        headers.value = headers.value or next(reader)
+        field_count = len(headers.value)
 
         if self.skip and self.skip > 0:
             for i in range(0, self.skip):
@@ -62,30 +59,20 @@ class CsvReader(CsvHandler, FileReader):
                     field_count,
                 ))
 
-            yield dict(zip(headers, row))
+            yield dict(zip(headers.value, row))
 
 
+@contextual
 class CsvWriter(CsvHandler, FileWriter):
-    def __init__(self, path_or_buf, delimiter=None, quotechar=None, headers=None):
-        super().__init__(path_or_buf)
+    @ContextProcessor
+    def writer(self, context, file, lineno):
+        writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar)
+        headers = ValueHolder(list(self.headers) if self.headers else None)
+        yield writer, headers
 
-        self.delimiter = str(delimiter or self.delimiter)
-        self.quotechar = quotechar or self.quotechar
-        self.headers = headers or self.headers
-
-    def initialize(self, ctx):
-        super().initialize(ctx)
-        ctx.writer = csv.writer(ctx.file, delimiter=self.delimiter, quotechar=self.quotechar)
-        ctx.headers = copy(self.headers)
-        ctx.first = True
-
-    def write(self, ctx, row):
-        if ctx.first:
-            ctx.headers = ctx.headers or row.keys()
-            ctx.writer.writerow(ctx.headers)
-            ctx.first = False
-        ctx.writer.writerow(row[header] for header in ctx.headers)
-
-    def finalize(self, ctx):
-        del ctx.headers, ctx.writer, ctx.first
-        super().finalize(ctx)
+    def write(self, file, lineno, writer, headers, row):
+        if not lineno.value:
+            headers.value = headers.value or row.keys()
+            writer.writerow(headers.value)
+        writer.writerow(row[header] for header in headers.value)
+        lineno.value += 1

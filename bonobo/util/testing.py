@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock
 
-from bonobo.core.contexts import ComponentExecutionContext
+from bonobo.context.execution import NodeExecutionContext
 
 
-class CapturingComponentExecutionContext(ComponentExecutionContext):
-    def __init__(self, component, parent):
-        super().__init__(component, parent)
+class CapturingNodeExecutionContext(NodeExecutionContext):
+    def __init__(self, wrapped, parent):
+        super().__init__(wrapped, parent)
         self.send = MagicMock()

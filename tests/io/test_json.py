@@ -1,20 +1,21 @@
 import pytest
 
 from bonobo import Bag, JsonWriter, JsonReader
-from bonobo.core.contexts import ComponentExecutionContext
-from bonobo.util.testing import CapturingComponentExecutionContext
+from bonobo.context.execution import NodeExecutionContext
+from bonobo.util.objects import ValueHolder
+from bonobo.util.testing import CapturingNodeExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_json_to_file(tmpdir):
     file = tmpdir.join('output.json')
-    writer = JsonWriter(str(file))
-    context = ComponentExecutionContext(writer, None)
+    writer = JsonWriter(path=str(file))
+    context = NodeExecutionContext(writer, None)
 
-    context.initialize()
+    context.start()
     context.recv(BEGIN, Bag({'foo': 'bar'}), END)
     context.step()
-    context.finalize()
+    context.stop()
 
     assert file.read() == '[\n{"foo": "bar"}\n]'
 
@@ -25,26 +26,17 @@ def test_write_json_to_file(tmpdir):
         getattr(context, 'first')
 
 
-def test_write_json_without_initializer_should_not_work(tmpdir):
-    file = tmpdir.join('output.json')
-    writer = JsonWriter(str(file))
-
-    context = ComponentExecutionContext(writer, None)
-    with pytest.raises(AttributeError):
-        writer(context, {'foo': 'bar'})
-
-
 def test_read_json_from_file(tmpdir):
     file = tmpdir.join('input.json')
     file.write('[{"x": "foo"},{"x": "bar"}]')
-    reader = JsonReader(str(file))
+    reader = JsonReader(path=str(file))
 
-    context = CapturingComponentExecutionContext(reader, None)
+    context = CapturingNodeExecutionContext(reader, None)
 
-    context.initialize()
+    context.start()
     context.recv(BEGIN, Bag(), END)
     context.step()
-    context.finalize()
+    context.stop()
 
     assert len(context.send.mock_calls) == 2
 

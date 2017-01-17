@@ -1,7 +1,5 @@
 import functools
-
 import itertools
-from functools import partial
 
 
 class service:
@@ -23,7 +21,7 @@ class service:
         return item
 
     def define(self, *args, **kwargs):
-        new_service = type(self)(partial(self.factory, *args, **kwargs))
+        new_service = type(self)(functools.partial(self.factory, *args, **kwargs))
         self.children.add(new_service)
         return new_service
 

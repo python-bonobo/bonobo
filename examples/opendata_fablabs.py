@@ -1,8 +1,9 @@
 import json
+import os
 
 from blessings import Terminal
 
-from bonobo import console_run, tee, JsonWriter, Graph
+from bonobo import tee, JsonWriter, Graph
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 try:
@@ -15,6 +16,7 @@ API_NETLOC = 'datanova.laposte.fr'
 ROWS = 100
 
 t = Terminal()
+__path__ = os.path.dirname(__file__)
 
 
 def _getlink(x):
@@ -57,13 +59,17 @@ def display(row):
 
 graph = Graph(
     from_opendatasoft_api(
-        API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
+        API_DATASET,
+        netloc=API_NETLOC,
+        timezone='Europe/Paris'
     ),
     normalize,
     filter_france,
     tee(display),
-    JsonWriter('fablabs.json'),
+    JsonWriter(path=os.path.join(__path__, 'datasets/coffeeshops.txt')),
 )
 
 if __name__ == '__main__':
-    console_run(graph, output=True)
+    import bonobo
+
+    bonobo.run(graph)

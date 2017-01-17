@@ -1,8 +1,8 @@
-from bonobo.core.stats import WithStatistics
+from bonobo.core.statistics import WithStatistics
 
 
 class MyThingWithStats(WithStatistics):
-    def get_stats(self, *args, **kwargs):
+    def get_statistics(self, *args, **kwargs):
         return (
             ('foo', 42),
             ('bar', 69),
@@ -11,4 +11,4 @@ class MyThingWithStats(WithStatistics):
 
 def test_with_statistics():
     o = MyThingWithStats()
-    assert o.get_stats_as_string() == 'foo=42 bar=69'
+    assert o.get_statistics_as_string() == 'foo=42 bar=69'

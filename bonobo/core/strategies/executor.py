@@ -17,19 +17,34 @@ class ExecutorStrategy(Strategy):
 
     executor_factory = Executor
 
+    def create_executor(self):
+        return self.executor_factory()
+
     def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_context(graph, plugins=plugins)
+        context = self.create_graph_execution_context(graph, plugins=plugins)
+
         context.recv(BEGIN, Bag(), END)
 
-        executor = self.executor_factory()
+        executor = self.create_executor()
 
         futures = []
 
         for plugin_context in context.plugins:
-            futures.append(executor.submit(plugin_context.run))
 
-        for component_context in context.components:
-            futures.append(executor.submit(component_context.run))
+            def _runner(plugin_context=plugin_context):
+                plugin_context.start()
+                plugin_context.loop()
+                plugin_context.stop()
+
+            futures.append(executor.submit(_runner))
+
+        for node_context in context.nodes:
+
+            def _runner(node_context=node_context):
+                node_context.start()
+                node_context.loop()
+
+            futures.append(executor.submit(_runner))
 
         while context.alive:
             time.sleep(0.2)
@@ -52,7 +67,7 @@ class ProcessPoolExecutorStrategy(ExecutorStrategy):
 
 class ThreadCollectionStrategy(Strategy):
     def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_context(graph, plugins=plugins)
+        context = self.create_graph_execution_context(graph, plugins=plugins)
         context.recv(BEGIN, Bag(), END)
 
         threads = []

@@ -2,8 +2,6 @@ import time
 from random import randint
 
 from bonobo.core.graphs import Graph
-from bonobo.core.strategies.executor import ThreadPoolExecutorStrategy
-from bonobo.ext.console import ConsoleOutputPlugin
 
 
 def extract():
@@ -25,11 +23,10 @@ def load(s):
     print(s)
 
 
-Strategy = ThreadPoolExecutorStrategy
+graph = Graph()
+graph.add_chain(extract, transform, load)
 
 if __name__ == '__main__':
-    etl = Graph()
-    etl.add_chain(extract, transform, load)
+    from bonobo import run
 
-    s = Strategy()
-    s.execute(etl, plugins=[ConsoleOutputPlugin()])
+    run(graph)

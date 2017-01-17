@@ -54,7 +54,6 @@ class Bag:
 
                 return generator()
             except TypeError as exc:
-                print('nop')
                 raise TypeError('Could not apply bag to {}.'.format(func_or_iter)) from exc
 
         raise TypeError('Could not apply bag to {}.'.format(func_or_iter))

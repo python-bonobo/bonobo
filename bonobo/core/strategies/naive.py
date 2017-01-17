@@ -6,12 +6,12 @@ from ..bags import Bag
 
 class NaiveStrategy(Strategy):
     def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_context(graph, plugins=plugins)
+        context = self.create_graph_execution_context(graph, plugins=plugins)
         context.recv(BEGIN, Bag(), END)
 
         # TODO: how to run plugins in "naive" mode ?
-
-        for component in context.components:
-            component.run()
+        context.start()
+        context.loop()
+        context.stop()
 
         return context

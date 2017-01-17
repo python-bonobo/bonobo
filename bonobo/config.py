@@ -33,6 +33,8 @@ class Configurable(metaclass=ConfigurableMeta):
     """
 
     def __init__(self, **kwargs):
+        super().__init__()
+
         self.__options_values__ = {}
 
         missing = set()

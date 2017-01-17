@@ -30,7 +30,7 @@ def from_opendatasoft_api(
                 break
 
             for row in records:
-                yield { ** row.get('fields', {}), 'geometry': row.get('geometry', {})}
+                yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
             start += rows
 

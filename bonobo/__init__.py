@@ -20,19 +20,55 @@
     limitations under the License.
 """
 import sys
+import warnings
 
 assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
 
 from ._version import __version__
+from .config import *
+from .context import *
 from .core import *
-from .io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
+from .io import *
 from .util import *
+
+DEFAULT_STRATEGY = 'threadpool'
+
+STRATEGIES = {
+    'naive': NaiveStrategy,
+    'processpool': ProcessPoolExecutorStrategy,
+    'threadpool': ThreadPoolExecutorStrategy,
+}
+
+
+def run(graph, *chain, strategy=None, plugins=None):
+    from bonobo.core.strategies.base import Strategy
+
+    if len(chain):
+        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
+        from bonobo import Graph
+        graph = Graph(graph, *chain)
+
+    if not isinstance(strategy, Strategy):
+        if strategy is None:
+            strategy = DEFAULT_STRATEGY
+
+        try:
+            strategy = STRATEGIES[strategy]
+        except KeyError as exc:
+            raise RuntimeError('Invalid strategy {}.'.format(repr(strategy))) from exc
+
+        strategy = strategy()
+
+    return strategy.execute(graph, plugins=plugins)
+
 
 __all__ = [
     'Bag',
+    'Configurable',
+    'ContextProcessor',
+    'contextual',
     'CsvReader',
     'CsvWriter',
-    'Configurable',
     'FileReader',
     'FileWriter',
     'Graph',
@@ -51,9 +87,9 @@ __all__ = [
     'log',
     'noop',
     'pprint',
-    'run',
     'service',
     'tee',
 ]
 
+del warnings
 del sys

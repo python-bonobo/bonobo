@@ -1,6 +1,5 @@
-from bonobo import Graph, NaiveStrategy, Bag
-from bonobo.core.contexts import ExecutionContext
-from bonobo.util.lifecycle import with_context
+from bonobo import Graph, NaiveStrategy, Bag, contextual
+from bonobo.context.execution import GraphExecutionContext
 from bonobo.util.tokens import BEGIN, END
 
 
@@ -12,11 +11,16 @@ def square(i: int) -> int:
     return i**2
 
 
-@with_context
-def push_result(ctx, i: int):
-    if not hasattr(ctx.parent, 'results'):
-        ctx.parent.results = []
-    ctx.parent.results.append(i)
+@contextual
+def push_result(results, i: int):
+    results.append(i)
+
+
+@push_result.__processors__.append
+def results(f, context):
+    results = []
+    yield results
+    context.parent.results = results
 
 
 chain = (generate_integers, square, push_result)
@@ -25,8 +29,8 @@ chain = (generate_integers, square, push_result)
 def test_empty_execution_context():
     graph = Graph()
 
-    ctx = ExecutionContext(graph)
-    assert not len(ctx.components)
+    ctx = GraphExecutionContext(graph)
+    assert not len(ctx.nodes)
     assert not len(ctx.plugins)
 
     assert not ctx.alive
@@ -46,15 +50,19 @@ def test_simple_execution_context():
     graph = Graph()
     graph.add_chain(*chain)
 
-    ctx = ExecutionContext(graph)
-    assert len(ctx.components) == len(chain)
+    ctx = GraphExecutionContext(graph)
+    assert len(ctx.nodes) == len(chain)
     assert not len(ctx.plugins)
 
-    for i, component in enumerate(chain):
-        assert ctx[i].component is component
+    for i, node in enumerate(chain):
+        assert ctx[i].wrapped is node
 
     assert not ctx.alive
 
     ctx.recv(BEGIN, Bag(), END)
+
+    assert not ctx.alive
+
+    ctx.start()
 
     assert ctx.alive
