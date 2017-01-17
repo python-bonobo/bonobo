@@ -14,12 +14,18 @@ def get_context_processors(mixed):
 
 
 class ContextProcessor:
+    _creation_counter = 0
+
     @property
     def __name__(self):
         return self.func.__name__
 
     def __init__(self, func):
         self.func = func
+
+        # This hack is necessary for python3.5
+        self._creation_counter = ContextProcessor._creation_counter
+        ContextProcessor._creation_counter += 1
 
     def __repr__(self):
         return repr(self.func).replace('<function', '<{}'.format(type(self).__name__))
@@ -42,4 +48,6 @@ def contextual(cls_or_func):
     for name, value in cls_or_func.__dict__.items():
         if isinstance(value, ContextProcessor):
             _processors.append(value)
+    # This is needed for python 3.5, python 3.6 should be fine, but it's considered an implementation detail.
+    _processors.sort(key=lambda proc: proc._creation_counter)
     return cls_or_func
