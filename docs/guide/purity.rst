@@ -1,5 +1,5 @@
-Pure components and space complexity
-====================================
+Pure transformations
+====================
 
 The nature of components, and how the data flow from one to another, make them not so easy to write correctly.
 Hopefully, with a few hints, you will be able to understand why and how they should be written.
@@ -14,7 +14,7 @@ returning) them. Numeric values, strings and tuples being immutable in python, m
 type will already return a different instance.
 
 Numbers
-=======
+:::::::
 
 You can't be wrong with numbers. All of the following are correct.
 
@@ -45,7 +45,7 @@ You can't be wrong with numbers. All of the following are correct.
 The same is true with other numeric types, so don't be shy. Operate like crazy, my friend.
 
 Tuples
-======
+::::::
 
 Tuples are immutable, so you risk nothing.
 
@@ -63,12 +63,12 @@ Tuples are immutable, so you risk nothing.
         return t
 
 Strings
-=======
+:::::::
 
 You know the drill, strings are immutable, blablabla ... Examples left as an exercise for the reader.
 
 Dicts
-=====
+:::::
 
 So, now it gets interesting. Dicts are mutable. It means that you can mess things up badly here if you're not cautious.
 

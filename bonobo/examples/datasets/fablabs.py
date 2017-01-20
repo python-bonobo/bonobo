@@ -3,7 +3,7 @@ import os
 
 from blessings import Terminal
 
-from bonobo import tee, JsonWriter, Graph
+from bonobo import Tee, JsonWriter, Graph, get_examples_path
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 
 try:
@@ -63,11 +63,11 @@ graph = Graph(
     ),
     normalize,
     filter_france,
-    tee(display),
-    JsonWriter(path=os.path.join(__path__, 'datasets/coffeeshops.txt')),
+    Tee(display),
+    JsonWriter(path=get_examples_path('datasets/fablabs.txt')),
 )
 
 if __name__ == '__main__':
-    import bonobo
+    from bonobo import run
 
-    bonobo.run(graph)
+    run(graph)

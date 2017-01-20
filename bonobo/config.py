@@ -1,3 +1,8 @@
+__all__ = [
+    'Configurable',
+    'Option',
+]
+
 class Option:
     def __init__(self, type=None, *, required=False, default=None):
         self.name = None

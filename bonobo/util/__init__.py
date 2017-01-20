@@ -9,14 +9,14 @@ from .helpers import console_run, jupyter_run
 from .tokens import NOT_MODIFIED
 
 __all__ = [
+    'Limit',
     'NOT_MODIFIED',
+    'PrettyPrint',
+    'Tee',
     'console_run',
     'jupyter_run',
-    'limit',
-    'log',
     'noop',
     'pprint',
-    'tee',
 ]
 
 
@@ -24,7 +24,7 @@ def identity(x):
     return x
 
 
-def limit(n=10):
+def Limit(n=10):
     i = 0
 
     def _limit(*args, **kwargs):
@@ -37,7 +37,7 @@ def limit(n=10):
     return _limit
 
 
-def tee(f):
+def Tee(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         nonlocal f
@@ -47,10 +47,10 @@ def tee(f):
     return wrapped
 
 
-log = tee(_pprint)
+pprint = Tee(_pprint)
 
 
-def pprint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
+def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
     term = blessings.Terminal()
 
     def _pprint(*args, **kwargs):
@@ -78,6 +78,7 @@ def pprint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
 
 
 '''
+    Old code from rdc.etl
 
     def writehr(self, label=None):
         width = t.width or 80
@@ -113,4 +114,4 @@ def pprint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
 
 
 def noop(*args, **kwargs):  # pylint: disable=unused-argument
-    pass
+    return NOT_MODIFIED

@@ -23,7 +23,7 @@ class GraphExecutionContext:
 
     @property
     def alive(self):
-        return self.started and not self.stopped
+        return any(node.alive for node in self.nodes)
 
     def __init__(self, graph, plugins=None):
         self.graph = graph

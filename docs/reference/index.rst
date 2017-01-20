@@ -6,8 +6,5 @@ References
 .. toctree::
     :maxdepth: 4
 
-    bonobo
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    commands
+    api

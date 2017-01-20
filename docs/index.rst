@@ -8,6 +8,7 @@ Bonobo
    tutorial/index
    guide/index
    reference/index
+   contribute/index
    genindex
    modindex
 

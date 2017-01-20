@@ -1,6 +1,6 @@
 import json
 
-from bonobo import ContextProcessor, contextual
+from bonobo.context import ContextProcessor, contextual
 from .file import FileWriter, FileReader
 
 __all__ = ['JsonWriter', ]

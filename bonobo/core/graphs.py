@@ -26,3 +26,6 @@ class Graph:
             _next = self.add_node(node)
             self.outputs_of(_input, create=True).add(_next)
             _input = _next
+
+    def __len__(self):
+        return len(self.nodes)

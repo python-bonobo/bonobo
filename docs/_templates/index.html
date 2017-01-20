@@ -38,14 +38,13 @@
     <table class="contentstable">
         <tr>
             <td>
-                <p class="biglink"><a class="biglink" href="{{ pathto("tutorial/basics") }}">{% trans %}First steps{% endtrans %}</a><br/>
+                <p class="biglink"><a class="biglink" href="{{ pathto("tutorial/index") }}">{% trans %}First steps{% endtrans %}</a><br/>
                     <span class="linkdescr">{% trans %}quick overview of basic features{% endtrans %}</span></p>
             </td>
             <td>
-                {%- if hasdoc('search') %}
-                    <p class="biglink"><a class="biglink" href="{{ pathto("search") }}">{% trans %}
-                        Search{% endtrans %}</a><br/>
-                        <span class="linkdescr">{% trans %}search the documentation{% endtrans %}</span></p>{%- endif %}
+                <p class="biglink"><a class="biglink" href="{{ pathto("search") }}">{% trans %}
+                    Search{% endtrans %}</a><br/>
+                    <span class="linkdescr">{% trans %}search the documentation{% endtrans %}</span></p>
             </td>
         </tr>
         <tr>
@@ -69,7 +68,7 @@
                     <span class="linkdescr">{% trans %}examples and recipes{% endtrans %}</span></p>
             </td>
             <td>
-                <p class="biglink"><a class="biglink" href="{{ pathto("changes") }}">{% trans %}
+                <p class="biglink"><a class="biglink" href="{{ pathto("contribute/index") }}">{% trans %}
                     Contribute{% endtrans %}</a><br/>
                     <span class="linkdescr">{% trans %}contributor guide{% endtrans %}</span></p>
             </td>

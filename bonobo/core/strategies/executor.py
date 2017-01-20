@@ -39,11 +39,9 @@ class ExecutorStrategy(Strategy):
             futures.append(executor.submit(_runner))
 
         for node_context in context.nodes:
-
             def _runner(node_context=node_context):
                 node_context.start()
                 node_context.loop()
-
             futures.append(executor.submit(_runner))
 
         while context.alive:

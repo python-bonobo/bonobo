@@ -4,7 +4,7 @@ from bonobo import console_run
 from bonobo.ext.opendatasoft import from_opendatasoft_api
 from bonobo.io.file import FileWriter
 
-OUTPUT_FILENAME = realpath(join(dirname(__file__), 'datasets/cheap_coffeeshops_in_paris.txt'))
+OUTPUT_FILENAME = realpath(join(dirname(__file__), 'coffeeshops.txt'))
 
 console_run(
     from_opendatasoft_api(

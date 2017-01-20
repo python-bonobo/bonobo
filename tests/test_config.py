@@ -1,4 +1,5 @@
 import pytest
+
 from bonobo import Configurable, Option
 
 

@@ -68,6 +68,11 @@ Version 0.2
 * Threaded does not terminate anymore
 * More tests
 
+Bugs:
+
+- KeyboardInterrupt does not work anymore.
+- ThreadPool does not stop anymore.
+
 Configuration
 .............
 
@@ -119,6 +124,7 @@ Random thoughts and things to do
         def execute(graph: Graph, *, strategy: ExecutionStrategy, plugins: List[Plugin]) -> Execution:
             pass
 
+* Handling console. Can we use a queue, and replace stdout / stderr ?
 
 
 

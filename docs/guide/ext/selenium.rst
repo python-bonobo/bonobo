@@ -1,8 +1,9 @@
-Web crawlers with Bonobo
-========================
+Bonobo with Selenium
+====================
 
-.. todo:: Bonobo-Selenium is at a very alpha stage, and things will change. This section is here to give a brief
-          overview but is neither complete nor definitive.
+.. todo:: The `bonobo-selenium` package is at a very alpha stage, and things will change. This section is here to give a
+          brief overview but is neither complete nor definitive.
+
 
 Writing web crawlers with Bonobo and Selenium is easy.
 
@@ -31,3 +32,11 @@ Where each step would do the following:
 * `details()` extract the data you're interested in.
 * ... and the writer saves it somewhere.
 
+Installation
+::::::::::::
+
+Overview
+::::::::
+
+Details
+:::::::
