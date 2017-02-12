@@ -3,7 +3,6 @@ from io import BytesIO
 from bonobo.config import Configurable, Option
 from bonobo.context import ContextProcessor
 from bonobo.context.processors import contextual
-from bonobo.util.file import create_reader
 from bonobo.util.objects import ValueHolder
 
 __all__ = [
