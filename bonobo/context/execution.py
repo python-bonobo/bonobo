@@ -101,8 +101,8 @@ class LoopingExecutionContext(Wrapper):
         self._started, self._stopped, self._context, self._stack = False, False, None, []
 
     def start(self):
-        assert self.state == (False, False), ('{}.start() can only be called on a new node.'
-                                              ).format(type(self).__name__)
+        assert self.state == (False,
+                              False), ('{}.start() can only be called on a new node.').format(type(self).__name__)
         assert self._context is None
 
         self._started = True
@@ -175,6 +175,7 @@ class PluginExecutionContext(LoopingExecutionContext):
         LoopingExecutionContext.__init__(self, wrapped, parent)
 
     def shutdown(self):
+        self.wrapped.finalize(self)
         self.alive = False
 
     def step(self):

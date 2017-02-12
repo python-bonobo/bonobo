@@ -3,6 +3,7 @@ __all__ = [
     'Option',
 ]
 
+
 class Option:
     def __init__(self, type=None, *, required=False, default=None):
         self.name = None
@@ -11,7 +12,9 @@ class Option:
         self.default = default
 
     def __get__(self, inst, typ):
-        return inst.__options_values__.get(self.name, self.default)
+        if not self.name in inst.__options_values__:
+            inst.__options_values__[self.name] = self.default() if callable(self.default) else self.default
+        return inst.__options_values__[self.name]
 
     def __set__(self, inst, value):
         inst.__options_values__[self.name] = self.type(value) if self.type else value

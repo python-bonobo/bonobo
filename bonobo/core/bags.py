@@ -21,10 +21,7 @@ class Bag:
     def args(self):
         if self._parent is None:
             return self._args
-        return (
-            *self._parent.args,
-            *self._args,
-        )
+        return (*self._parent.args, *self._args, )
 
     @property
     def kwargs(self):

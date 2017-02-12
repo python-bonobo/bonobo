@@ -24,9 +24,10 @@ def execute(file, quiet=False):
 
     graphs = dict((k, v) for k, v in context.items() if isinstance(v, Graph))
 
-    assert len(graphs) == 1, ('Having zero or more than one graph definition in one file is unsupported for now, '
-                              'but it is something that will be implemented in the future.\n\nExpected: 1, got: {}.').format(
-        len(graphs))
+    assert len(graphs) == 1, (
+        'Having zero or more than one graph definition in one file is unsupported for now, '
+        'but it is something that will be implemented in the future.\n\nExpected: 1, got: {}.'
+    ).format(len(graphs))
 
     name, graph = list(graphs.items())[0]
 

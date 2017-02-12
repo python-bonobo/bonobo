@@ -4,7 +4,7 @@ import os
 from blessings import Terminal
 
 from bonobo import Tee, JsonWriter, Graph, get_examples_path
-from bonobo.ext.opendatasoft import from_opendatasoft_api
+from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 try:
     import pycountry
@@ -44,8 +44,7 @@ def display(row):
     address = list(
         filter(
             None, (
-                ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))),
-                row.get('county', None),
+                ' '.join(filter(None, (row.get('postal_code', None), row.get('city', None)))), row.get('county', None),
                 row.get('country'),
             )
         )
@@ -58,9 +57,7 @@ def display(row):
 
 
 graph = Graph(
-    from_opendatasoft_api(
-        API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
-    ),
+    OpenDataSoftAPI(dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
     normalize,
     filter_france,
     Tee(display),

@@ -11,6 +11,7 @@ def entrypoint(args=None):
     subparsers.required = True
 
     commands = {}
+
     def register_extension(ext, commands=commands):
         try:
             parser = subparsers.add_parser(ext.name)
@@ -18,7 +19,9 @@ def entrypoint(args=None):
         except Exception:
             logging.exception('Error while loading command {}.'.format(ext.name))
 
-    mgr = ExtensionManager(namespace='bonobo.commands', )
+    mgr = ExtensionManager(
+        namespace='bonobo.commands',
+    )
     mgr.map(register_extension)
 
     args = parser.parse_args(args).__dict__

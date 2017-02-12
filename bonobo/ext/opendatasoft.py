@@ -2,28 +2,39 @@ from urllib.parse import urlencode
 
 import requests  # todo: make this a service so we can substitute it ?
 
+from bonobo.config import Configurable, Option
+from bonobo.context import ContextProcessor, contextual
+from bonobo.util.compat import deprecated
+from bonobo.util.objects import ValueHolder
 
-def from_opendatasoft_api(
-    dataset=None,
-    endpoint='{scheme}://{netloc}{path}',
-    scheme='https',
-    netloc='data.opendatasoft.com',
-    path='/api/records/1.0/search/',
-    rows=100,
-    **kwargs
-):
-    path = path if path.startswith('/') else '/' + path
-    params = (
-        ('dataset', dataset),
-        ('rows', rows),
-    ) + tuple(sorted(kwargs.items()))
-    base_url = endpoint.format(scheme=scheme, netloc=netloc, path=path) + '?' + urlencode(params)
 
-    def _extract_ods():
-        nonlocal base_url, rows
-        start = 0
+def path_str(path):
+    return path if path.startswith('/') else '/' + path
+
+
+@contextual
+class OpenDataSoftAPI(Configurable):
+    dataset = Option(str, required=True)
+    endpoint = Option(str, default='{scheme}://{netloc}{path}')
+    scheme = Option(str, default='https')
+    netloc = Option(str, default='data.opendatasoft.com')
+    path = Option(path_str, default='/api/records/1.0/search/')
+    rows = Option(int, default=100)
+    kwargs = Option(dict, default=dict)
+
+    @ContextProcessor
+    def compute_path(self, context):
+        params = (('dataset', self.dataset), ('rows', self.rows), ) + tuple(sorted(self.kwargs.items()))
+        yield self.endpoint.format(scheme=self.scheme, netloc=self.netloc, path=self.path) + '?' + urlencode(params)
+
+    @ContextProcessor
+    def start(self, context, base_url):
+        yield ValueHolder(0)
+
+    def __call__(self, base_url, start, *args, **kwargs):
         while True:
-            resp = requests.get('{}&start={start}'.format(base_url, start=start))
+            url = '{}&start={start}'.format(base_url, start=start.value)
+            resp = requests.get(url)
             records = resp.json().get('records', [])
 
             if not len(records):
@@ -32,7 +43,14 @@ def from_opendatasoft_api(
             for row in records:
                 yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
-            start += rows
+            start.value += self.rows
 
-    _extract_ods.__name__ = 'extract_' + dataset.replace('-', '_')
-    return _extract_ods
+
+@deprecated
+def from_opendatasoft_api(dataset, **kwargs):
+    return OpenDataSoftAPI(dataset=dataset, **kwargs)
+
+
+__all__ = [
+    'OpenDataSoftAPI',
+]

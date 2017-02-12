@@ -65,9 +65,8 @@ def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True
         if print_values:
             for k in sorted(row) if sort else row:
                 print(
-                    '  • {t.blue}{k}{t.normal} : {t.black}({tp}){t.normal} {v}{t.clear_eol}'.format(
-                        k=k, v=repr(row[k]), t=term, tp=type(row[k]).__name__
-                    )
+                    '  • {t.blue}{k}{t.normal} : {t.black}({tp}){t.normal} {v}{t.clear_eol}'.
+                    format(k=k, v=repr(row[k]), t=term, tp=type(row[k]).__name__)
                 )
 
         yield NOT_MODIFIED

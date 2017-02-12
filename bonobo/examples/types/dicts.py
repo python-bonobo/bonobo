@@ -35,11 +35,7 @@ def load(row: dict):
     print(row)
 
 
-graph = Graph(
-    extract,
-    transform,
-    load
-)
+graph = Graph(extract, transform, load)
 
 if __name__ == '__main__':
     from bonobo import run

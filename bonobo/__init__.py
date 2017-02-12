@@ -4,7 +4,6 @@
 # transformations using a simple directed graph of python callables.
 #
 # Licensed under Apache License 2.0, read the LICENSE file in the root of the source tree.
-
 """Bonobo data-processing toolkit main module."""
 
 import sys
@@ -62,8 +61,9 @@ def create_strategy(name=None):
     try:
         factory = STRATEGIES[name]
     except KeyError as exc:
-        raise RuntimeError('Invalid strategy {}. Available choices: {}.'.format(repr(name), ', '.join(
-            sorted(STRATEGIES.keys())))) from exc
+        raise RuntimeError(
+            'Invalid strategy {}. Available choices: {}.'.format(repr(name), ', '.join(sorted(STRATEGIES.keys())))
+        ) from exc
 
     return factory()
 

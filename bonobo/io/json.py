@@ -3,7 +3,9 @@ import json
 from bonobo.context import ContextProcessor, contextual
 from .file import FileWriter, FileReader
 
-__all__ = ['JsonWriter', ]
+__all__ = [
+    'JsonWriter',
+]
 
 
 class JsonHandler:
@@ -11,8 +13,10 @@ class JsonHandler:
 
 
 class JsonReader(JsonHandler, FileReader):
+    loader = staticmethod(json.load)
+
     def read(self, file):
-        for line in json.load(file):
+        for line in self.loader(file):
             yield line
 
 

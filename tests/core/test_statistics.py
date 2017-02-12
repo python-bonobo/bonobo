@@ -3,10 +3,7 @@ from bonobo.core.statistics import WithStatistics
 
 class MyThingWithStats(WithStatistics):
     def get_statistics(self, *args, **kwargs):
-        return (
-            ('foo', 42),
-            ('bar', 69),
-        )
+        return (('foo', 42), ('bar', 69), )
 
 
 def test_with_statistics():

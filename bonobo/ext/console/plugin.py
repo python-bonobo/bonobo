@@ -80,30 +80,16 @@ class ConsoleOutputPlugin(Plugin):
             if component.alive:
                 _line = ''.join(
                     (
-                        t.black('({})'.format(i + 1)),
-                        ' ',
-                        t.bold(t.white('+')),
-                        ' ',
-                        component.name,
-                        ' ',
-                        component.get_statistics_as_string(
-                            debug=debug, profile=profile
-                        ),
-                        ' ',
+                        t.black('({})'.format(i + 1)), ' ', t.bold(t.white('+')), ' ', component.name, ' ',
+                        component.get_statistics_as_string(debug=debug, profile=profile), ' ',
                     )
                 )
             else:
                 _line = t.black(
                     ''.join(
                         (
-                            '({})'.format(i + 1),
-                            ' - ',
-                            component.name,
-                            ' ',
-                            component.get_statistics_as_string(
-                                debug=debug, profile=profile
-                            ),
-                            ' ',
+                            '({})'.format(i + 1), ' - ', component.name, ' ',
+                            component.get_statistics_as_string(debug=debug, profile=profile), ' ',
                         )
                     )
                 )

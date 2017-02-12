@@ -13,7 +13,6 @@ Example on how to use :class:`bonobo.Bag` instances to pass flexible args/kwargs
 
 """
 
-
 from random import randint
 
 from bonobo import Bag, Graph
@@ -26,10 +25,7 @@ def extract():
 
 
 def transform(topic: str):
-    return Bag.inherit(
-        title=topic.title(),
-        rand=randint(10, 99)
-    )
+    return Bag.inherit(title=topic.title(), rand=randint(10, 99))
 
 
 def load(topic: str, title: str, rand: int):

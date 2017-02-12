@@ -1,6 +1,7 @@
 from mock import patch
 
-from bonobo.ext.opendatasoft import from_opendatasoft_api
+from bonobo.ext.opendatasoft import OpenDataSoftAPI
+from bonobo.util.objects import ValueHolder
 
 
 class ResponseMock:
@@ -13,11 +14,13 @@ class ResponseMock:
             return {}
         else:
             self.count += 1
-            return {'records': self.json_value, }
+            return {
+                'records': self.json_value,
+            }
 
 
 def test_read_from_opendatasoft_api():
-    extract = from_opendatasoft_api('http://example.com/', 'test-a-set')
+    extract = OpenDataSoftAPI(dataset='test-a-set')
     with patch(
         'requests.get', return_value=ResponseMock([
             {
@@ -32,5 +35,5 @@ def test_read_from_opendatasoft_api():
             },
         ])
     ):
-        for line in extract():
+        for line in extract('http://example.com/', ValueHolder(0)):
             assert 'foo' in line

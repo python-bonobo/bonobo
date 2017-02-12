@@ -14,14 +14,17 @@ def test_entrypoint():
     assert 'init' in commands
     assert 'run' in commands
 
+
 def test_no_command(capsys):
     with pytest.raises(SystemExit):
         entrypoint([])
     out, err = capsys.readouterr()
     assert 'error: the following arguments are required: command' in err
 
+
 def test_init():
-    pass # need ext dir
+    pass  # need ext dir
+
 
 def test_run(capsys):
     entrypoint(['run', '--quiet', get_examples_path('types/strings.py')])

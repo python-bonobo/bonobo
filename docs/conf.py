@@ -140,7 +140,9 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [(master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual'), ]
+latex_documents = [
+    (master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual'),
+]
 
 # -- Options for manual page output ---------------------------------------
 
@@ -181,7 +183,4 @@ epub_copyright = copyright
 epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None)
-}
-
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

@@ -1,6 +1,9 @@
+from io import BytesIO
+
 from bonobo.config import Configurable, Option
 from bonobo.context import ContextProcessor
 from bonobo.context.processors import contextual
+from bonobo.util.file import create_reader
 from bonobo.util.objects import ValueHolder
 
 __all__ = [
@@ -22,8 +25,13 @@ class FileHandler(Configurable):
 
     @ContextProcessor
     def file(self, context):
-        with self.open() as file:
-            yield file
+        if self.path.find('http://') == 0 or self.path.find('https://') == 0:
+            import requests
+            response = requests.get(self.path)
+            yield BytesIO(response.content)
+        else:
+            with self.open() as file:
+                yield file
 
     def open(self):
         return open(self.path, self.mode)

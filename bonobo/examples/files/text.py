@@ -1,4 +1,4 @@
-from bonobo import FileReader, Graph
+from bonobo import FileReader, Graph, get_examples_path
 
 
 def skip_comments(line):
@@ -7,7 +7,7 @@ def skip_comments(line):
 
 
 graph = Graph(
-    FileReader(path='/etc/passwd'),
+    FileReader(path=get_examples_path('datasets/passwd.txt')),
     skip_comments,
     lambda s: s.split(':'),
     lambda l: l[0],
