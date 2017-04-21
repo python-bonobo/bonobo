@@ -65,13 +65,13 @@ Version 0.2
 * Changelog
 * Migration guide
 * Update documentation
-* Threaded does not terminate anymore
+* Threaded does not terminate anymore (fixed ?)
 * More tests
 
 Bugs:
 
-- KeyboardInterrupt does not work anymore.
-- ThreadPool does not stop anymore.
+- KeyboardInterrupt does not work anymore. (fixed ?)
+- ThreadPool does not stop anymore. (fiexd ?)
 
 Configuration
 .............

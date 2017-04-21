@@ -57,11 +57,13 @@ data_files = [
 
 entry_points = {
     'console_scripts': [
-        'bonobo = bonobo.commands:entrypoint'
+        'bonobo = bonobo.commands:entrypoint',
+        'bb = bonobo.commands:entrypoint',
     ],
     'bonobo.commands': [
         'init = bonobo.commands.init:register',
         'run = bonobo.commands.run:register',
+        'version = bonobo.commands.version:register',
     ],
     'edgy.project.features': [
         'bonobo = bonobo.ext.edgy.project.feature:BonoboFeature'
