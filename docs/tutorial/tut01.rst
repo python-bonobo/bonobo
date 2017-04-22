@@ -15,7 +15,7 @@ Let's write a first data transformation
 We'll start with the simplest transformation possible.
 
 In **Bonobo**, a transformation is a plain old python callable, not more, not less. Let's write one that takes a string
-and uppercase it.
+and uppercases it.
 
 .. code-block:: python
 
@@ -113,12 +113,12 @@ Concepts and definitions
   by yielding values (a.k.a returning a generator).
 * Transformation graph (or Graph): a set of transformations tied together in a :class:`bonobo.Graph` instance, which is a simple
   directed acyclic graph (also refered as a DAG, sometimes).
-* Node: a transformation within the context of a transformation graph. The node defines what to do whith a
-  transformation's output, and especially what other node to feed with the output.
+* Node: a transformation within the context of a transformation graph. The node defines what to do with a
+  transformation's output, and especially what other nodes to feed with the output.
 * Execution strategy (or strategy): a way to run a transformation graph. It's responsibility is mainly to parallelize
   (or not) the transformations, on one or more process and/or computer, and to setup the right queuing mechanism for
   transformations' inputs and outputs.
-* Execution context (or context): a wrapper around a node that holds the state for it. If the node need the state, there
+* Execution context (or context): a wrapper around a node that holds the state for it. If the node needs state, there
   are tools available in bonobo to feed it to the transformation using additional call parameters, and so every
   transformation will be atomic.
 
