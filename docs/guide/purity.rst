@@ -82,7 +82,7 @@ For example, doing the following may cause unexpected problems:
             'foo': compute_something()
         })
         # Still bad! Don't mutate the dict!
-        d['bar']: compute_anotherthing()
+        d['bar'] = compute_anotherthing()
         return d
 
 The problem is easy to understand: as **Bonobo** won't make copies of your dict, the same dict will be passed along the
