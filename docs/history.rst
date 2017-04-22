@@ -11,7 +11,7 @@ happened because of **rdc.etl**.
 
 It would have been counterproductive to migrate the same codebase:
 
-  * a lot of mistakes were impossible to fix in a backward compatible way (for example, transormations were stateful,
+  * a lot of mistakes were impossible to fix in a backward compatible way (for example, transformations were stateful,
     making them more complicated to write and impossible to reuse, a lot of effort was used to make the components have
     multi-inputs and multi-outputs, although in 99% of the case it's useless, etc.).
   * we also wanted to develop something that took advantage of modern python versions, hence the choice of 3.5+.

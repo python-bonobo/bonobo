@@ -1,7 +1,7 @@
 import time
 
 
-class Timer(object):
+class Timer:
     """
     Context manager used to time execution of stuff.
     """

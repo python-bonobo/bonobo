@@ -68,7 +68,7 @@ Let's chain the three transformations together and run the transformation graph:
     }
 
 We use the :func:`bonobo.run` helper that hides the underlying object composition necessary to actually run the
-transformations in parralel, because it's simpler.
+transformations in parallel, because it's simpler.
 
 Depending on what you're doing, you may use the shorthand helper method, or the verbose one. Always favor the shorter,
 if you don't need to tune the graph or the execution strategy (see below).
@@ -115,7 +115,7 @@ Concepts and definitions
   directed acyclic graph (also refered as a DAG, sometimes).
 * Node: a transformation within the context of a transformation graph. The node defines what to do whith a
   transformation's output, and especially what other node to feed with the output.
-* Execution strategy (or strategy): a way to run a transformation graph. It's responsibility is mainly to parralelize
+* Execution strategy (or strategy): a way to run a transformation graph. It's responsibility is mainly to parallelize
   (or not) the transformations, on one or more process and/or computer, and to setup the right queuing mechanism for
   transformations' inputs and outputs.
 * Execution context (or context): a wrapper around a node that holds the state for it. If the node need the state, there
