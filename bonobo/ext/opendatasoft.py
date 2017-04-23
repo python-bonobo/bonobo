@@ -20,11 +20,12 @@ class OpenDataSoftAPI(Configurable):
     netloc = Option(str, default='data.opendatasoft.com')
     path = Option(path_str, default='/api/records/1.0/search/')
     rows = Option(int, default=100)
+    timezone = Option(str, default='Europe/Paris')
     kwargs = Option(dict, default=dict)
 
     @ContextProcessor
     def compute_path(self, context):
-        params = (('dataset', self.dataset), ('rows', self.rows), ) + tuple(sorted(self.kwargs.items()))
+        params = (('dataset', self.dataset), ('rows', self.rows), ('timezone', self.timezone)) + tuple(sorted(self.kwargs.items()))
         yield self.endpoint.format(scheme=self.scheme, netloc=self.netloc, path=self.path) + '?' + urlencode(params)
 
     @ContextProcessor
