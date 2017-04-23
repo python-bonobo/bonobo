@@ -2,7 +2,7 @@ Working with files
 ==================
 
 Bonobo would not be of any use if the aim was to uppercase small lists of strings. In fact, Bonobo should not be used
-if you don't expect any gain from parralelization/distribution of tasks.
+if you don't expect any gain from parallelization/distribution of tasks.
 
 Let's take the following graph as an example:
 
@@ -19,7 +19,7 @@ the :class:`bonobo.ThreadPoolExecutorStrategy`), which allows to start running `
 of data, and `C` as soon as `B` yielded the first line of data, even if `A` or `B` still have data to yield.
 
 The great thing is that you generally don't have to think about it. Just be aware that your components will be run in
-parralel (with the default strategy), and don't worry too much about blocking components, as they won't block their
+parallel (with the default strategy), and don't worry too much about blocking components, as they won't block their
 siblings when run in bonobo.
 
 That being said, let's try to write a more real-world like transformation.

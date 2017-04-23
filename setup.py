@@ -10,9 +10,12 @@ tolines = lambda c: list(filter(None, map(lambda s: s.strip(), c.split('\n'))))
 
 
 def read(filename, flt=None):
-    with open(filename) as f:
-        content = f.read().strip()
-        return flt(content) if callable(flt) else content
+    try:
+        with open(filename) as f:
+            content = f.read().strip()
+            return flt(content) if callable(flt) else content
+    except EnvironmentError:
+        return ''
 
 
 # Py3 compatibility hacks, borrowed from IPython.
@@ -26,8 +29,12 @@ except NameError:
 
 
 version_ns = {}
-execfile(os.path.join(root_dir, 'bonobo/_version.py'), version_ns)
-version = version_ns.get('__version__', 'dev')
+try:
+    execfile(os.path.join(root_dir, 'bonobo/_version.py'), version_ns)
+except EnvironmentError:
+    version = 'dev'
+else:
+    version = version_ns.get('__version__', 'dev')
 
 setup(
     name='bonobo',
@@ -58,8 +65,11 @@ setup(
         'jupyter': ['jupyter >=1.0,<1.1', 'ipywidgets >=6.0.0.beta5']
     },
     entry_points={
-        'bonobo.commands': ['init = bonobo.commands.init:register', 'run = bonobo.commands.run:register'],
-        'console_scripts': ['bonobo = bonobo.commands:entrypoint'],
+        'bonobo.commands': [
+            'init = bonobo.commands.init:register', 'run = bonobo.commands.run:register',
+            'version = bonobo.commands.version:register'
+        ],
+        'console_scripts': ['bonobo = bonobo.commands:entrypoint', 'bb = bonobo.commands:entrypoint'],
         'edgy.project.features': ['bonobo = '
                                   'bonobo.ext.edgy.project.feature:BonoboFeature']
     },

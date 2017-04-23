@@ -3,13 +3,13 @@
 
 Data-processing. By monkeys. For humans.
 
-Bonobo is a data-processing library for python 3.5+ that emphasis writing
+Bonobo is a data-processing library for python 3.5+ that emphasises writing
 simple, atomic, plain old python functions and chaining them using a basic
 acyclic graph. The nodes will need a bit of plumbery to be runnable in
 different means (iteratively, in threads, in processes, on different machines
 ...) but that should be as transparent as possible.
 
-The only thing asked to the developer is to either write "pure" functions to
+The only thing asked of the developer is to write "pure" functions to
 process data (create a new dict, don't change in place, etc.), and everything
 should be fine from this point.
 
@@ -65,13 +65,13 @@ Version 0.2
 * Changelog
 * Migration guide
 * Update documentation
-* Threaded does not terminate anymore
+* Threaded does not terminate anymore (fixed ?)
 * More tests
 
 Bugs:
 
-- KeyboardInterrupt does not work anymore.
-- ThreadPool does not stop anymore.
+- KeyboardInterrupt does not work anymore. (fixed ?)
+- ThreadPool does not stop anymore. (fiexd ?)
 
 Configuration
 .............
@@ -102,7 +102,7 @@ Random thoughts and things to do
   * NaiveStrategy
   * PoolExecutionStrategy
     * ThreadPoolExecutionStrategy
-    * ProcesPoolExecutionStrategy
+    * ProcessPoolExecutionStrategy
   * ThreadExecutionStrategy
   * ProcessExecutionStrategy
 
