@@ -21,8 +21,7 @@ import blessings
 import psutil
 
 from bonobo.core.plugins import Plugin
-
-t = blessings.Terminal()
+from bonobo.util import terminal as t
 
 
 @lru_cache(1)

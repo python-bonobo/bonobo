@@ -1,8 +1,6 @@
 import json
 import os
 
-from blessings import Terminal
-
 from bonobo import Tee, JsonWriter, Graph, get_examples_path
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
@@ -15,7 +13,6 @@ API_DATASET = 'fablabs-in-the-world'
 API_NETLOC = 'datanova.laposte.fr'
 ROWS = 100
 
-t = Terminal()
 __path__ = os.path.dirname(__file__)
 
 

@@ -164,8 +164,7 @@ class LoopingExecutionContext(Wrapper):
         :return: to hell
         """
 
-        from blessings import Terminal
-        term = Terminal()
+        from bonobo.util import terminal as term
         print(term.bold(term.red('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))))
         print(trace)
 

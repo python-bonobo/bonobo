@@ -3,20 +3,21 @@
 import functools
 from pprint import pprint as _pprint
 
-import blessings
-
-from .helpers import console_run, jupyter_run
 from .tokens import NOT_MODIFIED
+
+import colorama as _colorama
+_colorama.init()
+import blessings as _blessings
+terminal = _blessings.Terminal()
 
 __all__ = [
     'Limit',
     'NOT_MODIFIED',
     'PrettyPrint',
     'Tee',
-    'console_run',
-    'jupyter_run',
     'noop',
     'pprint',
+    'terminal',
 ]
 
 
@@ -51,10 +52,9 @@ pprint = Tee(_pprint)
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
-    term = blessings.Terminal()
-
     def _pprint(*args, **kwargs):
-        nonlocal title_keys, term, sort, print_values
+        global terminal
+        nonlocal title_keys, sort, print_values
 
         row = args[0]
         for key in title_keys:
