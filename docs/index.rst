@@ -9,6 +9,7 @@ Bonobo
    guide/index
    reference/index
    contribute/index
+   faq
    genindex
    modindex
 
