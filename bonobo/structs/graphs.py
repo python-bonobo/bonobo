@@ -1,4 +1,4 @@
-from bonobo.util.tokens import BEGIN
+from bonobo.constants import BEGIN
 
 
 class Graph:

@@ -1,6 +1,6 @@
 from bonobo import Graph, NaiveStrategy, Bag, contextual
+from bonobo.constants import BEGIN, END
 from bonobo.context.execution import GraphExecutionContext
-from bonobo.util.tokens import BEGIN, END
 
 
 def generate_integers():

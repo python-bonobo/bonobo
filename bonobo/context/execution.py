@@ -1,15 +1,16 @@
 import traceback
+import sys
 from functools import partial
 from queue import Empty
 from time import sleep
 
+from bonobo.constants import BEGIN, END, NOT_MODIFIED, INHERIT_INPUT
 from bonobo.context.processors import get_context_processors
-from bonobo.core.bags import Bag, INHERIT_INPUT, ErrorBag
-from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.statistics import WithStatistics
+from bonobo.errors import InactiveReadableError
+from bonobo.structs.bags import Bag, ErrorBag
 from bonobo.util.objects import Wrapper
-from bonobo.util.tokens import BEGIN, END, NOT_MODIFIED
 
 
 class GraphExecutionContext:
@@ -164,8 +165,15 @@ class LoopingExecutionContext(Wrapper):
         :return: to hell
         """
 
-        from bonobo.util import terminal as term
-        print(term.bold(term.red('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))))
+        from colorama import Fore, Style
+        print(
+            Style.BRIGHT,
+            Fore.RED,
+            '\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped),
+            Style.RESET_ALL,
+            sep='',
+            file=sys.stderr,
+        )
         print(trace)
 
 

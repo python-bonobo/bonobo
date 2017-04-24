@@ -41,8 +41,8 @@ setup(
     description='Bonobo',
     license='Apache License, Version 2.0',
     install_requires=[
-        'blessings >=1.6,<1.7', 'colorama >=0.3,<0.4', 'psutil >=5.0,<5.1',
-        'requests >=2.12,<2.13', 'stevedore >=1.19,<1.20', 'toolz >=0.8,<0.9'
+        'colorama >=0.3,<0.4', 'psutil >=5.0,<5.1', 'requests >=2.12,<2.13',
+        'stevedore >=1.19,<1.20'
     ],
     version=version,
     long_description=read('README.rst'),

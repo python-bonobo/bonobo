@@ -3,7 +3,7 @@ import pytest
 from bonobo import FileWriter, Bag, FileReader
 from bonobo.context.execution import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
-from bonobo.util.tokens import BEGIN, END
+from bonobo.constants import BEGIN, END
 
 
 @pytest.mark.parametrize(

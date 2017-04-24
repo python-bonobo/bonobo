@@ -1,9 +1,9 @@
 import pytest
 
 from bonobo import Bag, CsvReader, CsvWriter
+from bonobo.constants import BEGIN, END
 from bonobo.context.execution import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
-from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_csv_to_file(tmpdir):

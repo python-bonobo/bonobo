@@ -1,12 +1,13 @@
 import time
+from threading import Thread
+
 from concurrent.futures import Executor
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from threading import Thread
 
+from bonobo.constants import BEGIN, END
 from bonobo.core.strategies.base import Strategy
-from bonobo.util.tokens import BEGIN, END
-from ..bags import Bag
+from bonobo.structs.bags import Bag
 
 
 class ExecutorStrategy(Strategy):

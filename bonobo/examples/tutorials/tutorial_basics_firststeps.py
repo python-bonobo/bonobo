@@ -1,4 +1,4 @@
-from bonobo import run
+import bonobo
 
 
 def generate_data():
@@ -15,4 +15,11 @@ def output(x: str):
     print(x)
 
 
-run(generate_data, uppercase, output)
+graph = bonobo.Graph(
+    generate_data,
+    uppercase,
+    output,
+)
+
+if __name__ == '__main__':
+    bonobo.run(graph)

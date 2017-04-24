@@ -10,7 +10,7 @@ install:
   - pip install coveralls
 script:
   - make clean docs test
-  # - pip install pycountry
-  # - bin/run_all_examples.sh
+  - pip install pycountry
+  - bin/run_all_examples.sh
 after_success:
   - coveralls

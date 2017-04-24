@@ -6,9 +6,3 @@ class Token:
 
     def __repr__(self):
         return '<{}>'.format(self.__name__)
-
-
-BEGIN = Token('Begin')
-END = Token('End')
-
-NOT_MODIFIED = Token('NotModified')

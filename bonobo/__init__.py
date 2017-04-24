@@ -19,6 +19,10 @@ from .io import __all__ as __all_io__
 from .util import __all__ as __all_util__
 
 __all__ = __all_config__ + __all_context__ + __all_core__ + __all_io__ + __all_util__ + [
+    'Bag',
+    'ErrorBag'
+    'Graph',
+    'Token',
     '__version__',
     'create_strategy',
     'get_examples_path',
@@ -29,6 +33,9 @@ from .config import *
 from .context import *
 from .core import *
 from .io import *
+from .structs.bags import *
+from .structs.graphs import *
+from .structs.tokens import *
 from .util import *
 
 DEFAULT_STRATEGY = 'threadpool'

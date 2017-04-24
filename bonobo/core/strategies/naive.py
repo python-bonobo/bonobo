@@ -1,7 +1,6 @@
+from bonobo.constants import BEGIN, END
 from bonobo.core.strategies.base import Strategy
-from bonobo.util.tokens import BEGIN, END
-
-from ..bags import Bag
+from bonobo.structs.bags import Bag
 
 
 class NaiveStrategy(Strategy):

@@ -1,12 +1,7 @@
-import os
-import pathlib
-
 import bonobo
 
-workdir = pathlib.Path(os.path.dirname(__file__))
-
 graph = bonobo.Graph(
-    bonobo.FileReader(path=workdir.joinpath('datasets/coffeeshops.txt')),
+    bonobo.FileReader(path=bonobo.get_examples_path('datasets/coffeeshops.txt')),
     print,
 )
 
