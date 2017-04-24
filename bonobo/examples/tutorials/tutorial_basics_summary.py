@@ -1,19 +1,11 @@
-from bonobo import Graph, ThreadPoolExecutorStrategy
-
-
-def yield_from(*args):
-    yield from args
-
+import bonobo
 
 # Represent our data processor as a simple directed graph of callables.
-graph = Graph(
-    lambda: (x for x in ('foo', 'bar', 'baz')),
+graph = bonobo.Graph(
+    ['foo', 'bar', 'baz'],
     str.upper,
     print,
 )
 
-# Use a thread pool.
-executor = ThreadPoolExecutorStrategy()
-
-# Run the thing.
-executor.execute(graph)
+if __name__ == '__main__':
+    bonobo.run(graph)
