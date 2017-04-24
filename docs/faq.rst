@@ -9,8 +9,18 @@ Too long; didn't read.
 Bonobo is an extract-transform-load toolkit for python 3.5+, that use regular python functions, generators and iterators
 as input.
 
-By default, it uses a thread pool to execute all code, and pass outputs to the next callable in the graph using a FIFO
-queue, allowing the user to forget about what is blocking, not blocking, long, etc. It's lean manufacturing for data.
+By default, it uses a thread pool to execute all functions in parallel, and handle the movement of data rows in the
+directed graph using simple fifo queues.
+
+It allows the user to focus on the content of the transformations, and not optimizing blocking or long operations, nor
+thinking about threads or subprocesses.
+
+It's lean manufacturing for data.
+
+.. note::
+
+    This is NOT a «big data» tool. We process around 5 millions database lines in around 1 hour with rdc.etl, bonobo
+    ancestor (algorithms are the same, we still need to run a bit of benchmarks).
 
 Can a graph contain another graph?
 ----------------------------------
@@ -81,15 +91,18 @@ Sorry, my bad. I'll work on this point in the near future, but as an apology, we
 got about the project is somehow related to primates taxonomy, I'll make a special effort as soon as I can on this
 topic.
 
-Or maybe, I can use one of the comments as an answer: python not only has duck typing; it has the little known primate
-typing feature.
+Or maybe, I can use one of the comments from reddit as an answer: «Python not only has duck typing; it has the little
+known primate typing feature.»
+
+See https://github.com/python-bonobo/bonobo/issues/24
 
 Who is behind this?
 -------------------
 
 Me (as an individual), and a few great people that helped me along the way. Not commercially endorsed, or supported.
 
-The code, documentation, and surrounding material is created using spare time.
+The code, documentation, and surrounding material is created using spare time and may lack a bit velocity. Feel free
+to jump in so we can go faster!
 
 Documentation seriously lacks X, there is a problem in Y...
 -----------------------------------------------------------
