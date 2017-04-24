@@ -70,7 +70,6 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 	// When serialiazing entire widget state for embedding, only values different from the
 	// defaults will be specified.
 	
-	
 	var BonoboModel = widgets.DOMWidgetModel.extend({
 	    defaults: _.extend({}, widgets.DOMWidgetModel.prototype.defaults, {
 	        _model_name: 'BonoboModel',

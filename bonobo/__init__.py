@@ -67,17 +67,36 @@ def create_strategy(name=None):
 
     return factory()
 
+def _is_interactive_console():
+    import sys
+    return sys.stdout.isatty()
+
+def _is_jupyter_notebook():
+    try:
+        return get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
+    except NameError:
+        return False
 
 def run(graph, *chain, strategy=None, plugins=None):
-    strategy = create_strategy(strategy)
-
     if len(chain):
         warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
         from bonobo import Graph
         graph = Graph(graph, *chain)
 
-    return strategy.execute(graph, plugins=plugins)
+    strategy = create_strategy(strategy)
+    plugins = []
 
+    if _is_interactive_console():
+        from bonobo.ext.console import ConsoleOutputPlugin
+        if ConsoleOutputPlugin not in plugins:
+            plugins.append(ConsoleOutputPlugin)
+
+    if _is_jupyter_notebook():
+        from bonobo.ext.jupyter import JupyterOutputPlugin
+        if JupyterOutputPlugin not in plugins:
+            plugins.append(JupyterOutputPlugin)
+
+    return strategy.execute(graph, plugins=plugins)
 
 del sys
 del warnings

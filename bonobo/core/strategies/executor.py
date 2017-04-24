@@ -22,7 +22,6 @@ class ExecutorStrategy(Strategy):
 
     def execute(self, graph, *args, plugins=None, **kwargs):
         context = self.create_graph_execution_context(graph, plugins=plugins)
-
         context.recv(BEGIN, Bag(), END)
 
         executor = self.create_executor()
@@ -30,16 +29,13 @@ class ExecutorStrategy(Strategy):
         futures = []
 
         for plugin_context in context.plugins:
-
             def _runner(plugin_context=plugin_context):
                 plugin_context.start()
                 plugin_context.loop()
                 plugin_context.stop()
-
             futures.append(executor.submit(_runner))
 
         for node_context in context.nodes:
-
             def _runner(node_context=node_context):
                 node_context.start()
                 node_context.loop()
@@ -67,6 +63,7 @@ class ProcessPoolExecutorStrategy(ExecutorStrategy):
 
 class ThreadCollectionStrategy(Strategy):
     def execute(self, graph, *args, plugins=None, **kwargs):
+        print(type(self), 'execute', graph, args, plugins, kwargs)
         context = self.create_graph_execution_context(graph, plugins=plugins)
         context.recv(BEGIN, Bag(), END)
 

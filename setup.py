@@ -73,7 +73,7 @@ setup(
         ['bonobo = '
          'bonobo.ext.edgy.project.feature:BonoboFeature']
     },
-    url='https://bonobo-project.org/',
+    url='https://www.bonobo-project.org/',
     download_url=
     'https://github.com/python-bonobo/bonobo/tarball/{version}'.format(
         version=version), )
