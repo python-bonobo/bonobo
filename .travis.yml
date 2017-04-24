@@ -10,5 +10,6 @@ install:
   - pip install coveralls
 script:
   - make clean docs test
+  - bin/run_all_examples.sh
 after_success:
   - coveralls
