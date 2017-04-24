@@ -14,11 +14,22 @@ except ImportError as e:
 
 
 class JupyterOutputPlugin(Plugin):
-    def initialize(self, context):
+    def __init__(self, context):
+        self.context = context
         self.widget = BonoboWidget()
         IPython.core.display.display(self.widget)
 
-    def run(self, context):
-        self.widget.value = [repr(component) for component in context.parent.components]
+    def run(self):
+        self.widget.value = [repr(node) for node in self.context.parent.nodes]
 
     finalize = run
+
+
+"""
+TODO JUPYTER WIDGET
+###################
+
+# close the widget? what does it do?
+https://ipywidgets.readthedocs.io/en/latest/examples/Widget%20Basics.html#Closing-widgets
+
+"""

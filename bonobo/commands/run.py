@@ -1,6 +1,5 @@
 import argparse
-
-from bonobo import Graph, run
+import bonobo
 
 
 def execute(file, quiet=False):
@@ -22,7 +21,7 @@ def execute(file, quiet=False):
     except Exception as exc:
         raise
 
-    graphs = dict((k, v) for k, v in context.items() if isinstance(v, Graph))
+    graphs = dict((k, v) for k, v in context.items() if isinstance(v, bonobo.Graph))
 
     assert len(graphs) == 1, (
         'Having zero or more than one graph definition in one file is unsupported for now, '
@@ -34,7 +33,7 @@ def execute(file, quiet=False):
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display
 
-    return run(graph)
+    return bonobo.run(graph)
 
 
 def register(parser):

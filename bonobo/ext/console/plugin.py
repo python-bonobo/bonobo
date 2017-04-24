@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+import sys
 from functools import lru_cache
-import blessings
 
+import blessings
+import os
 import psutil
 
 from bonobo.core.plugins import Plugin
@@ -28,7 +29,7 @@ t = blessings.Terminal()
 @lru_cache(1)
 def memory_usage():
     process = psutil.Process(os.getpid())
-    return process.get_memory_info()[0] / float(2**20)
+    return process.get_memory_info()[0] / float(2 ** 20)
 
 
 # @lru_cache(64)
@@ -47,10 +48,11 @@ class ConsoleOutputPlugin(Plugin):
 
     """
 
-    def __init__(self, prefix=''):
-        self.prefix = prefix
+    def __init__(self, context):
+        self.context = context
+        self.prefix = ''
 
-    def _write(self, context, rewind):
+    def _write(self, graph_context, rewind):
         profile, debug = False, False
         if profile:
             append = (
@@ -59,18 +61,16 @@ class ConsoleOutputPlugin(Plugin):
             )
         else:
             append = ()
-        self.write(context, prefix=self.prefix, append=append, debug=debug, profile=profile, rewind=rewind)
+        self.write(graph_context, prefix=self.prefix, append=append, debug=debug, profile=profile, rewind=rewind)
 
-        # self.widget.value = [repr(component) for component in context.parent.components]
-
-    def run(self, context):
-        if t.is_a_tty:
-            self._write(context.parent, rewind=True)
+    def run(self):
+        if sys.stdout.isatty():
+            self._write(self.context.parent, rewind=True)
         else:
             pass  # not a tty
 
-    def finalize(self, context):
-        self._write(context.parent, rewind=False)
+    def finalize(self):
+        self._write(self.context.parent, rewind=False)
 
     @staticmethod
     def write(context, prefix='', rewind=True, append=None, debug=False, profile=False):
