@@ -77,7 +77,7 @@ class GraphExecutionContext:
 def ensure_tuple(tuple_or_mixed):
     if isinstance(tuple_or_mixed, tuple):
         return tuple_or_mixed
-    return (tuple_or_mixed,)
+    return (tuple_or_mixed, )
 
 
 class LoopingExecutionContext(Wrapper):
@@ -184,6 +184,14 @@ class PluginExecutionContext(LoopingExecutionContext):
         # Instanciate plugin. This is not yet considered stable, as at some point we may need a way to configure
         # plugins, for example if it depends on an external service.
         super().__init__(wrapped(self), parent)
+
+    def start(self):
+        super().start()
+
+        try:
+            self.wrapped.initialize()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
 
     def shutdown(self):
         try:

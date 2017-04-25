@@ -74,15 +74,18 @@ def create_strategy(name=None):
 
     return factory()
 
+
 def _is_interactive_console():
     import sys
     return sys.stdout.isatty()
+
 
 def _is_jupyter_notebook():
     try:
         return get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
     except NameError:
         return False
+
 
 def run(graph, *chain, strategy=None, plugins=None):
     if len(chain):
@@ -104,6 +107,7 @@ def run(graph, *chain, strategy=None, plugins=None):
             plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins)
+
 
 del sys
 del warnings

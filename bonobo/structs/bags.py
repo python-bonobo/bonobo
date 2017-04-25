@@ -19,7 +19,7 @@ class Bag:
     def args(self):
         if self._parent is None:
             return self._args
-        return (*self._parent.args, *self._args,)
+        return (*self._parent.args, *self._args, )
 
     @property
     def kwargs(self):
@@ -61,12 +61,12 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __repr__(self):
         return '<{} ({})>'.format(
             type(self).__name__, ', '.
-                join(itertools.chain(
+            join(itertools.chain(
                 map(repr, self.args),
                 ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
             ))

@@ -3,7 +3,7 @@ from mock import Mock
 from bonobo import Bag
 from bonobo.constants import INHERIT_INPUT
 
-args = ('foo', 'bar',)
+args = ('foo', 'bar', )
 kwargs = dict(acme='corp')
 
 
@@ -32,29 +32,29 @@ def test_inherit():
     bag3 = bag.extend('c', c=3)
     bag4 = Bag('d', d=4)
 
-    assert bag.args == ('a',)
+    assert bag.args == ('a', )
     assert bag.kwargs == {'a': 1}
     assert bag.flags is ()
 
-    assert bag2.args == ('a', 'b',)
+    assert bag2.args == ('a', 'b', )
     assert bag2.kwargs == {'a': 1, 'b': 2}
     assert INHERIT_INPUT in bag2.flags
 
-    assert bag3.args == ('a', 'c',)
+    assert bag3.args == ('a', 'c', )
     assert bag3.kwargs == {'a': 1, 'c': 3}
     assert bag3.flags is ()
 
-    assert bag4.args == ('d',)
+    assert bag4.args == ('d', )
     assert bag4.kwargs == {'d': 4}
     assert bag4.flags is ()
 
     bag4.set_parent(bag)
-    assert bag4.args == ('a', 'd',)
+    assert bag4.args == ('a', 'd', )
     assert bag4.kwargs == {'a': 1, 'd': 4}
     assert bag4.flags is ()
 
     bag4.set_parent(bag3)
-    assert bag4.args == ('a', 'c', 'd',)
+    assert bag4.args == ('a', 'c', 'd', )
     assert bag4.kwargs == {'a': 1, 'c': 3, 'd': 4}
     assert bag4.flags is ()
 

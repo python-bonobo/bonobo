@@ -14,21 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 import sys
-from functools import lru_cache
 
-import os
-import psutil
 from colorama import Fore, Style
 
-from bonobo.core.plugins import Plugin
+from bonobo.plugins import Plugin
 from bonobo.util.term import CLEAR_EOL, MOVE_CURSOR_UP
 
 
-@lru_cache(1)
+@functools.lru_cache(1)
 def memory_usage():
+    import os, psutil
     process = psutil.Process(os.getpid())
-    return process.get_memory_info()[0] / float(2 ** 20)
+    return process.get_memory_info()[0] / float(2**20)
 
 
 # @lru_cache(64)
@@ -47,8 +46,7 @@ class ConsoleOutputPlugin(Plugin):
 
     """
 
-    def __init__(self, context):
-        self.context = context
+    def initialize(self):
         self.prefix = ''
 
     def _write(self, graph_context, rewind):
@@ -77,47 +75,32 @@ class ConsoleOutputPlugin(Plugin):
 
         for i, component in enumerate(context):
             if component.alive:
-                _line = ''.join((
-                    Fore.BLACK,
-                    '({})'.format(i + 1),
-                    Style.RESET_ALL,
-                    ' ',
-                    Style.BRIGHT,
-                    '+',
-                    Style.RESET_ALL,
-                    ' ',
-                    component.name,
-                    ' ',
-                    component.get_statistics_as_string(debug=debug, profile=profile),
-                    Style.RESET_ALL,
-                    ' ',
-                ))
+                _line = ''.join(
+                    (
+                        Fore.BLACK, '({})'.format(i + 1), Style.RESET_ALL, ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ',
+                        component.name, ' ', component.get_statistics_as_string(debug=debug,
+                                                                                profile=profile), Style.RESET_ALL, ' ',
+                    )
+                )
             else:
-                _line = ''.join((
-                    Fore.BLACK,
-                    '({})'.format(i + 1),
-                    ' - ',
-                    component.name,
-                    ' ',
-                    component.get_statistics_as_string(debug=debug, profile=profile),
-                    Style.RESET_ALL,
-                    ' ',
-                ))
+                _line = ''.join(
+                    (
+                        Fore.BLACK, '({})'.format(i + 1), ' - ', component.name, ' ',
+                        component.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
+                    )
+                )
             print(prefix + _line + '\033[0K')
 
         if append:
             # todo handle multiline
-            print(''.join((
-                ' `-> ',
-                ' '.join(
-                    '{}{}{}: {}'.format(
-                        Style.BRIGHT,
-                        k,
-                        Style.RESET_ALL,
-                        v
-                    ) for k, v in append),
-                CLEAR_EOL
-            )))
+            print(
+                ''.join(
+                    (
+                        ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v)
+                                          for k, v in append), CLEAR_EOL
+                    )
+                )
+            )
             t_cnt += 1
 
         if rewind:

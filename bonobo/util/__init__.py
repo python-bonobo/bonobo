@@ -71,12 +71,7 @@ def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True
         row = args[0]
         for key in title_keys:
             if key in row:
-                print(
-                    Style.BRIGHT,
-                    row.get(key),
-                    Style.RESET_ALL,
-                    sep=''
-                )
+                print(Style.BRIGHT, row.get(key), Style.RESET_ALL, sep='')
                 break
 
         if print_values:

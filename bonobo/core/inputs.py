@@ -111,4 +111,3 @@ class Input(Queue, Readable, Writable):
     @property
     def alive(self):
         return self._runlevel > 0
-

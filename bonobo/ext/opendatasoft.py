@@ -35,7 +35,9 @@ class OpenDataSoftAPI(Configurable):
 
     def __call__(self, base_url, start, *args, **kwargs):
         while (not self.limit) or (self.limit > start):
-            url = '{}&start={start}&rows={rows}'.format(base_url, start=start.value, rows=self.rows if not self.limit else min(self.rows, self.limit-start))
+            url = '{}&start={start}&rows={rows}'.format(
+                base_url, start=start.value, rows=self.rows if not self.limit else min(self.rows, self.limit - start)
+            )
             resp = requests.get(url)
             records = resp.json().get('records', [])
 
@@ -43,10 +45,7 @@ class OpenDataSoftAPI(Configurable):
                 break
 
             for row in records:
-                yield {
-                    **row.get('fields', {}),
-                    'geometry': row.get('geometry', {})
-                }
+                yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
             start.value += self.rows
 

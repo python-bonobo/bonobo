@@ -1,5 +1,5 @@
-from bonobo.core.plugins import Plugin
 from bonobo.ext.jupyter.widget import BonoboWidget
+from bonobo.plugins import Plugin
 
 try:
     import IPython.core.display
@@ -14,8 +14,7 @@ except ImportError as e:
 
 
 class JupyterOutputPlugin(Plugin):
-    def __init__(self, context):
-        self.context = context
+    def initialize(self):
         self.widget = BonoboWidget()
         IPython.core.display.display(self.widget)
 
