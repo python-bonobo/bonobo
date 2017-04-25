@@ -1,4 +1,5 @@
 import re
+import types
 
 from bonobo.config.options import Option
 
@@ -9,7 +10,6 @@ def validate_service_name(name):
     if not _service_name_re.match(name):
         raise ValueError('Invalid service name {!r}.'.format(name))
     return name
-
 
 class Service(Option):
     """
@@ -48,10 +48,7 @@ class Service(Option):
         inst.__options_values__[self.name] = validate_service_name(value)
 
     def resolve(self, inst, services):
-        name = getattr(inst, self.name)
-        if not name in services:
-            raise KeyError('Cannot resolve service {!r} using provided service collection.'.format(name))
-        return services.get(name)
+        return services.get(getattr(inst, self.name))
 
 
 class Container(dict):
@@ -75,3 +72,17 @@ class Container(dict):
             for name, option in options.items()
             if isinstance(option, Service)
         )
+
+    def get(self, name, default=None):
+        if not name in self:
+            if default:
+                return default
+            raise KeyError('Cannot resolve service {!r} using provided service collection.'.format(name))
+        value = super().get(name)
+        if isinstance(value, types.LambdaType):
+            value = value(self)
+        return value
+
+
+
+

@@ -40,6 +40,7 @@ class ExecutorStrategy(Strategy):
             def _runner(node_context=node_context):
                 node_context.start()
                 node_context.loop()
+                node_context.stop()
 
             futures.append(executor.submit(_runner))
 

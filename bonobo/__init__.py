@@ -54,6 +54,12 @@ def get_examples_path(*pathsegments):
 
 
 def create_strategy(name=None):
+    """
+    Create a strategy, or just returns it if it's already one.
+    
+    :param name: 
+    :return: Strategy
+    """
     from bonobo.strategies.base import Strategy
     import logging
 
