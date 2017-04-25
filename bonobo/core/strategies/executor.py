@@ -64,7 +64,6 @@ class ProcessPoolExecutorStrategy(ExecutorStrategy):
 
 class ThreadCollectionStrategy(Strategy):
     def execute(self, graph, *args, plugins=None, **kwargs):
-        print(type(self), 'execute', graph, args, plugins, kwargs)
         context = self.create_graph_execution_context(graph, plugins=plugins)
         context.recv(BEGIN, Bag(), END)
 
