@@ -1,7 +1,8 @@
 import json
 import os
 
-from bonobo import Tee, JsonWriter, Graph, get_examples_path
+from bonobo import JsonWriter, Graph, get_examples_path
+from bonobo.basics import Tee
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 from colorama import Fore, Style

@@ -15,3 +15,9 @@ def force_iterator(mixed):
         return iter(mixed)
     except TypeError:
         return [mixed] if mixed else []
+
+
+def ensure_tuple(tuple_or_mixed):
+    if isinstance(tuple_or_mixed, tuple):
+        return tuple_or_mixed
+    return (tuple_or_mixed,)

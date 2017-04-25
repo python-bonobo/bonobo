@@ -12,13 +12,13 @@ import warnings
 assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
 
 from ._version import __version__
+from .basics import __all__ as __all_basics__
 from .config import __all__ as __all_config__
-from .context import __all__ as __all_context__
-from .core import __all__ as __all_core__
+from .execution import __all__ as __all_execution__
 from .io import __all__ as __all_io__
-from .util import __all__ as __all_util__
+from .strategies import __all__ as __all_strategies__
 
-__all__ = __all_config__ + __all_context__ + __all_core__ + __all_io__ + __all_util__ + [
+__all__ = __all_basics__ + __all_config__ + __all_execution__ + __all_io__ + __all_strategies__ + [
     'Bag',
     'ErrorBag'
     'Graph',
@@ -29,14 +29,14 @@ __all__ = __all_config__ + __all_context__ + __all_core__ + __all_io__ + __all_u
     'run',
 ]
 
+from .basics import *
 from .config import *
-from .context import *
-from .core import *
+from .execution import *
 from .io import *
+from .strategies import *
 from .structs.bags import *
 from .structs.graphs import *
 from .structs.tokens import *
-from .util import *
 
 DEFAULT_STRATEGY = 'threadpool'
 
@@ -54,7 +54,7 @@ def get_examples_path(*pathsegments):
 
 
 def create_strategy(name=None):
-    from bonobo.core.strategies.base import Strategy
+    from bonobo.strategies.base import Strategy
     import logging
 
     if isinstance(name, Strategy):
@@ -87,7 +87,7 @@ def _is_jupyter_notebook():
         return False
 
 
-def run(graph, *chain, strategy=None, plugins=None):
+def run(graph, *chain, strategy=None, plugins=None, services=None):
     if len(chain):
         warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
         from bonobo import Graph
@@ -106,7 +106,7 @@ def run(graph, *chain, strategy=None, plugins=None):
         if JupyterOutputPlugin not in plugins:
             plugins.append(JupyterOutputPlugin)
 
-    return strategy.execute(graph, plugins=plugins)
+    return strategy.execute(graph, plugins=plugins, services=services)
 
 
 del sys

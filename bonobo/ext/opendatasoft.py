@@ -2,8 +2,9 @@ from urllib.parse import urlencode
 
 import requests  # todo: make this a service so we can substitute it ?
 
-from bonobo.config import Configurable, Option
-from bonobo.context import ContextProcessor, contextual
+from bonobo.config import Option
+from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.config.configurables import Configurable
 from bonobo.util.compat import deprecated
 from bonobo.util.objects import ValueHolder
 

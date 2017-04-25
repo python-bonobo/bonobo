@@ -3,7 +3,7 @@ import time
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
 from bonobo.constants import BEGIN, END
-from bonobo.core.strategies.base import Strategy
+from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
 
 
@@ -18,8 +18,8 @@ class ExecutorStrategy(Strategy):
     def create_executor(self):
         return self.executor_factory()
 
-    def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_graph_execution_context(graph, plugins=plugins)
+    def execute(self, graph, *args, plugins=None, services=None, **kwargs):
+        context = self.create_graph_execution_context(graph, plugins=plugins, services=services)
         context.recv(BEGIN, Bag(), END)
 
         executor = self.create_executor()

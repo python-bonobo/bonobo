@@ -1,7 +1,6 @@
 from operator import attrgetter
 
-from bonobo import contextual, ContextProcessor
-from bonobo.context.processors import get_context_processors
+from bonobo.config.processors import ContextProcessor, contextual, resolve_processors
 
 
 @contextual
@@ -46,7 +45,7 @@ class CP3(CP2):
 
 
 def get_all_processors_names(cls):
-    return list(map(attrgetter('__name__'), get_context_processors(cls)))
+    return list(map(attrgetter('__name__'), resolve_processors(cls)))
 
 
 def test_inheritance_and_ordering():

@@ -1,16 +1,24 @@
-import traceback
 import sys
+import traceback
 from functools import partial
 from queue import Empty
 from time import sleep
 
-from bonobo.constants import BEGIN, END, NOT_MODIFIED, INHERIT_INPUT
-from bonobo.context.processors import get_context_processors
+from bonobo.config import Container
+from bonobo.config.processors import resolve_processors
+from bonobo.constants import BEGIN, END, INHERIT_INPUT, NOT_MODIFIED
 from bonobo.core.inputs import Input
 from bonobo.core.statistics import WithStatistics
 from bonobo.errors import InactiveReadableError
 from bonobo.structs.bags import Bag, ErrorBag
+from bonobo.util.iterators import ensure_tuple
 from bonobo.util.objects import Wrapper
+
+__all__ = [
+    'GraphExecutionContext',
+    'NodeExecutionContext',
+    'PluginExecutionContext',
+]
 
 
 class GraphExecutionContext:
@@ -26,10 +34,11 @@ class GraphExecutionContext:
     def alive(self):
         return any(node.alive for node in self.nodes)
 
-    def __init__(self, graph, plugins=None):
+    def __init__(self, graph, plugins=None, services=None):
         self.graph = graph
         self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph.nodes]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
+        self.services = Container(services) if services else Container()
 
         for i, component_context in enumerate(self):
             try:
@@ -74,12 +83,6 @@ class GraphExecutionContext:
             node.stop()
 
 
-def ensure_tuple(tuple_or_mixed):
-    if isinstance(tuple_or_mixed, tuple):
-        return tuple_or_mixed
-    return (tuple_or_mixed, )
-
-
 class LoopingExecutionContext(Wrapper):
     alive = True
     PERIOD = 0.25
@@ -105,13 +108,16 @@ class LoopingExecutionContext(Wrapper):
         assert self.state == (False,
                               False), ('{}.start() can only be called on a new node.').format(type(self).__name__)
         assert self._context is None
-
         self._started = True
-        self._context = ()
-        for processor in get_context_processors(self.wrapped):
-            _processed = processor(self.wrapped, self, *self._context)
+        try:
+            self._context = self.parent.services.args_for(self.wrapped) if self.parent else ()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
+            raise
+
+        for processor in resolve_processors(self.wrapped):
             try:
-                # todo yield from ?
+                _processed = processor(self.wrapped, self, *self._context)
                 _append_to_context = next(_processed)
                 if _append_to_context is not None:
                     self._context += ensure_tuple(_append_to_context)
@@ -127,9 +133,7 @@ class LoopingExecutionContext(Wrapper):
             sleep(self.PERIOD)
 
     def step(self):
-        """
-        TODO xxx this is a step, not a loop
-        """
+        """Left as an exercise for the children."""
         raise NotImplementedError('Abstract.')
 
     def stop(self):
@@ -175,37 +179,6 @@ class LoopingExecutionContext(Wrapper):
             file=sys.stderr,
         )
         print(trace)
-
-
-class PluginExecutionContext(LoopingExecutionContext):
-    PERIOD = 0.5
-
-    def __init__(self, wrapped, parent):
-        # Instanciate plugin. This is not yet considered stable, as at some point we may need a way to configure
-        # plugins, for example if it depends on an external service.
-        super().__init__(wrapped(self), parent)
-
-    def start(self):
-        super().start()
-
-        try:
-            self.wrapped.initialize()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-
-    def shutdown(self):
-        try:
-            self.wrapped.finalize()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-        finally:
-            self.alive = False
-
-    def step(self):
-        try:
-            self.wrapped.run()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
 
 
 class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
@@ -311,6 +284,37 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                         output.apply(self.handle_error)
                     else:
                         self.send(_resolve(input_bag, output))
+
+
+class PluginExecutionContext(LoopingExecutionContext):
+    PERIOD = 0.5
+
+    def __init__(self, wrapped, parent):
+        # Instanciate plugin. This is not yet considered stable, as at some point we may need a way to configure
+        # plugins, for example if it depends on an external service.
+        super().__init__(wrapped(self), parent)
+
+    def start(self):
+        super().start()
+
+        try:
+            self.wrapped.initialize()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
+
+    def shutdown(self):
+        try:
+            self.wrapped.finalize()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
+        finally:
+            self.alive = False
+
+    def step(self):
+        try:
+            self.wrapped.run()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
 
 
 def _iter(mixed):

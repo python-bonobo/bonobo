@@ -1,5 +1,5 @@
 from bonobo.constants import BEGIN, END
-from bonobo.core.strategies.base import Strategy
+from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
 
 
