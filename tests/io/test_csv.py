@@ -2,7 +2,7 @@ import pytest
 
 from bonobo import Bag, CsvReader, CsvWriter
 from bonobo.constants import BEGIN, END
-from bonobo.context.execution import NodeExecutionContext
+from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
 
 

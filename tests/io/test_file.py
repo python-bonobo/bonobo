@@ -1,15 +1,15 @@
 import pytest
 
-from bonobo import FileWriter, Bag, FileReader
-from bonobo.context.execution import NodeExecutionContext
-from bonobo.util.testing import CapturingNodeExecutionContext
+from bonobo import Bag, FileReader, FileWriter
 from bonobo.constants import BEGIN, END
+from bonobo.execution.node import NodeExecutionContext
+from bonobo.util.testing import CapturingNodeExecutionContext
 
 
 @pytest.mark.parametrize(
     'lines,output',
     [
-        (('ACME', ), 'ACME'),  # one line...
+        (('ACME',), 'ACME'),  # one line...
         (('Foo', 'Bar', 'Baz'), 'Foo\nBar\nBaz'),  # more than one line...
     ]
 )

@@ -1,4 +1,4 @@
-from bonobo.util import noop
+from bonobo.basics import noop
 
 
 def _create_lifecycle_functions(noun, verb):

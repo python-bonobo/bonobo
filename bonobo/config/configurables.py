@@ -1,26 +1,11 @@
-__all__ = [
-    'Configurable',
-    'Option',
-]
-
-
-class Option:
-    def __init__(self, type=None, *, required=False, default=None):
-        self.name = None
-        self.type = type
-        self.required = required
-        self.default = default
-
-    def __get__(self, inst, typ):
-        if not self.name in inst.__options_values__:
-            inst.__options_values__[self.name] = self.default() if callable(self.default) else self.default
-        return inst.__options_values__[self.name]
-
-    def __set__(self, inst, value):
-        inst.__options_values__[self.name] = self.type(value) if self.type else value
+from bonobo.config.options import Option
 
 
 class ConfigurableMeta(type):
+    """
+    Metaclass for Configurables that will add options to a special __options__ dict.
+    """
+
     def __init__(cls, what, bases=None, dict=None):
         super().__init__(what, bases, dict)
         cls.__options__ = {}

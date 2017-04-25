@@ -1,18 +1,10 @@
-from functools import partial
+import functools
 
 import types
 
+from bonobo.util.compat import deprecated_alias
+
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
-
-
-def get_context_processors(mixed):
-    if isinstance(mixed, types.FunctionType):
-        yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
-
-    for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
-        yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
-
-    return ()
 
 
 class ContextProcessor:
@@ -47,7 +39,7 @@ def contextual(cls_or_func):
     :param cls_or_func: 
     """
     if not add_context_processor.__name__ in cls_or_func.__dict__:
-        setattr(cls_or_func, add_context_processor.__name__, partial(add_context_processor, cls_or_func))
+        setattr(cls_or_func, add_context_processor.__name__, functools.partial(add_context_processor, cls_or_func))
 
     if isinstance(cls_or_func, types.FunctionType):
         try:
@@ -63,6 +55,20 @@ def contextual(cls_or_func):
     for name, value in cls_or_func.__dict__.items():
         if isinstance(value, ContextProcessor):
             _processors.append(value)
+
     # This is needed for python 3.5, python 3.6 should be fine, but it's considered an implementation detail.
     _processors.sort(key=lambda proc: proc._creation_counter)
     return cls_or_func
+
+
+def resolve_processors(mixed):
+    if isinstance(mixed, types.FunctionType):
+        yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
+
+    for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
+        yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
+
+    return ()
+
+
+get_context_processors = deprecated_alias('get_context_processors', resolve_processors)

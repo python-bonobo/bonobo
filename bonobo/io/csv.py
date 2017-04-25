@@ -1,7 +1,7 @@
 import csv
 
 from bonobo.config import Option
-from bonobo.context import ContextProcessor, contextual
+from bonobo.config.processors import ContextProcessor, contextual
 from bonobo.util.objects import ValueHolder
 from .file import FileReader, FileWriter, FileHandler
 
