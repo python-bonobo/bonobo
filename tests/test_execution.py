@@ -1,7 +1,7 @@
 from bonobo import Graph, NaiveStrategy, Bag
 from bonobo.config.processors import contextual
 from bonobo.constants import BEGIN, END
-from bonobo.execution import GraphExecutionContext
+from bonobo.execution.graph import GraphExecutionContext
 
 
 def generate_integers():

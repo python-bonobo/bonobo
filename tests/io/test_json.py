@@ -2,7 +2,7 @@ import pytest
 
 from bonobo import Bag, JsonReader, JsonWriter
 from bonobo.constants import BEGIN, END
-from bonobo.execution import NodeExecutionContext
+from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
 
 

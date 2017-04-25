@@ -21,3 +21,9 @@ def ensure_tuple(tuple_or_mixed):
     if isinstance(tuple_or_mixed, tuple):
         return tuple_or_mixed
     return (tuple_or_mixed,)
+
+
+def iter_if_not_sequence(mixed):
+    if isinstance(mixed, (dict, list, str)):
+        raise TypeError(type(mixed).__name__)
+    return iter(mixed)

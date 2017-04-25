@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from bonobo.execution import NodeExecutionContext
+from bonobo.execution.node import NodeExecutionContext
 
 
 class CapturingNodeExecutionContext(NodeExecutionContext):
