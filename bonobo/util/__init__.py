@@ -3,18 +3,20 @@
 import functools
 from pprint import pprint as _pprint
 
-import blessings
+from colorama import Fore, Style
 
-from .helpers import console_run, jupyter_run
-from .tokens import NOT_MODIFIED
+from bonobo.constants import NOT_MODIFIED
+from bonobo.context.processors import contextual
+from bonobo.structs.bags import Bag
+from bonobo.util.objects import ValueHolder
+from bonobo.util.term import CLEAR_EOL
 
 __all__ = [
     'Limit',
     'NOT_MODIFIED',
     'PrettyPrint',
     'Tee',
-    'console_run',
-    'jupyter_run',
+    'count',
     'noop',
     'pprint',
 ]
@@ -33,7 +35,7 @@ def Limit(n=10):
         if i <= n:
             yield NOT_MODIFIED
 
-    _limit.__name__ = 'limit({})'.format(n)
+    _limit.__name__ = 'Limit({})'.format(n)
     return _limit
 
 
@@ -47,26 +49,47 @@ def Tee(f):
     return wrapped
 
 
+@contextual
+def count(counter, *args, **kwargs):
+    counter += 1
+
+
+@count.add_context_processor
+def _count_counter(self, context):
+    counter = ValueHolder(0)
+    yield counter
+    context.send(Bag(counter.value))
+
+
 pprint = Tee(_pprint)
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
-    term = blessings.Terminal()
-
     def _pprint(*args, **kwargs):
-        nonlocal title_keys, term, sort, print_values
+        nonlocal title_keys, sort, print_values
 
         row = args[0]
         for key in title_keys:
             if key in row:
-                print(term.bold(row.get(key)))
+                print(Style.BRIGHT, row.get(key), Style.RESET_ALL, sep='')
                 break
 
         if print_values:
             for k in sorted(row) if sort else row:
                 print(
-                    '  • {t.blue}{k}{t.normal} : {t.black}({tp}){t.normal} {v}{t.clear_eol}'.
-                    format(k=k, v=repr(row[k]), t=term, tp=type(row[k]).__name__)
+                    '  • ',
+                    Fore.BLUE,
+                    k,
+                    Style.RESET_ALL,
+                    ' : ',
+                    Fore.BLACK,
+                    '(',
+                    type(row[k]).__name__,
+                    ')',
+                    Style.RESET_ALL,
+                    ' ',
+                    repr(row[k]),
+                    CLEAR_EOL,
                 )
 
         yield NOT_MODIFIED
@@ -74,42 +97,6 @@ def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True
     _pprint.__name__ = 'pprint'
 
     return _pprint
-
-
-'''
-    Old code from rdc.etl
-
-    def writehr(self, label=None):
-        width = t.width or 80
-
-        if label:
-            label = str(label)
-            sys.stderr.write(t.black('·' * 4) + shade('{') + label + shade('}') + t.black('·' * (width - (6+len(label)) - 1)) + '\n')
-        else:
-            sys.stderr.write(t.black('·' * (width-1) + '\n'))
-
-
-    def writeln(self, s):
-        """Output method."""
-        sys.stderr.write(self.format(s) + '\n')
-
-    def initialize(self):
-        self.lineno = 0
-
-    def transform(self, hash, channel=STDIN):
-        """Actual transformation."""
-        self.lineno += 1
-        if not self.condition or self.condition(hash):
-            hash = hash.copy()
-            hash = hash if not isinstance(self.field_filter, collections.Callable) else hash.restrict(self.field_filter)
-            if self.clean:
-                hash = hash.restrict(lambda k: len(k) and k[0] != '_')
-            self.writehr(self.lineno)
-            self.writeln(hash)
-            self.writehr()
-            sys.stderr.write('\n')
-        yield hash
-'''
 
 
 def noop(*args, **kwargs):  # pylint: disable=unused-argument

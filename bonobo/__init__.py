@@ -19,6 +19,10 @@ from .io import __all__ as __all_io__
 from .util import __all__ as __all_util__
 
 __all__ = __all_config__ + __all_context__ + __all_core__ + __all_io__ + __all_util__ + [
+    'Bag',
+    'ErrorBag'
+    'Graph',
+    'Token',
     '__version__',
     'create_strategy',
     'get_examples_path',
@@ -29,6 +33,9 @@ from .config import *
 from .context import *
 from .core import *
 from .io import *
+from .structs.bags import *
+from .structs.graphs import *
+from .structs.tokens import *
 from .util import *
 
 DEFAULT_STRATEGY = 'threadpool'
@@ -67,15 +74,18 @@ def create_strategy(name=None):
 
     return factory()
 
+
 def _is_interactive_console():
     import sys
     return sys.stdout.isatty()
+
 
 def _is_jupyter_notebook():
     try:
         return get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
     except NameError:
         return False
+
 
 def run(graph, *chain, strategy=None, plugins=None):
     if len(chain):
@@ -97,6 +107,7 @@ def run(graph, *chain, strategy=None, plugins=None):
             plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins)
+
 
 del sys
 del warnings

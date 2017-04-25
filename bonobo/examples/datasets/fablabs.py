@@ -1,11 +1,10 @@
 import json
 import os
 
-from blessings import Terminal
-
 from bonobo import Tee, JsonWriter, Graph, get_examples_path
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
+from colorama import Fore, Style
 try:
     import pycountry
 except ImportError as exc:
@@ -15,7 +14,6 @@ API_DATASET = 'fablabs-in-the-world'
 API_NETLOC = 'datanova.laposte.fr'
 ROWS = 100
 
-t = Terminal()
 __path__ = os.path.dirname(__file__)
 
 
@@ -39,7 +37,7 @@ def filter_france(row):
 
 
 def display(row):
-    print(t.bold(row.get('name')))
+    print(Style.BRIGHT, row.get('name'), Style.RESET_ALL, sep='')
 
     address = list(
         filter(
@@ -50,10 +48,10 @@ def display(row):
         )
     )
 
-    print('  - {}: {address}'.format(t.blue('address'), address=', '.join(address)))
-    print('  - {}: {links}'.format(t.blue('links'), links=', '.join(row['links'])))
-    print('  - {}: {geometry}'.format(t.blue('geometry'), **row))
-    print('  - {}: {source}'.format(t.blue('source'), source='datanova/' + API_DATASET))
+    print('  - {}address{}: {address}'.format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address)))
+    print('  - {}links{}: {links}'.format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links'])))
+    print('  - {}geometry{}: {geometry}'.format(Fore.BLUE, Style.RESET_ALL, **row))
+    print('  - {}source{}: {source}'.format(Fore.BLUE, Style.RESET_ALL, source='datanova/' + API_DATASET))
 
 
 graph = Graph(

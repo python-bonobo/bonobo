@@ -1,7 +1,7 @@
 from mock import Mock
 
 from bonobo import Bag
-from bonobo.core.bags import INHERIT_INPUT
+from bonobo.constants import INHERIT_INPUT
 
 args = ('foo', 'bar', )
 kwargs = dict(acme='corp')

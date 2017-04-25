@@ -1,10 +1,9 @@
 import pytest
 
 from bonobo import Bag, JsonWriter, JsonReader
+from bonobo.constants import BEGIN, END
 from bonobo.context.execution import NodeExecutionContext
-from bonobo.util.objects import ValueHolder
 from bonobo.util.testing import CapturingNodeExecutionContext
-from bonobo.util.tokens import BEGIN, END
 
 
 def test_write_json_to_file(tmpdir):

@@ -6,8 +6,7 @@ dependencies:
 - wheel=0.29.0=py35_0
 - pip:
   - psycopg2 >=2.6.1
-  - blessings >=1.6,<1.7
+  - colorama >=0.3,<0.4
   - psutil >=5.0,<5.1
   - requests >=2.12,<2.13
   - stevedore >=1.19,<1.20
-  - toolz >=0.8,<0.9

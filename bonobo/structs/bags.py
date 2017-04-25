@@ -1,13 +1,11 @@
 import itertools
 
-from bonobo.util.tokens import Token
+from bonobo.constants import INHERIT_INPUT
 
 __all__ = [
     'Bag',
     'ErrorBag',
 ]
-
-INHERIT_INPUT = Token('InheritInput')
 
 
 class Bag:
@@ -28,8 +26,8 @@ class Bag:
         if self._parent is None:
             return self._kwargs
         return {
-            ** self._parent.kwargs,
-            ** self._kwargs,
+            **self._parent.kwargs,
+            **self._kwargs,
         }
 
     @property

@@ -1,15 +1,16 @@
 import traceback
+import sys
 from functools import partial
 from queue import Empty
 from time import sleep
 
+from bonobo.constants import BEGIN, END, NOT_MODIFIED, INHERIT_INPUT
 from bonobo.context.processors import get_context_processors
-from bonobo.core.bags import Bag, INHERIT_INPUT, ErrorBag
-from bonobo.core.errors import InactiveReadableError
 from bonobo.core.inputs import Input
 from bonobo.core.statistics import WithStatistics
+from bonobo.errors import InactiveReadableError
+from bonobo.structs.bags import Bag, ErrorBag
 from bonobo.util.objects import Wrapper
-from bonobo.util.tokens import BEGIN, END, NOT_MODIFIED
 
 
 class GraphExecutionContext:
@@ -76,7 +77,7 @@ class GraphExecutionContext:
 def ensure_tuple(tuple_or_mixed):
     if isinstance(tuple_or_mixed, tuple):
         return tuple_or_mixed
-    return (tuple_or_mixed,)
+    return (tuple_or_mixed, )
 
 
 class LoopingExecutionContext(Wrapper):
@@ -164,9 +165,15 @@ class LoopingExecutionContext(Wrapper):
         :return: to hell
         """
 
-        from blessings import Terminal
-        term = Terminal()
-        print(term.bold(term.red('\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped))))
+        from colorama import Fore, Style
+        print(
+            Style.BRIGHT,
+            Fore.RED,
+            '\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped),
+            Style.RESET_ALL,
+            sep='',
+            file=sys.stderr,
+        )
         print(trace)
 
 
@@ -177,6 +184,14 @@ class PluginExecutionContext(LoopingExecutionContext):
         # Instanciate plugin. This is not yet considered stable, as at some point we may need a way to configure
         # plugins, for example if it depends on an external service.
         super().__init__(wrapped(self), parent)
+
+    def start(self):
+        super().start()
+
+        try:
+            self.wrapped.initialize()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
 
     def shutdown(self):
         try:

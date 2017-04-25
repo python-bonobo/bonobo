@@ -1,3 +1,5 @@
+from functools import partial
+
 import types
 
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
@@ -34,7 +36,19 @@ class ContextProcessor:
         return self.func(*args, **kwargs)
 
 
+def add_context_processor(cls_or_func, context_processor):
+    getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR).append(context_processor)
+
+
 def contextual(cls_or_func):
+    """
+    Make sure an element has the context processors collection.
+    
+    :param cls_or_func: 
+    """
+    if not add_context_processor.__name__ in cls_or_func.__dict__:
+        setattr(cls_or_func, add_context_processor.__name__, partial(add_context_processor, cls_or_func))
+
     if isinstance(cls_or_func, types.FunctionType):
         try:
             getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
@@ -44,6 +58,7 @@ def contextual(cls_or_func):
 
     if not _CONTEXT_PROCESSORS_ATTR in cls_or_func.__dict__:
         setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
+
     _processors = getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
     for name, value in cls_or_func.__dict__.items():
         if isinstance(value, ContextProcessor):

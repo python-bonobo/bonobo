@@ -17,9 +17,9 @@
 from abc import ABCMeta, abstractmethod
 from queue import Queue
 
-from bonobo.core.errors import AbstractError, InactiveWritableError, InactiveReadableError
+from bonobo.errors import AbstractError, InactiveWritableError, InactiveReadableError
+from bonobo.constants import BEGIN, END
 from bonobo.util import noop
-from bonobo.util.tokens import BEGIN, END
 
 BUFFER_SIZE = 8192
 
