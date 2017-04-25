@@ -25,6 +25,7 @@ class ValueHolder:
     at least all in a certain category, but it feels like a more correct method should exist, like with a getattr-something on the
     value. Let's see later.
     """
+
     def __init__(self, value, *, type=None):
         self.value = value
         self.type = type
@@ -117,10 +118,10 @@ class ValueHolder:
         return divmod(other, self.value)
 
     def __pow__(self, other):
-        return self.value ** other
+        return self.value**other
 
     def __rpow__(self, other):
-        return other ** self.value
+        return other**self.value
 
     def __ipow__(self, other):
         self.value **= other
@@ -181,4 +182,3 @@ class ValueHolder:
 
     def __invert__(self):
         return ~self.value
-

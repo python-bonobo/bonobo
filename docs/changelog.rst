@@ -1,20 +1,18 @@
 Changelog
 =========
 
+v.0.2.1
+:::::::
 
-Incoming...
-:::::::::::
-
-* todo migrate doc
-* todo migrate tests
-* todo migrate transforms ?
-
-Version 0.3
-:::::::::::
-
-* Autodetect if within jupyter notebook context, and apply plugin if it's the case.
-* Console run should allow console plugin as a command line argument.
-* New bonobo.structs package with simple data structures (bags, graphs, tokens).
+* Plugins (jupyter, console) are now auto-activated depending on the environment when using bonobo.run(...).
+* Remove dependencies to toolz (which was unused) and blessings (which caused problems on windows).
+* New dependency on colorama, which has better cross-platform support than blessings.
+* New bonobo.structs package containing basic datastructures, like graphs, tokens and bags.
+* Enhancements of ValueHolder to implement basic operators on its value without referencing the value attribute.
+* Fix issue with timezone argument of OpenDataSoftAPI (Sanket Dasgupta).
+* Fix Jupyter plugin.
+* Better continuous integration, testing and fixes in documentation.
+* Version updates for dependencies (psutil install problem on windows).
 
 Initial release
 :::::::::::::::
