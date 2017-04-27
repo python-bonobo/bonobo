@@ -8,7 +8,9 @@ Services and dependencies (draft implementation)
 Most probably, you'll want to use external systems within your transformations. Those systems may include databases,
 apis (using http, for example), filesystems, etc.
 
-Hardocing those services in your code can do the job at first, but you'll pretty soon feel limited, for a few reasons:
+You can start by hardcoding those services. That does the job, at first.
+
+If you're going a little further than that, you'll feel limited, for a few reasons:
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
 * Processing data on your laptop is great, but being able to do it on different systems (or stages), in different
@@ -61,27 +63,32 @@ Let's see how to execute it:
 
     import bonobo
 
-    bonobo.run(
-        [...extract...],
+    graph = bonobo.graph(
+        *before,
         JoinDatabaseCategories(),
-        [...load...],
-        services={
-            'primary_sql_database': my_database_service,
-        }
+        *after,
     )
+    
+    if __name__ == '__main__':
+        bonobo.run(
+            graph,
+            services={
+                'primary_sql_database': my_database_service,
+            }
+        )
     
 A dictionary, or dictionary-like, "services" named argument can be passed to the :func:`bonobo.run` helper. The
 "dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the implementation
 provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of the provided
 stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will use it.
 
-Future
-::::::
+Future and proposals
+::::::::::::::::::::
 
 This is the first proposed implementation and it will evolve, but looks a lot like how we used bonobo ancestor in
 production.
 
-You can expect to see the following features pretty soon:
+May or may not happen, depending on discussions.
 
 * Singleton or prototype based injection (to use spring terminology, see
   https://www.tutorialspoint.com/spring/spring_bean_scopes.htm), allowing smart factory usage and efficient sharing of
@@ -89,8 +96,12 @@ You can expect to see the following features pretty soon:
 * Lazily resolved parameters, eventually overriden by command line or environment, so you can for example override the
   database DSN or target filesystem on command line (or with shell environment).
 * Pool based locks that ensure that only one (or n) transformations are using a given service at the same time.
+* Simple config implementation, using a python file for config (ex: bonobo run ... --services=services_prod.py).
+* Default configuration for services, using an optional callable (`def get_services(args): ...`). Maybe tie default
+  configuration to graph, but not really a fan because this is unrelated to graph logic.
 
 This is under development, let us know what you think (slack may be a good place for this).
+The basics already work, and you can try it.
 
 
 Read more
