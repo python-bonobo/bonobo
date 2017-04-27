@@ -99,6 +99,34 @@ May or may not happen, depending on discussions.
 * Simple config implementation, using a python file for config (ex: bonobo run ... --services=services_prod.py).
 * Default configuration for services, using an optional callable (`def get_services(args): ...`). Maybe tie default
   configuration to graph, but not really a fan because this is unrelated to graph logic.
+* Default implementation for a service in a transformation or in the descriptor. Maybe not a good idea, because it
+  tends to push forward multiple instances of the same thing, but we maybe...
+  
+  A few ideas on how it can be implemented, from the user perspective.
+  
+  .. code-block:: python
+  
+      # using call
+      http = Service('http.client')(requests)
+      
+      # using more explicit call
+      http = Service('http.client').set_default_impl(requests)
+      
+      # using a decorator
+      @Service('http.client')
+      def http(self, services):
+          import requests
+          return requests
+      
+      # as a default in a subclass of Service
+      class HttpService(Service):
+          def get_default_impl(self, services):
+              import requests
+              return requests
+              
+      # ... then use it as another service
+      http = HttpService('http.client')
+      
 
 This is under development, let us know what you think (slack may be a good place for this).
 The basics already work, and you can try it.
