@@ -3,8 +3,6 @@
 
 Data-processing. By monkeys. For humans.
 
-*Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the process (feel free to complain on issues, so we notice breakages we did not expect)*
-
 Bonobo is a data-processing library for python 3.5+ that emphasises writing
 simple, atomic, plain old python functions and chaining them using a basic
 acyclic graph. The nodes will need a bit of plumbery to be runnable in
@@ -51,6 +49,8 @@ concepts work.
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
+
+**Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the process (feel free to complain on issues, so we notice breakages we did not expect)**
 
 ----
 
