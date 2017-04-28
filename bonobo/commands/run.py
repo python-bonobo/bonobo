@@ -1,5 +1,32 @@
 import argparse
+
+import os
+
 import bonobo
+
+DEFAULT_SERVICES_FILENAME = '_services.py'
+DEFAULT_SERVICES_ATTR = 'get_services'
+
+
+def get_default_services(filename, services=None):
+    dirname = os.path.dirname(filename)
+    services_filename = os.path.join(dirname, DEFAULT_SERVICES_FILENAME)
+    if os.path.exists(services_filename):
+        with open(services_filename) as file:
+            code = compile(file.read(), services_filename, 'exec')
+        context = {
+            '__name__': '__bonobo__',
+            '__file__': services_filename,
+        }
+        try:
+            exec(code, context)
+        except Exception as exc:
+            raise
+        return {
+            **context[DEFAULT_SERVICES_ATTR](),
+            **(services or {}),
+        }
+    return services or {}
 
 
 def execute(file, quiet=False):
@@ -32,8 +59,7 @@ def execute(file, quiet=False):
 
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display
-
-    return bonobo.run(graph)
+    return bonobo.run(graph, plugins=[], services=get_default_services(file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None))
 
 
 def register(parser):

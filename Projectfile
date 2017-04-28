@@ -21,10 +21,11 @@ enable_features = {
 }
 
 install_requires = [
-    'colorama >=0.3,<0.4',
-    'psutil >=5.2,<5.3',
-    'requests >=2.13,<2.14',
-    'stevedore >=1.19,<1.20',
+    'colorama ==0.3.9',
+    'fs ==2.0.3',
+    'psutil ==5.2.2',
+    'requests ==2.13.0',
+    'stevedore ==1.21.0',
 ]
 
 extras_require = {
@@ -33,8 +34,7 @@ extras_require = {
         'ipywidgets >=6.0.0.beta5'
     ],
     'dev': [
-        'coverage >=4.3,<4.4',
-        'mock >=2.0,<2.1',
+        'coverage >=4,<5',
         'pylint >=1,<2',
         'pytest >=3,<4',
         'pytest-cov >=2,<3',

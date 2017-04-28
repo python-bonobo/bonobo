@@ -1,11 +1,11 @@
 import json
-import os
-
-from bonobo import JsonWriter, Graph, get_examples_path
-from bonobo.basics import Tee
-from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 from colorama import Fore, Style
+
+import bonobo
+from bonobo.commands.run import get_default_services
+from bonobo.ext.opendatasoft import OpenDataSoftAPI
+
 try:
     import pycountry
 except ImportError as exc:
@@ -14,8 +14,6 @@ except ImportError as exc:
 API_DATASET = 'fablabs-in-the-world'
 API_NETLOC = 'datanova.laposte.fr'
 ROWS = 100
-
-__path__ = os.path.dirname(__file__)
 
 
 def _getlink(x):
@@ -55,15 +53,13 @@ def display(row):
     print('  - {}source{}: {source}'.format(Fore.BLUE, Style.RESET_ALL, source='datanova/' + API_DATASET))
 
 
-graph = Graph(
+graph = bonobo.Graph(
     OpenDataSoftAPI(dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
     normalize,
     filter_france,
-    Tee(display),
-    JsonWriter(path=get_examples_path('datasets/fablabs.txt')),
+    bonobo.Tee(display),
+    bonobo.JsonWriter(path='fablabs.txt'),
 )
 
 if __name__ == '__main__':
-    from bonobo import run
-
-    run(graph)
+    bonobo.run(graph, services=get_default_services(__file__))

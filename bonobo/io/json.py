@@ -15,7 +15,7 @@ class JsonHandler:
 class JsonReader(JsonHandler, FileReader):
     loader = staticmethod(json.load)
 
-    def read(self, file):
+    def read(self, fs, file):
         for line in self.loader(file):
             yield line
 
@@ -23,16 +23,16 @@ class JsonReader(JsonHandler, FileReader):
 @contextual
 class JsonWriter(JsonHandler, FileWriter):
     @ContextProcessor
-    def envelope(self, context, file, lineno):
+    def envelope(self, context, fs, file, lineno):
         file.write('[\n')
         yield
         file.write('\n]')
 
-    def write(self, file, lineno, row):
+    def write(self, fs, file, lineno, row):
         """
         Write a json row on the next line of file pointed by ctx.file.
 
         :param ctx:
         :param row:
         """
-        return super().write(file, lineno, json.dumps(row))
+        return super().write(fs, file, lineno, json.dumps(row))

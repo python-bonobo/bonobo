@@ -1,6 +1,7 @@
 import pytest
 
-from bonobo import Graph, BEGIN
+from bonobo.constants import BEGIN
+from bonobo.structs import Graph
 
 identity = lambda x: x
 
