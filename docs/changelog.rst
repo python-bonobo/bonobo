@@ -1,8 +1,18 @@
 Changelog
 =========
 
-v.0.2.1
-:::::::
+v.0.2.2 - 28 apr 2017
+:::::::::::::::::::::
+
+* First implementation of services and basic injection.
+* Default service configuration for directories and files.
+* Code structure refactoring.
+* Critical bug fix in default strategy causing end of pipeline not to terminate correctly.
+* Force tighter dependency management to avoid unexpected upgrade problems.
+* Filesystems are now injected as a service, using new filesystem2 (fs) dependency.
+
+v.0.2.1 - 25 apr 2017
+:::::::::::::::::::::
 
 * Plugins (jupyter, console) are now auto-activated depending on the environment when using bonobo.run(...).
 * Remove dependencies to toolz (which was unused) and blessings (which caused problems on windows).

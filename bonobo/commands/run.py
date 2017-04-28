@@ -59,7 +59,13 @@ def execute(file, quiet=False):
 
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display
-    return bonobo.run(graph, plugins=[], services=get_default_services(file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None))
+    return bonobo.run(
+        graph,
+        plugins=[],
+        services=get_default_services(
+            file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
+        )
+    )
 
 
 def register(parser):

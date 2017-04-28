@@ -32,7 +32,8 @@ def deprecated_alias(alias, func):
         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
         warnings.warn(
             "Call to deprecated function alias {}, use {} instead.".format(alias, func.__name__),
-            category=DeprecationWarning, stacklevel=2
+            category=DeprecationWarning,
+            stacklevel=2
         )
         warnings.simplefilter('default', DeprecationWarning)  # reset filter
         return func(*args, **kwargs)

@@ -30,7 +30,8 @@ class LoopingExecutionContext(Wrapper):
         if services:
             if parent:
                 raise RuntimeError(
-                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.')
+                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.'
+                )
             self.services = Container(services) if services else Container()
         else:
             self.services = None

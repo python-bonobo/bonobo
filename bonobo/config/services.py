@@ -11,6 +11,7 @@ def validate_service_name(name):
         raise ValueError('Invalid service name {!r}.'.format(name))
     return name
 
+
 class Service(Option):
     """
     A Service is a special kind of option defining a dependency to something that will be resolved at runtime, using an
@@ -55,7 +56,7 @@ class Container(dict):
     def __new__(cls, *args, **kwargs):
         if len(args) == 1:
             assert not len(kwargs), 'only one usage at a time, my dear.'
-            if not(args[0]):
+            if not (args[0]):
                 return super().__new__(cls)
             if isinstance(args[0], cls):
                 return cls
@@ -67,11 +68,7 @@ class Container(dict):
         except AttributeError:
             options = {}
 
-        return tuple(
-            option.resolve(mixed, self)
-            for name, option in options.items()
-            if isinstance(option, Service)
-        )
+        return tuple(option.resolve(mixed, self) for name, option in options.items() if isinstance(option, Service))
 
     def get(self, name, default=None):
         if not name in self:
@@ -82,7 +79,3 @@ class Container(dict):
         if isinstance(value, types.LambdaType):
             value = value(self)
         return value
-
-
-
-

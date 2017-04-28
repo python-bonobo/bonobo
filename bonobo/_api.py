@@ -24,7 +24,6 @@ from bonobo.strategies import create_strategy
 
 __all__ += ['create_strategy']
 
-
 # Extract and loads from stdlib.
 from bonobo.io import *
 from bonobo.io import __all__ as _all_io

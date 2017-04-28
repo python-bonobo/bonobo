@@ -14,4 +14,3 @@ def test_wildcard_import():
             continue
 
         assert name in bonobo.__all__
-
