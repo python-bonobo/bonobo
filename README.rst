@@ -31,13 +31,13 @@ concepts work.
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration
 
-.. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
-   :target: https://landscape.io/github/python-bonobo/bonobo/0.2
-   :alt: Code Health from landscape
-
 .. image:: https://api.codacy.com/project/badge/Grade/60aa1ba3ee7b4b4ebd71ca659736c0af
    :target: https://www.codacy.com/app/hartym/bonobo
    :alt: Code Health from codacy
+
+.. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
+   :target: https://landscape.io/github/python-bonobo/bonobo/0.2
+   :alt: Code Health from landscape
 
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
