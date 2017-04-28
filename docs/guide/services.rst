@@ -3,7 +3,7 @@ Services and dependencies (draft implementation)
 
 :Status: Draft implementation
 :Stability: Alpha
-:Last-Modified: 27 apr 2017
+:Last-Modified: 28 apr 2017
 
 Most probably, you'll want to use external systems within your transformations. Those systems may include databases,
 apis (using http, for example), filesystems, etc.
@@ -81,6 +81,13 @@ A dictionary, or dictionary-like, "services" named argument can be passed to the
 "dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the implementation
 provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of the provided
 stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will use it.
+
+Service configuration (to be decided and implemented)
+:::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+* There should be a way to configure default service implementation for a python file, a directory, a project ...
+* There should be a way to override services when running a transformation.
+* There should be a way to use environment for service configuration.
 
 Future and proposals
 ::::::::::::::::::::

@@ -1,4 +1,5 @@
 import bonobo
+from bonobo.commands.run import get_default_services
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 filename = 'coffeeshops.txt'
@@ -9,13 +10,5 @@ graph = bonobo.Graph(
     bonobo.FileWriter(path=filename),
 )
 
-
-def get_services():
-    from os.path import dirname
-    return {
-        'fs': bonobo.open_fs(dirname(__file__))
-    }
-
-
 if __name__ == '__main__':
-    bonobo.run(graph, services=get_services())
+    bonobo.run(graph, services=get_default_services(__file__))
