@@ -3,7 +3,7 @@ import csv
 from bonobo.config import Option
 from bonobo.config.processors import ContextProcessor, contextual
 from bonobo.util.objects import ValueHolder
-from .file import FileReader, FileWriter, FileHandler
+from .file import FileHandler, FileReader, FileWriter
 
 
 class CsvHandler(FileHandler):
@@ -41,10 +41,10 @@ class CsvReader(CsvHandler, FileReader):
     skip = Option(int, default=0)
 
     @ContextProcessor
-    def csv_headers(self, context, file):
+    def csv_headers(self, context, fs, file):
         yield ValueHolder(self.headers)
 
-    def read(self, file, headers):
+    def read(self, fs, file, headers):
         reader = csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
         headers.value = headers.value or next(reader)
         field_count = len(headers.value)
@@ -55,7 +55,7 @@ class CsvReader(CsvHandler, FileReader):
 
         for row in reader:
             if len(row) != field_count:
-                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count, ))
+                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count,))
 
             yield dict(zip(headers.value, row))
 
@@ -63,12 +63,12 @@ class CsvReader(CsvHandler, FileReader):
 @contextual
 class CsvWriter(CsvHandler, FileWriter):
     @ContextProcessor
-    def writer(self, context, file, lineno):
-        writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar)
+    def writer(self, context, fs, file, lineno):
+        writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol)
         headers = ValueHolder(list(self.headers) if self.headers else None)
         yield writer, headers
 
-    def write(self, file, lineno, writer, headers, row):
+    def write(self, fs, file, lineno, writer, headers, row):
         if not lineno.value:
             headers.value = headers.value or row.keys()
             writer.writerow(headers.value)

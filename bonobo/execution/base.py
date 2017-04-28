@@ -2,6 +2,7 @@ import sys
 import traceback
 from time import sleep
 
+from bonobo.config import Container
 from bonobo.config.processors import resolve_processors
 from bonobo.util.iterators import ensure_tuple
 from bonobo.util.objects import Wrapper
@@ -23,9 +24,17 @@ class LoopingExecutionContext(Wrapper):
     def stopped(self):
         return self._stopped
 
-    def __init__(self, wrapped, parent):
+    def __init__(self, wrapped, parent, services=None):
         super().__init__(wrapped)
         self.parent = parent
+        if services:
+            if parent:
+                raise RuntimeError(
+                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.')
+            self.services = Container(services) if services else Container()
+        else:
+            self.services = None
+
         self._started, self._stopped, self._context, self._stack = False, False, None, []
 
     def start(self):
@@ -34,7 +43,12 @@ class LoopingExecutionContext(Wrapper):
         assert self._context is None
         self._started = True
         try:
-            self._context = self.parent.services.args_for(self.wrapped) if self.parent else ()
+            if self.parent:
+                self._context = self.parent.services.args_for(self.wrapped)
+            elif self.services:
+                self._context = self.services.args_for(self.wrapped)
+            else:
+                self._context = ()
         except Exception as exc:  # pylint: disable=broad-except
             self.handle_error(exc, traceback.format_exc())
             raise

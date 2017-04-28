@@ -1,7 +1,8 @@
-from bonobo import Graph, NaiveStrategy, Bag
 from bonobo.config.processors import contextual
 from bonobo.constants import BEGIN, END
 from bonobo.execution.graph import GraphExecutionContext
+from bonobo.strategies import NaiveStrategy
+from bonobo.structs import Bag, Graph
 
 
 def generate_integers():
@@ -9,7 +10,7 @@ def generate_integers():
 
 
 def square(i: int) -> int:
-    return i**2
+    return i ** 2
 
 
 @contextual

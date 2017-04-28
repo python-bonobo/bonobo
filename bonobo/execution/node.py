@@ -2,12 +2,12 @@ import traceback
 from queue import Empty
 from time import sleep
 
-from bonobo.structs.bags import Bag, ErrorBag
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
 from bonobo.core.inputs import Input
 from bonobo.core.statistics import WithStatistics
 from bonobo.errors import InactiveReadableError
 from bonobo.execution.base import LoopingExecutionContext
+from bonobo.structs.bags import Bag, ErrorBag
 from bonobo.util.iterators import iter_if_not_sequence
 
 
@@ -21,8 +21,8 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         """todo check if this is right, and where it is used"""
         return self.input.alive and self._started and not self._stopped
 
-    def __init__(self, wrapped, parent):
-        LoopingExecutionContext.__init__(self, wrapped, parent)
+    def __init__(self, wrapped, parent=None, services=None):
+        LoopingExecutionContext.__init__(self, wrapped, parent=parent, services=services)
         WithStatistics.__init__(self, 'in', 'out', 'err')
 
         self.input = Input()
@@ -115,8 +115,10 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                 else:
                     self.push(_resolve(input_bag, result))
 
+
 def is_error(bag):
     return isinstance(bag, ErrorBag)
+
 
 def _resolve(input_bag, output):
     # NotModified means to send the input unmodified to output.

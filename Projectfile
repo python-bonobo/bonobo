@@ -22,6 +22,7 @@ enable_features = {
 
 install_requires = [
     'colorama >=0.3,<0.4',
+    'fs ==2.0.3',
     'psutil >=5.2,<5.3',
     'requests >=2.13,<2.14',
     'stevedore >=1.19,<1.20',
