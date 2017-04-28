@@ -22,6 +22,21 @@ concepts work.
 * Release announcements: http://eepurl.com/csHFKL
 * Old project (for reference, don't use anymore, instead, help us recode the missing parts in bonobo): http://etl.rdc.li/
 
+.. image:: https://img.shields.io/pypi/v/bonobo.svg
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: PyPI
+
+.. image:: https://img.shields.io/pypi/wheel/bonobo.svg
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: Wheel
+
+.. image:: https://img.shields.io/pypi/pyversions/bonobo.svg
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: Versions
+    
+.. image:: https://img.shields.io/pypi/l/bonobo.svg
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: License
 
 .. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.2
     :target: http://docs.bonobo-project.org/
