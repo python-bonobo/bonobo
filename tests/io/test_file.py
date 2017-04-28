@@ -1,6 +1,6 @@
 import pytest
 
-from bonobo import Bag, FileReader, FileWriter
+from bonobo import Bag, FileReader, FileWriter, open_fs
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
@@ -14,10 +14,10 @@ from bonobo.util.testing import CapturingNodeExecutionContext
     ]
 )
 def test_file_writer_in_context(tmpdir, lines, output):
-    file = tmpdir.join('output.txt')
+    fs, filename = open_fs(tmpdir), 'output.txt'
 
-    writer = FileWriter(path=str(file))
-    context = NodeExecutionContext(writer, None)
+    writer = FileWriter(path=filename)
+    context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.start()
     context.recv(BEGIN, *map(Bag, lines), END)
@@ -25,25 +25,27 @@ def test_file_writer_in_context(tmpdir, lines, output):
         context.step()
     context.stop()
 
-    assert file.read() == output
+    assert fs.open(filename).read() == output
 
 
 def test_file_writer_out_of_context(tmpdir):
-    file = tmpdir.join('output.txt')
-    writer = FileWriter(path=str(file))
+    fs, filename = open_fs(tmpdir), 'output.txt'
 
-    with writer.open() as fp:
+    writer = FileWriter(path=filename)
+
+    with writer.open(fs) as fp:
         fp.write('Yosh!')
 
-    assert file.read() == 'Yosh!'
+    assert fs.open(filename).read() == 'Yosh!'
 
 
 def test_file_reader_in_context(tmpdir):
-    file = tmpdir.join('input.txt')
-    file.write('Hello\nWorld\n')
+    fs, filename = open_fs(tmpdir), 'input.txt'
 
-    reader = FileReader(path=str(file))
-    context = CapturingNodeExecutionContext(reader, None)
+    fs.open(filename, 'w').write('Hello\nWorld\n')
+
+    reader = FileReader(path=filename)
+    context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
     context.start()
     context.recv(BEGIN, Bag(), END)

@@ -10,6 +10,7 @@ There are a few things that you should know while writing transformations graphs
     :maxdepth: 2
 
     purity
+    services
 
 Third party integrations
 ::::::::::::::::::::::::

@@ -4,6 +4,6 @@ from bonobo.execution.node import NodeExecutionContext
 
 
 class CapturingNodeExecutionContext(NodeExecutionContext):
-    def __init__(self, wrapped, parent):
-        super().__init__(wrapped, parent)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.send = MagicMock()

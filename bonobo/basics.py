@@ -19,6 +19,7 @@ __all__ = [
     'noop',
 ]
 
+
 def identity(x):
     return x
 
