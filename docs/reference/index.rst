@@ -8,3 +8,4 @@ References
 
     commands
     api
+    examples

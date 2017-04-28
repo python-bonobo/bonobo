@@ -41,8 +41,8 @@ setup(
     description='Bonobo',
     license='Apache License, Version 2.0',
     install_requires=[
-        'colorama >=0.3,<0.4', 'psutil >=5.2,<5.3', 'requests >=2.13,<2.14',
-        'stevedore >=1.19,<1.20'
+        'colorama ==0.3.9', 'psutil ==5.2.2', 'requests ==2.13.0',
+        'stevedore ==1.21.0'
     ],
     version=version,
     long_description=read('README.rst'),
@@ -56,9 +56,9 @@ setup(
     ])],
     extras_require={
         'dev': [
-            'coverage >=4.3,<4.4', 'mock >=2.0,<2.1', 'pylint >=1,<2',
-            'pytest >=3,<4', 'pytest-cov >=2,<3', 'pytest-timeout >=1,<2',
-            'sphinx', 'sphinx_rtd_theme', 'yapf'
+            'coverage >=4,<5', 'pylint >=1,<2', 'pytest >=3,<4',
+            'pytest-cov >=2,<3', 'pytest-timeout >=1,<2', 'sphinx',
+            'sphinx_rtd_theme', 'yapf'
         ],
         'jupyter': ['jupyter >=1.0,<1.1', 'ipywidgets >=6.0.0.beta5']
     },
