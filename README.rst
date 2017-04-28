@@ -3,6 +3,8 @@
 
 Data-processing. By monkeys. For humans.
 
+*Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the process (feel free to complain on issues, so we notice breakages we did not expect)*
+
 Bonobo is a data-processing library for python 3.5+ that emphasises writing
 simple, atomic, plain old python functions and chaining them using a basic
 acyclic graph. The nodes will need a bit of plumbery to be runnable in
@@ -18,10 +20,6 @@ transformations per day for years on production, so as though it may not yet
 be complete or fully stable (please, allow us to reach 1.0), the underlying
 concepts work.
 
-* Documentation: http://docs.bonobo-project.org/
-* Release announcements: http://eepurl.com/csHFKL
-* Old project (for reference, don't use anymore, instead, help us recode the missing parts in bonobo): http://etl.rdc.li/
-
 .. image:: https://img.shields.io/pypi/v/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: PyPI
@@ -33,10 +31,6 @@ concepts work.
 .. image:: https://img.shields.io/pypi/pyversions/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Versions
-    
-.. image:: https://img.shields.io/pypi/l/bonobo.svg
-    :target: https://pypi.python.org/pypi/bonobo
-    :alt: License
 
 .. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.2
     :target: http://docs.bonobo-project.org/
@@ -60,13 +54,22 @@ concepts work.
 
 ----
 
+Documentation: http://docs.bonobo-project.org/
+
 Issues: https://github.com/python-bonobo/bonobo/issues
 
 Roadmap: https://www.bonobo-project.org/roadmap
 
 Slack: https://bonobo-slack.herokuapp.com/
 
+Release announcements: http://eepurl.com/csHFKL
+
 ----
 
 Made with ♥ by `Romain Dorgueil <https://twitter.com/rdorgueil>`_ and `contributors <https://github.com/python-bonobo/bonobo/graphs/contributors>`_.
+    
+.. image:: https://img.shields.io/pypi/l/bonobo.svg
+    :target: https://pypi.python.org/pypi/bonobo
+    :alt: License
+
 
