@@ -50,11 +50,7 @@ concepts work.
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
 
-.. note::
-
-    Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also
-    need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the
-    process (feel free to complain on issues, so we notice breakages we did not expect)**
+*Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the process (feel free to complain on issues, so we notice breakages we did not expect)*
 
 ----
 
