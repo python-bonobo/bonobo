@@ -3,21 +3,6 @@
 
 Data-processing. By monkeys. For humans.
 
-Bonobo is a data-processing library for python 3.5+ that emphasises writing
-simple, atomic, plain old python functions and chaining them using a basic
-acyclic graph. The nodes will need a bit of plumbery to be runnable in
-different means (iteratively, in threads, in processes, on different machines
-...) but that should be as transparent as possible.
-
-The only thing asked of the developer is to write "pure" functions to
-process data (create a new dict, don't change in place, etc.), and everything
-should be fine from this point.
-
-It's a young rewrite of an old python2.7 tool that ran millions of
-transformations per day for years on production, so as though it may not yet 
-be complete or fully stable (please, allow us to reach 1.0), the underlying
-concepts work.
-
 .. image:: https://img.shields.io/pypi/v/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: PyPI
@@ -49,6 +34,21 @@ concepts work.
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
+
+Bonobo is a data-processing library for python 3.5+ that emphasises writing
+simple, atomic, plain old python functions and chaining them using a basic
+acyclic graph. The nodes will need a bit of plumbery to be runnable in
+different means (iteratively, in threads, in processes, on different machines
+...) but that should be as transparent as possible.
+
+The only thing asked of the developer is to write "pure" functions to
+process data (create a new dict, don't change in place, etc.), and everything
+should be fine from this point.
+
+It's a young rewrite of an old python2.7 tool that ran millions of
+transformations per day for years on production, so as though it may not yet 
+be complete or fully stable (please, allow us to reach 1.0), the underlying
+concepts work.
 
 ----
 
