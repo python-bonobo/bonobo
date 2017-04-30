@@ -127,6 +127,5 @@ Next
 
 You now know all the basic concepts necessary to build (batch-like) data processors.
 
-If you're confident with this part, let's get to a more real world example, using files and nice console output:
-:doc:`basics2`
+Time to jump to the second part: :doc:`tut02`
 

@@ -1,5 +1,5 @@
 Bonobo with Jupyter
-==================
+===================
 
 There is a builtin plugin that integrates (kind of minimalistically, for now) bonobo within jupyter notebooks, so
 you can read the execution status of a graph within a nice (ok not so nice) html/javascript widget.
@@ -9,7 +9,11 @@ See https://github.com/jupyter-widgets/widget-cookiecutter for the base template
 Installation
 ::::::::::::
 
-To install the widget::
+Install `bonobo` with the **jupyter** extra::
+
+    pip install bonobo[jupyter]
+
+Install the jupyter extension::
 
     jupyter nbextension enable --py --sys-prefix bonobo.ext.jupyter
 

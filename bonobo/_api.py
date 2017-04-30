@@ -10,6 +10,7 @@ __all__ += ['Bag', 'Graph']
 
 # Filesystem. This is a shortcut from the excellent filesystem2 library, that we make available there for convenience.
 from fs import open_fs as _open_fs
+
 open_fs = lambda url, *args, **kwargs: _open_fs(str(url), *args, **kwargs)
 __all__ += ['open_fs']
 
@@ -38,7 +39,11 @@ def get_examples_path(*pathsegments):
     return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
 
 
+def open_examples_fs(*pathsegments):
+    return open_fs(get_examples_path(*pathsegments))
+
 __all__.append(get_examples_path.__name__)
+__all__.append(open_examples_fs.__name__)
 
 
 def _is_interactive_console():

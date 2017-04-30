@@ -1,8 +1,14 @@
 import bonobo
 
+
+def split_one(line):
+    return line.split(', ', 1)
+
+
 graph = bonobo.Graph(
     bonobo.FileReader(path='coffeeshops.txt'),
-    print,
+    split_one,
+    bonobo.JsonWriter(path='coffeeshops.json'),
 )
 
 if __name__ == '__main__':

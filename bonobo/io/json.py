@@ -10,6 +10,7 @@ __all__ = [
 
 class JsonHandler:
     eol = ',\n'
+    prefix, suffix = '[', ']'
 
 
 class JsonReader(JsonHandler, FileReader):
@@ -24,9 +25,9 @@ class JsonReader(JsonHandler, FileReader):
 class JsonWriter(JsonHandler, FileWriter):
     @ContextProcessor
     def envelope(self, context, fs, file, lineno):
-        file.write('[\n')
+        file.write(self.prefix)
         yield
-        file.write('\n]')
+        file.write(self.suffix)
 
     def write(self, fs, file, lineno, row):
         """

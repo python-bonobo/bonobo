@@ -13,17 +13,18 @@ concepts you'll see everywhere in the software.
 If you're not familiar with python, you should first read :doc:`./python`.
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   tut01
-   tut02
+    tut01
+    tut02
 
-Where to go next?
-:::::::::::::::::
+What's next?
+::::::::::::
 
-When you're done with the tutorial, you may be interested in the following next steps:
+Read a few examples
+-------------------
 
-Read the :doc:`../reference/examples`
+* :doc:`../reference/examples`
 
 Read about best development practices
 -------------------------------------
