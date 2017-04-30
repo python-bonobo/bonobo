@@ -1,1 +1,7 @@
 -e .
+
+colorama ==0.3.9
+fs ==2.0.3
+psutil ==5.2.2
+requests ==2.13.0
+stevedore ==1.21.0
