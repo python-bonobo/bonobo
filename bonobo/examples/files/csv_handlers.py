@@ -2,7 +2,7 @@ import bonobo
 from bonobo.commands.run import get_default_services
 
 graph = bonobo.Graph(
-    bonobo.CsvReader(path='datasets/coffeeshops.txt'),
+    bonobo.CsvReader('datasets/coffeeshops.txt'),
     print,
 )
 

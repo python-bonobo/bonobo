@@ -1,7 +1,7 @@
 import bonobo
 
 graph = bonobo.Graph(
-    bonobo.FileReader(path='coffeeshops.txt'),
+    bonobo.FileReader('coffeeshops.txt'),
     print,
 )
 
