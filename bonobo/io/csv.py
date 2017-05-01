@@ -27,7 +27,6 @@ class CsvHandler(FileHandler):
     headers = Option(tuple)
 
 
-@contextual
 class CsvReader(CsvHandler, FileReader):
     """
     Reads a CSV and yield the values as dicts.
@@ -60,7 +59,6 @@ class CsvReader(CsvHandler, FileReader):
             yield dict(zip(headers.value, row))
 
 
-@contextual
 class CsvWriter(CsvHandler, FileWriter):
     @ContextProcessor
     def writer(self, context, fs, file, lineno):
