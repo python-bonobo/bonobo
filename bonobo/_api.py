@@ -1,49 +1,51 @@
-from bonobo._version import __version__
-
-__all__ = [
-    '__version__',
-]
-
-from bonobo.structs import Bag, Graph
-
-__all__ += ['Bag', 'Graph']
-
-# Filesystem. This is a shortcut from the excellent filesystem2 library, that we make available there for convenience.
-from fs import open_fs as _open_fs
-
-open_fs = lambda url, *args, **kwargs: _open_fs(str(url), *args, **kwargs)
-__all__ += ['open_fs']
-
-# Basic transformations.
-from bonobo.basics import *
-from bonobo.basics import __all__ as _all_basics
-
-__all__ += _all_basics
-
-# Execution strategies.
+from bonobo.basics import Limit, PrettyPrint, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
+from bonobo.structs import Bag, Graph
+from bonobo.util.objects import get_name
+from bonobo.io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
 
-__all__ += ['create_strategy']
-
-# Extract and loads from stdlib.
-from bonobo.io import *
-from bonobo.io import __all__ as _all_io
-
-__all__ += _all_io
+__all__ = []
 
 
-# XXX This may be belonging to the bonobo.examples package.
-def get_examples_path(*pathsegments):
-    import os
-    import pathlib
-    return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
+def register_api(x, __all__=__all__):
+    __all__.append(get_name(x))
+    return x
+
+def register_api_group(*args):
+    for attr in args:
+        register_api(attr)
 
 
-def open_examples_fs(*pathsegments):
-    return open_fs(get_examples_path(*pathsegments))
+# bonobo.basics
+register_api_group(Limit, PrettyPrint, Tee, count, identity, noop, pprint, )
 
-__all__.append(get_examples_path.__name__)
-__all__.append(open_examples_fs.__name__)
+# bonobo.io
+register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
+
+# bonobo.strategies
+register_api(create_strategy)
+
+# bonobo.structs
+register_api_group(Bag, Graph)
+
+# Shortcut to filesystem2's open_fs, that we make available there for convenience.
+@register_api
+def open_fs(fs_url, *args, **kwargs):
+    """
+    Wraps :func:`fs.open_fs` function with a few candies.
+    
+    :param str fs_url: A filesystem URL
+    :param parse_result: A parsed filesystem URL.
+    :type parse_result: :class:`ParseResult`
+    :param bool writeable: True if the filesystem must be writeable.
+    :param bool create: True if the filesystem should be created if it does not exist.
+    :param str cwd: The current working directory (generally only relevant for OS filesystems).
+    :param str default_protocol: The protocol to use if one is not supplied in the FS URL (defaults to ``"osfs"``).
+    :returns: :class:`~fs.base.FS` object
+    """
+    from fs import open_fs as _open_fs
+    return _open_fs(str(fs_url), *args, **kwargs)
+
 
 
 def _is_interactive_console():
@@ -58,7 +60,7 @@ def _is_jupyter_notebook():
         return False
 
 
-# @api
+@register_api
 def run(graph, *chain, strategy=None, plugins=None, services=None):
     if len(chain):
         warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
@@ -81,4 +83,16 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
     return strategy.execute(graph, plugins=plugins, services=services)
 
 
-__all__.append(run.__name__)
+@register_api
+def get_examples_path(*pathsegments):
+    import os
+    import pathlib
+    return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
+
+
+@register_api
+def open_examples_fs(*pathsegments):
+    return open_fs(get_examples_path(*pathsegments))
+
+
+print(__all__)
