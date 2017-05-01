@@ -46,6 +46,7 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
         graph = Graph(graph, *chain)
 
     strategy = create_strategy(strategy)
+
     plugins = plugins or []
 
     if _is_interactive_console():

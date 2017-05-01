@@ -31,7 +31,7 @@ Data-processing. By monkeys. For humans.
    :target: https://landscape.io/github/python-bonobo/bonobo/0.2
    :alt: Code Health from landscape
 
-.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
+.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.2.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
 
