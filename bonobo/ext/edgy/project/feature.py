@@ -14,10 +14,6 @@ from edgy.project.feature import Feature, SUPPORT_PRIORITY
 class BonoboFeature(Feature):
     requires = {'python'}
 
-    @subscribe('edgy.project.feature.make.on_generate', priority=SUPPORT_PRIORITY)
-    def on_make_generate(self, event):
-        makefile = event.makefile
-
     @subscribe('edgy.project.on_start', priority=SUPPORT_PRIORITY)
     def on_start(self, event):
         package_path = event.setup['name'].replace('.', os.sep)

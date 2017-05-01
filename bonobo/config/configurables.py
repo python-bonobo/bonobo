@@ -53,4 +53,4 @@ class Configurable(metaclass=ConfigurableMeta):
             )
 
         for name, value in kwargs.items():
-            setattr(self, name, kwargs[name])
+            setattr(self, name, value)
