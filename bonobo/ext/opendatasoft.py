@@ -13,7 +13,6 @@ def path_str(path):
     return path if path.startswith('/') else '/' + path
 
 
-@contextual
 class OpenDataSoftAPI(Configurable):
     dataset = Option(str, required=True)
     endpoint = Option(str, default='{scheme}://{netloc}{path}')

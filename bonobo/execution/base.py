@@ -2,7 +2,7 @@ import traceback
 from time import sleep
 
 from bonobo.config import Container
-from bonobo.config.processors import resolve_processors
+from bonobo.config.processors import resolve_processors, ContextCurrifier
 from bonobo.util.errors import print_error
 from bonobo.util.iterators import ensure_tuple
 from bonobo.util.objects import Wrapper
@@ -36,31 +36,19 @@ class LoopingExecutionContext(Wrapper):
         else:
             self.services = None
 
-        self._started, self._stopped, self._context, self._stack = False, False, None, []
+        self._started, self._stopped, self._stack = False, False, None
 
     def start(self):
         assert self.state == (False,
                               False), ('{}.start() can only be called on a new node.').format(type(self).__name__)
-        assert self._context is None
         self._started = True
+        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
 
-        if self.parent:
-            self._context = self.parent.services.args_for(self.wrapped)
-        elif self.services:
-            self._context = self.services.args_for(self.wrapped)
-        else:
-            self._context = ()
-
-        for processor in resolve_processors(self.wrapped):
-            try:
-                _processed = processor(self.wrapped, self, *self._context)
-                _append_to_context = next(_processed)
-                if _append_to_context is not None:
-                    self._context += ensure_tuple(_append_to_context)
-            except Exception as exc:  # pylint: disable=broad-except
-                self.handle_error(exc, traceback.format_exc())
-                raise
-            self._stack.append(_processed)
+        try:
+            self._stack.setup(self)
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
+            raise
 
     def loop(self):
         """Generic loop. A bit boring. """
@@ -78,21 +66,18 @@ class LoopingExecutionContext(Wrapper):
             return
 
         self._stopped = True
-        if self._context is not None:
-            while len(self._stack):
-                processor = self._stack.pop()
-                try:
-                    # todo yield from ? how to ?
-                    next(processor)
-                except StopIteration as exc:
-                    # This is normal, and wanted.
-                    pass
-                except Exception as exc:  # pylint: disable=broad-except
-                    self.handle_error(exc, traceback.format_exc())
-                    raise
-                else:
-                    # No error ? We should have had StopIteration ...
-                    raise RuntimeError('Context processors should not yield more than once.')
+        try:
+            self._stack.teardown()
+        except Exception as exc:  # pylint: disable=broad-except
+            self.handle_error(exc, traceback.format_exc())
+            raise
 
     def handle_error(self, exc, trace):
         return print_error(exc, trace, context=self.wrapped)
+
+    def _get_initial_context(self):
+        if self.parent:
+            return self.parent.services.args_for(self.wrapped)
+        if self.services:
+            return self.services.args_for(self.wrapped)
+        return ()
