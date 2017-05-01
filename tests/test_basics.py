@@ -1,4 +1,3 @@
-import pprint
 from unittest.mock import MagicMock
 
 import bonobo
@@ -19,7 +18,7 @@ def test_count():
         currified()
     currified.teardown()
 
-    context.send.assert_called_once()
+    assert len(context.method_calls) == 1
     bag = context.send.call_args[0][0]
     assert isinstance(bag, bonobo.Bag)
     assert 0 == len(bag.kwargs)
