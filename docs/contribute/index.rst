@@ -58,7 +58,7 @@ Guidelines
 License
 :::::::
 
-`Bonobo is released under the apache license <https://github.com/python-bonobo/bonobo/blob/0.2/LICENSE>`_.
+`Bonobo is released under the apache license <https://github.com/python-bonobo/bonobo/blob/0.3/LICENSE>`_.
 
 License for non lawyers
 :::::::::::::::::::::::
