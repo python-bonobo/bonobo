@@ -2,24 +2,23 @@ import functools
 
 import types
 
-from bonobo.util.compat import deprecated_alias
+from bonobo.util.compat import deprecated_alias, deprecated
+
+from bonobo.config.options import Option
+from bonobo.util.iterators import ensure_tuple
 
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
 
 
-class ContextProcessor:
-    _creation_counter = 0
-
+class ContextProcessor(Option):
     @property
     def __name__(self):
         return self.func.__name__
 
     def __init__(self, func):
         self.func = func
-
-        # This hack is necessary for python3.5
-        self._creation_counter = ContextProcessor._creation_counter
-        ContextProcessor._creation_counter += 1
+        super(ContextProcessor, self).__init__(required=False, default=self.__name__)
+        self.name = self.__name__
 
     def __repr__(self):
         return repr(self.func).replace('<function', '<{}'.format(type(self).__name__))
@@ -27,11 +26,63 @@ class ContextProcessor:
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
+    @classmethod
+    def decorate(cls, cls_or_func):
+        try:
+            cls_or_func.__processors__
+        except AttributeError:
+            cls_or_func.__processors__ = []
 
+        def decorator(processor, cls_or_func=cls_or_func):
+            cls_or_func.__processors__.append(cls(processor))
+            return cls_or_func
+
+        return decorator
+
+
+class ContextCurrifier:
+    """
+    This is a helper to resolve processors.
+    """
+
+    def __init__(self, wrapped, *initial_context):
+        self.wrapped = wrapped
+        self.context = tuple(initial_context)
+        self._stack = []
+
+    def setup(self, *context):
+        if len(self._stack):
+            raise RuntimeError('Cannot setup context currification twice.')
+        for processor in resolve_processors(self.wrapped):
+            _processed = processor(self.wrapped, *context, *self.context)
+            _append_to_context = next(_processed)
+            if _append_to_context is not None:
+                self.context += ensure_tuple(_append_to_context)
+            self._stack.append(_processed)
+
+    def __call__(self, *args, **kwargs):
+        return self.wrapped(*self.context, *args, **kwargs)
+
+    def teardown(self):
+        while len(self._stack):
+            processor = self._stack.pop()
+            try:
+                # todo yield from ? how to ?
+                next(processor)
+            except StopIteration as exc:
+                # This is normal, and wanted.
+                pass
+            else:
+                # No error ? We should have had StopIteration ...
+                raise RuntimeError('Context processors should not yield more than once.')
+
+
+@deprecated
 def add_context_processor(cls_or_func, context_processor):
     getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR).append(context_processor)
 
 
+@deprecated
 def contextual(cls_or_func):
     """
     Make sure an element has the context processors collection.
@@ -62,11 +113,15 @@ def contextual(cls_or_func):
 
 
 def resolve_processors(mixed):
-    if isinstance(mixed, types.FunctionType):
-        yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
+    try:
+        yield from mixed.__processors__
+    except AttributeError:
+        # old code, deprecated usage
+        if isinstance(mixed, types.FunctionType):
+            yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
 
-    for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
-        yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
+        for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
+            yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
 
     return ()
 
