@@ -1,10 +1,12 @@
 import time
+import traceback
 
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
 from bonobo.constants import BEGIN, END
 from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
+from bonobo.util.errors import print_error
 
 
 class ExecutorStrategy(Strategy):
@@ -29,18 +31,32 @@ class ExecutorStrategy(Strategy):
         for plugin_context in context.plugins:
 
             def _runner(plugin_context=plugin_context):
-                plugin_context.start()
-                plugin_context.loop()
-                plugin_context.stop()
+                try:
+                    plugin_context.start()
+                    plugin_context.loop()
+                    plugin_context.stop()
+                except Exception as exc:
+                    print_error(exc, traceback.format_exc(), prefix='Error in plugin context', context=plugin_context)
 
             futures.append(executor.submit(_runner))
 
         for node_context in context.nodes:
 
             def _runner(node_context=node_context):
-                node_context.start()
-                node_context.loop()
-                node_context.stop()
+                try:
+                    node_context.start()
+                except Exception as exc:
+                    print_error(
+                        exc, traceback.format_exc(), prefix='Could not start node context', context=node_context
+                    )
+                    node_context.input.on_end()
+                else:
+                    node_context.loop()
+
+                try:
+                    node_context.stop()
+                except Exception as exc:
+                    print_error(exc, traceback.format_exc(), prefix='Could not stop node context', context=node_context)
 
             futures.append(executor.submit(_runner))
 

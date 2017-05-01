@@ -25,15 +25,15 @@ class GraphExecutionContext:
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
         self.services = Container(services) if services else Container()
 
-        for i, component_context in enumerate(self):
+        for i, node_context in enumerate(self):
             try:
-                component_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
+                node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             except KeyError:
                 continue
 
-            component_context.input.on_begin = partial(component_context.send, BEGIN, _control=True)
-            component_context.input.on_end = partial(component_context.send, END, _control=True)
-            component_context.input.on_finalize = partial(component_context.stop)
+            node_context.input.on_begin = partial(node_context.send, BEGIN, _control=True)
+            node_context.input.on_end = partial(node_context.send, END, _control=True)
+            node_context.input.on_finalize = partial(node_context.stop)
 
     def __getitem__(self, item):
         return self.nodes[item]

@@ -1,8 +1,10 @@
 import bonobo
 from bonobo.commands.run import get_default_services
 
+
 def get_fields(row):
     return row['fields']
+
 
 graph = bonobo.Graph(
     bonobo.JsonReader(path='datasets/theaters.json'),
