@@ -7,7 +7,8 @@ from bonobo.core.inputs import Input
 from bonobo.core.statistics import WithStatistics
 from bonobo.errors import InactiveReadableError
 from bonobo.execution.base import LoopingExecutionContext
-from bonobo.structs.bags import Bag, ErrorBag
+from bonobo.structs.bags import Bag
+from bonobo.util.errors import is_error
 from bonobo.util.iterators import iter_if_not_sequence
 
 
@@ -32,7 +33,13 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         return (('+' if self.alive else '-') + ' ' + self.__name__ + ' ' + self.get_statistics_as_string()).strip()
 
     def __repr__(self):
-        return '<' + self.__str__() + '>'
+        stats = self.get_statistics_as_string().strip()
+        return '<{}({}{}){}>'.format(
+            type(self).__name__,
+            '+' if self.alive else '',
+            self.__name__,
+            (' ' + stats) if stats else '',
+        )
 
     def recv(self, *messages):
         """
@@ -114,10 +121,6 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                     break
                 else:
                     self.push(_resolve(input_bag, result))
-
-
-def is_error(bag):
-    return isinstance(bag, ErrorBag)
 
 
 def _resolve(input_bag, output):
