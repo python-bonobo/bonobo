@@ -1,4 +1,4 @@
-from mock import Mock
+from unittest.mock import Mock
 
 from bonobo import Bag
 from bonobo.constants import INHERIT_INPUT

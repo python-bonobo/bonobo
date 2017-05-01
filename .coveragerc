@@ -2,6 +2,7 @@
 branch = True
 omit =
     bonobo/examples/**
+    bonobo/ext/**
 
 [report]
 # Regexes for lines to exclude from consideration

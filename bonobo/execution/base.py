@@ -1,9 +1,9 @@
-import sys
 import traceback
 from time import sleep
 
 from bonobo.config import Container
 from bonobo.config.processors import resolve_processors
+from bonobo.util.errors import print_error
 from bonobo.util.iterators import ensure_tuple
 from bonobo.util.objects import Wrapper
 
@@ -43,16 +43,13 @@ class LoopingExecutionContext(Wrapper):
                               False), ('{}.start() can only be called on a new node.').format(type(self).__name__)
         assert self._context is None
         self._started = True
-        try:
-            if self.parent:
-                self._context = self.parent.services.args_for(self.wrapped)
-            elif self.services:
-                self._context = self.services.args_for(self.wrapped)
-            else:
-                self._context = ()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-            raise
+
+        if self.parent:
+            self._context = self.parent.services.args_for(self.wrapped)
+        elif self.services:
+            self._context = self.services.args_for(self.wrapped)
+        else:
+            self._context = ()
 
         for processor in resolve_processors(self.wrapped):
             try:
@@ -80,41 +77,22 @@ class LoopingExecutionContext(Wrapper):
         if self._stopped:
             return
 
-        assert self._context is not None
-
         self._stopped = True
-        while len(self._stack):
-            processor = self._stack.pop()
-            try:
-                # todo yield from ? how to ?
-                next(processor)
-            except StopIteration as exc:
-                # This is normal, and wanted.
-                pass
-            except Exception as exc:  # pylint: disable=broad-except
-                self.handle_error(exc, traceback.format_exc())
-                raise
-            else:
-                # No error ? We should have had StopIteration ...
-                raise RuntimeError('Context processors should not yield more than once.')
+        if self._context is not None:
+            while len(self._stack):
+                processor = self._stack.pop()
+                try:
+                    # todo yield from ? how to ?
+                    next(processor)
+                except StopIteration as exc:
+                    # This is normal, and wanted.
+                    pass
+                except Exception as exc:  # pylint: disable=broad-except
+                    self.handle_error(exc, traceback.format_exc())
+                    raise
+                else:
+                    # No error ? We should have had StopIteration ...
+                    raise RuntimeError('Context processors should not yield more than once.')
 
     def handle_error(self, exc, trace):
-        """
-        Error handler. Whatever happens in a plugin or component, if it looks like an exception, taste like an exception
-        or somehow make me think it is an exception, I'll handle it.
-
-        :param exc: the culprit
-        :param trace: Hercule Poirot's logbook.
-        :return: to hell
-        """
-
-        from colorama import Fore, Style
-        print(
-            Style.BRIGHT,
-            Fore.RED,
-            '\U0001F4A3 {} in {}'.format(type(exc).__name__, self.wrapped),
-            Style.RESET_ALL,
-            sep='',
-            file=sys.stderr,
-        )
-        print(trace)
+        return print_error(exc, trace, context=self.wrapped)

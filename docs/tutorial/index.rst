@@ -10,7 +10,7 @@ We strongly advice that even if you're an advanced python developper, you go thr
 reasons: that should be sufficient to do anything possible with **Bonobo** and that's a good moment to learn the few
 concepts you'll see everywhere in the software.
 
-If you're not familiar with python, you should first read :doc:`./python`.
+If you're not familiar with python, you should first read :doc:`python`.
 
 .. toctree::
     :maxdepth: 2

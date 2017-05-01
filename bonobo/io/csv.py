@@ -50,7 +50,7 @@ class CsvReader(CsvHandler, FileReader):
         field_count = len(headers.value)
 
         if self.skip and self.skip > 0:
-            for i in range(0, self.skip):
+            for _ in range(0, self.skip):
                 next(reader)
 
         for row in reader:

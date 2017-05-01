@@ -22,5 +22,6 @@ available as an optional extra dependency, and the maturity stage of each extens
     :maxdepth: 2
 
     ext/docker
+    ext/jupyter
     ext/selenium
     ext/sqlalchemy

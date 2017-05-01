@@ -22,13 +22,3 @@ class JupyterOutputPlugin(Plugin):
         self.widget.value = [repr(node) for node in self.context.parent.nodes]
 
     finalize = run
-
-
-"""
-TODO JUPYTER WIDGET
-###################
-
-# close the widget? what does it do?
-https://ipywidgets.readthedocs.io/en/latest/examples/Widget%20Basics.html#Closing-widgets
-
-"""
