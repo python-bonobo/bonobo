@@ -5,29 +5,6 @@ __all__ = [
     'Option',
 ]
 
-_options_insert_order = 0
-
-class Option:
-    def __init__(self, type=None, *, required=False, positional=False, default=None):
-        self.name = None
-        self.type = type
-        self.required = required
-        self.positional = positional
-        self.default = default
-
-        global _options_insert_order
-        self.order = _options_insert_order
-        _options_insert_order += 1
-
-    def __get__(self, inst, typ):
-        if not self.name in inst.__options_values__:
-            inst.__options_values__[self.name] = self.default() if callable(self.default) else self.default
-        return inst.__options_values__[self.name]
-
-    def __set__(self, inst, value):
-        inst.__options_values__[self.name] = self.type(value) if self.type else value
-
-
 class ConfigurableMeta(type):
     """
     Metaclass for Configurables that will add options to a special __options__ dict.
@@ -36,6 +13,8 @@ class ConfigurableMeta(type):
     def __init__(cls, what, bases=None, dict=None):
         super().__init__(what, bases, dict)
         cls.__options__ = {}
+        cls.__positional_options__ = []
+
         for typ in cls.__mro__:
             for name, value in typ.__dict__.items():
                 if isinstance(value, Option):
@@ -43,6 +22,8 @@ class ConfigurableMeta(type):
                         value.name = name
                     if not name in cls.__options__:
                         cls.__options__[name] = value
+                    if value.positional:
+                        cls.__positional_options__.append(name)
 
 
 class Configurable(metaclass=ConfigurableMeta):
@@ -55,16 +36,24 @@ class Configurable(metaclass=ConfigurableMeta):
     def __init__(self, *args, **kwargs):
         super().__init__()
 
+        # initialize option's value dictionary, used by descriptor implementation (see Option).
         self.__options_values__ = {}
 
-        missing = list()
+        # compute missing options, given the kwargs.
+        missing = set()
         for name, option in type(self).__options__.items():
             if option.required and not option.name in kwargs:
-                missing.append(name)
+                missing.add(name)
 
-        for i in range(min(len(args), len(missing))):
-            kwargs
+        # transform positional arguments in keyword arguments if possible.
+        position = 0
+        for positional_option in self.__positional_options__:
+            if positional_option in missing:
+                kwargs[positional_option] = args[position]
+                position += 1
+                missing.remove(positional_option)
 
+        # complain if there are still missing options.
         if len(missing):
             raise TypeError(
                 '{}() missing {} required option{}: {}.'.format(
@@ -73,6 +62,7 @@ class Configurable(metaclass=ConfigurableMeta):
                 )
             )
 
+        # complain if there is more options than possible.
         extraneous = set(kwargs.keys()) - set(type(self).__options__.keys())
         if len(extraneous):
             raise TypeError(
@@ -82,5 +72,6 @@ class Configurable(metaclass=ConfigurableMeta):
                 )
             )
 
+        # set option values.
         for name, value in kwargs.items():
             setattr(self, name, value)

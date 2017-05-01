@@ -5,10 +5,11 @@ class Option:
     """
     _creation_counter = 0
 
-    def __init__(self, type=None, *, required=False, default=None):
+    def __init__(self, type=None, *, required=False, positional=False, default=None):
         self.name = None
         self.type = type
         self.required = required
+        self.positional = positional
         self.default = default
 
         # This hack is necessary for python3.5
@@ -25,3 +26,5 @@ class Option:
 
     def __set__(self, inst, value):
         inst.__options_values__[self.name] = self.type(value) if self.type else value
+
+
