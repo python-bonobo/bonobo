@@ -22,5 +22,3 @@ class JupyterOutputPlugin(Plugin):
         self.widget.value = [repr(node) for node in self.context.parent.nodes]
 
     finalize = run
-
-

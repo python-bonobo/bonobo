@@ -66,6 +66,7 @@ pprint = Tee(_pprint)
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
     from bonobo.constants import NOT_MODIFIED
+
     def _pprint(*args, **kwargs):
         nonlocal title_keys, sort, print_values
 

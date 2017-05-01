@@ -21,8 +21,9 @@ def print_error(exc, trace, context=None, prefix=''):
     print(
         Style.BRIGHT,
         Fore.RED,
-        '\U0001F4A3 {}{}{}'.format((prefix + ': ') if prefix else '', type(exc).__name__,
-                                   ' in {!r}'.format(context) if context else ''),
+        '\U0001F4A3 {}{}{}'.format(
+            (prefix + ': ') if prefix else '', type(exc).__name__, ' in {!r}'.format(context) if context else ''
+        ),
         Style.RESET_ALL,
         sep='',
         file=sys.stderr,

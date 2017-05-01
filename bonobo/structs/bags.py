@@ -32,7 +32,7 @@ class Bag:
         foo notbaz
     
     """
-    
+
     def __init__(self, *args, _flags=None, _parent=None, **kwargs):
         self._flags = _flags or ()
         self._parent = _parent

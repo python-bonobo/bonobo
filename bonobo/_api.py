@@ -88,7 +88,15 @@ def open_fs(fs_url, *args, **kwargs):
 
 
 # bonobo.basics
-register_api_group(Limit, PrettyPrint, Tee, count, identity, noop, pprint, )
+register_api_group(
+    Limit,
+    PrettyPrint,
+    Tee,
+    count,
+    identity,
+    noop,
+    pprint,
+)
 
 # bonobo.io
 register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
@@ -116,4 +124,3 @@ def get_examples_path(*pathsegments):
 @register_api
 def open_examples_fs(*pathsegments):
     return open_fs(get_examples_path(*pathsegments))
-

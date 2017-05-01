@@ -29,6 +29,7 @@ class ExecutorStrategy(Strategy):
         futures = []
 
         for plugin_context in context.plugins:
+
             def _runner(plugin_context=plugin_context):
                 try:
                     plugin_context.start()
@@ -45,8 +46,9 @@ class ExecutorStrategy(Strategy):
                 try:
                     node_context.start()
                 except Exception as exc:
-                    print_error(exc, traceback.format_exc(), prefix='Could not start node context',
-                                context=node_context)
+                    print_error(
+                        exc, traceback.format_exc(), prefix='Could not start node context', context=node_context
+                    )
                     node_context.input.on_end()
                 else:
                     node_context.loop()
