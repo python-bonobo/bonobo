@@ -30,6 +30,9 @@ class ValueHolder:
         self.value = value
         self.type = type
 
+    def __repr__(self):
+        return repr(self.value)
+
     def __lt__(self, other):
         return self.value < other
 
@@ -56,6 +59,7 @@ class ValueHolder:
 
     def __iadd__(self, other):
         self.value += other
+        return self
 
     def __sub__(self, other):
         return self.value - other
@@ -65,6 +69,7 @@ class ValueHolder:
 
     def __isub__(self, other):
         self.value -= other
+        return self
 
     def __mul__(self, other):
         return self.value * other
@@ -74,6 +79,7 @@ class ValueHolder:
 
     def __imul__(self, other):
         self.value *= other
+        return self
 
     def __matmul__(self, other):
         return self.value @ other
@@ -83,6 +89,7 @@ class ValueHolder:
 
     def __imatmul__(self, other):
         self.value @= other
+        return self
 
     def __truediv__(self, other):
         return self.value / other
@@ -92,6 +99,7 @@ class ValueHolder:
 
     def __itruediv__(self, other):
         self.value /= other
+        return self
 
     def __floordiv__(self, other):
         return self.value // other
@@ -101,6 +109,7 @@ class ValueHolder:
 
     def __ifloordiv__(self, other):
         self.value //= other
+        return self
 
     def __mod__(self, other):
         return self.value % other
@@ -110,6 +119,7 @@ class ValueHolder:
 
     def __imod__(self, other):
         self.value %= other
+        return self
 
     def __divmod__(self, other):
         return divmod(self.value, other)
@@ -118,13 +128,14 @@ class ValueHolder:
         return divmod(other, self.value)
 
     def __pow__(self, other):
-        return self.value**other
+        return self.value ** other
 
     def __rpow__(self, other):
-        return other**self.value
+        return other ** self.value
 
     def __ipow__(self, other):
         self.value **= other
+        return self
 
     def __lshift__(self, other):
         return self.value << other
@@ -134,6 +145,7 @@ class ValueHolder:
 
     def __ilshift__(self, other):
         self.value <<= other
+        return self
 
     def __rshift__(self, other):
         return self.value >> other
@@ -143,6 +155,7 @@ class ValueHolder:
 
     def __irshift__(self, other):
         self.value >>= other
+        return self
 
     def __and__(self, other):
         return self.value & other
@@ -152,6 +165,7 @@ class ValueHolder:
 
     def __iand__(self, other):
         self.value &= other
+        return self
 
     def __xor__(self, other):
         return self.value ^ other
@@ -161,6 +175,7 @@ class ValueHolder:
 
     def __ixor__(self, other):
         self.value ^= other
+        return self
 
     def __or__(self, other):
         return self.value | other
@@ -170,6 +185,7 @@ class ValueHolder:
 
     def __ior__(self, other):
         self.value |= other
+        return self
 
     def __neg__(self):
         return -self.value

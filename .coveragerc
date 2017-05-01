@@ -1,5 +1,7 @@
 [run]
 branch = True
+omit =
+    bonobo/examples/**
 
 [report]
 # Regexes for lines to exclude from consideration
