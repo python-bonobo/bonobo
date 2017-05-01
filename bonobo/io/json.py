@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-class JsonHandler:
+class JsonHandler():
     eol = ',\n'
     prefix, suffix = '[', ']'
 

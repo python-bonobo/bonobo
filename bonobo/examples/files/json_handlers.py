@@ -7,7 +7,7 @@ def get_fields(row):
 
 
 graph = bonobo.Graph(
-    bonobo.JsonReader(path='datasets/theaters.json'),
+    bonobo.JsonReader('datasets/theaters.json'),
     get_fields,
     bonobo.PrettyPrint(title_keys=('eq_nom_equipement', )),
 )

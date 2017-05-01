@@ -16,9 +16,9 @@ class MyJsonWriter(bonobo.JsonWriter):
 
 
 graph = bonobo.Graph(
-    bonobo.FileReader(path='coffeeshops.txt'),
+    bonobo.FileReader('coffeeshops.txt'),
     split_one_to_map,
-    MyJsonWriter(path='coffeeshops.json'),
+    MyJsonWriter('coffeeshops.json'),
 )
 
 if __name__ == '__main__':

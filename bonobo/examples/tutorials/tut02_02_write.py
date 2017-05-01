@@ -6,9 +6,9 @@ def split_one(line):
 
 
 graph = bonobo.Graph(
-    bonobo.FileReader(path='coffeeshops.txt'),
+    bonobo.FileReader('coffeeshops.txt'),
     split_one,
-    bonobo.JsonWriter(path='coffeeshops.json'),
+    bonobo.JsonWriter('coffeeshops.json'),
 )
 
 if __name__ == '__main__':

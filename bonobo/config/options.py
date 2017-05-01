@@ -5,10 +5,11 @@ class Option:
     """
     _creation_counter = 0
 
-    def __init__(self, type=None, *, required=False, default=None):
+    def __init__(self, type=None, *, required=False, positional=False, default=None):
         self.name = None
         self.type = type
         self.required = required
+        self.positional = positional
         self.default = default
 
         # This hack is necessary for python3.5

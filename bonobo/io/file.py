@@ -20,7 +20,7 @@ class FileHandler(Configurable):
         fs (str): service name to use for filesystem.
     """
 
-    path = Option(str, required=True)  # type: str
+    path = Option(str, required=True, positional=True)  # type: str
     eol = Option(str, default='\n')  # type: str
     mode = Option(str)  # type: str
 
