@@ -52,9 +52,9 @@ def contextual(cls_or_func):
         setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
 
     _processors = getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
-    for name, value in cls_or_func.__dict__.items():
-        if isinstance(value, ContextProcessor):
-            _processors.append(value)
+    for processor in cls_or_func.__dict__.values():
+        if isinstance(processor, ContextProcessor):
+            _processors.append(processor)
 
     # This is needed for python 3.5, python 3.6 should be fine, but it's considered an implementation detail.
     _processors.sort(key=lambda proc: proc._creation_counter)

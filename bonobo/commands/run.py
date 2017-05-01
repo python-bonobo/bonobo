@@ -20,7 +20,7 @@ def get_default_services(filename, services=None):
         }
         try:
             exec(code, context)
-        except Exception as exc:
+        except Exception:
             raise
         return {
             **context[DEFAULT_SERVICES_ATTR](),
@@ -55,7 +55,7 @@ def execute(file, quiet=False):
         'but it is something that will be implemented in the future.\n\nExpected: 1, got: {}.'
     ).format(len(graphs))
 
-    name, graph = list(graphs.items())[0]
+    graph = list(graphs.values())[0]
 
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display

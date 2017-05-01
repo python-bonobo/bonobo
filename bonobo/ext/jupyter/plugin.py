@@ -24,11 +24,3 @@ class JupyterOutputPlugin(Plugin):
     finalize = run
 
 
-"""
-TODO JUPYTER WIDGET
-###################
-
-# close the widget? what does it do?
-https://ipywidgets.readthedocs.io/en/latest/examples/Widget%20Basics.html#Closing-widgets
-
-"""
