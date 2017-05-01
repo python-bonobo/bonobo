@@ -21,7 +21,12 @@ Data-processing. By monkeys. For humans.
 
 .. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.3
     :target: https://travis-ci.org/python-bonobo/bonobo
-    :alt: Continuous Integration
+    :alt: Continuous Integration (Linux)
+
+.. image:: https://ci.appveyor.com/api/projects/status/github/python-bonobo/bonobo?retina=true&branch=0.3&svg=true
+    :target: https://ci.appveyor.com/project/hartym/bonobo?branch=0.3
+    :alt: Continuous Integration (Windows)
+
 
 .. image:: https://landscape.io/github/python-bonobo/bonobo/0.3/landscape.svg?style=flat
    :target: https://landscape.io/github/python-bonobo/bonobo/0.3
