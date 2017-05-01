@@ -1,5 +1,32 @@
 from bonobo.config.options import Option
 
+__all__ = [
+    'Configurable',
+    'Option',
+]
+
+_options_insert_order = 0
+
+class Option:
+    def __init__(self, type=None, *, required=False, positional=False, default=None):
+        self.name = None
+        self.type = type
+        self.required = required
+        self.positional = positional
+        self.default = default
+
+        global _options_insert_order
+        self.order = _options_insert_order
+        _options_insert_order += 1
+
+    def __get__(self, inst, typ):
+        if not self.name in inst.__options_values__:
+            inst.__options_values__[self.name] = self.default() if callable(self.default) else self.default
+        return inst.__options_values__[self.name]
+
+    def __set__(self, inst, value):
+        inst.__options_values__[self.name] = self.type(value) if self.type else value
+
 
 class ConfigurableMeta(type):
     """
@@ -25,15 +52,18 @@ class Configurable(metaclass=ConfigurableMeta):
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__()
 
         self.__options_values__ = {}
 
-        missing = set()
+        missing = list()
         for name, option in type(self).__options__.items():
             if option.required and not option.name in kwargs:
-                missing.add(name)
+                missing.append(name)
+
+        for i in range(min(len(args), len(missing))):
+            kwargs
 
         if len(missing):
             raise TypeError(

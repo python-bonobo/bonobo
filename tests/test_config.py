@@ -18,6 +18,11 @@ class MyHarderConfigurable(MyConfigurable):
 class MyBetterConfigurable(MyConfigurable):
     required_str = Option(str, required=False, default='kaboom')
 
+class MyConfigurableUsingPositionalOptions(MyConfigurable):
+    first = Option(str, required=True, positional=True)
+    second = Option(str, required=True, positional=True)
+    third = Option(str, required=False, positional=True)
+
 
 class PrinterInterface():
     def print(self, *args):
@@ -133,3 +138,8 @@ def test_service_dependency_unavailable():
     o = MyServiceDependantConfigurable(printer='printer2')
     with pytest.raises(KeyError):
         SERVICES.args_for(o)
+
+
+def test_option_positional():
+    o = MyConfigurableUsingPositionalOptions('1', '2', '3', required_str='hello')
+

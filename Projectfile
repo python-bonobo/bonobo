@@ -1,7 +1,7 @@
 # bonobo (see github.com/python-edgy/project)
 
 name = 'bonobo'
-description = 'Bonobo'
+description = 'Bonobo, a simple, modern and atomic extract-transform-load toolkit for python 3.5+.'
 license = 'Apache License, Version 2.0'
 
 url = 'https://www.bonobo-project.org/'
