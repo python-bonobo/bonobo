@@ -41,7 +41,7 @@ context.
 The API may evolve a bit though, because I feel it's a bit hackish, as it is. The concept will stay the same, but we need
 to find a better way to apply it.
 
-To understand how it works today, look at https://github.com/python-bonobo/bonobo/blob/0.3/bonobo/io/csv.py#L63 and class hierarchy.
+To understand how it works today, look at https://github.com/python-bonobo/bonobo/blob/0.2/bonobo/io/csv.py#L63 and class hierarchy.
 
 What is a plugin? Do I need to write one?
 -----------------------------------------

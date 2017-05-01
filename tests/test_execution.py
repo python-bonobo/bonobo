@@ -1,4 +1,4 @@
-from bonobo.config.processors import ContextProcessor
+from bonobo.config.processors import contextual
 from bonobo.constants import BEGIN, END
 from bonobo.execution.graph import GraphExecutionContext
 from bonobo.strategies import NaiveStrategy
@@ -13,11 +13,12 @@ def square(i: int) -> int:
     return i**2
 
 
+@contextual
 def push_result(results, i: int):
     results.append(i)
 
 
-@ContextProcessor.decorate(push_result)
+@push_result.__processors__.append
 def results(f, context):
     results = []
     yield results

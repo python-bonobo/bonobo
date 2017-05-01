@@ -21,6 +21,7 @@ class JsonReader(JsonHandler, FileReader):
             yield line
 
 
+@contextual
 class JsonWriter(JsonHandler, FileWriter):
     @ContextProcessor
     def envelope(self, context, fs, file, lineno):

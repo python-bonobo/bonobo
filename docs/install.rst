@@ -17,7 +17,7 @@ but editable installs (see below).
 
 .. code-block:: shell-session
 
-    $ pip install git+https://github.com/python-bonobo/bonobo.git@0.3#egg=bonobo
+    $ pip install git+https://github.com/python-bonobo/bonobo.git@0.2#egg=bonobo
 
 Editable install
 ::::::::::::::::
@@ -28,7 +28,7 @@ python interpreter.
 
 .. code-block:: shell-session
 
-    $ pip install --editable git+https://github.com/python-bonobo/bonobo.git@0.3#egg=bonobo
+    $ pip install --editable git+https://github.com/python-bonobo/bonobo.git@0.2#egg=bonobo
 
 .. note:: You can also use the `-e` flag instead of the long version.
 

@@ -15,20 +15,20 @@ Data-processing. By monkeys. For humans.
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Versions
 
-.. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.3
+.. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.2
     :target: http://docs.bonobo-project.org/
     :alt: Documentation
 
-.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.3
+.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.2
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration
 
-.. image:: https://landscape.io/github/python-bonobo/bonobo/0.3/landscape.svg?style=flat
-   :target: https://landscape.io/github/python-bonobo/bonobo/0.3
+.. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
+   :target: https://landscape.io/github/python-bonobo/bonobo/0.2
    :alt: Code Health from landscape
 
-.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.3.svg
-    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.3
+.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.2.svg
+    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
 
 Bonobo is a data-processing library for python 3.5+ that emphasises writing
