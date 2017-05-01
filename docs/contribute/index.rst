@@ -1,6 +1,21 @@
 Contributing
 ============
 
+There's a lot of different ways you can contribute, and not all of them includes coding. Do not think that the codeless
+contributions have less value, all contributions are very important.
+
+* You can contribute to the documentation.
+* You can help reproducing errors and giving more infos in the issues.
+* You can open issues with problems you're facing.
+* You can help creating better presentation material.
+* You can talk about it in your local python user group.
+* You can enhance examples.
+* You can enhance tests.
+* etc.
+
+Code-related contributions (including tests and examples)
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 Contributing to bonobo is usually done this way:
 
 * Discuss ideas in the `issue tracker <https://github.com/python-bonobo/bonobo>`_ or on `Slack <https://bonobo-slack.herokuapp.com/>`_.

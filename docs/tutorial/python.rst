@@ -6,16 +6,6 @@ Just enough Python for Bonobo
     This is a work in progress and it is not yet available. Please come back later or even better, help us write this
     guide!
 
-This guide is intended to help programmers or enthusiasts to grasp the python basics necessary to use Bonobo. It should
-definately not be considered as a general python introduction, neither a deep dive into details.
-
-.. toctree::
-    :maxdepth: 2
-
-    python01
-    python02
-    python03
-    python04
-    python05
-
+    This guide is intended to help programmers or enthusiasts to grasp the python basics necessary to use Bonobo. It
+    should definately not be considered as a general python introduction, neither a deep dive into details.
 

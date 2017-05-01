@@ -1,3 +1,19 @@
+"""
+Extracts a list of fablabs in the world, restrict to the ones in france, then format it both for a nice console output
+and a flat txt file.
+
+.. graphviz::
+
+    digraph {
+        rankdir = LR;
+        stylesheet = "../_static/graphs.css";
+
+        BEGIN [shape="point"];
+        BEGIN -> "ODS()" -> "normalize" -> "filter_france" -> "Tee()" -> "JsonWriter()";
+    }
+
+"""
+
 import json
 
 from colorama import Fore, Style

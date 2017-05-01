@@ -1,11 +1,10 @@
 References
 ==========
 
-.. todo:: write the fucking doc!
-
 .. toctree::
     :maxdepth: 4
 
-    commands
     api
+    api_config
+    commands
     examples
