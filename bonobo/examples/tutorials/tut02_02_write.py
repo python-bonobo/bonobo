@@ -12,4 +12,6 @@ graph = bonobo.Graph(
 )
 
 if __name__ == '__main__':
-    bonobo.run(graph, services={'fs': bonobo.open_examples_fs('datasets')})
+    bonobo.run(
+        graph, services={'fs': bonobo.open_examples_fs('datasets')}
+    )

@@ -1,4 +1,4 @@
 [style]
 based_on_style = pep8
-column_limit = 80
+column_limit = 74
 dedent_closing_brackets = true

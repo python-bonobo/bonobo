@@ -61,8 +61,10 @@ def display(row):
             None, (
                 ' '.join(
                     filter(
-                        None,
-                        (row.get('postal_code', None), row.get('city', None))
+                        None, (
+                            row.get('postal_code', None),
+                            row.get('city', None)
+                        )
                     )
                 ), row.get('county', None), row.get('country'),
             )
@@ -82,8 +84,9 @@ def display(row):
         format(Fore.BLUE, Style.RESET_ALL, **row)
     )
     print(
-        '  - {}source{}: {source}'.
-        format(Fore.BLUE, Style.RESET_ALL, source='datanova/' + API_DATASET)
+        '  - {}source{}: {source}'.format(
+            Fore.BLUE, Style.RESET_ALL, source='datanova/' + API_DATASET
+        )
     )
 
 
