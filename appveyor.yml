@@ -69,12 +69,12 @@ test_script:
   # Run the project tests
   - "%CMD_IN_ENV% pytest --capture=no --cov=bonobo --cov-report html"
 
-after_test:
-  # If tests are successful, create binary packages for the project.
-  - "%CMD_IN_ENV% python setup.py bdist_wheel"
-  - "%CMD_IN_ENV% python setup.py bdist_wininst"
-  - "%CMD_IN_ENV% python setup.py bdist_msi"
-  - ps: "ls dist"
+#after_test:
+# If tests are successful, create binary packages for the project.
+#  - "%CMD_IN_ENV% python setup.py bdist_wheel"
+#  - "%CMD_IN_ENV% python setup.py bdist_wininst"
+#  - "%CMD_IN_ENV% python setup.py bdist_msi"
+#  - ps: "ls dist"
 
 artifacts:
   # Archive the generated packages in the ci.appveyor.com build report.
