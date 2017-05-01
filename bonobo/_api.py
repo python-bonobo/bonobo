@@ -1,3 +1,5 @@
+import warnings
+
 from bonobo.basics import Limit, PrettyPrint, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
 from bonobo.structs import Bag, Graph
@@ -11,22 +13,60 @@ def register_api(x, __all__=__all__):
     __all__.append(get_name(x))
     return x
 
+
 def register_api_group(*args):
     for attr in args:
         register_api(attr)
 
 
-# bonobo.basics
-register_api_group(Limit, PrettyPrint, Tee, count, identity, noop, pprint, )
+@register_api
+def run(graph, *chain, strategy=None, plugins=None, services=None):
+    """
+    Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
+    
+    The only necessary argument is a :class:`Graph` instance, containing the logic you actually want to execute.
+    
+    By default, this graph will be executed using the "threadpool" strategy: each graph node will be wrapped in a
+    thread, and executed in a loop until there is no more input to this node.
+    
+    You can provide plugins factory objects in the plugins list, this function will add the necessary plugins for
+    interactive console execution and jupyter notebook execution if it detects correctly that it runs in this context.
+    
+    You'll probably want to provide a services dictionary mapping service names to service instances.
+    
+    :param Graph graph: The :class:`Graph` to execute.
+    :param str strategy: The :class:`bonobo.strategies.base.Strategy` to use.
+    :param list plugins: The list of plugins to enhance execution.
+    :param dict services: The implementations of services this graph will use.
+    :return bonobo.execution.graph.GraphExecutionContext:
+    """
+    if len(chain):
+        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
+        from bonobo import Graph
+        graph = Graph(graph, *chain)
 
-# bonobo.io
-register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
+    strategy = create_strategy(strategy)
+    plugins = plugins or []
+
+    if _is_interactive_console():
+        from bonobo.ext.console import ConsoleOutputPlugin
+        if ConsoleOutputPlugin not in plugins:
+            plugins.append(ConsoleOutputPlugin)
+
+    if _is_jupyter_notebook():
+        from bonobo.ext.jupyter import JupyterOutputPlugin
+        if JupyterOutputPlugin not in plugins:
+            plugins.append(JupyterOutputPlugin)
+
+    return strategy.execute(graph, plugins=plugins, services=services)
+
+
+# bonobo.structs
+register_api_group(Bag, Graph)
 
 # bonobo.strategies
 register_api(create_strategy)
 
-# bonobo.structs
-register_api_group(Bag, Graph)
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
 @register_api
@@ -47,6 +87,12 @@ def open_fs(fs_url, *args, **kwargs):
     return _open_fs(str(fs_url), *args, **kwargs)
 
 
+# bonobo.basics
+register_api_group(Limit, PrettyPrint, Tee, count, identity, noop, pprint, )
+
+# bonobo.io
+register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
+
 
 def _is_interactive_console():
     import sys
@@ -61,29 +107,6 @@ def _is_jupyter_notebook():
 
 
 @register_api
-def run(graph, *chain, strategy=None, plugins=None, services=None):
-    if len(chain):
-        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
-        from bonobo import Graph
-        graph = Graph(graph, *chain)
-
-    strategy = create_strategy(strategy)
-    plugins = []
-
-    if _is_interactive_console():
-        from bonobo.ext.console import ConsoleOutputPlugin
-        if ConsoleOutputPlugin not in plugins:
-            plugins.append(ConsoleOutputPlugin)
-
-    if _is_jupyter_notebook():
-        from bonobo.ext.jupyter import JupyterOutputPlugin
-        if JupyterOutputPlugin not in plugins:
-            plugins.append(JupyterOutputPlugin)
-
-    return strategy.execute(graph, plugins=plugins, services=services)
-
-
-@register_api
 def get_examples_path(*pathsegments):
     import os
     import pathlib
@@ -94,5 +117,3 @@ def get_examples_path(*pathsegments):
 def open_examples_fs(*pathsegments):
     return open_fs(get_examples_path(*pathsegments))
 
-
-print(__all__)

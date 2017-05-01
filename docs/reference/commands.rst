@@ -1,5 +1,5 @@
-Commands Reference
-==================
+Command-line Reference
+======================
 
 Bonobo Init
 :::::::::::
