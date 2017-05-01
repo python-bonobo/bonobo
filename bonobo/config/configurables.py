@@ -5,6 +5,7 @@ __all__ = [
     'Option',
 ]
 
+
 class ConfigurableMeta(type):
     """
     Metaclass for Configurables that will add options to a special __options__ dict.

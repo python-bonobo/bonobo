@@ -129,10 +129,10 @@ class ValueHolder:
         return divmod(other, self.value)
 
     def __pow__(self, other):
-        return self.value ** other
+        return self.value**other
 
     def __rpow__(self, other):
-        return other ** self.value
+        return other**self.value
 
     def __ipow__(self, other):
         self.value **= other

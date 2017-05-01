@@ -51,6 +51,3 @@ def test_valueholder():
     assert y == x
     assert y is not x
     assert repr(x) == repr(y) == repr(43)
-
-
-

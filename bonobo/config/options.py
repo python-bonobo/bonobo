@@ -26,5 +26,3 @@ class Option:
 
     def __set__(self, inst, value):
         inst.__options_values__[self.name] = self.type(value) if self.type else value
-
-

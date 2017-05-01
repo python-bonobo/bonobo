@@ -18,6 +18,7 @@ class MyHarderConfigurable(MyConfigurable):
 class MyBetterConfigurable(MyConfigurable):
     required_str = Option(str, required=False, default='kaboom')
 
+
 class MyConfigurableUsingPositionalOptions(MyConfigurable):
     first = Option(str, required=True, positional=True)
     second = Option(str, required=True, positional=True)
@@ -142,4 +143,3 @@ def test_service_dependency_unavailable():
 
 def test_option_positional():
     o = MyConfigurableUsingPositionalOptions('1', '2', '3', required_str='hello')
-
