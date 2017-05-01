@@ -1,3 +1,4 @@
+from bonobo.config.processors import ContextProcessor
 from bonobo.config.options import Option
 
 __all__ = [
@@ -15,16 +16,24 @@ class ConfigurableMeta(type):
         super().__init__(what, bases, dict)
         cls.__options__ = {}
         cls.__positional_options__ = []
+        cls.__processors__ = []
 
         for typ in cls.__mro__:
             for name, value in typ.__dict__.items():
                 if isinstance(value, Option):
-                    if not value.name:
-                        value.name = name
-                    if not name in cls.__options__:
-                        cls.__options__[name] = value
-                    if value.positional:
-                        cls.__positional_options__.append(name)
+                    if isinstance(value, ContextProcessor):
+                        cls.__processors__.append(value)
+                    else:
+                        if not value.name:
+                            value.name = name
+                        if not name in cls.__options__:
+                            cls.__options__[name] = value
+                        if value.positional:
+                            cls.__positional_options__.append(name)
+
+        # This can be done before, more efficiently. Not so bad neither as this is only done at type() creation time
+        # (aka class Xxx(...) time) and there should not be hundreds of processors. Still not very elegant.
+        cls.__processors__ = sorted(cls.__processors__, key=lambda v: v._creation_counter)
 
 
 class Configurable(metaclass=ConfigurableMeta):
