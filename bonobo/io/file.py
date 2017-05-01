@@ -9,6 +9,7 @@ __all__ = [
 ]
 
 
+@contextual
 class FileHandler(Configurable):
     """Abstract component factory for file-related components.
     
@@ -74,6 +75,7 @@ class FileReader(Reader):
             yield line.rstrip(self.eol)
 
 
+@contextual
 class FileWriter(Writer):
     """Component factory for file or file-like writers.
 

@@ -46,7 +46,7 @@ We'll use a text file that was generated using Bonobo from the "liste-des-cafes-
 Mairie de Paris under the Open Database License (ODbL). You can `explore the original dataset
 <https://opendata.paris.fr/explore/dataset/liste-des-cafes-a-un-euro/information/>`_.
 
-You'll need the `example dataset <https://github.com/python-bonobo/bonobo/blob/0.3/bonobo/examples/datasets/coffeeshops.txt>`_,
+You'll need the `example dataset <https://github.com/python-bonobo/bonobo/blob/0.2/bonobo/examples/datasets/coffeeshops.txt>`_,
 available in **Bonobo**'s repository.
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02_01_read.py
@@ -75,7 +75,7 @@ containerization capabilities are provided by an optional and separate python pa
 It also change a bit the way you can configure service dependencies. The CLI won't run the `if __name__ == '__main__'`
 block,  and thus it won't get the configured services passed to :func:`bonobo.run`. Instead, one option to configure
 services is to define a `get_services()` function in a
-`_services.py <https://github.com/python-bonobo/bonobo/blob/0.3/bonobo/examples/tutorials/_services.py>`_ file.
+`_services.py <https://github.com/python-bonobo/bonobo/blob/0.2/bonobo/examples/tutorials/_services.py>`_ file.
 
 There will be more options using the CLI or environment to override things soon.
 

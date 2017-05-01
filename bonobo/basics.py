@@ -3,7 +3,7 @@ from pprint import pprint as _pprint
 
 from colorama import Fore, Style
 
-from bonobo.config.processors import ContextProcessor
+from bonobo.config.processors import contextual
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
@@ -49,11 +49,12 @@ def Tee(f):
     return wrapped
 
 
+@contextual
 def count(counter, *args, **kwargs):
     counter += 1
 
 
-@ContextProcessor.decorate(count)
+@count.add_context_processor
 def _count_counter(self, context):
     counter = ValueHolder(0)
     yield counter

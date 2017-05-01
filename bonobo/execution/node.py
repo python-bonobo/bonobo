@@ -93,7 +93,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         input_bag = self.get()
 
         # todo add timer
-        self.handle_results(input_bag, input_bag.apply(self._stack))
+        self.handle_results(input_bag, input_bag.apply(self.wrapped, *self._context))
 
     def push(self, bag):
         # MAKE THIS PUBLIC API FOR CONTEXT PROCESSORS !!!
