@@ -23,10 +23,6 @@ Data-processing for humans.
     :target: https://ci.appveyor.com/project/hartym/bonobo?branch=0.2
     :alt: Continuous Integration (Windows)
 
-.. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
-   :target: https://landscape.io/github/python-bonobo/bonobo/0.2
-   :alt: Code Health from landscape
-
 .. image:: https://codeclimate.com/github/python-bonobo/bonobo/badges/gpa.svg
    :target: https://codeclimate.com/github/python-bonobo/bonobo
    :alt: Code Climate
