@@ -1,7 +1,5 @@
 ---
 engines:
-  csslint:
-    enabled: true
   duplication:
     enabled: true
     config:
@@ -15,7 +13,11 @@ ratings:
   paths:
   - "**.py"
 exclude_paths:
+  - .*/
   - bonobo/examples/
   - bonobo/ext/
+  - build/
   - config/
+  - dist/
+  - docs/
   - tests/
