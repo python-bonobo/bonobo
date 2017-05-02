@@ -1,16 +1,12 @@
+==========
 🐵  bonobo
-=========
+==========
 
-Data-processing. By monkeys. For humans.
+Data-processing for humans.
 
 .. image:: https://img.shields.io/pypi/v/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: PyPI
-
-.. image:: https://img.shields.io/pypi/wheel/bonobo.svg
-    :target: https://pypi.python.org/pypi/bonobo
-    :alt: Wheel
-
 .. image:: https://img.shields.io/pypi/pyversions/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Versions
@@ -27,29 +23,30 @@ Data-processing. By monkeys. For humans.
     :target: https://ci.appveyor.com/project/hartym/bonobo?branch=0.3
     :alt: Continuous Integration (Windows)
 
-
 .. image:: https://landscape.io/github/python-bonobo/bonobo/0.3/landscape.svg?style=flat
    :target: https://landscape.io/github/python-bonobo/bonobo/0.3
    :alt: Code Health from landscape
+
+.. image:: https://codeclimate.com/github/python-bonobo/bonobo/badges/gpa.svg
+   :target: https://codeclimate.com/github/python-bonobo/bonobo
+   :alt: Code Climate
 
 .. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.3.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.3
     :alt: Coverage
 
-Bonobo is a data-processing library for python 3.5+ that emphasises writing
-simple, atomic, plain old python functions and chaining them using a basic
-acyclic graph. The nodes will need a bit of plumbery to be runnable in
-different means (iteratively, in threads, in processes, on different machines
-...) but that should be as transparent as possible.
+Bonobo is an extract-transform-load framework for python 3.5+ (see comparisons with other data tools).
 
-The only thing asked of the developer is to write "pure" functions to
-process data (create a new dict, don't change in place, etc.), and everything
-should be fine from this point.
+Bonobo uses plain old python objects (functions, generators and iterators), allows to link them in a directed graph and
+execute them using a parallelized strategy, without having to worry about the underlying complexity.
 
-It's a young rewrite of an old python2.7 tool that ran millions of
-transformations per day for years on production, so as though it may not yet 
-be complete or fully stable (please, allow us to reach 1.0), the underlying
-concepts work.
+Developpers can focus on writing simple and atomic operations, that are by-design easy to unit-test, while the
+framework focus on applying them concurrently to rows of data.
+
+One thing to note: write pure transformations and you'll be safe.
+
+Bonobo is a young rewrite of an old python2.7 tool that ran millions of transformations per day for years on production,
+so as though it may not yet be complete or fully stable (please, allow us to reach 1.0), the basics are there.
 
 ----
 
