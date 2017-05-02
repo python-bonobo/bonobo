@@ -8,7 +8,7 @@ def skip_comments(line):
 
 
 graph = bonobo.Graph(
-    bonobo.FileReader(path='datasets/passwd.txt'),
+    bonobo.FileReader('datasets/passwd.txt'),
     skip_comments,
     lambda s: s.split(':'),
     lambda l: l[0],

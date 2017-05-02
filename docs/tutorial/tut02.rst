@@ -38,9 +38,9 @@ There are a few component builders available in **Bonobo** that let you read fro
 
 All readers work the same way. They need a filesystem to work with, and open a "path" they will read from.
 
-* :class:`bonobo.FileReader`
-* :class:`bonobo.JsonReader`
-* :class:`bonobo.CsvReader`
+* :class:`bonobo.io.FileReader`
+* :class:`bonobo.io.JsonReader`
+* :class:`bonobo.io.CsvReader`
 
 We'll use a text file that was generated using Bonobo from the "liste-des-cafes-a-un-euro" dataset made available by
 Mairie de Paris under the Open Database License (ODbL). You can `explore the original dataset
@@ -86,9 +86,9 @@ Let's split this file's each lines on the first comma and store a json file mapp
 
 Here are, like the readers, the classes available to write files
 
-* :class:`bonobo.FileWriter`
-* :class:`bonobo.JsonWriter`
-* :class:`bonobo.CsvWriter`
+* :class:`bonobo.io.FileWriter`
+* :class:`bonobo.io.JsonWriter`
+* :class:`bonobo.io.CsvWriter`
 
 Let's write a first implementation:
 
@@ -96,7 +96,7 @@ Let's write a first implementation:
     :language: python
 
 You can run it and read the output file, you'll see it misses the "map" part of the question. Let's extend
-:class:`bonobo.JsonWriter` to finish the job:
+:class:`bonobo.io.JsonWriter` to finish the job:
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02_03_writeasmap.py
     :language: python

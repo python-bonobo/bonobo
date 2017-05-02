@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v.0.2.3 - 1 may 2017
+:::::::::::::::::::::
+
+* Positional options now supported, backward compatible. All FileHandler subclasses supports their path argument as positional.
+* Better transformation lifecycle management (still work needed here).
+* Windows continuous integration now works.
+* Refactoring the "API" a lot to have a much cleaner first glance at it.
+* More documentation, tutorials, and tuning project artifacts.
+
 v.0.2.2 - 28 apr 2017
 :::::::::::::::::::::
 

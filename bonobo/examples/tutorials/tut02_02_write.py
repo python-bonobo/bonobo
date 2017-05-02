@@ -6,12 +6,12 @@ def split_one(line):
 
 
 graph = bonobo.Graph(
-    bonobo.FileReader(path='coffeeshops.txt'),
+    bonobo.FileReader('coffeeshops.txt'),
     split_one,
-    bonobo.JsonWriter(path='coffeeshops.json'),
+    bonobo.JsonWriter('coffeeshops.json'),
 )
 
 if __name__ == '__main__':
-    bonobo.run(graph, services={
-        'fs': bonobo.open_examples_fs('datasets')
-    })
+    bonobo.run(
+        graph, services={'fs': bonobo.open_examples_fs('datasets')}
+    )

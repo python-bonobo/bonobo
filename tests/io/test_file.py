@@ -21,7 +21,7 @@ def test_file_writer_in_context(tmpdir, lines, output):
 
     context.start()
     context.recv(BEGIN, *map(Bag, lines), END)
-    for i in range(len(lines)):
+    for _ in range(len(lines)):
         context.step()
     context.stop()
 

@@ -4,7 +4,6 @@ from pprint import pprint as _pprint
 from colorama import Fore, Style
 
 from bonobo.config.processors import contextual
-from bonobo.constants import NOT_MODIFIED
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
@@ -25,6 +24,7 @@ def identity(x):
 
 
 def Limit(n=10):
+    from bonobo.constants import NOT_MODIFIED
     i = 0
 
     def _limit(*args, **kwargs):
@@ -38,6 +38,8 @@ def Limit(n=10):
 
 
 def Tee(f):
+    from bonobo.constants import NOT_MODIFIED
+
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         nonlocal f
@@ -63,6 +65,8 @@ pprint = Tee(_pprint)
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
+    from bonobo.constants import NOT_MODIFIED
+
     def _pprint(*args, **kwargs):
         nonlocal title_keys, sort, print_values
 
@@ -98,4 +102,5 @@ def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True
 
 
 def noop(*args, **kwargs):  # pylint: disable=unused-argument
+    from bonobo.constants import NOT_MODIFIED
     return NOT_MODIFIED

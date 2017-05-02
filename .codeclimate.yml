@@ -1,0 +1,23 @@
+---
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+  - "**.py"
+exclude_paths:
+  - .*/
+  - bonobo/examples/
+  - bonobo/ext/
+  - build/
+  - config/
+  - dist/
+  - docs/
+  - tests/

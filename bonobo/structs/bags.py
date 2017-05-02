@@ -9,6 +9,30 @@ __all__ = [
 
 
 class Bag:
+    """
+    Bags are simple datastructures that holds arguments and keyword arguments together, that may be applied to a
+    callable.
+    
+    Example:
+    
+        >>> from bonobo import Bag
+        >>> def myfunc(foo, *, bar):
+        ...     print(foo, bar)
+        ...
+        >>> bag = Bag('foo', bar='baz')
+        >>> bag.apply(myfunc)
+        foo baz
+    
+    A bag can inherit another bag, allowing to override only a few arguments without touching the parent.
+    
+    Example:
+        
+        >>> bag2 = Bag(bar='notbaz', _parent=bag)
+        >>> bag2.apply(myfunc)
+        foo notbaz
+    
+    """
+
     def __init__(self, *args, _flags=None, _parent=None, **kwargs):
         self._flags = _flags or ()
         self._parent = _parent

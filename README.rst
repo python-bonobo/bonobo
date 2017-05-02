@@ -22,17 +22,21 @@ Data-processing. By monkeys. For humans.
 
 .. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.2
     :target: https://travis-ci.org/python-bonobo/bonobo
-    :alt: Continuous Integration
+    :alt: Continuous Integration (Linux)
 
-.. image:: https://api.codacy.com/project/badge/Grade/60aa1ba3ee7b4b4ebd71ca659736c0af
-   :target: https://www.codacy.com/app/hartym/bonobo
-   :alt: Code Health from codacy
+.. image:: https://ci.appveyor.com/api/projects/status/github/python-bonobo/bonobo?retina=true&branch=0.2&svg=true
+    :target: https://ci.appveyor.com/project/hartym/bonobo?branch=0.2
+    :alt: Continuous Integration (Windows)
 
 .. image:: https://landscape.io/github/python-bonobo/bonobo/0.2/landscape.svg?style=flat
    :target: https://landscape.io/github/python-bonobo/bonobo/0.2
    :alt: Code Health from landscape
 
-.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo.svg
+.. image:: https://codeclimate.com/github/python-bonobo/bonobo/badges/gpa.svg
+   :target: https://codeclimate.com/github/python-bonobo/bonobo
+   :alt: Code Climate
+
+.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.2.svg
     :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.2
     :alt: Coverage
 

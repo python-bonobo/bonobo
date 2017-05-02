@@ -1,9 +1,15 @@
 import bonobo
 from bonobo.commands.run import get_default_services
 
+
+def get_fields(row):
+    return row['fields']
+
+
 graph = bonobo.Graph(
-    bonobo.CsvReader('datasets/coffeeshops.txt'),
-    print,
+    bonobo.JsonReader('datasets/theaters.json'),
+    get_fields,
+    bonobo.PrettyPrint(title_keys=('eq_nom_equipement', )),
 )
 
 if __name__ == '__main__':
