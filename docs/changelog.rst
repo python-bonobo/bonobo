@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v.0.2.4 - 2 may 2017
+::::::::::::::::::::
+
+* Cosmetic release for PyPI package page formating. Same content as v.0.2.3.
+
 v.0.2.3 - 1 may 2017
 :::::::::::::::::::::
 
