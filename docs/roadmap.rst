@@ -1,6 +1,27 @@
 Detailed roadmap
 ================
 
+initialize / finalize better than start / stop ?
+
+Graph and node level plugins
+::::::::::::::::::::::::::::
+
+ * Enhancers or nide-level plugins
+ * Graph level plugins
+ * Documentation
+
+Command line interface and environment
+::::::::::::::::::::::::::::::::::::::
+
+* How do we manage environment ? .env ?
+* How do we configure plugins ?
+* Console run should allow console plugin as a command line argument (or silence it).
+
+Services and Processors
+:::::::::::::::::::::::
+
+* ContextProcessors not clean
+
 Next...
 :::::::
 
@@ -10,8 +31,13 @@ Next...
 * Windows break because of readme encoding. Fix in edgy.
 * bonobo init --with sqlalchemy,docker
 * logger, vebosity level
-* Console run should allow console plugin as a command line argument (or silence it).
-* ContextProcessors not clean
+
+
+External libs that looks good
+:::::::::::::::::::::::::::::
+
+* dask.distributed
+* mediator (event dispatcher)
 
 Version 0.3
 :::::::::::

@@ -50,7 +50,7 @@ class GraphExecutionContext:
 
         for i in self.graph.outputs_of(BEGIN):
             for message in messages:
-                self[i].recv(message)
+                self[i].write(message)
 
     def start(self):
         # todo use strategy

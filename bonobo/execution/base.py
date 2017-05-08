@@ -1,20 +1,26 @@
 import traceback
+from contextlib import contextmanager
 from time import sleep
 
 from bonobo.config import Container
-from bonobo.config.processors import resolve_processors, ContextCurrifier
+from bonobo.config.processors import ContextCurrifier
+from bonobo.plugins import get_enhancers
 from bonobo.util.errors import print_error
-from bonobo.util.iterators import ensure_tuple
-from bonobo.util.objects import Wrapper
+from bonobo.util.objects import Wrapper, get_name
+
+
+@contextmanager
+def unrecoverable(error_handler):
+    try:
+        yield
+    except Exception as exc:  # pylint: disable=broad-except
+        error_handler(exc, traceback.format_exc())
+        raise  # raise unrecoverableerror from x ?
 
 
 class LoopingExecutionContext(Wrapper):
     alive = True
     PERIOD = 0.25
-
-    @property
-    def state(self):
-        return self._started, self._stopped
 
     @property
     def started(self):
@@ -26,7 +32,9 @@ class LoopingExecutionContext(Wrapper):
 
     def __init__(self, wrapped, parent, services=None):
         super().__init__(wrapped)
+
         self.parent = parent
+
         if services:
             if parent:
                 raise RuntimeError(
@@ -36,19 +44,25 @@ class LoopingExecutionContext(Wrapper):
         else:
             self.services = None
 
-        self._started, self._stopped, self._stack = False, False, None
+        self._started, self._stopped = False, False
+        self._stack = None
+
+        # XXX enhancers
+        self._enhancers = get_enhancers(self.wrapped)
 
     def start(self):
-        assert self.state == (False,
-                              False), ('{}.start() can only be called on a new node.').format(type(self).__name__)
+        if self.started:
+            raise RuntimeError('Cannot start a node twice ({}).'.format(get_name(self)))
+
         self._started = True
         self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
 
-        try:
+        with unrecoverable(self.handle_error):
             self._stack.setup(self)
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-            raise
+
+        for enhancer in self._enhancers:
+            with unrecoverable(self.handle_error):
+                enhancer.start(self)
 
     def loop(self):
         """Generic loop. A bit boring. """
@@ -61,16 +75,16 @@ class LoopingExecutionContext(Wrapper):
         raise NotImplementedError('Abstract.')
 
     def stop(self):
-        assert self._started, ('{}.stop() can only be called on a previously started node.').format(type(self).__name__)
+        if not self.started:
+            raise RuntimeError('Cannot stop an unstarted node ({}).'.format(get_name(self)))
+
         if self._stopped:
             return
 
         self._stopped = True
-        try:
+
+        with unrecoverable(self.handle_error):
             self._stack.teardown()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-            raise
 
     def handle_error(self, exc, trace):
         return print_error(exc, trace, context=self.wrapped)

@@ -199,3 +199,12 @@ class ValueHolder:
 
     def __invert__(self):
         return ~self.value
+
+
+def get_attribute_or_create(obj, attr, default):
+    try:
+        return getattr(obj, attr)
+    except AttributeError:
+        setattr(obj, attr, default)
+        return getattr(obj, attr)
+

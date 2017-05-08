@@ -20,7 +20,7 @@ def test_file_writer_in_context(tmpdir, lines, output):
     context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.start()
-    context.recv(BEGIN, *map(Bag, lines), END)
+    context.write(BEGIN, *map(Bag, lines), END)
     for _ in range(len(lines)):
         context.step()
     context.stop()
@@ -48,7 +48,7 @@ def test_file_reader_in_context(tmpdir):
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
     context.start()
-    context.recv(BEGIN, Bag(), END)
+    context.write(BEGIN, Bag(), END)
     context.step()
     context.stop()
 
