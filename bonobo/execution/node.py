@@ -22,7 +22,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     @property
     def alive(self):
         """todo check if this is right, and where it is used"""
-        return self.input.alive and self._started and not self._stopped
+        return self._started and not self._stopped
 
     @property
     def alive_str(self):

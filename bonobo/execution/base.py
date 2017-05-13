@@ -81,10 +81,12 @@ class LoopingExecutionContext(Wrapper):
         if self._stopped:
             return
 
-        self._stopped = True
+        try:
+            with unrecoverable(self.handle_error):
+                self._stack.teardown()
+        finally:
+            self._stopped = True
 
-        with unrecoverable(self.handle_error):
-            self._stack.teardown()
 
     def handle_error(self, exc, trace):
         return print_error(exc, trace, context=self.wrapped)
