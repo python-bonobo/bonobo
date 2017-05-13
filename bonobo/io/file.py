@@ -1,6 +1,7 @@
 from bonobo.config import Option, Service
 from bonobo.config.configurables import Configurable
 from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 
 __all__ = [
@@ -94,6 +95,7 @@ class FileWriter(Writer):
         """
         self._write_line(file, (self.eol if lineno.value else '') + row)
         lineno.value += 1
+        return NOT_MODIFIED
 
     def _write_line(self, file, line):
         return file.write(line)

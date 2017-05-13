@@ -2,6 +2,7 @@ import csv
 
 from bonobo.config import Option
 from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from .file import FileHandler, FileReader, FileWriter
 
@@ -54,7 +55,7 @@ class CsvReader(CsvHandler, FileReader):
 
         for row in reader:
             if len(row) != field_count:
-                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count, ))
+                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count,))
 
             yield dict(zip(headers.value, row))
 
@@ -72,3 +73,6 @@ class CsvWriter(CsvHandler, FileWriter):
             writer.writerow(headers.value)
         writer.writerow(row[header] for header in headers.value)
         lineno.value += 1
+        return NOT_MODIFIED
+
+
