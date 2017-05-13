@@ -49,6 +49,7 @@ class ContextCurrifier:
         self.wrapped = wrapped
         self.context = tuple(initial_context)
         self._stack = []
+        self._stack_values = []
 
     def setup(self, *context):
         if len(self._stack):
@@ -56,6 +57,7 @@ class ContextCurrifier:
         for processor in resolve_processors(self.wrapped):
             _processed = processor(self.wrapped, *context, *self.context)
             _append_to_context = next(_processed)
+            self._stack_values.append(_append_to_context)
             if _append_to_context is not None:
                 self.context += ensure_tuple(_append_to_context)
             self._stack.append(_processed)
@@ -68,7 +70,7 @@ class ContextCurrifier:
             processor = self._stack.pop()
             try:
                 # todo yield from ? how to ?
-                next(processor)
+                processor.send(self._stack_values.pop())
             except StopIteration as exc:
                 # This is normal, and wanted.
                 pass
