@@ -73,20 +73,20 @@ class ConsoleOutputPlugin(Plugin):
     def write(context, prefix='', rewind=True, append=None, debug=False, profile=False):
         t_cnt = len(context)
 
-        for i, component in enumerate(context):
-            if component.alive:
+        for i, node in enumerate(context):
+            if node.alive:
                 _line = ''.join(
                     (
                         Fore.BLACK, '({})'.format(i + 1), Style.RESET_ALL, ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ',
-                        component.name, ' ', component.get_statistics_as_string(debug=debug,
+                        node.name, ' ', node.get_statistics_as_string(debug=debug,
                                                                                 profile=profile), Style.RESET_ALL, ' ',
                     )
                 )
             else:
                 _line = ''.join(
                     (
-                        Fore.BLACK, '({})'.format(i + 1), ' - ', component.name, ' ',
-                        component.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
+                        Fore.BLACK, '({})'.format(i + 1), ' - ', node.name, ' ',
+                        node.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
                     )
                 )
             print(prefix + _line + '\033[0K')
