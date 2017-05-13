@@ -21,11 +21,17 @@ class Graph:
         self.nodes.append(c)
         return i
 
-    def add_chain(self, *nodes, _input=BEGIN):
+    def add_chain(self, *nodes, _input=BEGIN, _output=None):
         for node in nodes:
             _next = self.add_node(node)
             self.outputs_of(_input, create=True).add(_next)
             _input = _next
+        if _output:
+            if not _output in self.nodes:
+                raise ValueError('Output not found.')
+            self.outputs_of(_input, create=True).add(self.nodes.index(_output))
+
+        return self
 
     def __len__(self):
         return len(self.nodes)
