@@ -19,6 +19,7 @@ import sys
 
 from colorama import Fore, Style
 
+from bonobo import settings
 from bonobo.plugins import Plugin
 from bonobo.util.term import CLEAR_EOL, MOVE_CURSOR_UP
 
@@ -27,7 +28,7 @@ from bonobo.util.term import CLEAR_EOL, MOVE_CURSOR_UP
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.get_memory_info()[0] / float(2**20)
+    return process.memory_info()[0] / float(2**20)
 
 
 # @lru_cache(64)
@@ -50,15 +51,14 @@ class ConsoleOutputPlugin(Plugin):
         self.prefix = ''
 
     def _write(self, graph_context, rewind):
-        profile, debug = False, False
-        if profile:
+        if settings.PROFILE:
             append = (
                 ('Memory', '{0:.2f} Mb'.format(memory_usage())),
                 # ('Total time', '{0} s'.format(execution_time(harness))),
             )
         else:
             append = ()
-        self.write(graph_context, prefix=self.prefix, append=append, debug=debug, profile=profile, rewind=rewind)
+        self.write(graph_context, prefix=self.prefix, append=append, rewind=rewind)
 
     def run(self):
         if sys.stdout.isatty():
@@ -70,23 +70,24 @@ class ConsoleOutputPlugin(Plugin):
         self._write(self.context.parent, rewind=False)
 
     @staticmethod
-    def write(context, prefix='', rewind=True, append=None, debug=False, profile=False):
+    def write(context, prefix='', rewind=True, append=None):
         t_cnt = len(context)
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
+            name_suffix = '({})'.format(i) if settings.DEBUG else ''
             if node.alive:
                 _line = ''.join(
                     (
-                        ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ', node.name, '(', str(i), ') ',
-                        node.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
+                        ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ', node.name, name_suffix, ' ',
+                        node.get_statistics_as_string(), Style.RESET_ALL, ' ',
                     )
                 )
             else:
                 _line = ''.join(
                     (
-                        ' ', Fore.BLACK, '-', ' ', node.name, '(', str(i), ') ',
-                        node.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
+                        ' ', Fore.BLACK, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
+                        Style.RESET_ALL, ' ',
                     )
                 )
             print(prefix + _line + '\033[0K')
