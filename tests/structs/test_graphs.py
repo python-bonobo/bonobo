@@ -67,6 +67,7 @@ def test_graph_topological_sort():
         _output=sentinel.a2,
     )
 
-    assert g.topologically_sorted_indexes == (0, 3, 4, 1, 2)
+    assert g.topologically_sorted_indexes[-2:] == (1, 2)
+    assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)
     assert g[3] == sentinel.b1
     assert g[4] == sentinel.b2
