@@ -87,7 +87,6 @@ class LoopingExecutionContext(Wrapper):
         finally:
             self._stopped = True
 
-
     def handle_error(self, exc, trace):
         return print_error(exc, trace, context=self.wrapped)
 

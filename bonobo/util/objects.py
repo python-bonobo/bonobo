@@ -200,6 +200,9 @@ class ValueHolder:
     def __invert__(self):
         return ~self.value
 
+    def __len__(self):
+        return len(self.value)
+
 
 def get_attribute_or_create(obj, attr, default):
     try:
@@ -207,4 +210,3 @@ def get_attribute_or_create(obj, attr, default):
     except AttributeError:
         setattr(obj, attr, default)
         return getattr(obj, attr)
-

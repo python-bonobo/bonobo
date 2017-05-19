@@ -55,7 +55,7 @@ class CsvReader(CsvHandler, FileReader):
 
         for row in reader:
             if len(row) != field_count:
-                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count,))
+                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count, ))
 
             yield dict(zip(headers.value, row))
 
@@ -74,5 +74,3 @@ class CsvWriter(CsvHandler, FileWriter):
         writer.writerow(row[header] for header in headers.value)
         lineno.value += 1
         return NOT_MODIFIED
-
-

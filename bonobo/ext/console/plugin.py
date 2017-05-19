@@ -73,19 +73,19 @@ class ConsoleOutputPlugin(Plugin):
     def write(context, prefix='', rewind=True, append=None, debug=False, profile=False):
         t_cnt = len(context)
 
-        for i, node in enumerate(context):
+        for i in context.graph.topologically_sorted_indexes:
+            node = context[i]
             if node.alive:
                 _line = ''.join(
                     (
-                        Fore.BLACK, '({})'.format(i + 1), Style.RESET_ALL, ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ',
-                        node.name, ' ', node.get_statistics_as_string(debug=debug,
-                                                                                profile=profile), Style.RESET_ALL, ' ',
+                        ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ', node.name, '(', str(i), ') ',
+                        node.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
                     )
                 )
             else:
                 _line = ''.join(
                     (
-                        Fore.BLACK, '({})'.format(i + 1), ' - ', node.name, ' ',
+                        ' ', Fore.BLACK, '-', ' ', node.name, '(', str(i), ') ',
                         node.get_statistics_as_string(debug=debug, profile=profile), Style.RESET_ALL, ' ',
                     )
                 )

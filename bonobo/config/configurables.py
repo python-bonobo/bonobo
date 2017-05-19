@@ -85,3 +85,8 @@ class Configurable(metaclass=ConfigurableMeta):
         # set option values.
         for name, value in kwargs.items():
             setattr(self, name, value)
+
+    def __call__(self, *args, **kwargs):
+        """ You can implement a configurable callable behaviour by implemenenting the call(...) method. Of course, it is also backward compatible with legacy __call__ override.
+        """
+        return self.call(*args, **kwargs)

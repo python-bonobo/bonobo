@@ -21,7 +21,7 @@ class GraphExecutionContext:
 
     def __init__(self, graph, plugins=None, services=None):
         self.graph = graph
-        self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph.nodes]
+        self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
         self.services = Container(services) if services else Container()
 
