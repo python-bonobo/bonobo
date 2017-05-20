@@ -28,7 +28,9 @@ class ConfigurableMeta(type):
                     else:
                         if isinstance(value, Method):
                             if cls.__wrappable__:
-                                raise ConfigurationError('Cannot define more than one "Method" option in a configurable. That may change in the future.')
+                                raise ConfigurationError(
+                                    'Cannot define more than one "Method" option in a configurable. That may change in the future.'
+                                )
                             cls.__wrappable__ = name
                         if not value.name:
                             value.name = name

@@ -1,6 +1,7 @@
 import functools
 
 import types
+from collections import Iterable
 
 from bonobo.util.compat import deprecated_alias, deprecated
 
@@ -62,7 +63,12 @@ class ContextCurrifier:
                 self.context += ensure_tuple(_append_to_context)
             self._stack.append(_processed)
 
+    def __iter__(self):
+        yield from self.wrapped
+
     def __call__(self, *args, **kwargs):
+        if not callable(self.wrapped) and isinstance(self.wrapped, Iterable):
+            return self.__iter__()
         return self.wrapped(*self.context, *args, **kwargs)
 
     def teardown(self):

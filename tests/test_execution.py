@@ -79,4 +79,3 @@ def test_simple_execution_context():
     assert not ctx.alive
     assert ctx.started
     assert ctx.stopped
-

@@ -42,7 +42,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         name, type_name = get_name(self), get_name(type(self))
         return '<{}({}{}){}>'.format(type_name, self.alive_str, name, self.get_statistics_as_string(prefix=' '))
 
-    def write(self, *messages):  # XXX write() ? ( node.write(...) )
+    def write(self, *messages):
         """
         Push a message list to this context's input queue.
 
@@ -54,7 +54,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     # XXX deprecated alias
     recv = deprecated_alias('recv', write)
 
-    def send(self, value, _control=False):  # XXX self.send(....)
+    def send(self, value, _control=False):
         """
         Sends a message to all of this context's outputs.
 

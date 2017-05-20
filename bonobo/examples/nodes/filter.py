@@ -1,6 +1,6 @@
 import bonobo
 
-from bonobo.filter import Filter
+from bonobo import Filter
 
 
 class OddOnlyFilter(Filter):
