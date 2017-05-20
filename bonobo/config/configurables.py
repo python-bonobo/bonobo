@@ -1,5 +1,6 @@
+from bonobo.config.options import Method, Option
 from bonobo.config.processors import ContextProcessor
-from bonobo.config.options import Option
+from bonobo.errors import ConfigurationError
 
 __all__ = [
     'Configurable',
@@ -17,6 +18,7 @@ class ConfigurableMeta(type):
         cls.__options__ = {}
         cls.__positional_options__ = []
         cls.__processors__ = []
+        cls.__wrappable__ = None
 
         for typ in cls.__mro__:
             for name, value in typ.__dict__.items():
@@ -24,6 +26,10 @@ class ConfigurableMeta(type):
                     if isinstance(value, ContextProcessor):
                         cls.__processors__.append(value)
                     else:
+                        if isinstance(value, Method):
+                            if cls.__wrappable__:
+                                raise ConfigurationError('Cannot define more than one "Method" option in a configurable. That may change in the future.')
+                            cls.__wrappable__ = name
                         if not value.name:
                             value.name = name
                         if not name in cls.__options__:
@@ -42,6 +48,13 @@ class Configurable(metaclass=ConfigurableMeta):
     the configuration schema of the type.
 
     """
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__wrappable__ and len(args) == 1 and hasattr(args[0], '__call__'):
+            wrapped, args = args[0], args[1:]
+            return type(wrapped.__name__, (cls, ), {cls.__wrappable__: wrapped})
+
+        return super().__new__(cls)
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -90,3 +103,6 @@ class Configurable(metaclass=ConfigurableMeta):
         """ You can implement a configurable callable behaviour by implemenenting the call(...) method. Of course, it is also backward compatible with legacy __call__ override.
         """
         return self.call(*args, **kwargs)
+
+    def call(self, *args, **kwargs):
+        raise NotImplementedError('Not implemented.')

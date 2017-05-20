@@ -26,11 +26,7 @@ class GraphExecutionContext:
         self.services = Container(services) if services else Container()
 
         for i, node_context in enumerate(self):
-            try:
-                node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
-            except KeyError:
-                continue
-
+            node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             node_context.input.on_begin = partial(node_context.send, BEGIN, _control=True)
             node_context.input.on_end = partial(node_context.send, END, _control=True)
             node_context.input.on_finalize = partial(node_context.stop)

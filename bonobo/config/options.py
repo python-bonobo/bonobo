@@ -16,13 +16,34 @@ class Option:
         self._creation_counter = Option._creation_counter
         Option._creation_counter += 1
 
-    def get_default(self):
-        return self.default() if callable(self.default) else self.default
-
     def __get__(self, inst, typ):
         if not self.name in inst.__options_values__:
             inst.__options_values__[self.name] = self.get_default()
         return inst.__options_values__[self.name]
 
     def __set__(self, inst, value):
+        inst.__options_values__[self.name] = self.clean(value)
+
+    def get_default(self):
+        return self.default() if callable(self.default) else self.default
+
+    def clean(self, value):
+        return self.type(value) if self.type else value
+
+
+class Method(Option):
+    def __init__(self):
+        super().__init__(None, required=False, positional=True)
+
+    def __get__(self, inst, typ):
+        if not self.name in inst.__options_values__:
+            inst.__options_values__[self.name] = getattr(inst, self.name)
+        return inst.__options_values__[self.name]
+
+    def __set__(self, inst, value):
         inst.__options_values__[self.name] = self.type(value) if self.type else value
+
+    def clean(self, value):
+        if not hasattr(value, '__call__'):
+            raise ValueError('{} value must be callable.'.format(type(self).__name__))
+        return value

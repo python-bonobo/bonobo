@@ -59,11 +59,24 @@ def test_simple_execution_context():
         assert ctx[i].wrapped is node
 
     assert not ctx.alive
+    assert not ctx.started
+    assert not ctx.stopped
 
     ctx.recv(BEGIN, Bag(), END)
 
     assert not ctx.alive
+    assert not ctx.started
+    assert not ctx.stopped
 
     ctx.start()
 
     assert ctx.alive
+    assert ctx.started
+    assert not ctx.stopped
+
+    ctx.stop()
+
+    assert not ctx.alive
+    assert ctx.started
+    assert ctx.stopped
+
