@@ -24,5 +24,3 @@ class Filter(Configurable):
     def call(self, *args, **kwargs):
         if self.filter(*args, **kwargs):
             return NOT_MODIFIED
-
-

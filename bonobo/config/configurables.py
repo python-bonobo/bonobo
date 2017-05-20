@@ -54,6 +54,7 @@ class Configurable(metaclass=ConfigurableMeta):
             wrapped, args = args[0], args[1:]
             return type(wrapped.__name__, (cls, ), {cls.__wrappable__: wrapped})
 
+        # XXX is that correct ??? how does it pass args/kwargs to __init__ ???
         return super().__new__(cls)
 
     def __init__(self, *args, **kwargs):

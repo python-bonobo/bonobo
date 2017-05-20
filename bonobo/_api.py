@@ -1,10 +1,10 @@
 import warnings
 
-from bonobo.basics import Limit, PrettyPrint, Tee, count, identity, noop, pprint
+from bonobo.structs import Bag, Graph, Token
+from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
+    PrettyPrint, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
-from bonobo.structs import Bag, Graph
 from bonobo.util.objects import get_name
-from bonobo.io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
 
 __all__ = []
 
@@ -63,7 +63,7 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
 
 
 # bonobo.structs
-register_api_group(Bag, Graph)
+register_api_group(Bag, Graph, Token)
 
 # bonobo.strategies
 register_api(create_strategy)
@@ -88,8 +88,15 @@ def open_fs(fs_url, *args, **kwargs):
     return _open_fs(str(fs_url), *args, **kwargs)
 
 
-# bonobo.basics
+# bonobo.nodes
 register_api_group(
+    CsvReader,
+    CsvWriter,
+    FileReader,
+    FileWriter,
+    Filter,
+    JsonReader,
+    JsonWriter,
     Limit,
     PrettyPrint,
     Tee,
@@ -98,9 +105,6 @@ register_api_group(
     noop,
     pprint,
 )
-
-# bonobo.io
-register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
 
 
 def _is_interactive_console():
