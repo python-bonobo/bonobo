@@ -1,22 +1,28 @@
 First steps
 ===========
 
-We tried hard to make **Bonobo** simple. We use simple python, and we believe it should be simple to learn.
+Bonobo uses simple python and should be quick and easy to learn.
+
+What is Bonobo?
+:::::::::::::::
+
+Bonobo is an ETL (Extract-Transform-Load) framework for python 3.5. The goal is to define data-transformations, with
+python code in charge of handling similar shaped independant lines of data.
+
+Bonobo *is not* a statistical or data-science tool. If you're looking for a data-analysis tool in python, use Pandas.
+
+Bonobo is a lean manufacturing assembly line for data that let you focus on the actual work instead of the plumbery.
+
 
 Tutorial
 ::::::::
-
-We strongly advice that even if you're an advanced python developper, you go through the whole tutorial for two
-reasons: that should be sufficient to do anything possible with **Bonobo** and that's a good moment to learn the few
-concepts you'll see everywhere in the software.
-
-If you're not familiar with python, you should first read :doc:`python`.
 
 .. toctree::
     :maxdepth: 2
 
     tut01
     tut02
+
 
 What's next?
 ::::::::::::
@@ -39,3 +45,4 @@ Read about integrating external tools with bonobo
 * :doc:`../guide/ext/jupyter`: run transformations within jupyter notebooks.
 * :doc:`../guide/ext/selenium`: run
 * :doc:`../guide/ext/sqlalchemy`: everything you need to interract with SQL databases.
+
