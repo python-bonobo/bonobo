@@ -3,15 +3,15 @@ from queue import Empty
 from time import sleep
 
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
-from bonobo.core.inputs import Input
-from bonobo.core.statistics import WithStatistics
 from bonobo.errors import InactiveReadableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
+from bonobo.structs.inputs import Input
 from bonobo.util.compat import deprecated_alias
 from bonobo.util.errors import is_error
 from bonobo.util.iterators import iter_if_not_sequence
 from bonobo.util.objects import get_name
+from bonobo.util.statistics import WithStatistics
 
 
 class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
