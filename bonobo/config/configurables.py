@@ -108,4 +108,4 @@ class Configurable(metaclass=ConfigurableMeta):
         return self.call(*args, **kwargs)
 
     def call(self, *args, **kwargs):
-        raise NotImplementedError('Not implemented.')
+        raise AbstractError('Not implemented.')

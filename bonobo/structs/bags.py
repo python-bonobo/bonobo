@@ -65,12 +65,8 @@ class Bag:
         if len(args) == 0 and len(kwargs) == 0:
             try:
                 iter(func_or_iter)
-
                 def generator():
-                    nonlocal func_or_iter
-                    for x in func_or_iter:
-                        yield x
-
+                    yield from func_or_iter
                 return generator()
             except TypeError as exc:
                 raise TypeError('Could not apply bag to {}.'.format(func_or_iter)) from exc
