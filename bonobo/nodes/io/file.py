@@ -1,6 +1,6 @@
 from bonobo.config import Option, Service
 from bonobo.config.configurables import Configurable
-from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 

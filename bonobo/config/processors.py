@@ -85,41 +85,6 @@ class ContextCurrifier:
                 raise RuntimeError('Context processors should not yield more than once.')
 
 
-@deprecated
-def add_context_processor(cls_or_func, context_processor):
-    getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR).append(context_processor)
-
-
-@deprecated
-def contextual(cls_or_func):
-    """
-    Make sure an element has the context processors collection.
-    
-    :param cls_or_func: 
-    """
-    if not add_context_processor.__name__ in cls_or_func.__dict__:
-        setattr(cls_or_func, add_context_processor.__name__, functools.partial(add_context_processor, cls_or_func))
-
-    if isinstance(cls_or_func, types.FunctionType):
-        try:
-            getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
-        except AttributeError:
-            setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
-        return cls_or_func
-
-    if not _CONTEXT_PROCESSORS_ATTR in cls_or_func.__dict__:
-        setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
-
-    _processors = getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
-    for processor in cls_or_func.__dict__.values():
-        if isinstance(processor, ContextProcessor):
-            _processors.append(processor)
-
-    # This is needed for python 3.5, python 3.6 should be fine, but it's considered an implementation detail.
-    _processors.sort(key=lambda proc: proc._creation_counter)
-    return cls_or_func
-
-
 def resolve_processors(mixed):
     try:
         yield from mixed.__processors__

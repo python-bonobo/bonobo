@@ -20,7 +20,7 @@ def register_api_group(*args):
 
 
 @register_api
-def run(graph, *chain, strategy=None, plugins=None, services=None):
+def run(graph, strategy=None, plugins=None, services=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
     
@@ -40,21 +40,16 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    if len(chain):
-        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
-        from bonobo import Graph
-        graph = Graph(graph, *chain)
-
     strategy = create_strategy(strategy)
 
     plugins = plugins or []
 
-    if _is_interactive_console():
+    if _is_interactive_console():  # pragma: no cover
         from bonobo.ext.console import ConsoleOutputPlugin
         if ConsoleOutputPlugin not in plugins:
             plugins.append(ConsoleOutputPlugin)
 
-    if _is_jupyter_notebook():
+    if _is_jupyter_notebook():  # pragma: no cover
         from bonobo.ext.jupyter import JupyterOutputPlugin
         if JupyterOutputPlugin not in plugins:
             plugins.append(JupyterOutputPlugin)
