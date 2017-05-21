@@ -3,8 +3,7 @@ from pprint import pprint as _pprint
 
 from colorama import Fore, Style
 
-from bonobo.config import Configurable, Option
-from bonobo.config.processors import ContextProcessor
+from bonobo.config import Configurable, ContextProcessor, Option
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
@@ -74,6 +73,7 @@ pprint = Tee(_pprint)
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
     from bonobo.constants import NOT_MODIFIED
+    from colorama import Fore, Style
 
     def _pprint(*args, **kwargs):
         nonlocal title_keys, sort, print_values

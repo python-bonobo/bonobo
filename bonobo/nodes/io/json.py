@@ -1,5 +1,7 @@
 import json
+from itertools import starmap
 
+from bonobo.structs.bags import Bag
 from bonobo.config.processors import ContextProcessor
 from .file import FileWriter, FileReader
 
@@ -19,6 +21,13 @@ class JsonReader(JsonHandler, FileReader):
     def read(self, fs, file):
         for line in self.loader(file):
             yield line
+
+
+class JsonDictReader(JsonReader):
+    """ not api, don't use or expect breakage. """
+
+    def read(self, fs, file):
+        yield from starmap(Bag, self.loader(file).items())
 
 
 class JsonWriter(JsonHandler, FileWriter):

@@ -48,10 +48,6 @@ def normalize(row):
     return result
 
 
-def filter_france(row):
-    if row.get('country') == 'France':
-        yield row
-
 
 def display(row):
     print(Style.BRIGHT, row.get('name'), Style.RESET_ALL, sep='')
@@ -73,15 +69,15 @@ def display(row):
 
     print(
         '  - {}address{}: {address}'.
-        format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address))
+            format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address))
     )
     print(
         '  - {}links{}: {links}'.
-        format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links']))
+            format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links']))
     )
     print(
         '  - {}geometry{}: {geometry}'.
-        format(Fore.BLUE, Style.RESET_ALL, **row)
+            format(Fore.BLUE, Style.RESET_ALL, **row)
     )
     print(
         '  - {}source{}: {source}'.format(
@@ -95,7 +91,7 @@ graph = bonobo.Graph(
         dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
     ),
     normalize,
-    filter_france,
+    bonobo.Filter(filter=lambda row: row.get('country') == 'France'),
     bonobo.Tee(display),
     bonobo.JsonWriter(path='fablabs.txt'),
 )
