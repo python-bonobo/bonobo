@@ -21,4 +21,3 @@ def test_deprecated_alias():
 
     with pytest.warns(DeprecationWarning):
         foo()
-

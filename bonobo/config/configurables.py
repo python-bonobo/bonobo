@@ -74,9 +74,11 @@ class Configurable(metaclass=ConfigurableMeta):
         # transform positional arguments in keyword arguments if possible.
         position = 0
         for positional_option in self.__positional_options__:
+            if len(args) <= position:
+                break
+            kwargs[positional_option] = args[position]
+            position += 1
             if positional_option in missing:
-                kwargs[positional_option] = args[position]
-                position += 1
                 missing.remove(positional_option)
 
         # complain if there are still missing options.

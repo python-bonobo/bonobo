@@ -46,7 +46,7 @@ class OpenDataSoftAPI(Configurable):
             for row in records:
                 yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
-            start.value += self.rows
+            start += self.rows
 
 
 __all__ = [

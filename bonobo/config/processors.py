@@ -1,11 +1,9 @@
-import functools
-
 import types
 from collections import Iterable
-
-from bonobo.util.compat import deprecated_alias, deprecated
+from contextlib import contextmanager
 
 from bonobo.config.options import Option
+from bonobo.util.compat import deprecated_alias
 from bonobo.util.iterators import ensure_tuple
 
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
@@ -52,6 +50,14 @@ class ContextCurrifier:
         self._stack = []
         self._stack_values = []
 
+    def __iter__(self):
+        yield from self.wrapped
+
+    def __call__(self, *args, **kwargs):
+        if not callable(self.wrapped) and isinstance(self.wrapped, Iterable):
+            return self.__iter__()
+        return self.wrapped(*self.context, *args, **kwargs)
+
     def setup(self, *context):
         if len(self._stack):
             raise RuntimeError('Cannot setup context currification twice.')
@@ -62,14 +68,6 @@ class ContextCurrifier:
             if _append_to_context is not None:
                 self.context += ensure_tuple(_append_to_context)
             self._stack.append(_processed)
-
-    def __iter__(self):
-        yield from self.wrapped
-
-    def __call__(self, *args, **kwargs):
-        if not callable(self.wrapped) and isinstance(self.wrapped, Iterable):
-            return self.__iter__()
-        return self.wrapped(*self.context, *args, **kwargs)
 
     def teardown(self):
         while len(self._stack):
@@ -83,6 +81,23 @@ class ContextCurrifier:
             else:
                 # No error ? We should have had StopIteration ...
                 raise RuntimeError('Context processors should not yield more than once.')
+
+    @contextmanager
+    def as_contextmanager(self, *context):
+        """
+        Convenience method to use it as a contextmanager, mostly for test purposes.
+
+        Example:
+
+            >>> with ContextCurrifier(node).as_contextmanager(context) as stack:
+            ...     stack()
+
+        :param context:
+        :return:
+        """
+        self.setup(*context)
+        yield self
+        self.teardown()
 
 
 def resolve_processors(mixed):

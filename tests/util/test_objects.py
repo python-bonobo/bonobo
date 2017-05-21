@@ -35,6 +35,7 @@ def test_wrapper_name():
 
 def test_valueholder():
     x = ValueHolder(42)
+
     assert x == 42
     x += 1
     assert x == 43
