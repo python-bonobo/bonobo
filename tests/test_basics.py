@@ -11,7 +11,6 @@ def test_count():
     with pytest.raises(TypeError):
         bonobo.count()
 
-
     context = MagicMock()
 
     with ContextCurrifier(bonobo.count).as_contextmanager(context) as stack:
@@ -48,6 +47,7 @@ def test_limit_not_there():
             results += list(stack())
 
     assert results == [NOT_MODIFIED] * 10
+
 
 def test_limit_default():
     context, results = MagicMock(), []
