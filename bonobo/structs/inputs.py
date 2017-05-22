@@ -15,11 +15,12 @@
 # limitations under the License.
 
 from abc import ABCMeta, abstractmethod
+
 from queue import Queue
 
-from bonobo.errors import AbstractError, InactiveWritableError, InactiveReadableError
 from bonobo.constants import BEGIN, END
-from bonobo.basics import noop
+from bonobo.errors import AbstractError, InactiveReadableError, InactiveWritableError
+from bonobo.nodes import noop
 
 BUFFER_SIZE = 8192
 

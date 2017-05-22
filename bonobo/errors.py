@@ -52,3 +52,7 @@ class ValidationError(RuntimeError):
 
 class ProhibitedOperationError(RuntimeError):
     pass
+
+
+class ConfigurationError(Exception):
+    pass

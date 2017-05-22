@@ -1,20 +1,18 @@
-Services and dependencies (draft implementation)
-================================================
+Services and dependencies
+=========================
 
-:Status: Draft implementation
-:Stability: Alpha
-:Last-Modified: 28 apr 2017
+:Last-Modified: 20 may 2017
 
-Most probably, you'll want to use external systems within your transformations. Those systems may include databases,
-apis (using http, for example), filesystems, etc.
+You'll probably want to use external systems within your transformations. Those systems may include databases, apis
+(using http, for example), filesystems, etc.
 
 You can start by hardcoding those services. That does the job, at first.
 
 If you're going a little further than that, you'll feel limited, for a few reasons:
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
-* Processing data on your laptop is great, but being able to do it on different systems (or stages), in different
-  environments, is more realistic? You probably want to contigure a different database on a staging environment,
+* Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
+  environments, is more realistic. You'll want to contigure a different database on a staging environment,
   preprod environment or production system. Maybe you have silimar systems for different clients and want to select
   the system at runtime. Etc.
 
@@ -52,10 +50,11 @@ injected to your calls under the parameter name "database".
 Function-based transformations
 ------------------------------
 
-No implementation yet, but expect something similar to CBT API, maybe using a `@Service(...)` decorator.
+No implementation yet, but expect something similar to CBT API, maybe using a `@Service(...)` decorator. See
+`issue #70 <https://github.com/python-bonobo/bonobo/issues/70>`_.
 
-Execution
----------
+Provide implementation at run time
+----------------------------------
 
 Let's see how to execute it:
 

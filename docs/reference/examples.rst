@@ -70,7 +70,7 @@ Utils
 Count
 -----
 
-.. automodule:: bonobo.examples.utils.count
+.. automodule:: bonobo.examples.nodes.count
     :members:
     :undoc-members:
     :show-inheritance:

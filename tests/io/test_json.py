@@ -13,7 +13,7 @@ def test_write_json_to_file(tmpdir):
     context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.start()
-    context.recv(BEGIN, Bag({'foo': 'bar'}), END)
+    context.write(BEGIN, Bag({'foo': 'bar'}), END)
     context.step()
     context.stop()
 
@@ -34,7 +34,7 @@ def test_read_json_from_file(tmpdir):
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
     context.start()
-    context.recv(BEGIN, Bag(), END)
+    context.write(BEGIN, Bag(), END)
     context.step()
     context.stop()
 

@@ -1,4 +1,4 @@
-from bonobo.core.statistics import WithStatistics
+from bonobo.util.statistics import WithStatistics
 
 
 class MyThingWithStats(WithStatistics):

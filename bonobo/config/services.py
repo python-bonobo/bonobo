@@ -39,6 +39,10 @@ class Service(Option):
             
     The main goal is not to tie transformations to actual dependencies, so the same can be run in different contexts
     (stages like preprod, prod, or tenants like client1, client2, or anything you want).
+
+    .. attribute:: name
+
+        Service name will be used to retrieve the implementation at runtime.
     
     """
 

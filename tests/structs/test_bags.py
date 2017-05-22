@@ -1,7 +1,9 @@
+import pickle
 from unittest.mock import Mock
 
 from bonobo import Bag
 from bonobo.constants import INHERIT_INPUT
+from bonobo.structs import Token
 
 args = ('foo', 'bar', )
 kwargs = dict(acme='corp')
@@ -59,6 +61,37 @@ def test_inherit():
     assert bag4.flags is ()
 
 
+def test_pickle():
+    bag1 = Bag('a', a=1)
+    bag2 = Bag.inherit('b', b=2, _parent=bag1)
+    bag3 = bag1.extend('c', c=3)
+    bag4 = Bag('d', d=4)
+
+    # XXX todo this probably won't work with inheriting bags if parent is not there anymore? maybe that's not true
+    # because the parent may be in the serialization output but we need to verify this assertion.
+
+    for bag in bag1, bag2, bag3, bag4:
+        pickled = pickle.dumps(bag)
+        unpickled = pickle.loads(pickled)
+        assert unpickled == bag
+
+
+def test_eq_operator():
+    assert Bag('foo') == Bag('foo')
+    assert Bag('foo') != Bag('bar')
+    assert Bag('foo') is not Bag('foo')
+    assert Bag('foo') != Token('foo')
+    assert Token('foo') != Bag('foo')
+
+
 def test_repr():
     bag = Bag('a', a=1)
     assert repr(bag) == "<Bag ('a', a=1)>"
+
+
+def test_iterator():
+    bag = Bag()
+    assert list(bag.apply([1, 2, 3])) == [1, 2, 3]
+    assert list(bag.apply((1, 2, 3))) == [1, 2, 3]
+    assert list(bag.apply(range(5))) == [0, 1, 2, 3, 4]
+    assert list(bag.apply('azerty')) == ['a', 'z', 'e', 'r', 't', 'y']

@@ -67,9 +67,7 @@ class Bag:
                 iter(func_or_iter)
 
                 def generator():
-                    nonlocal func_or_iter
-                    for x in func_or_iter:
-                        yield x
+                    yield from func_or_iter
 
                 return generator()
             except TypeError as exc:
@@ -86,6 +84,9 @@ class Bag:
     @classmethod
     def inherit(cls, *args, **kwargs):
         return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
+
+    def __eq__(self, other):
+        return isinstance(other, Bag) and other.args == self.args and other.kwargs == self.kwargs
 
     def __repr__(self):
         return '<{} ({})>'.format(

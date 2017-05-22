@@ -1,6 +1,7 @@
 from bonobo.config import Option, Service
 from bonobo.config.configurables import Configurable
-from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.config.processors import ContextProcessor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 
 __all__ = [
@@ -85,7 +86,7 @@ class FileWriter(Writer):
 
     @ContextProcessor
     def lineno(self, context, fs, file):
-        lineno = ValueHolder(0, type=int)
+        lineno = ValueHolder(0)
         yield lineno
 
     def write(self, fs, file, lineno, row):
@@ -93,7 +94,8 @@ class FileWriter(Writer):
         Write a row on the next line of opened file in context.
         """
         self._write_line(file, (self.eol if lineno.value else '') + row)
-        lineno.value += 1
+        lineno += 1
+        return NOT_MODIFIED
 
     def _write_line(self, file, line):
         return file.write(line)

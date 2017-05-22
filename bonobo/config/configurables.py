@@ -1,5 +1,6 @@
+from bonobo.config.options import Method, Option
 from bonobo.config.processors import ContextProcessor
-from bonobo.config.options import Option
+from bonobo.errors import ConfigurationError
 
 __all__ = [
     'Configurable',
@@ -17,6 +18,7 @@ class ConfigurableMeta(type):
         cls.__options__ = {}
         cls.__positional_options__ = []
         cls.__processors__ = []
+        cls.__wrappable__ = None
 
         for typ in cls.__mro__:
             for name, value in typ.__dict__.items():
@@ -26,8 +28,17 @@ class ConfigurableMeta(type):
                     else:
                         if not value.name:
                             value.name = name
+
+                        if isinstance(value, Method):
+                            if cls.__wrappable__:
+                                raise ConfigurationError(
+                                    'Cannot define more than one "Method" option in a configurable. That may change in the future.'
+                                )
+                            cls.__wrappable__ = name
+
                         if not name in cls.__options__:
                             cls.__options__[name] = value
+
                         if value.positional:
                             cls.__positional_options__.append(name)
 
@@ -42,6 +53,12 @@ class Configurable(metaclass=ConfigurableMeta):
     the configuration schema of the type.
 
     """
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__wrappable__ and len(args) == 1 and hasattr(args[0], '__call__'):
+            return type(args[0].__name__, (cls, ), {cls.__wrappable__: args[0]})
+
+        return super(Configurable, cls).__new__(cls)
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -58,9 +75,11 @@ class Configurable(metaclass=ConfigurableMeta):
         # transform positional arguments in keyword arguments if possible.
         position = 0
         for positional_option in self.__positional_options__:
+            if len(args) <= position:
+                break
+            kwargs[positional_option] = args[position]
+            position += 1
             if positional_option in missing:
-                kwargs[positional_option] = args[position]
-                position += 1
                 missing.remove(positional_option)
 
         # complain if there are still missing options.
@@ -85,3 +104,11 @@ class Configurable(metaclass=ConfigurableMeta):
         # set option values.
         for name, value in kwargs.items():
             setattr(self, name, value)
+
+    def __call__(self, *args, **kwargs):
+        """ You can implement a configurable callable behaviour by implemenenting the call(...) method. Of course, it is also backward compatible with legacy __call__ override.
+        """
+        return self.call(*args, **kwargs)
+
+    def call(self, *args, **kwargs):
+        raise AbstractError('Not implemented.')

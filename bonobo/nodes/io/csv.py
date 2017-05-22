@@ -1,7 +1,8 @@
 import csv
 
 from bonobo.config import Option
-from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.config.processors import ContextProcessor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from .file import FileHandler, FileReader, FileWriter
 
@@ -45,8 +46,11 @@ class CsvReader(CsvHandler, FileReader):
 
     def read(self, fs, file, headers):
         reader = csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
-        headers.value = headers.value or next(reader)
-        field_count = len(headers.value)
+
+        if not headers.get():
+            headers.set(next(reader))
+
+        field_count = len(headers)
 
         if self.skip and self.skip > 0:
             for _ in range(0, self.skip):
@@ -67,8 +71,9 @@ class CsvWriter(CsvHandler, FileWriter):
         yield writer, headers
 
     def write(self, fs, file, lineno, writer, headers, row):
-        if not lineno.value:
-            headers.value = headers.value or row.keys()
-            writer.writerow(headers.value)
-        writer.writerow(row[header] for header in headers.value)
-        lineno.value += 1
+        if not lineno:
+            headers.set(headers.value or row.keys())
+            writer.writerow(headers.get())
+        writer.writerow(row[header] for header in headers.get())
+        lineno += 1
+        return NOT_MODIFIED

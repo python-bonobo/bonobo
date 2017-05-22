@@ -37,6 +37,7 @@
 /examples/private
 /htmlcov/
 /sdist/
+/tags
 celerybeat-schedule
 parts/
 pip-delete-this-directory.txt

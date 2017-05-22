@@ -3,9 +3,8 @@ from urllib.parse import urlencode
 import requests  # todo: make this a service so we can substitute it ?
 
 from bonobo.config import Option
-from bonobo.config.processors import ContextProcessor, contextual
+from bonobo.config.processors import ContextProcessor
 from bonobo.config.configurables import Configurable
-from bonobo.util.compat import deprecated
 from bonobo.util.objects import ValueHolder
 
 
@@ -47,12 +46,7 @@ class OpenDataSoftAPI(Configurable):
             for row in records:
                 yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
 
-            start.value += self.rows
-
-
-@deprecated
-def from_opendatasoft_api(dataset, **kwargs):
-    return OpenDataSoftAPI(dataset=dataset, **kwargs)
+            start += self.rows
 
 
 __all__ = [

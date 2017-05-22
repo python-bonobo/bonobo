@@ -1,10 +1,10 @@
 import warnings
 
-from bonobo.basics import Limit, PrettyPrint, Tee, count, identity, noop, pprint
+from bonobo.structs import Bag, Graph, Token
+from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
+    PrettyPrint, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
-from bonobo.structs import Bag, Graph
 from bonobo.util.objects import get_name
-from bonobo.io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
 
 __all__ = []
 
@@ -20,7 +20,7 @@ def register_api_group(*args):
 
 
 @register_api
-def run(graph, *chain, strategy=None, plugins=None, services=None):
+def run(graph, strategy=None, plugins=None, services=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
     
@@ -40,21 +40,16 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    if len(chain):
-        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
-        from bonobo import Graph
-        graph = Graph(graph, *chain)
-
     strategy = create_strategy(strategy)
 
     plugins = plugins or []
 
-    if _is_interactive_console():
+    if _is_interactive_console():  # pragma: no cover
         from bonobo.ext.console import ConsoleOutputPlugin
         if ConsoleOutputPlugin not in plugins:
             plugins.append(ConsoleOutputPlugin)
 
-    if _is_jupyter_notebook():
+    if _is_jupyter_notebook():  # pragma: no cover
         from bonobo.ext.jupyter import JupyterOutputPlugin
         if JupyterOutputPlugin not in plugins:
             plugins.append(JupyterOutputPlugin)
@@ -63,7 +58,7 @@ def run(graph, *chain, strategy=None, plugins=None, services=None):
 
 
 # bonobo.structs
-register_api_group(Bag, Graph)
+register_api_group(Bag, Graph, Token)
 
 # bonobo.strategies
 register_api(create_strategy)
@@ -88,8 +83,15 @@ def open_fs(fs_url, *args, **kwargs):
     return _open_fs(str(fs_url), *args, **kwargs)
 
 
-# bonobo.basics
+# bonobo.nodes
 register_api_group(
+    CsvReader,
+    CsvWriter,
+    FileReader,
+    FileWriter,
+    Filter,
+    JsonReader,
+    JsonWriter,
     Limit,
     PrettyPrint,
     Tee,
@@ -98,9 +100,6 @@ register_api_group(
     noop,
     pprint,
 )
-
-# bonobo.io
-register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
 
 
 def _is_interactive_console():

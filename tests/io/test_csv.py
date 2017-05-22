@@ -12,7 +12,7 @@ def test_write_csv_to_file(tmpdir):
     writer = CsvWriter(path=filename)
     context = NodeExecutionContext(writer, services={'fs': fs})
 
-    context.recv(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
+    context.write(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
 
     context.start()
     context.step()
@@ -34,7 +34,7 @@ def test_read_csv_from_file(tmpdir):
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
     context.start()
-    context.recv(BEGIN, Bag(), END)
+    context.write(BEGIN, Bag(), END)
     context.step()
     context.stop()
 

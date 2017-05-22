@@ -3,10 +3,12 @@ from pprint import pprint as _pprint
 
 from colorama import Fore, Style
 
+from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
+from bonobo.constants import NOT_MODIFIED
 
 __all__ = [
     'identity',
@@ -23,18 +25,25 @@ def identity(x):
     return x
 
 
-def Limit(n=10):
-    from bonobo.constants import NOT_MODIFIED
-    i = 0
+class Limit(Configurable):
+    """
+    Creates a Limit() node, that will only let go through the first n rows (defined by the `limit` option), unmodified.
 
-    def _limit(*args, **kwargs):
-        nonlocal i, n
-        i += 1
-        if i <= n:
+    .. attribute:: limit
+
+        Number of rows to let go through.
+
+    """
+    limit = Option(positional=True, default=10)
+
+    @ContextProcessor
+    def counter(self, context):
+        yield ValueHolder(0)
+
+    def call(self, counter, *args, **kwargs):
+        counter += 1
+        if counter <= self.limit:
             yield NOT_MODIFIED
-
-    _limit.__name__ = 'Limit({})'.format(n)
-    return _limit
 
 
 def Tee(f):
@@ -57,7 +66,7 @@ def count(counter, *args, **kwargs):
 def _count_counter(self, context):
     counter = ValueHolder(0)
     yield counter
-    context.send(Bag(counter.value))
+    context.send(Bag(counter._value))
 
 
 pprint = Tee(_pprint)

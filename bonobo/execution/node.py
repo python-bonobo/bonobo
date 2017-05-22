@@ -3,13 +3,15 @@ from queue import Empty
 from time import sleep
 
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
-from bonobo.core.inputs import Input
-from bonobo.core.statistics import WithStatistics
 from bonobo.errors import InactiveReadableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
+from bonobo.structs.inputs import Input
+from bonobo.util.compat import deprecated_alias
 from bonobo.util.errors import is_error
 from bonobo.util.iterators import iter_if_not_sequence
+from bonobo.util.objects import get_name
+from bonobo.util.statistics import WithStatistics
 
 
 class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
@@ -20,7 +22,11 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     @property
     def alive(self):
         """todo check if this is right, and where it is used"""
-        return self.input.alive and self._started and not self._stopped
+        return self._started and not self._stopped
+
+    @property
+    def alive_str(self):
+        return '+' if self.alive else '-'
 
     def __init__(self, wrapped, parent=None, services=None):
         LoopingExecutionContext.__init__(self, wrapped, parent=parent, services=services)
@@ -30,18 +36,13 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         self.outputs = []
 
     def __str__(self):
-        return (('+' if self.alive else '-') + ' ' + self.__name__ + ' ' + self.get_statistics_as_string()).strip()
+        return self.alive_str + ' ' + self.__name__ + self.get_statistics_as_string(prefix=' ')
 
     def __repr__(self):
-        stats = self.get_statistics_as_string().strip()
-        return '<{}({}{}){}>'.format(
-            type(self).__name__,
-            '+' if self.alive else '',
-            self.__name__,
-            (' ' + stats) if stats else '',
-        )
+        name, type_name = get_name(self), get_name(type(self))
+        return '<{}({}{}){}>'.format(type_name, self.alive_str, name, self.get_statistics_as_string(prefix=' '))
 
-    def recv(self, *messages):
+    def write(self, *messages):
         """
         Push a message list to this context's input queue.
 
@@ -50,6 +51,9 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         for message in messages:
             self.input.put(message)
 
+    # XXX deprecated alias
+    recv = deprecated_alias('recv', write)
+
     def send(self, value, _control=False):
         """
         Sends a message to all of this context's outputs.
@@ -57,12 +61,19 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         :param mixed value: message
         :param _control: if true, won't count in statistics.
         """
+
         if not _control:
             self.increment('out')
-        for output in self.outputs:
-            output.put(value)
 
-    def get(self):
+        if is_error(value):
+            value.apply(self.handle_error)
+        else:
+            for output in self.outputs:
+                output.put(value)
+
+    push = deprecated_alias('push', send)
+
+    def get(self):  # recv() ? input_data = self.receive()
         """
         Get from the queue first, then increment stats, so if Queue raise Timeout or Empty, stat won't be changed.
 
@@ -95,12 +106,6 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         # todo add timer
         self.handle_results(input_bag, input_bag.apply(self._stack))
 
-    def push(self, bag):
-        # MAKE THIS PUBLIC API FOR CONTEXT PROCESSORS !!!
-        # xxx handle error or send in first call to apply(...)?
-        # xxx return value ?
-        bag.apply(self.handle_error) if is_error(bag) else self.send(bag)
-
     def handle_results(self, input_bag, results):
         # self._exec_time += timer.duration
         # Put data onto output channels
@@ -108,7 +113,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             results = iter_if_not_sequence(results)
         except TypeError:  # not an iterator
             if results:
-                self.push(_resolve(input_bag, results))
+                self.send(_resolve(input_bag, results))
             else:
                 # case with no result, an execution went through anyway, use for stats.
                 # self._exec_count += 1
@@ -120,7 +125,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                 except StopIteration:
                     break
                 else:
-                    self.push(_resolve(input_bag, result))
+                    self.send(_resolve(input_bag, result))
 
 
 def _resolve(input_bag, output):
