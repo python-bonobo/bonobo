@@ -15,6 +15,7 @@ class MethodBasedConfigurable(Configurable):
 
 def test_one_wrapper_only():
     with pytest.raises(ConfigurationError):
+
         class TwoMethods(Configurable):
             h1 = Method()
             h2 = Method()

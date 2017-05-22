@@ -56,7 +56,7 @@ class Configurable(metaclass=ConfigurableMeta):
 
     def __new__(cls, *args, **kwargs):
         if cls.__wrappable__ and len(args) == 1 and hasattr(args[0], '__call__'):
-            return type(args[0].__name__, (cls,), {cls.__wrappable__: args[0]})
+            return type(args[0].__name__, (cls, ), {cls.__wrappable__: args[0]})
 
         return super(Configurable, cls).__new__(cls)
 

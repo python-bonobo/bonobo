@@ -74,7 +74,6 @@ class Option:
         return self.default() if callable(self.default) else self.default
 
 
-
 class Method(Option):
     """
     A Method is a special callable-valued option, that can be used in three different ways (but for same purpose).
