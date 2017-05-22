@@ -11,8 +11,15 @@ Bonobo *is not* a statistical or data-science tool. If you're looking for a data
 
 Bonobo is a lean manufacturing assembly line for data that let you focus on the actual work instead of the plumbery.
 
+Bonobo uses simple python and should be quick and easy to learn.
+
 Tutorial
 ::::::::
+
+Warning: the documentation is still in progress. Although all content here should be accurate, you may feel a lack of
+completeness, for which we plaid guilty and apologize. If there is something blocking, please come on our
+`slack channel <https://bonobo-slack.herokuapp.com/>`_ and complain, we'll figure something out. If there is something
+that did not block you but can be a no-go for others, please consider contributing to the docs.
 
 .. toctree::
     :maxdepth: 2
