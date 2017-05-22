@@ -59,6 +59,7 @@ def test_run_module(runner, capsys):
     assert out[1].startswith('Bar ')
     assert out[2].startswith('Baz ')
 
+
 @all_runners
 def test_run_path(runner, capsys):
     runner('run', '--quiet', get_examples_path('types'))
