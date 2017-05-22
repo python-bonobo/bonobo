@@ -4,11 +4,6 @@ from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 
-__all__ = [
-    'FileReader',
-    'FileWriter',
-]
-
 
 class FileHandler(Configurable):
     """Abstract component factory for file-related components.
