@@ -1,11 +1,13 @@
-import argparse
-
 import os
+import runpy
 
 import bonobo
 
 DEFAULT_SERVICES_FILENAME = '_services.py'
 DEFAULT_SERVICES_ATTR = 'get_services'
+
+DEFAULT_GRAPH_FILENAME = '__main__.py'
+DEFAULT_GRAPH_ATTR = 'get_graph'
 
 
 def get_default_services(filename, services=None):
@@ -29,24 +31,24 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def execute(file, quiet=False):
-    with file:
-        code = compile(file.read(), file.name, 'exec')
+def execute(filename, module, quiet=False, verbose=False):
+    from bonobo import settings
 
-    # TODO: A few special variables should be set before running the file:
-    #
-    # See:
-    #  - https://docs.python.org/3/reference/import.html#import-mod-attrs
-    #  - https://docs.python.org/3/library/runpy.html#runpy.run_module
-    context = {
-        '__name__': '__bonobo__',
-        '__file__': file.name,
-    }
+    if quiet:
+        settings.QUIET = True
 
-    try:
-        exec(code, context)
-    except Exception as exc:
-        raise
+    if verbose:
+        settings.DEBUG = True
+
+    if filename:
+        if os.path.isdir(filename):
+            filename = os.path.join(filename, DEFAULT_GRAPH_FILENAME)
+        context = runpy.run_path(filename, run_name='__bonobo__')
+    elif module:
+        context = runpy.run_module(module, run_name='__bonobo__')
+        filename = context['__file__']
+    else:
+        raise RuntimeError('UNEXPECTED: argparse should not allow this.')
 
     graphs = dict((k, v) for k, v in context.items() if isinstance(v, bonobo.Graph))
 
@@ -63,12 +65,16 @@ def execute(file, quiet=False):
         graph,
         plugins=[],
         services=get_default_services(
-            file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
+            filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
         )
     )
 
 
 def register(parser):
-    parser.add_argument('file', type=argparse.FileType())
-    parser.add_argument('--quiet', action='store_true')
+    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group.add_argument('filename', nargs='?', type=str)
+    source_group.add_argument('--module', '-m', type=str)
+    verbosity_group = parser.add_mutually_exclusive_group()
+    verbosity_group.add_argument('--quiet', '-q', action='store_true')
+    verbosity_group.add_argument('--verbose', '-v', action='store_true')
     return execute

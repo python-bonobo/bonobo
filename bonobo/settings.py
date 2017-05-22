@@ -9,8 +9,16 @@ def to_bool(s):
     return False
 
 
-# Debug mode.
+# Debug/verbose mode.
 DEBUG = to_bool(os.environ.get('BONOBO_DEBUG', 'f'))
 
 # Profile mode.
 PROFILE = to_bool(os.environ.get('BONOBO_PROFILE', 'f'))
+
+# Quiet mode.
+QUIET = to_bool(os.environ.get('BONOBO_QUIET', 'f'))
+
+
+def check():
+    if DEBUG and QUIET:
+        raise RuntimeError('I cannot be verbose and quiet at the same time.')
