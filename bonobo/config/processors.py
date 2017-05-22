@@ -10,6 +10,33 @@ _CONTEXT_PROCESSORS_ATTR = '__processors__'
 
 
 class ContextProcessor(Option):
+    """
+    A ContextProcessor is a kind of transformation decorator that can setup and teardown a transformation and runtime
+    related dependencies, at the execution level.
+
+    It works like a yielding context manager, and is the recommended way to setup and teardown objects you'll need
+    in the context of one execution. It's the way to overcome the stateless nature of transformations.
+
+    The yielded values will be passed as positional arguments to the next context processors (order do matter), and
+    finally to the __call__ method of the transformation.
+
+    Warning: this may change for a similar but simpler implementation, don't relly too much on it (yet).
+
+    Example:
+
+        >>> from bonobo.config import Configurable
+        >>> from bonobo.util.objects import ValueHolder
+
+        >>> class Counter(Configurable):
+        ...     @ContextProcessor
+        ...     def counter(self, context):
+        ...         yield ValueHolder(0)
+        ...
+        ...     def __call__(self, counter, *args, **kwargs):
+        ...         counter += 1
+        ...         yield counter.get()
+
+    """
     @property
     def __name__(self):
         return self.func.__name__
