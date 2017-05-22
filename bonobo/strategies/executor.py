@@ -36,7 +36,7 @@ class ExecutorStrategy(Strategy):
                     plugin_context.loop()
                     plugin_context.stop()
                 except Exception as exc:
-                    print_error(exc, traceback.format_exc(), prefix='Error in plugin context', context=plugin_context)
+                    print_error(exc, traceback.format_exc(), context=plugin_context)
 
             futures.append(executor.submit(_runner))
 
@@ -46,9 +46,7 @@ class ExecutorStrategy(Strategy):
                 try:
                     node_context.start()
                 except Exception as exc:
-                    print_error(
-                        exc, traceback.format_exc(), prefix='Could not start node context', context=node_context
-                    )
+                    print_error(exc, traceback.format_exc(), context=node_context, method='start')
                     node_context.input.on_end()
                 else:
                     node_context.loop()
@@ -56,7 +54,7 @@ class ExecutorStrategy(Strategy):
                 try:
                     node_context.stop()
                 except Exception as exc:
-                    print_error(exc, traceback.format_exc(), prefix='Could not stop node context', context=node_context)
+                    print_error(exc, traceback.format_exc(), context=node_context, method='stop')
 
             futures.append(executor.submit(_runner))
 
