@@ -51,6 +51,16 @@ def test_run(runner, capsys):
 
 
 @all_runners
+def test_run_module(runner, capsys):
+    runner('run', '--quiet', '-m', 'bonobo.examples.types.strings')
+    out, err = capsys.readouterr()
+    out = out.split('\n')
+    assert out[0].startswith('Foo ')
+    assert out[1].startswith('Bar ')
+    assert out[2].startswith('Baz ')
+
+
+@all_runners
 def test_version(runner, capsys):
     runner('version')
     out, err = capsys.readouterr()
