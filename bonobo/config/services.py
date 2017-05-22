@@ -83,6 +83,7 @@ class Container(dict):
                 'Cannot resolve service {!r} using provided service collection.'.format(name)
             )
         value = super().get(name)
+        # XXX this is not documented and can lead to errors.
         if isinstance(value, types.LambdaType):
             value = value(self)
         return value
