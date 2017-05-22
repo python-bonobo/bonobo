@@ -1,6 +1,7 @@
 import functools
 from pprint import pprint as _pprint
 
+import itertools
 from colorama import Fore, Style
 
 from bonobo.config import Configurable, Option
@@ -67,6 +68,12 @@ def _count_counter(self, context):
     counter = ValueHolder(0)
     yield counter
     context.send(Bag(counter._value))
+
+
+class PrettyPrinter(Configurable):
+    def call(self, *args, **kwargs):
+        for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
+            print(' ' if i else '•', item, '=', str(value).strip().replace('\n', '\n'+CLEAR_EOL), CLEAR_EOL)
 
 
 pprint = Tee(_pprint)
