@@ -55,10 +55,9 @@ class LoopingExecutionContext(Wrapper):
             raise RuntimeError('Cannot start a node twice ({}).'.format(get_name(self)))
 
         self._started = True
-        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
 
-        with unrecoverable(self.handle_error):
-            self._stack.setup(self)
+        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
+        self._stack.setup(self)
 
         for enhancer in self._enhancers:
             with unrecoverable(self.handle_error):
@@ -82,7 +81,7 @@ class LoopingExecutionContext(Wrapper):
             return
 
         try:
-            with unrecoverable(self.handle_error):
+            if self._stack:
                 self._stack.teardown()
         finally:
             self._stopped = True

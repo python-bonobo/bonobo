@@ -2,6 +2,7 @@ import re
 import types
 
 from bonobo.config.options import Option
+from bonobo.errors import MissingServiceImplementationError
 
 _service_name_re = re.compile(r"^[^\d\W]\w*(:?\.[^\d\W]\w*)*$", re.UNICODE)
 
@@ -78,7 +79,7 @@ class Container(dict):
         if not name in self:
             if default:
                 return default
-            raise KeyError('Cannot resolve service {!r} using provided service collection.'.format(name))
+            raise MissingServiceImplementationError('Cannot resolve service {!r} using provided service collection.'.format(name))
         value = super().get(name)
         if isinstance(value, types.LambdaType):
             value = value(self)
