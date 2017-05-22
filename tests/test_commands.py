@@ -1,7 +1,7 @@
 import pkg_resources
 import pytest
 
-from bonobo import get_examples_path
+from bonobo import get_examples_path, __version__
 from bonobo.commands import entrypoint
 
 
@@ -33,3 +33,11 @@ def test_run(capsys):
     assert out[0].startswith('Foo ')
     assert out[1].startswith('Bar ')
     assert out[2].startswith('Baz ')
+
+def test_version(capsys):
+    entrypoint(['version'])
+    out, err = capsys.readouterr()
+    out = out.strip()
+    assert out.startswith('bonobo ')
+    assert out.endswith(__version__)
+
