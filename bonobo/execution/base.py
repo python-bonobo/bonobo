@@ -8,6 +8,12 @@ from bonobo.plugins import get_enhancers
 from bonobo.util.errors import print_error
 from bonobo.util.objects import Wrapper, get_name
 
+@contextmanager
+def recoverable(error_handler):
+    try:
+        yield
+    except Exception as exc:  # pylint: disable=broad-except
+        error_handler(exc, traceback.format_exc())
 
 @contextmanager
 def unrecoverable(error_handler):
@@ -16,7 +22,6 @@ def unrecoverable(error_handler):
     except Exception as exc:  # pylint: disable=broad-except
         error_handler(exc, traceback.format_exc())
         raise  # raise unrecoverableerror from x ?
-
 
 class LoopingExecutionContext(Wrapper):
     alive = True
