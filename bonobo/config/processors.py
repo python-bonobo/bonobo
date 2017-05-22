@@ -37,6 +37,7 @@ class ContextProcessor(Option):
         ...         yield counter.get()
 
     """
+
     @property
     def __name__(self):
         return self.func.__name__
