@@ -26,16 +26,19 @@ class ConfigurableMeta(type):
                     if isinstance(value, ContextProcessor):
                         cls.__processors__.append(value)
                     else:
+                        if not value.name:
+                            value.name = name
+
                         if isinstance(value, Method):
                             if cls.__wrappable__:
                                 raise ConfigurationError(
                                     'Cannot define more than one "Method" option in a configurable. That may change in the future.'
                                 )
                             cls.__wrappable__ = name
-                        if not value.name:
-                            value.name = name
+
                         if not name in cls.__options__:
                             cls.__options__[name] = value
+
                         if value.positional:
                             cls.__positional_options__.append(name)
 
@@ -53,11 +56,9 @@ class Configurable(metaclass=ConfigurableMeta):
 
     def __new__(cls, *args, **kwargs):
         if cls.__wrappable__ and len(args) == 1 and hasattr(args[0], '__call__'):
-            wrapped, args = args[0], args[1:]
-            return type(wrapped.__name__, (cls, ), {cls.__wrappable__: wrapped})
+            return type(args[0].__name__, (cls,), {cls.__wrappable__: args[0]})
 
-        # XXX is that correct ??? how does it pass args/kwargs to __init__ ???
-        return super().__new__(cls)
+        return super(Configurable, cls).__new__(cls)
 
     def __init__(self, *args, **kwargs):
         super().__init__()
