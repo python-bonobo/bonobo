@@ -79,7 +79,9 @@ class Container(dict):
         if not name in self:
             if default:
                 return default
-            raise MissingServiceImplementationError('Cannot resolve service {!r} using provided service collection.'.format(name))
+            raise MissingServiceImplementationError(
+                'Cannot resolve service {!r} using provided service collection.'.format(name)
+            )
         value = super().get(name)
         if isinstance(value, types.LambdaType):
             value = value(self)

@@ -73,7 +73,7 @@ def _count_counter(self, context):
 class PrettyPrinter(Configurable):
     def call(self, *args, **kwargs):
         for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
-            print(' ' if i else '•', item, '=', str(value).strip().replace('\n', '\n'+CLEAR_EOL), CLEAR_EOL)
+            print(' ' if i else '•', item, '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL)
 
 
 pprint = Tee(_pprint)

@@ -1,7 +1,11 @@
+import runpy
+import sys
+from unittest.mock import patch
+
 import pkg_resources
 import pytest
 
-from bonobo import __version__, get_examples_path
+from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint
 
 
@@ -10,7 +14,8 @@ def runner_entrypoint(*args):
 
 
 def runner_module(*args):
-    return entrypoint(list(args))
+    with patch.object(sys, 'argv', ['bonobo', *args]):
+        return runpy.run_path(__main__.__file__, run_name='__main__')
 
 
 all_runners = pytest.mark.parametrize('runner', [runner_entrypoint, runner_module])

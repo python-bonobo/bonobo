@@ -37,11 +37,10 @@ def print_error(exc, trace, context=None, method=None):
         ' (in {}{})'.format(type(context).__name__, '.{}()'.format(method) if method else '') if context else '',
         Style.RESET_ALL,
         '\n',
-        indent(_get_error_message(exc), prefix+Style.BRIGHT),
+        indent(_get_error_message(exc), prefix + Style.BRIGHT),
         Style.RESET_ALL,
         sep='',
         file=sys.stderr,
     )
     print(prefix, file=sys.stderr)
     print(indent(trace, prefix, predicate=lambda line: True), file=sys.stderr)
-
