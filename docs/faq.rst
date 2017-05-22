@@ -3,6 +3,7 @@ F.A.Q.
 
 List of questions that went up about the project, in no particuliar order.
 
+
 Too long; didn't read.
 ----------------------
 
@@ -19,8 +20,22 @@ It's lean manufacturing for data.
 
 .. note::
 
-    This is NOT a «big data» tool. We process around 5 millions database lines in around 1 hour with rdc.etl, bonobo
-    ancestor (algorithms are the same, we still need to run a bit of benchmarks).
+    This is NOT a «big data» tool. Neither a «data analysis» tool. We process around 5 millions database lines in around
+    1 hour with rdc.etl, bonobo ancestor (algorithms are the same, we still need to run a bit of benchmarks).
+
+
+What versions of python does bonobo support? Why not more?
+----------------------------------------------------------
+
+Bonobo is battle-tested against the latest python 3.5 and python 3.6. It may work well using other patch releases of those
+versions, but we cannot guarantee it.
+
+The main reasons about why 3.5+:
+
+* Creating a tool that works well under both python 2 and 3 is a lot more work.
+* Python 3 is nearly 10 years old. Consider moving on.
+* Python 3.5 contains syntaxic sugar that makes working with data a lot more convenient.
+
 
 Can a graph contain another graph?
 ----------------------------------
@@ -30,7 +45,13 @@ No, not for now. There are no tools today in bonobo to insert a graph as a subgr
 It would be great to allow it, but there is a few design questions behind this, like what node you use as input and
 output of the subgraph, etc.
 
+On another hand, if you don't consider a graph as the container but by the nodes and edges it contains, its pretty
+easy to add a set of nodes and edge to a subgraph, and thus simulate it. But there will be more threads, more copies
+of the same nodes, so it's not really an acceptable answer for big graphs. If it was possible to use a Graph as a
+node, then the problem would be correctly solved.
+
 It is something to be seriously considered post 1.0 (probably way post 1.0).
+
 
 How would one access contextual data from a transformation? Are there parameter injections like pytest's fixtures?
 ------------------------------------------------------------------------------------------------------------------
@@ -43,19 +64,25 @@ to find a better way to apply it.
 
 To understand how it works today, look at https://github.com/python-bonobo/bonobo/blob/0.3/bonobo/io/csv.py#L63 and class hierarchy.
 
+
 What is a plugin? Do I need to write one?
 -----------------------------------------
 
 Plugins are special classes added to an execution context, used to enhance or change the actual behavior of an execution
 in a generic way. You don't need to write plugins to code transformation graphs.
 
+
 Is there a difference between a transformation node and a regular python function or generator?
 -----------------------------------------------------------------------------------------------
 
-No.
+Short answer: no.
 
 Transformation callables are just regular callables, and there is nothing that differentiate it from regular python callables.
 You can even use some callables both in an imperative programming context and in a transformation graph, no problem.
+
+Longer answer: yes, sometimes, but you should not care. The function-based transformations are plain old python callable. The
+class-based transformations can be plain-old-python-objects, but can also subclass Configurable which brings a lot of
+fancy features, like options, service injections, class factories as decorators...
 
 
 Why did you include the word «marketing» in a commit message? Why is there a marketing-automation tag on the project? Isn't marketing evil?
@@ -83,6 +110,7 @@ See https://github.com/python-bonobo/bonobo/issues/1
 Bonobo is not a replacement for pandas, nor dask, nor luigi, nor airflow... It may be a replacement for Pentaho, Talend
 or other data integration suites but targets people more comfortable with code as an interface.
 
+
 All those references to monkeys hurt my head. Bonobos are not monkeys.
 ----------------------------------------------------------------------
 
@@ -96,6 +124,7 @@ known primate typing feature.»
 
 See https://github.com/python-bonobo/bonobo/issues/24
 
+
 Who is behind this?
 -------------------
 
@@ -103,6 +132,7 @@ Me (as an individual), and a few great people that helped me along the way. Not 
 
 The code, documentation, and surrounding material is created using spare time and may lack a bit velocity. Feel free
 to jump in so we can go faster!
+
 
 Documentation seriously lacks X, there is a problem in Y...
 -----------------------------------------------------------
