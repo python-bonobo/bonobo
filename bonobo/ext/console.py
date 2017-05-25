@@ -21,16 +21,22 @@ class ConsoleOutputPlugin(Plugin):
 
     def initialize(self):
         self.prefix = ''
+        self.counter = 0
+        self._append_cache = ''
 
     def _write(self, graph_context, rewind):
         if settings.PROFILE:
-            append = (
-                ('Memory', '{0:.2f} Mb'.format(memory_usage())),
-                # ('Total time', '{0} s'.format(execution_time(harness))),
-            )
+            if self.counter % 10 and self._append_cache:
+                append = self._append_cache
+            else:
+                self._append_cache = append = (
+                    ('Memory', '{0:.2f} Mb'.format(memory_usage())),
+                    # ('Total time', '{0} s'.format(execution_time(harness))),
+                )
         else:
             append = ()
         self.write(graph_context, prefix=self.prefix, append=append, rewind=rewind)
+        self.counter += 1
 
     def run(self):
         if sys.stdout.isatty():
@@ -81,7 +87,6 @@ class ConsoleOutputPlugin(Plugin):
             print(MOVE_CURSOR_UP(t_cnt + 2))
 
 
-@functools.lru_cache(1)
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
