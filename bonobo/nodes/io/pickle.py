@@ -27,10 +27,10 @@ class PickleReader(PickleHandler, FileReader):
     mode = Option(str, default='rb')
 
     @ContextProcessor
-    def pickle_items(self, context, fs, file):
+    def pickle_headers(self, context, fs, file):
         yield ValueHolder(self.item_names)
 
-    def read(self, fs, file, item_names):
+    def read(self, fs, file, pickle_headers):
         data = pickle.load(file)
 
         # if the data is not iterable, then wrap the object in a list so it may be iterated
@@ -44,26 +44,26 @@ class PickleReader(PickleHandler, FileReader):
             except TypeError:
                 iterator = iter([data])
 
-        if not item_names.get():
-            item_names.set(next(iterator))
+        if not pickle_headers.get():
+            pickle_headers.set(next(iterator))
 
-        item_count = len(item_names.value)
+        item_count = len(pickle_headers.value)
 
         for i in iterator:
             if len(i) != item_count:
                 raise ValueError('Received an object with %d items, expecting %d.' % (len(i), item_count, ))
 
-            yield dict(zip(i)) if is_dict else dict(zip(item_names.value, i))
+            yield dict(zip(i)) if is_dict else dict(zip(pickle_headers.value, i))
 
 
 class PickleWriter(PickleHandler, FileWriter):
 
     mode = Option(str, default='wb')
 
-    def write(self, fs, file, itemno, item):
+    def write(self, fs, file, lineno, item):
         """
         Write a pickled item to the opened file.
         """
         file.write(pickle.dumps(item))
-        itemno += 1
+        lineno += 1
         return NOT_MODIFIED
