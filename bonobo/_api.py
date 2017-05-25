@@ -83,7 +83,9 @@ def open_fs(fs_url, *args, **kwargs):
     :returns: :class:`~fs.base.FS` object
     """
     from fs import open_fs as _open_fs
-    return _open_fs(str(fs_url), *args, **kwargs)
+    from os.path import expanduser
+
+    return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
 
 # bonobo.nodes
