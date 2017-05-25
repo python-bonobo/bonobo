@@ -1,11 +1,7 @@
-import argparse
-
 import os
 
 import bonobo
-
-DEFAULT_SERVICES_FILENAME = '_services.py'
-DEFAULT_SERVICES_ATTR = 'get_services'
+from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 
 
 def get_default_services(filename, services=None):
@@ -29,7 +25,7 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def execute(file, quiet=False):
+def read_file(file):
     with file:
         code = compile(file.read(), file.name, 'exec')
 
@@ -56,19 +52,24 @@ def execute(file, quiet=False):
     ).format(len(graphs))
 
     graph = list(graphs.values())[0]
+    plugins = []
+    services = get_default_services(
+        file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
+    )
+
+    return graph, plugins, services
+
+
+def execute(file, quiet=False):
+    graph, plugins, services = read_file(file)
 
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display
-    return bonobo.run(
-        graph,
-        plugins=[],
-        services=get_default_services(
-            file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
-        )
-    )
+    return bonobo.run(graph, plugins=plugins, services=services)
 
 
 def register(parser):
+    import argparse
     parser.add_argument('file', type=argparse.FileType())
     parser.add_argument('--quiet', action='store_true')
     return execute
