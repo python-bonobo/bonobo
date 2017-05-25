@@ -51,11 +51,11 @@ so as though it may not yet be complete or fully stable (please, allow us to rea
 
 ----
 
+Homepage: https://www.bonobo-project.org/ (`Roadmap <https://www.bonobo-project.org/roadmap>`_)
+
 Documentation: http://docs.bonobo-project.org/
 
 Issues: https://github.com/python-bonobo/bonobo/issues
-
-Roadmap: https://www.bonobo-project.org/roadmap
 
 Slack: https://bonobo-slack.herokuapp.com/
 
