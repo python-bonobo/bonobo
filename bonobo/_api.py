@@ -44,15 +44,20 @@ def run(graph, strategy=None, plugins=None, services=None):
 
     plugins = plugins or []
 
-    if _is_interactive_console():  # pragma: no cover
-        from bonobo.ext.console import ConsoleOutputPlugin
-        if ConsoleOutputPlugin not in plugins:
-            plugins.append(ConsoleOutputPlugin)
+    from bonobo import settings
 
-    if _is_jupyter_notebook():  # pragma: no cover
-        from bonobo.ext.jupyter import JupyterOutputPlugin
-        if JupyterOutputPlugin not in plugins:
-            plugins.append(JupyterOutputPlugin)
+    settings.check()
+
+    if not settings.QUIET:  # pragma: no cover
+        if _is_interactive_console():
+            from bonobo.ext.console import ConsoleOutputPlugin
+            if ConsoleOutputPlugin not in plugins:
+                plugins.append(ConsoleOutputPlugin)
+
+        if _is_jupyter_notebook():
+            from bonobo.ext.jupyter import JupyterOutputPlugin
+            if JupyterOutputPlugin not in plugins:
+                plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
