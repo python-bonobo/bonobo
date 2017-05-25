@@ -1,5 +1,7 @@
 import re
+import threading
 import types
+from contextlib import ContextDecorator
 
 from bonobo.config.options import Option
 from bonobo.errors import MissingServiceImplementationError
@@ -87,3 +89,40 @@ class Container(dict):
         if isinstance(value, types.LambdaType):
             value = value(self)
         return value
+
+
+class Exclusive(ContextDecorator):
+    """
+    Decorator and context manager used to require exclusive usage of an object, most probably a service. It's usefull
+    for example if call order matters on a service implementation (think of an http api that requires a nonce or version
+    parameter ...).
+
+    Usage:
+
+        >>> def handler(some_service):
+        ...     with Exclusive(some_service):
+        ...         some_service.call_1()
+        ...         some_service.call_2()
+        ...         some_service.call_3()
+
+    This will ensure that nobody else is using the same service while in the "with" block, using a lock primitive to
+    ensure that.
+
+    """
+    _locks = {}
+
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+
+    def get_lock(self):
+        _id = id(self._wrapped)
+        if not _id in Exclusive._locks:
+            Exclusive._locks[_id] = threading.RLock()
+        return Exclusive._locks[_id]
+
+    def __enter__(self):
+        self.get_lock().acquire()
+        return self._wrapped
+
+    def __exit__(self, *exc):
+        self.get_lock().release()

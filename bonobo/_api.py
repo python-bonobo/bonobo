@@ -1,5 +1,3 @@
-import warnings
-
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PrettyPrint, Tee, count, identity, noop, pprint
