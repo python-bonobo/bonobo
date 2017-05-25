@@ -18,6 +18,7 @@ class FileHandler(Configurable):
     path = Option(str, required=True, positional=True)  # type: str
     eol = Option(str, default='\n')  # type: str
     mode = Option(str)  # type: str
+    encoding = Option(str, default='utf-8')  # type: str
 
     fs = Service('fs')  # type: str
 
@@ -27,7 +28,7 @@ class FileHandler(Configurable):
             yield file
 
     def open(self, fs):
-        return fs.open(self.path, self.mode)
+        return fs.open(self.path, self.mode, encoding=self.encoding)
 
 
 class Reader(FileHandler):
