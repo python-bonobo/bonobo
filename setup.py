@@ -18,13 +18,19 @@ except NameError:
 
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+        long_description = f.read()
+except:
+    long_description = ''
 
 # Get the classifiers from the classifiers file
 tolines = lambda c: list(filter(None, map(lambda s: s.strip(), c.split('\n'))))
-with open(path.join(here, 'classifiers.txt'), encoding='utf-8') as f:
-    classifiers = tolines(f.read())
+try:
+    with open(path.join(here, 'classifiers.txt'), encoding='utf-8') as f:
+        classifiers = tolines(f.read())
+except:
+    classifiers = []
 
 version_ns = {}
 try:

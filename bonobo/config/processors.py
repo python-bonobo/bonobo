@@ -1,4 +1,3 @@
-import types
 from collections import Iterable
 from contextlib import contextmanager
 
@@ -132,14 +131,7 @@ def resolve_processors(mixed):
     try:
         yield from mixed.__processors__
     except AttributeError:
-        # old code, deprecated usage
-        if isinstance(mixed, types.FunctionType):
-            yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
-
-        for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
-            yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
-
-    return ()
+        yield from ()
 
 
 get_context_processors = deprecated_alias('get_context_processors', resolve_processors)

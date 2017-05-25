@@ -20,10 +20,8 @@ def get_default_services(filename, services=None):
             '__name__': '__bonobo__',
             '__file__': services_filename,
         }
-        try:
-            exec(code, context)
-        except Exception:
-            raise
+        exec(code, context)
+
         return {
             **context[DEFAULT_SERVICES_ATTR](),
             **(services or {}),
