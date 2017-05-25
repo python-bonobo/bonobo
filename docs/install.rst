@@ -1,7 +1,16 @@
 Installation
 ============
 
-Bonobo is `available on PyPI <https://pypi.python.org/pypi/bonobo>`_, and it's the easiest solution to get started.
+Create an ETL project
+:::::::::::::::::::::
+
+If you only want to use Bonobo to code ETLs, your easiest option to get started is to use our
+`cookiecutter template <https://github.com/python-bonobo/cookiecutter-bonobo>`_.
+
+Install from PyPI
+:::::::::::::::::
+
+You can also install it directly from the `Python Package Index <https://pypi.python.org/pypi/bonobo>`_.
 
 .. code-block:: shell-session
 

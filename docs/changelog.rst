@@ -1,6 +1,51 @@
 Changelog
 =========
 
+v.0.3.0 - 22 may 2017
+:::::::::::::::::::::
+
+Features
+--------
+
+* ContextProcessors can now be implemented by getting the "yield" value (v = yield x), shortening the teardown-only context processors by one line.
+* File related writers (file, csv, json ...) now returns NOT_MODIFIED, making it easier to chain something after.
+* More consistent console output, nodes are now sorted in a topological order before display.
+* Graph.add_chain(...) now takes _input and _output parameters the same way, accepting indexes, instances or names (subject to change).
+* Graph.add_chain(...) now allows to "name" a chain, using _name keyword argument, to easily reference its output later (subject to change).
+* New settings module (bonobo.settings) read environment for some global configuration stuff (DEBUG and PROFILE, for now).
+* New Method subclass of Option allows to use Configurable objects as decorator (see bonobo.nodes.filter.Filter for a simple example).
+* New Filter transformation in standard library.
+
+Internal features
+-----------------
+
+* Better ContextProcessor implementation, avoiding to use a decorator on the parent class. Now works with Configurable instances like Option, Service and Method.
+* ContextCurrifier replaces the logic that was in NodeExecutionContext, that setup and teardown the context stack. Maybe the name is not ideal.
+* All builtin transformations are of course updated to use the improved API, and should be 100% backward compatible.
+* The "core" package has been dismantled, and its rare remaining members are now in "structs" and "util" packages.
+* Standard transformation library has been moved under the bonobo.nodes package. It does not change anything if you used bonobo.* (which you should).
+* ValueHolder is now more restrictive, not allowing to use .value anymore.
+
+Miscellaneous
+-------------
+
+* Code cleanup, dead code removal, more tests, etc.
+* More documentation.
+
+v.0.2.4 - 2 may 2017
+::::::::::::::::::::
+
+* Cosmetic release for PyPI package page formating. Same content as v.0.2.3.
+
+v.0.2.3 - 1 may 2017
+:::::::::::::::::::::
+
+* Positional options now supported, backward compatible. All FileHandler subclasses supports their path argument as positional.
+* Better transformation lifecycle management (still work needed here).
+* Windows continuous integration now works.
+* Refactoring the "API" a lot to have a much cleaner first glance at it.
+* More documentation, tutorials, and tuning project artifacts.
+
 v.0.2.2 - 28 apr 2017
 :::::::::::::::::::::
 

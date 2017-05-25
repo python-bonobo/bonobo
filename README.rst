@@ -7,11 +7,12 @@ Data-processing for humans.
 .. image:: https://img.shields.io/pypi/v/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: PyPI
+    
 .. image:: https://img.shields.io/pypi/pyversions/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Versions
 
-.. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.3
+.. image:: https://readthedocs.org/projects/bonobo/badge/?version=latest
     :target: http://docs.bonobo-project.org/
     :alt: Documentation
 
