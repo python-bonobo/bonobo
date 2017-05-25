@@ -3,10 +3,6 @@ import json
 from bonobo.config.processors import ContextProcessor
 from .file import FileWriter, FileReader
 
-__all__ = [
-    'JsonWriter',
-]
-
 
 class JsonHandler():
     eol = ',\n'

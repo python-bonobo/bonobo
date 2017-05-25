@@ -55,3 +55,38 @@ def test_read_csv_from_file(tmpdir):
         'b': 'b bar',
         'c': 'c bar',
     }
+
+
+def test_read_csv_kwargs_output_formater(tmpdir):
+    fs, filename = open_fs(tmpdir), 'input.csv'
+    fs.open(filename, 'w').write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
+
+    reader = CsvReader(path=filename, delimiter=',', output_format='kwargs')
+
+    context = CapturingNodeExecutionContext(reader, services={'fs': fs})
+
+    context.start()
+    context.write(BEGIN, Bag(), END)
+    context.step()
+    context.stop()
+
+    assert len(context.send.mock_calls) == 2
+
+    args0, kwargs0 = context.send.call_args_list[0]
+    assert len(args0) == 1 and not len(kwargs0)
+    args1, kwargs1 = context.send.call_args_list[1]
+    assert len(args1) == 1 and not len(kwargs1)
+
+    _args, _kwargs = args0[0].get()
+    assert not len(_args) and _kwargs == {
+        'a': 'a foo',
+        'b': 'b foo',
+        'c': 'c foo',
+    }
+
+    _args, _kwargs = args1[0].get()
+    assert not len(_args) and _kwargs == {
+        'a': 'a bar',
+        'b': 'b bar',
+        'c': 'c bar',
+    }

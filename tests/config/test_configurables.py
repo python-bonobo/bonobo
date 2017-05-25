@@ -2,7 +2,6 @@ import pytest
 
 from bonobo.config.configurables import Configurable
 from bonobo.config.options import Option
-from bonobo.config.services import Container, Service, validate_service_name
 
 
 class MyConfigurable(Configurable):
@@ -23,28 +22,6 @@ class MyConfigurableUsingPositionalOptions(MyConfigurable):
     first = Option(str, required=True, positional=True)
     second = Option(str, required=True, positional=True)
     third = Option(str, required=False, positional=True)
-
-
-class PrinterInterface():
-    def print(self, *args):
-        raise NotImplementedError()
-
-
-class ConcretePrinter(PrinterInterface):
-    def __init__(self, prefix):
-        self.prefix = prefix
-
-    def print(self, *args):
-        return ';'.join((self.prefix, *args))
-
-
-class MyServiceDependantConfigurable(Configurable):
-    printer = Service(
-        PrinterInterface,
-    )
-
-    def __call__(self, printer: PrinterInterface, *args):
-        return printer.print(*args)
 
 
 def test_missing_required_option_error():
@@ -105,40 +82,6 @@ def test_option_resolution_order():
     assert o.required_str == 'kaboom'
     assert o.default_str == 'foo'
     assert o.integer == None
-
-
-def test_service_name_validator():
-    assert validate_service_name('foo') == 'foo'
-    assert validate_service_name('foo.bar') == 'foo.bar'
-    assert validate_service_name('Foo') == 'Foo'
-    assert validate_service_name('Foo.Bar') == 'Foo.Bar'
-    assert validate_service_name('Foo.a0') == 'Foo.a0'
-
-    with pytest.raises(ValueError):
-        validate_service_name('foo.0')
-
-    with pytest.raises(ValueError):
-        validate_service_name('0.foo')
-
-
-SERVICES = Container(
-    printer0=ConcretePrinter(prefix='0'),
-    printer1=ConcretePrinter(prefix='1'),
-)
-
-
-def test_service_dependency():
-    o = MyServiceDependantConfigurable(printer='printer0')
-
-    assert o(SERVICES.get('printer0'), 'foo', 'bar') == '0;foo;bar'
-    assert o(SERVICES.get('printer1'), 'bar', 'baz') == '1;bar;baz'
-    assert o(*SERVICES.args_for(o), 'foo', 'bar') == '0;foo;bar'
-
-
-def test_service_dependency_unavailable():
-    o = MyServiceDependantConfigurable(printer='printer2')
-    with pytest.raises(KeyError):
-        SERVICES.args_for(o)
 
 
 def test_option_positional():

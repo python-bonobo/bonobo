@@ -1,12 +1,12 @@
-Detailed roadmap
-================
+Internal roadmap notes
+======================
 
-initialize / finalize better than start / stop ?
+Things that should be thought about and/or implemented, but that I don't know where to store.
 
 Graph and node level plugins
 ::::::::::::::::::::::::::::
 
- * Enhancers or nide-level plugins
+ * Enhancers or node-level plugins
  * Graph level plugins
  * Documentation
 
@@ -15,21 +15,19 @@ Command line interface and environment
 
 * How do we manage environment ? .env ?
 * How do we configure plugins ?
-* Console run should allow console plugin as a command line argument (or silence it).
 
 Services and Processors
 :::::::::::::::::::::::
 
-* ContextProcessors not clean
+* ContextProcessors not clean (a bit better, but still not in love with the api)
 
 Next...
 :::::::
 
 * Release process specialised for bonobo. With changelog production, etc.
 * Document how to upgrade version, like, minor need change badges, etc.
-* PyPI page looks like crap: https://pypi.python.org/pypi/bonobo/0.2.1
-* Windows break because of readme encoding. Fix in edgy.
-* bonobo init --with sqlalchemy,docker
+* Windows console looks crappy.
+* bonobo init --with sqlalchemy,docker; cookiecutter?
 * logger, vebosity level
 
 
@@ -39,22 +37,15 @@ External libs that looks good
 * dask.distributed
 * mediator (event dispatcher)
 
-Version 0.3
+Version 0.4
 :::::::::::
 
-* Services !
 * SQLAlchemy 101
 
-Version 0.2
-:::::::::::
+Design decisions
+::::::::::::::::
 
-* Autodetect if within jupyter notebook context, and apply plugin if it's the case.
-* New bonobo.structs package with simple data structures (bags, graphs, tokens).
-
-Plugins API
-:::::::::::
-
-* Stabilize, find other things to do.
+* initialize / finalize better than start / stop ?
 
 Minor stuff
 :::::::::::

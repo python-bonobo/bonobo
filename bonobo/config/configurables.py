@@ -1,6 +1,6 @@
 from bonobo.config.options import Method, Option
 from bonobo.config.processors import ContextProcessor
-from bonobo.errors import ConfigurationError
+from bonobo.errors import ConfigurationError, AbstractError
 
 __all__ = [
     'Configurable',

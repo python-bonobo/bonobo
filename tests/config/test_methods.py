@@ -28,8 +28,6 @@ def test_define_with_decorator():
     def Concrete(self, *args, **kwargs):
         calls.append((args, kwargs, ))
 
-    print('handler', Concrete.handler)
-
     assert callable(Concrete.handler)
     t = Concrete('foo', bar='baz')
 

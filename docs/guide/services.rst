@@ -81,6 +81,26 @@ A dictionary, or dictionary-like, "services" named argument can be passed to the
 provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of the provided
 stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will use it.
 
+Solving concurrency problems
+----------------------------
+
+If a service cannot be used by more than one thread at a time, either because it's just not threadsafe, or because
+it requires to carefully order the calls made (apis that includes nonces, or work on results returned by previous
+calls are usually good candidates), you can use the :class:`bonobo.config.Exclusive` context processor to lock the
+use of a dependency for a time period.
+
+.. code-block:: python
+
+    from bonobo.config import Exclusive
+
+    def t1(api):
+        with Exclusive(api):
+            api.first_call()
+            api.second_call()
+            # ... etc
+            api.last_call()
+
+
 Service configuration (to be decided and implemented)
 :::::::::::::::::::::::::::::::::::::::::::::::::::::
 
