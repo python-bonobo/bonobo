@@ -1,6 +1,6 @@
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrint, Tee, count, identity, noop, pprint
+    PrettyPrint, PickleWriter, PickleReader, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
@@ -43,7 +43,6 @@ def run(graph, strategy=None, plugins=None, services=None):
     plugins = plugins or []
 
     from bonobo import settings
-
     settings.check()
 
     if not settings.QUIET:  # pragma: no cover
@@ -98,6 +97,8 @@ register_api_group(
     JsonReader,
     JsonWriter,
     Limit,
+    PickleReader,
+    PickleWriter,
     PrettyPrint,
     Tee,
     count,
