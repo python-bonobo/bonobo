@@ -53,8 +53,8 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'colorama (>= 0.3, < 1.0)', 'fs (>= 2.0, < 3.0)', 'psutil (>= 5.2, < 6.0)', 'requests (>= 2.0, < 3.0)',
-        'stevedore (>= 1.21, < 2.0)'
+        'colorama (>= 0.3, < 1.0)', 'fs (>= 2.0, < 3.0)', 'packaging (>= 16, < 17)', 'psutil (>= 5.2, < 6.0)',
+        'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.21, < 2.0)'
     ],
     extras_require={
         'dev': [
