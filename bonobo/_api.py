@@ -1,11 +1,10 @@
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrint, Tee, count, identity, noop, pprint
+    PrettyPrinter, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
 __all__ = []
-
 
 def register_api(x, __all__=__all__):
     __all__.append(get_name(x))
@@ -98,7 +97,7 @@ register_api_group(
     JsonReader,
     JsonWriter,
     Limit,
-    PrettyPrint,
+    PrettyPrinter,
     Tee,
     count,
     identity,

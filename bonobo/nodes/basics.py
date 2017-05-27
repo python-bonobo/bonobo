@@ -18,7 +18,7 @@ __all__ = [
     'Tee',
     'count',
     'pprint',
-    'PrettyPrint',
+    'PrettyPrinter',
     'noop',
 ]
 
@@ -85,7 +85,8 @@ class PrettyPrinter(Configurable):
         return ' '.join(((' ' if i else '•'), str(item), '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL))
 
 
-pprint = Tee(_pprint)
+pprint = PrettyPrinter()
+pprint.__name__ = 'pprint'
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):

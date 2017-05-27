@@ -12,12 +12,12 @@ author_email = 'romain@dorgueil.net'
 
 enable_features = {
     'make',
-    'sphinx',
-    'pytest',
+    'sphinx',  # should install sphinx
+    'pytest',  # should install pytest/pytest-cov/coverage
     'git',
     'pylint',
     'python',
-    'yapf',
+    'yapf',  # should install yapf
 }
 
 # stricts deendencies in requirements.txt
@@ -30,10 +30,6 @@ install_requires = [
 ]
 
 extras_require = {
-    'jupyter': [
-        'jupyter >=1.0,<1.1',
-        'ipywidgets >=6.0.0.beta5'
-    ],
     'dev': [
         'coverage >=4,<5',
         'pylint >=1,<2',
@@ -41,8 +37,11 @@ extras_require = {
         'pytest-cov >=2,<3',
         'pytest-timeout >=1,<2',
         'sphinx',
-        'sphinx_rtd_theme',
         'yapf',
+    ],
+    'jupyter': [
+        'jupyter >=1.0,<1.1',
+        'ipywidgets >=6.0.0.beta5'
     ],
 }
 
@@ -63,9 +62,6 @@ entry_points = {
         'run = bonobo.commands.run:register',
         'version = bonobo.commands.version:register',
     ],
-    'edgy.project.features': [
-        'bonobo = bonobo.ext.edgy.project.feature:BonoboFeature'
-    ]
 }
 
 @listen('edgy.project.feature.make.on_generate', priority=10)
