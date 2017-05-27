@@ -1,6 +1,8 @@
 import os
 import runpy
 
+import pip
+
 import bonobo
 
 DEFAULT_SERVICES_FILENAME = '_services.py'
@@ -29,7 +31,7 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def execute(filename, module, quiet=False, verbose=False):
+def execute(filename, module, install=False, quiet=False, verbose=False):
     from bonobo import settings
 
     if quiet:
@@ -40,7 +42,12 @@ def execute(filename, module, quiet=False, verbose=False):
 
     if filename:
         if os.path.isdir(filename):
+            if install:
+                requirements = os.path.join(filename, 'requirements.txt')
+                pip.main(['install', '-qr', requirements])
             filename = os.path.join(filename, DEFAULT_GRAPH_FILENAME)
+        elif install:
+            raise RuntimeError('Cannot --install on a file (only available for dirs containing requirements.txt).')
         context = runpy.run_path(filename, run_name='__bonobo__')
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
@@ -68,11 +75,17 @@ def execute(filename, module, quiet=False, verbose=False):
     )
 
 
-def register(parser):
+def register_generic_run_arguments(parser):
     source_group = parser.add_mutually_exclusive_group(required=True)
     source_group.add_argument('filename', nargs='?', type=str)
     source_group.add_argument('--module', '-m', type=str)
+    return parser
+
+
+def register(parser):
+    parser = register_generic_run_arguments(parser)
     verbosity_group = parser.add_mutually_exclusive_group()
     verbosity_group.add_argument('--quiet', '-q', action='store_true')
     verbosity_group.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--install', '-I', action='store_true')
     return execute
