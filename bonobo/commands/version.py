@@ -1,5 +1,5 @@
 import bonobo
-from bonobo.util.packages import bonobo_packages
+from bonobo.util.pkgs import bonobo_packages
 
 
 def format_version(mod, *, name=None, quiet=False):
