@@ -76,4 +76,4 @@ def test_version(runner, capsys):
     out, err = capsys.readouterr()
     out = out.strip()
     assert out.startswith('bonobo ')
-    assert out.endswith(__version__)
+    assert __version__ in out
