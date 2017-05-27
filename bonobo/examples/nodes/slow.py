@@ -1,7 +1,6 @@
 import bonobo
 import time
 
-
 from bonobo.constants import NOT_MODIFIED
 
 

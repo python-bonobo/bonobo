@@ -9,7 +9,9 @@ def execute(name):
             'You must install "cookiecutter" to use this command.\n\n $ pip install edgy.project\n'
         ) from exc
 
-    return cookiecutter('https://github.com/python-bonobo/cookiecutter-bonobo.git', extra_context={'name': name}, no_input=True)
+    return cookiecutter(
+        'https://github.com/python-bonobo/cookiecutter-bonobo.git', extra_context={'name': name}, no_input=True
+    )
 
 
 def register(parser):

@@ -1,5 +1,4 @@
 -e .[jupyter]
-
 appnope==0.1.0
 bleach==2.0.0
 decorator==4.0.11
@@ -18,7 +17,7 @@ jupyter-core==4.3.0
 jupyter==1.0.0
 markupsafe==1.0
 mistune==0.7.4
-nbconvert==5.1.1
+nbconvert==5.2.1
 nbformat==4.3.0
 notebook==5.0.0
 pandocfilters==1.4.1
@@ -33,7 +32,7 @@ qtconsole==4.3.0
 simplegeneric==0.8.1
 six==1.10.0
 terminado==0.6
-testpath==0.3
+testpath==0.3.1
 tornado==4.5.1
 traitlets==4.3.2
 wcwidth==0.1.7

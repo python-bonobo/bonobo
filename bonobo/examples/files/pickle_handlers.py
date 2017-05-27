@@ -6,7 +6,9 @@ import os
 def cleanse_sms(row):
 
     if row['category'] == 'spam':
-        row['sms_clean'] = '**MARKED AS SPAM** ' + row['sms'][0:50] + ('...' if len(row['sms']) > 50 else '')
+        row['sms_clean'] = '**MARKED AS SPAM** ' + row['sms'][0:50] + (
+            '...' if len(row['sms']) > 50 else ''
+        )
     else:
         row['sms_clean'] = row['sms']
 
@@ -14,14 +16,13 @@ def cleanse_sms(row):
 
 
 graph = bonobo.Graph(
-    bonobo.PickleReader('spam.pkl'),        # spam.pkl is within the gzipped tarball
+    bonobo.PickleReader('spam.pkl'
+                        ),  # spam.pkl is within the gzipped tarball
     cleanse_sms,
     print
 )
 
-
 if __name__ == '__main__':
-
     '''
     This example shows how a different file system service can be injected
     into a transformation (as compressing pickled objects often makes sense
@@ -51,8 +52,10 @@ if __name__ == '__main__':
     '''
 
     services = {
-        'fs': TarFS(
-            os.path.join(bonobo.get_examples_path(), 'datasets', 'spam.tgz')
+        'fs':
+        TarFS(
+            os.path.
+            join(bonobo.get_examples_path(), 'datasets', 'spam.tgz')
         )
     }
     bonobo.run(graph, services=services)

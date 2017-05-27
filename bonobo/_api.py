@@ -6,6 +6,7 @@ from bonobo.util.objects import get_name
 
 __all__ = []
 
+
 def register_api(x, __all__=__all__):
     __all__.append(get_name(x))
     return x

@@ -90,7 +90,8 @@ class ConsoleOutputPlugin(Plugin):
                         ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v)
                                           for k, v in append), CLEAR_EOL
                     )
-                ), file=sys.stderr
+                ),
+                file=sys.stderr
             )
             t_cnt += 1
 
@@ -116,4 +117,4 @@ class ConsoleOutputPlugin(Plugin):
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2 ** 20)
+    return process.memory_info()[0] / float(2**20)

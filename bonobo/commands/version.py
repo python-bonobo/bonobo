@@ -4,9 +4,7 @@ from bonobo.util.pkgs import bonobo_packages
 
 def format_version(mod, *, name=None, quiet=False):
     return ('{name} {version}' if quiet else '{name} v.{version} (in {location})').format(
-        name=name or mod.__name__,
-        version=mod.__version__,
-        location=bonobo_packages[name or mod.__name__].location
+        name=name or mod.__name__, version=mod.__version__, location=bonobo_packages[name or mod.__name__].location
     )
 
 

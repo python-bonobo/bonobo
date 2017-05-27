@@ -82,7 +82,9 @@ class PrettyPrinter(Configurable):
         return ' '.join(((' ' if i else '-'), str(item), ':', str(value).strip()))
 
     def _format_console(self, i, item, value):
-        return ' '.join(((' ' if i else '•'), str(item), '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL))
+        return ' '.join(
+            ((' ' if i else '•'), str(item), '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL)
+        )
 
 
 pprint = PrettyPrinter()
