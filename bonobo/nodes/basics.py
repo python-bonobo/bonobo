@@ -4,6 +4,7 @@ from pprint import pprint as _pprint
 import itertools
 from colorama import Fore, Style
 
+from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
 from bonobo.structs.bags import Bag
@@ -17,7 +18,7 @@ __all__ = [
     'Tee',
     'count',
     'pprint',
-    'PrettyPrint',
+    'PrettyPrinter',
     'noop',
 ]
 
@@ -72,11 +73,22 @@ def _count_counter(self, context):
 
 class PrettyPrinter(Configurable):
     def call(self, *args, **kwargs):
+        formater = self._format_quiet if settings.QUIET else self._format_console
+
         for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
-            print(' ' if i else '•', item, '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL)
+            print(formater(i, item, value))
+
+    def _format_quiet(self, i, item, value):
+        return ' '.join(((' ' if i else '-'), str(item), ':', str(value).strip()))
+
+    def _format_console(self, i, item, value):
+        return ' '.join(
+            ((' ' if i else '•'), str(item), '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL)
+        )
 
 
-pprint = Tee(_pprint)
+pprint = PrettyPrinter()
+pprint.__name__ = 'pprint'
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):

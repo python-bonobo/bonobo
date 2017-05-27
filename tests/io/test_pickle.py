@@ -28,9 +28,8 @@ def test_write_pickled_dict_to_file(tmpdir):
 
 def test_read_pickled_list_from_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.pkl'
-    fs.open(filename, 'wb').write(pickle.dumps([
-        ['a', 'b', 'c'], ['a foo', 'b foo', 'c foo'], ['a bar', 'b bar', 'c bar']
-    ]))
+    fs.open(filename,
+            'wb').write(pickle.dumps([['a', 'b', 'c'], ['a foo', 'b foo', 'c foo'], ['a bar', 'b bar', 'c bar']]))
 
     reader = PickleReader(path=filename)
 

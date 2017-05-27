@@ -13,6 +13,26 @@ contributions have less value, all contributions are very important.
 * You can enhance tests.
 * etc.
 
+tl;dr
+:::::
+
+1. Fork the github repository
+
+.. code-block:: shell-session
+
+    $ git clone https://github.com/python-bonobo/bonobo.git  # change this to use your fork.
+    $ cd bonobo
+    $ git remote add upstream https://github.com/python-bonobo/bonobo.git
+    $ git fetch upstream
+    $ git checkout upstream/develop -b feature/my_awesome_feature
+    $ # code, code, code, test, doc, code, test ...
+    $ git commit -m '[topic] .... blaaaah ....'
+    $ git push origin feature/my_awesome_feature
+
+2. Open pull request
+3. Rince, repeat
+
+
 Code-related contributions (including tests and examples)
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
