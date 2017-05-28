@@ -1,3 +1,4 @@
+import importlib
 import os
 import runpy
 
@@ -44,7 +45,13 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
         if os.path.isdir(filename):
             if install:
                 requirements = os.path.join(filename, 'requirements.txt')
-                pip.main(['install', '-qr', requirements])
+                pip.main(['install', '-r', requirements])
+                # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
+                # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
+                # python interpreter.
+                pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
+                import site
+                importlib.reload(site)
             filename = os.path.join(filename, DEFAULT_GRAPH_FILENAME)
         elif install:
             raise RuntimeError('Cannot --install on a file (only available for dirs containing requirements.txt).')
