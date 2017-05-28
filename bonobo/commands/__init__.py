@@ -5,6 +5,7 @@ from stevedore import ExtensionManager
 
 
 def entrypoint(args=None):
+    logging.basicConfig()
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(dest='command')
@@ -19,9 +20,7 @@ def entrypoint(args=None):
         except Exception:
             logging.exception('Error while loading command {}.'.format(ext.name))
 
-    mgr = ExtensionManager(
-        namespace='bonobo.commands',
-    )
+    mgr = ExtensionManager(namespace='bonobo.commands')
     mgr.map(register_extension)
 
     args = parser.parse_args(args).__dict__
