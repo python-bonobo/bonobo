@@ -46,6 +46,9 @@ python.add_requirements(
     dev=[
         'pytest-timeout >=1,<2',
     ],
+    docker=[
+        'bonobo-docker',
+    ],
     jupyter=[
         'jupyter >=1.0,<1.1',
         'ipywidgets >=6.0.0.beta5',
