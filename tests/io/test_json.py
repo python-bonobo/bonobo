@@ -17,7 +17,8 @@ def test_write_json_to_file(tmpdir):
     context.step()
     context.stop()
 
-    assert fs.open(filename).read() == '[{"foo": "bar"}]'
+    with fs.open(filename) as fp:
+        assert fp.read() == '[{"foo": "bar"}]'
 
     with pytest.raises(AttributeError):
         getattr(context, 'file')
@@ -28,7 +29,8 @@ def test_write_json_to_file(tmpdir):
 
 def test_read_json_from_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.json'
-    fs.open(filename, 'w').write('[{"x": "foo"},{"x": "bar"}]')
+    with fs.open(filename, 'w') as fp:
+        fp.write('[{"x": "foo"},{"x": "bar"}]')
     reader = JsonReader(path=filename)
 
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})

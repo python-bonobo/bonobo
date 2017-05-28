@@ -25,7 +25,8 @@ def test_file_writer_in_context(tmpdir, lines, output):
         context.step()
     context.stop()
 
-    assert fs.open(filename).read() == output
+    with fs.open(filename) as fp:
+        assert fp.read() == output
 
 
 def test_file_writer_out_of_context(tmpdir):
@@ -36,13 +37,15 @@ def test_file_writer_out_of_context(tmpdir):
     with writer.open(fs) as fp:
         fp.write('Yosh!')
 
-    assert fs.open(filename).read() == 'Yosh!'
+    with fs.open(filename) as fp:
+        assert fp.read() == 'Yosh!'
 
 
 def test_file_reader_in_context(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.txt'
 
-    fs.open(filename, 'w').write('Hello\nWorld\n')
+    with fs.open(filename, 'w') as fp:
+        fp.write('Hello\nWorld\n')
 
     reader = FileReader(path=filename)
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})

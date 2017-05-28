@@ -19,7 +19,8 @@ def test_write_csv_to_file(tmpdir):
     context.step()
     context.stop()
 
-    assert fs.open(filename).read() == 'foo\nbar\nbaz\n'
+    with fs.open(filename)as fp:
+        assert fp.read() == 'foo\nbar\nbaz\n'
 
     with pytest.raises(AttributeError):
         getattr(context, 'file')
@@ -27,7 +28,8 @@ def test_write_csv_to_file(tmpdir):
 
 def test_read_csv_from_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.csv'
-    fs.open(filename, 'w').write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
+    with fs.open(filename, 'w') as fp:
+        fp.write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
 
     reader = CsvReader(path=filename, delimiter=',')
 
@@ -59,7 +61,8 @@ def test_read_csv_from_file(tmpdir):
 
 def test_read_csv_kwargs_output_formater(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.csv'
-    fs.open(filename, 'w').write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
+    with fs.open(filename, 'w') as fp:
+        fp.write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
 
     reader = CsvReader(path=filename, delimiter=',', output_format='kwargs')
 
