@@ -9,8 +9,6 @@ install:
   - make install-dev
   - pip install coveralls
 script:
-  - make clean docs test
-  - pip install pycountry
-  - bin/run_all_examples.sh
+  - make clean test
 after_success:
   - coveralls
