@@ -1,7 +1,7 @@
 # This file has been auto-generated.
 # All changes will be lost, see Projectfile.
 #
-# Updated at 2017-05-28 12:03:49.427061
+# Updated at 2017-05-28 12:24:17.298429
 
 PACKAGE ?= bonobo
 PYTHON ?= $(shell which python)
@@ -48,3 +48,4 @@ $(SPHINX_SOURCEDIR): install-dev
 
 format: install-dev
 	$(YAPF) $(YAPF_OPTIONS) .
+	$(YAPF) $(YAPF_OPTIONS) Projectfile

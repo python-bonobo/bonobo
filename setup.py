@@ -68,7 +68,9 @@ setup(
             'init = bonobo.commands.init:register', 'run = bonobo.commands.run:register',
             'version = bonobo.commands.version:register'
         ],
-        'console_scripts': ['bonobo = bonobo.commands:entrypoint']
+        'console_scripts': ['bonobo = bonobo.commands:entrypoint'],
+        'edgy.project.features': ['bonobo = '
+                                  'bonobo.ext.edgy.project.feature:BonoboFeature']
     },
     url='https://www.bonobo-project.org/',
     download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.format(version=version),
