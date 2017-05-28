@@ -1,10 +1,16 @@
 Examples
 ========
 
-There are a few examples bundled with **bonobo**. You'll find them under the :mod:`bonobo.examples` package, and
-you can try them in a clone of bonobo by typing::
+There are a few examples bundled with **bonobo**.
 
-    $ bonobo run bonobo/examples/.../file.py
+You'll find them under the :mod:`bonobo.examples` package, and you can run them directly as modules:
+
+    $ bonobo run -m bonobo.examples...module
+
+.. toctree::
+    :maxdepth: 4
+
+    examples/tutorials
 
 
 Datasets

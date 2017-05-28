@@ -1,7 +1,7 @@
 # This file has been auto-generated.
 # All changes will be lost, see Projectfile.
 #
-# Updated at 2017-05-28 16:50:32.109035
+# Updated at 2017-05-28 18:02:16.552433
 
 PACKAGE ?= bonobo
 PYTHON ?= $(shell which python)

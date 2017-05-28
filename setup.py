@@ -58,8 +58,8 @@ setup(
     ],
     extras_require={
         'dev': [
-            'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)', 'pytest-cov (>= 2.5, < 3.0)',
-            'pytest-timeout (>= 1, < 2)', 'sphinx (>= 1.6, < 2.0)'
+            'cookiecutter (>= 1.5, < 1.6)', 'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)',
+            'pytest-cov (>= 2.5, < 3.0)', 'pytest-timeout (>= 1, < 2)', 'sphinx (>= 1.6, < 2.0)'
         ],
         'docker': ['bonobo-docker'],
         'jupyter': ['ipywidgets (>= 6.0.0.beta5)', 'jupyter (>= 1.0, < 1.1)']
