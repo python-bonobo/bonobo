@@ -16,13 +16,14 @@ python.setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
     data_files=[
-        ('share/jupyter/nbextensions/bonobo-jupyter', [
-            'bonobo/ext/jupyter/static/extension.js',
-            'bonobo/ext/jupyter/static/index.js',
-            'bonobo/ext/jupyter/static/index.js.map',
-        ]),
+        (
+            'share/jupyter/nbextensions/bonobo-jupyter', [
+                'bonobo/ext/jupyter/static/extension.js',
+                'bonobo/ext/jupyter/static/index.js',
+                'bonobo/ext/jupyter/static/index.js.map',
+            ]
+        ),
     ],
-
     entry_points={
         'console_scripts': [
             'bonobo = bonobo.commands:entrypoint',
@@ -33,7 +34,6 @@ python.setup(
             'version = bonobo.commands.version:register',
         ],
     }
-
 )
 
 python.add_requirements(

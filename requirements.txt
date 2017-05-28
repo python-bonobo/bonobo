@@ -11,7 +11,7 @@ pbr==3.0.1
 psutil==5.2.2
 pyparsing==2.2.0
 pytz==2017.2
-requests==2.16.2
+requests==2.16.5
 six==1.10.0
 stevedore==1.21.0
 urllib3==1.21.1
