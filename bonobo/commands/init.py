@@ -6,7 +6,7 @@ def execute(name):
         from cookiecutter.main import cookiecutter
     except ImportError as exc:
         raise ImportError(
-            'You must install "cookiecutter" to use this command.\n\n $ pip install edgy.project\n'
+            'You must install "cookiecutter" to use this command.\n\n $ pip install cookiecutter\n'
         ) from exc
 
     return cookiecutter(
