@@ -1,6 +1,3 @@
-import os
-
-
 def execute(name):
     try:
         from cookiecutter.main import cookiecutter
