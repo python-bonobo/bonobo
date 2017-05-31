@@ -1,5 +1,7 @@
 import os
 
+import logging
+
 
 def to_bool(s):
     if len(s):
@@ -10,13 +12,16 @@ def to_bool(s):
 
 
 # Debug/verbose mode.
-DEBUG = to_bool(os.environ.get('BONOBO_DEBUG', 'f'))
+DEBUG = to_bool(os.environ.get('DEBUG', 'f'))
 
 # Profile mode.
-PROFILE = to_bool(os.environ.get('BONOBO_PROFILE', 'f'))
+PROFILE = to_bool(os.environ.get('PROFILE', 'f'))
 
 # Quiet mode.
-QUIET = to_bool(os.environ.get('BONOBO_QUIET', 'f'))
+QUIET = to_bool(os.environ.get('QUIET', 'f'))
+
+# Logging level.
+LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
 
 
 def check():

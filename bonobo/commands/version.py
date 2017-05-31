@@ -1,8 +1,5 @@
-import bonobo
-from bonobo.util.pkgs import bonobo_packages
-
-
 def format_version(mod, *, name=None, quiet=False):
+    from bonobo.util.pkgs import bonobo_packages
     args = {
         'name': name or mod.__name__,
         'version': mod.__version__,
@@ -20,6 +17,9 @@ def format_version(mod, *, name=None, quiet=False):
 
 
 def execute(all=False, quiet=False):
+    import bonobo
+    from bonobo.util.pkgs import bonobo_packages
+
     print(format_version(bonobo, quiet=quiet))
     if all:
         for name in sorted(bonobo_packages):

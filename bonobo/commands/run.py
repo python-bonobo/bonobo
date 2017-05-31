@@ -1,17 +1,10 @@
-import importlib
 import os
-import runpy
-
-import pip
-
-import bonobo
 
 DEFAULT_SERVICES_FILENAME = '_services.py'
 DEFAULT_SERVICES_ATTR = 'get_services'
 
 DEFAULT_GRAPH_FILENAME = '__main__.py'
 DEFAULT_GRAPH_ATTR = 'get_graph'
-
 
 def get_default_services(filename, services=None):
     dirname = os.path.dirname(filename)
@@ -33,7 +26,8 @@ def get_default_services(filename, services=None):
 
 
 def execute(filename, module, install=False, quiet=False, verbose=False):
-    from bonobo import settings
+    import runpy
+    from bonobo import Graph, run, settings
 
     if quiet:
         settings.QUIET = True
@@ -44,6 +38,8 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     if filename:
         if os.path.isdir(filename):
             if install:
+                import importlib
+                import pip
                 requirements = os.path.join(filename, 'requirements.txt')
                 pip.main(['install', '-r', requirements])
                 # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
@@ -62,7 +58,7 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     else:
         raise RuntimeError('UNEXPECTED: argparse should not allow this.')
 
-    graphs = dict((k, v) for k, v in context.items() if isinstance(v, bonobo.Graph))
+    graphs = dict((k, v) for k, v in context.items() if isinstance(v, Graph))
 
     assert len(graphs) == 1, (
         'Having zero or more than one graph definition in one file is unsupported for now, '
@@ -73,7 +69,7 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
 
     # todo if console and not quiet, then add the console plugin
     # todo when better console plugin, add it if console and just disable display
-    return bonobo.run(
+    return run(
         graph,
         plugins=[],
         services=get_default_services(
@@ -82,8 +78,8 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     )
 
 
-def register_generic_run_arguments(parser):
-    source_group = parser.add_mutually_exclusive_group(required=True)
+def register_generic_run_arguments(parser, required=True):
+    source_group = parser.add_mutually_exclusive_group(required=required)
     source_group.add_argument('filename', nargs='?', type=str)
     source_group.add_argument('--module', '-m', type=str)
     return parser
