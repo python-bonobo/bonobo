@@ -9,7 +9,7 @@ idna==2.5
 imagesize==0.7.1
 jinja2==2.9.6
 markupsafe==1.0
-py==1.4.33
+py==1.4.34
 pygments==2.2.0
 pytest-cov==2.5.1
 pytest-timeout==1.2.0
