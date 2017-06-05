@@ -2,8 +2,8 @@ import bonobo
 from bonobo.commands.run import get_default_services
 
 graph = bonobo.Graph(
-    bonobo.CsvReader('datasets/coffeeshops.txt'),
-    print,
+    bonobo.CsvReader('datasets/coffeeshops.txt', headers=('item',)),
+    bonobo.PrettyPrinter(),
 )
 
 if __name__ == '__main__':

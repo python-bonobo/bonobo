@@ -14,7 +14,7 @@ class JsonReader(JsonHandler, FileReader):
 
     def read(self, fs, file):
         for line in self.loader(file):
-            yield line
+            yield self.get_output(line)
 
 
 class JsonWriter(JsonHandler, FileWriter):
