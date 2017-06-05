@@ -52,6 +52,6 @@ python.add_requirements(
     ],
     jupyter=[
         'jupyter >=1.0,<1.1',
-        'ipywidgets >=6.0.0.beta5',
+        'ipywidgets >=6.0.0,<7',
     ]
 )
