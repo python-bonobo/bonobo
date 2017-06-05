@@ -16,7 +16,7 @@ jinja2-time==0.2.0
 jinja2==2.9.6
 markupsafe==1.0
 poyo==0.4.1
-py==1.4.33
+py==1.4.34
 pygments==2.2.0
 pytest-cov==2.5.1
 pytest-timeout==1.2.0
