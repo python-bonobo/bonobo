@@ -1,7 +1,7 @@
 import json
 
 from bonobo.config.processors import ContextProcessor
-from .file import FileWriter, FileReader
+from bonobo.nodes.io.file import FileWriter, FileReader
 
 
 class JsonHandler():
