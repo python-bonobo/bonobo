@@ -2,7 +2,7 @@
 alabaster==0.7.10
 babel==2.4.0
 certifi==2017.4.17
-chardet==3.0.3
+chardet==3.0.4
 coverage==4.4.1
 docutils==0.13.1
 idna==2.5
