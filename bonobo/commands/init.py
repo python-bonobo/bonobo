@@ -1,4 +1,4 @@
-def execute(name):
+def execute(name, branch):
     try:
         from cookiecutter.main import cookiecutter
     except ImportError as exc:
@@ -7,10 +7,12 @@ def execute(name):
         ) from exc
 
     return cookiecutter(
-        'https://github.com/python-bonobo/cookiecutter-bonobo.git', extra_context={'name': name}, no_input=True
+        'https://github.com/python-bonobo/cookiecutter-bonobo.git', extra_context={'name': name}, no_input=True,
+        checkout=branch
     )
 
 
 def register(parser):
     parser.add_argument('name')
+    parser.add_argument('--branch', '-b', default='master')
     return execute
