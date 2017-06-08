@@ -1,6 +1,6 @@
 import pytest
 
-from bonobo import Bag, JsonReader, JsonWriter, open_fs
+from bonobo import Bag, JsonReader, JsonWriter, open_fs, settings
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
@@ -9,7 +9,7 @@ from bonobo.util.testing import CapturingNodeExecutionContext
 def test_write_json_to_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'output.json'
 
-    writer = JsonWriter(path=filename)
+    writer = JsonWriter(filename, ioformat=settings.IOFORMAT_ARG0)
     context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.start()
@@ -31,7 +31,7 @@ def test_read_json_from_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'input.json'
     with fs.open(filename, 'w') as fp:
         fp.write('[{"x": "foo"},{"x": "bar"}]')
-    reader = JsonReader(path=filename)
+    reader = JsonReader(filename, ioformat=settings.IOFORMAT_ARG0)
 
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 

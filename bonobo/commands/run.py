@@ -6,6 +6,7 @@ DEFAULT_SERVICES_ATTR = 'get_services'
 DEFAULT_GRAPH_FILENAME = '__main__.py'
 DEFAULT_GRAPH_ATTR = 'get_graph'
 
+
 def get_default_services(filename, services=None):
     dirname = os.path.dirname(filename)
     services_filename = os.path.join(dirname, DEFAULT_SERVICES_FILENAME)

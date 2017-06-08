@@ -1,7 +1,11 @@
 import bonobo
 
 graph = bonobo.Graph(
-    ['foo', 'bar', 'baz', ],
+    [
+        'foo',
+        'bar',
+        'baz',
+    ],
     str.upper,
     print,
 )

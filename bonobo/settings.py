@@ -1,6 +1,5 @@
-import os
-
 import logging
+import os
 
 from bonobo.errors import ValidationError
 
@@ -11,6 +10,36 @@ def to_bool(s):
             return False
         return True
     return False
+
+
+class Setting:
+    def __init__(self, name, default=None, validator=None):
+        self.name = name
+
+        if default:
+            self.default = default if callable(default) else lambda: default
+        else:
+            self.default = lambda: None
+
+        if validator:
+            self.validator = validator
+        else:
+            self.validator = None
+
+    def __repr__(self):
+        return '<Setting {}={!r}>'.format(self.name, self.value)
+
+    def set(self, value):
+        if self.validator and not self.validator(value):
+            raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
+        self.value = value
+
+    def get(self):
+        try:
+            return self.value
+        except AttributeError:
+            self.value = self.default()
+            return self.value
 
 
 # Debug/verbose mode.
@@ -34,21 +63,9 @@ IOFORMATS = {
     IOFORMAT_KWARGS,
 }
 
-IOFORMAT = os.environ.get('IOFORMAT', IOFORMAT_KWARGS)
-
-
-def validate_io_format(v):
-    if callable(v):
-        return v
-    if v in IOFORMATS:
-        return v
-    raise ValidationError('Unsupported format {!r}.'.format(v))
+IOFORMAT = Setting('IOFORMAT', default=IOFORMAT_KWARGS, validator=IOFORMATS.__contains__)
 
 
 def check():
     if DEBUG and QUIET:
         raise RuntimeError('I cannot be verbose and quiet at the same time.')
-
-    if IOFORMAT not in IOFORMATS:
-        raise RuntimeError('Invalid default input/output format.')
-

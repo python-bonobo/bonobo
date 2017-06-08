@@ -21,10 +21,8 @@ class FileHandler(Configurable):
     eol = Option(str, default='\n')  # type: str
     mode = Option(str)  # type: str
     encoding = Option(str, default='utf-8')  # type: str
-
     fs = Service('fs')  # type: str
-
-    ioformat = Option(settings.validate_io_format, default=settings.IOFORMAT)
+    ioformat = Option(default=settings.IOFORMAT.get)
 
     @ContextProcessor
     def file(self, context, fs):

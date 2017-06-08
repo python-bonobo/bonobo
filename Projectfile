@@ -44,8 +44,9 @@ python.add_requirements(
     'requests >=2.0,<3.0',
     'stevedore >=1.21,<2.0',
     dev=[
-        'pytest-timeout >=1,<2',
         'cookiecutter >=1.5,<1.6',
+        'pytest-sugar >=0.8,<0.9',
+        'pytest-timeout >=1,<2',
     ],
     docker=[
         'bonobo-docker',

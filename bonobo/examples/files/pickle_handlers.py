@@ -52,12 +52,7 @@ graph = bonobo.Graph(
 
 
 def get_services():
-    return {
-        'fs':
-            TarFS(
-                bonobo.get_examples_path('datasets/spam.tgz')
-            )
-    }
+    return {'fs': TarFS(bonobo.get_examples_path('datasets/spam.tgz'))}
 
 
 if __name__ == '__main__':
