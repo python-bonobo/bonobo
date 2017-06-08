@@ -2,7 +2,7 @@
 appnope==0.1.0
 bleach==2.0.0
 decorator==4.0.11
-entrypoints==0.2.2
+entrypoints==0.2.3
 html5lib==0.999999999
 ipykernel==4.6.1
 ipython-genutils==0.2.0
