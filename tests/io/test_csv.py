@@ -1,6 +1,6 @@
 import pytest
 
-from bonobo import Bag, CsvReader, CsvWriter, open_fs
+from bonobo import Bag, CsvReader, CsvWriter, open_fs, settings
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
@@ -9,7 +9,7 @@ from bonobo.util.testing import CapturingNodeExecutionContext
 def test_write_csv_to_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'output.csv'
 
-    writer = CsvWriter(path=filename)
+    writer = CsvWriter(path=filename, ioformat=settings.IOFORMAT_ARG0)
     context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.write(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
@@ -19,7 +19,7 @@ def test_write_csv_to_file(tmpdir):
     context.step()
     context.stop()
 
-    with fs.open(filename)as fp:
+    with fs.open(filename) as fp:
         assert fp.read() == 'foo\nbar\nbaz\n'
 
     with pytest.raises(AttributeError):
@@ -31,7 +31,7 @@ def test_read_csv_from_file(tmpdir):
     with fs.open(filename, 'w') as fp:
         fp.write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
 
-    reader = CsvReader(path=filename, delimiter=',')
+    reader = CsvReader(path=filename, delimiter=',', ioformat=settings.IOFORMAT_ARG0)
 
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
@@ -64,7 +64,7 @@ def test_read_csv_kwargs_output_formater(tmpdir):
     with fs.open(filename, 'w') as fp:
         fp.write('a,b,c\na foo,b foo,c foo\na bar,b bar,c bar')
 
-    reader = CsvReader(path=filename, delimiter=',', output_format='kwargs')
+    reader = CsvReader(path=filename, delimiter=',')
 
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 

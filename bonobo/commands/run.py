@@ -3,8 +3,9 @@ import os
 DEFAULT_SERVICES_FILENAME = '_services.py'
 DEFAULT_SERVICES_ATTR = 'get_services'
 
-DEFAULT_GRAPH_FILENAME = '__main__.py'
+DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py',)
 DEFAULT_GRAPH_ATTR = 'get_graph'
+
 
 def get_default_services(filename, services=None):
     dirname = os.path.dirname(filename)
@@ -48,7 +49,14 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
                 pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
                 import site
                 importlib.reload(site)
-            filename = os.path.join(filename, DEFAULT_GRAPH_FILENAME)
+
+            pathname = filename
+            for filename in DEFAULT_GRAPH_FILENAMES:
+                filename = os.path.join(pathname, filename)
+                if os.path.exists(filename):
+                    break
+            if not os.path.exists(filename):
+                raise IOError('Could not find entrypoint (candidates: {}).'.format(', '.join(DEFAULT_GRAPH_FILENAMES)))
         elif install:
             raise RuntimeError('Cannot --install on a file (only available for dirs containing requirements.txt).')
         context = runpy.run_path(filename, run_name='__bonobo__')

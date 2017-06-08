@@ -1,7 +1,9 @@
+from bonobo import settings
 from bonobo.config import Option, Service
 from bonobo.config.configurables import Configurable
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
+from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 
 
@@ -19,8 +21,8 @@ class FileHandler(Configurable):
     eol = Option(str, default='\n')  # type: str
     mode = Option(str)  # type: str
     encoding = Option(str, default='utf-8')  # type: str
-
     fs = Service('fs')  # type: str
+    ioformat = Option(default=settings.IOFORMAT.get)
 
     @ContextProcessor
     def file(self, context, fs):
@@ -30,15 +32,35 @@ class FileHandler(Configurable):
     def open(self, fs):
         return fs.open(self.path, self.mode, encoding=self.encoding)
 
+    def get_input(self, *args, **kwargs):
+        if self.ioformat == settings.IOFORMAT_ARG0:
+            assert len(args) == 1 and not len(kwargs), 'ARG0 format implies one arg and no kwargs.'
+            return args[0]
+
+        if self.ioformat == settings.IOFORMAT_KWARGS:
+            assert len(args) == 0 and len(kwargs), 'KWARGS format implies no arg.'
+            return kwargs
+
+        raise NotImplementedError('Unsupported format.')
+
+    def get_output(self, row):
+        if self.ioformat == settings.IOFORMAT_ARG0:
+            return row
+
+        if self.ioformat == settings.IOFORMAT_KWARGS:
+            return Bag(**row)
+
+        raise NotImplementedError('Unsupported format.')
+
 
 class Reader(FileHandler):
     """Abstract component factory for readers.
     """
 
-    def __call__(self, *args):
-        yield from self.read(*args)
+    def __call__(self, *args, **kwargs):
+        yield from self.read(*args, **kwargs)
 
-    def read(self, *args):
+    def read(self, *args, **kwargs):
         raise NotImplementedError('Abstract.')
 
 
@@ -46,10 +68,10 @@ class Writer(FileHandler):
     """Abstract component factory for writers.
     """
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
         return self.write(*args)
 
-    def write(self, *args):
+    def write(self, *args, **kwargs):
         raise NotImplementedError('Abstract.')
 
 

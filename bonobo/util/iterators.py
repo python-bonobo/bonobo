@@ -21,7 +21,7 @@ def force_iterator(mixed):
 def ensure_tuple(tuple_or_mixed):
     if isinstance(tuple_or_mixed, tuple):
         return tuple_or_mixed
-    return (tuple_or_mixed,)
+    return (tuple_or_mixed, )
 
 
 def tuplize(generator):

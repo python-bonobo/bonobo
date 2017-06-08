@@ -1,7 +1,8 @@
 import pickle
+
 import pytest
 
-from bonobo import Bag, PickleReader, PickleWriter, open_fs
+from bonobo import Bag, PickleReader, PickleWriter, open_fs, settings
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import CapturingNodeExecutionContext
@@ -10,7 +11,7 @@ from bonobo.util.testing import CapturingNodeExecutionContext
 def test_write_pickled_dict_to_file(tmpdir):
     fs, filename = open_fs(tmpdir), 'output.pkl'
 
-    writer = PickleWriter(path=filename)
+    writer = PickleWriter(filename, ioformat=settings.IOFORMAT_ARG0)
     context = NodeExecutionContext(writer, services={'fs': fs})
 
     context.write(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
@@ -32,7 +33,7 @@ def test_read_pickled_list_from_file(tmpdir):
     with fs.open(filename, 'wb') as fp:
         fp.write(pickle.dumps([['a', 'b', 'c'], ['a foo', 'b foo', 'c foo'], ['a bar', 'b bar', 'c bar']]))
 
-    reader = PickleReader(path=filename)
+    reader = PickleReader(filename, ioformat=settings.IOFORMAT_ARG0)
 
     context = CapturingNodeExecutionContext(reader, services={'fs': fs})
 
