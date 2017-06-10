@@ -1,6 +1,21 @@
 Changelog
 =========
 
+v.0.3.2 - 10 june 2017
+::::::::::::::::::::::
+
+Weekly maintenance release.
+
+* Updated frozen version numbers in requirements. 
+
+  * pytest==3.1.1
+  * requests==2.17.3
+  * sphinx==1.6.2
+  * stevedore==1.22.0
+
+  Note: this does not change anything when used as a dependency if you freeze your requirements, as the setup.py
+  requirement specifiers did not change.
+
 v.0.3.1 - 28 may 2017
 :::::::::::::::::::::
 
