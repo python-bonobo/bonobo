@@ -52,7 +52,7 @@ We'll use a text file that was generated using Bonobo from the "liste-des-cafes-
 Mairie de Paris under the Open Database License (ODbL). You can `explore the original dataset
 <https://opendata.paris.fr/explore/dataset/liste-des-cafes-a-un-euro/information/>`_.
 
-You'll need the `example dataset <https://github.com/python-bonobo/bonobo/blob/0.3/bonobo/examples/datasets/coffeeshops.txt>`_,
+You'll need the `example dataset <https://github.com/python-bonobo/bonobo/blob/master/bonobo/examples/datasets/coffeeshops.txt>`_,
 available in **Bonobo**'s repository.
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02e01_read.py

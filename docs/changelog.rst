@@ -1,6 +1,74 @@
 Changelog
 =========
 
+v.0.4.0 - 10 june 2017
+::::::::::::::::::::::
+
+Important highlights
+--------------------
+
+* **BC BREAK WARNING** New IOFORMAT option determines the default expected input and output format of transformations.
+  New default input/output format of transformations is now kwargs-based, instead of first-argument based. The
+  rationale behind this is that it does not make any sense to put a dict as the only argument of a transformation
+  knowing that python has a well supported syntax to do so already. Of course, it may break some of your
+  transformations but you can require the old behaviour by setting the IOFORMAT=arg0 environment variable.
+
+New features
+------------
+
+Command line interface
+......................
+
+* Allow to run directories or modules using "bonobo run".
+* Bonobo version command now shows where the package is installed, and an optional "--all/-a" flag show all
+  extensions in the same way. (#81)
+* Bonobo run flag "--install/-I" allow to pip install a requirements.txt file if run targets a directory. (#71)
+* Adds python logging facility configuration in bonobo cli commands.
+* Bonobo init now uses cookiecutter template.
+
+Configuration
+.............
+
+* `Exclusive(...)` context manager locks an object usage to one thread at a time.
+  ([docs](http://docs-dev.bonobo-project.org/en/develop/guide/services.html#solving-concurrency-problems))
+
+Standard library
+................
+
+* New PrettyPrinter and deprecate old crappy modules.
+* New pickle reader and writer (thanks @jelloslinger).
+
+Internals
+---------
+
+* ConsoleOutputPlugin now buffers stdout to avoid terminal conflicts. Side effect, output is only done every few tenth
+  of a second.
+
+Bugfixes
+--------
+
+* Fixes jupyter widget.
+
+Extensions
+----------
+
+* First release officially supporting bonobo-docker extension. See https://www.bonobo-project.org/with/docker.
+* Docker extension can be now installed using the "docker" extra on bonobo (`pip install bonobo[docker]`).
+* Jupyter widget now displays the status in topological order, like console.
+
+Miscellaneous
+-------------
+
+* Allow "main.py" as well as "__main__.py" to be the main entrypoint of an etl job.
+* Better error display (329296c).
+* Better testing.
+* Code sweeping (ecfdc81).
+* Dependencies updated.
+* Filesystem now resolve (expand) ~ in path.
+* Moving project artifact management (Projectfile) to edgy.project 0.3 format.
+* Refactoring and fixes around ioformats.
+* Some really minor changes.
+
 v.0.3.2 - 10 june 2017
 ::::::::::::::::::::::
 
