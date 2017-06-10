@@ -3,7 +3,7 @@ import os
 DEFAULT_SERVICES_FILENAME = '_services.py'
 DEFAULT_SERVICES_ATTR = 'get_services'
 
-DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py',)
+DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py', )
 DEFAULT_GRAPH_ATTR = 'get_graph'
 
 

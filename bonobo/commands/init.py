@@ -7,7 +7,9 @@ def execute(name, branch):
         ) from exc
 
     return cookiecutter(
-        'https://github.com/python-bonobo/cookiecutter-bonobo.git', extra_context={'name': name}, no_input=True,
+        'https://github.com/python-bonobo/cookiecutter-bonobo.git',
+        extra_context={'name': name},
+        no_input=True,
         checkout=branch
     )
 
