@@ -70,6 +70,9 @@ def set_level(level):
 def get_logger(name='bonobo'):
     return logging.getLogger(name)
 
+# Compatibility with python logging
+getLogger = get_logger
+
 
 # Setup formating and level.
 setup(level=settings.LOGGING_LEVEL)
