@@ -1,10 +1,11 @@
 import pickle
 
-from bonobo.config.processors import ContextProcessor
 from bonobo.config import Option
+from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
+from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
+from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.util.objects import ValueHolder
-from .file import FileReader, FileWriter, FileHandler
 
 
 class PickleHandler(FileHandler):
@@ -19,7 +20,7 @@ class PickleHandler(FileHandler):
     item_names = Option(tuple)
 
 
-class PickleReader(PickleHandler, FileReader):
+class PickleReader(IOFormatEnabled, FileReader, PickleHandler):
     """
     Reads a Python pickle object and yields the items in dicts.
     """
@@ -56,8 +57,7 @@ class PickleReader(PickleHandler, FileReader):
             yield self.get_output(dict(zip(i)) if is_dict else dict(zip(pickle_headers.value, i)))
 
 
-class PickleWriter(PickleHandler, FileWriter):
-
+class PickleWriter(IOFormatEnabled, FileWriter, PickleHandler):
     mode = Option(str, default='wb')
 
     def write(self, fs, file, lineno, item):

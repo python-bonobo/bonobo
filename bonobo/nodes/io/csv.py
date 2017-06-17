@@ -3,7 +3,8 @@ import csv
 from bonobo.config import Option
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
-from bonobo.nodes.io.file import FileHandler, FileReader, FileWriter
+from bonobo.nodes.io.file import FileReader, FileWriter
+from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
 from bonobo.util.objects import ValueHolder
 
 
@@ -28,7 +29,7 @@ class CsvHandler(FileHandler):
     headers = Option(tuple)
 
 
-class CsvReader(CsvHandler, FileReader):
+class CsvReader(IOFormatEnabled, FileReader, CsvHandler):
     """
     Reads a CSV and yield the values as dicts.
 
@@ -59,12 +60,12 @@ class CsvReader(CsvHandler, FileReader):
 
         for row in reader:
             if len(row) != field_count:
-                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count,))
+                raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count, ))
 
             yield self.get_output(dict(zip(_headers, row)))
 
 
-class CsvWriter(CsvHandler, FileWriter):
+class CsvWriter(IOFormatEnabled, FileWriter, CsvHandler):
     @ContextProcessor
     def writer(self, context, fs, file, lineno):
         writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol)
