@@ -68,7 +68,7 @@ register_api(create_strategy)
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
 @register_api
-def open_fs(fs_url, *args, **kwargs):
+def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
     
@@ -83,6 +83,10 @@ def open_fs(fs_url, *args, **kwargs):
     """
     from fs import open_fs as _open_fs
     from os.path import expanduser
+    from os import getcwd
+
+    if fs_url is None:
+        fs_url = getcwd()
 
     return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 

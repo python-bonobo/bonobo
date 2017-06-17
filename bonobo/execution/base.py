@@ -58,6 +58,13 @@ class LoopingExecutionContext(Wrapper):
         # XXX enhancers
         self._enhancers = get_enhancers(self.wrapped)
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        self.stop()
+
     def start(self):
         if self.started:
             raise RuntimeError('Cannot start a node twice ({}).'.format(get_name(self)))
