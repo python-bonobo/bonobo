@@ -1,7 +1,7 @@
 # This file has been auto-generated.
 # All changes will be lost, see Projectfile.
 #
-# Updated at 2017-06-10 15:15:34.093885
+# Updated at 2017-06-18 21:29:55.255815
 
 PACKAGE ?= bonobo
 PYTHON ?= $(shell which python)
@@ -18,7 +18,7 @@ SPHINX_BUILD ?= $(PYTHON_DIRNAME)/sphinx-build
 SPHINX_OPTIONS ?= 
 SPHINX_SOURCEDIR ?= docs
 SPHINX_BUILDDIR ?= $(SPHINX_SOURCEDIR)/_build
-YAPF ?= $(PYTHON_DIRNAME)/yapf
+YAPF ?= $(PYTHON) -m yapf
 YAPF_OPTIONS ?= -rip
 VERSION ?= $(shell git describe 2>/dev/null || echo dev)
 
