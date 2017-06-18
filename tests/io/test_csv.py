@@ -26,7 +26,7 @@ def test_write_csv_to_file_arg0(tmpdir):
 
 @pytest.mark.parametrize('add_kwargs', ({}, {
     'ioformat': settings.IOFORMAT_KWARGS,
-},))
+}, ))
 def test_write_csv_to_file_kwargs(tmpdir, add_kwargs):
     fs, filename, services = csv_tester.get_services_for_writer(tmpdir)
 
@@ -46,8 +46,8 @@ def test_read_csv_from_file_arg0(tmpdir):
     fs, filename, services = csv_tester.get_services_for_reader(tmpdir)
 
     with CapturingNodeExecutionContext(
-            CsvReader(path=filename, delimiter=',', ioformat=settings.IOFORMAT_ARG0),
-            services=services,
+        CsvReader(path=filename, delimiter=',', ioformat=settings.IOFORMAT_ARG0),
+        services=services,
     ) as context:
         context.write(BEGIN, Bag(), END)
         context.step()
@@ -75,8 +75,8 @@ def test_read_csv_from_file_kwargs(tmpdir):
     fs, filename, services = csv_tester.get_services_for_reader(tmpdir)
 
     with CapturingNodeExecutionContext(
-            CsvReader(path=filename, delimiter=','),
-            services=services,
+        CsvReader(path=filename, delimiter=','),
+        services=services,
     ) as context:
         context.write(BEGIN, Bag(), END)
         context.step()

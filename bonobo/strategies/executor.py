@@ -28,6 +28,7 @@ class ExecutorStrategy(Strategy):
         futures = []
 
         for plugin_context in context.plugins:
+
             def _runner(plugin_context=plugin_context):
                 with plugin_context:
                     try:
@@ -38,6 +39,7 @@ class ExecutorStrategy(Strategy):
             futures.append(executor.submit(_runner))
 
         for node_context in context.nodes:
+
             def _runner(node_context=node_context):
                 try:
                     node_context.start()

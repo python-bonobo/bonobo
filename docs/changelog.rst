@@ -1,6 +1,23 @@
 Changelog
 =========
 
+v.0.4.2 - 18 june 2017
+::::::::::::::::::::::
+
+* [config] Implements a "requires()" service injection decorator for functions (api may change).
+* [core] Execution contexts are now context managers.
+* [fs] adds a defaut to current working directory in open_fs(...).
+* [logging] Adds logging alias for easier imports.
+* [stdlib] Fix I/O related nodes (especially json), there were bad bugs with ioformat.
+
+Dependency updates
+------------------
+
+* Update bonobo-docker from 0.2.6 to 0.2.8
+* Update dependencies.
+* Update fs from 2.0.3 to 2.0.4
+* Update requests from 2.17.3 to 2.18.1
+
 v.0.4.0 - 10 june 2017
 ::::::::::::::::::::::
 
