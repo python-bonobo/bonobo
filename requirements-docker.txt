@@ -17,4 +17,4 @@ requests==2.18.1
 six==1.10.0
 stevedore==1.23.0
 urllib3==1.21.1
-websocket-client==0.42.1
+websocket-client==0.43.0
