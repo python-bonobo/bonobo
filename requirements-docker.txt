@@ -9,7 +9,7 @@ docker==2.3.0
 fs==2.0.4
 idna==2.5
 packaging==16.8
-pbr==3.0.1
+pbr==3.1.1
 psutil==5.2.2
 pyparsing==2.2.0
 pytz==2017.2
