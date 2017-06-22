@@ -24,7 +24,7 @@ pandocfilters==1.4.1
 pexpect==4.2.1
 pickleshare==0.7.4
 prompt-toolkit==1.0.14
-ptyprocess==0.5.1
+ptyprocess==0.5.2
 pygments==2.2.0
 python-dateutil==2.6.0
 pyzmq==16.0.2
