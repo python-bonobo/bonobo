@@ -58,19 +58,22 @@ class ConfigurationError(Exception):
     pass
 
 
-class MissingServiceImplementationError(KeyError):
-    pass
-
-
 class UnrecoverableError(Exception):
     """Flag for errors that must interrupt the workflow, either because they will happen for sure on each node run, or
     because you know that your transformation has no point continuing runnning after a bad event."""
 
+
 class UnrecoverableValueError(UnrecoverableError, ValueError):
     pass
+
 
 class UnrecoverableRuntimeError(UnrecoverableError, RuntimeError):
     pass
 
+
 class UnrecoverableNotImplementedError(UnrecoverableError, NotImplementedError):
+    pass
+
+
+class MissingServiceImplementationError(UnrecoverableError, KeyError):
     pass
