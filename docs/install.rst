@@ -4,36 +4,47 @@ Installation
 Create an ETL project
 :::::::::::::::::::::
 
-If you only want to use Bonobo to code ETLs, your easiest option to get started is to use our
-`cookiecutter template <https://github.com/python-bonobo/cookiecutter-bonobo>`_.
+Creating a project and starting to write code should take less than a minute:
+
+.. code-block:: shell-session
+
+    $ pip install --upgrade bonobo cookiecutter
+    $ bonobo init my-etl-project
+    $ bonobo run my-etl-project
+
+Once you bootstrapped a project, you can start editing the default example transformation by editing
+`my-etl-project/main.py`.
+
+Other installation options
+::::::::::::::::::::::::::
 
 Install from PyPI
-:::::::::::::::::
+-----------------
 
-You can also install it directly from the `Python Package Index <https://pypi.python.org/pypi/bonobo>`_.
+You can install it directly from the `Python Package Index <https://pypi.python.org/pypi/bonobo>`_ (like we did above).
 
 .. code-block:: shell-session
 
     $ pip install bonobo
 
 Install from source
-:::::::::::::::::::
+-------------------
 
 If you want to install an unreleased version, you can use git urls with pip. This is useful when using bonobo as a
-dependency of your code and you want to try a forked version of bonobo with your software. You can use the git+http
-string in your `requirements.txt` file. However, the best option for development on bonobo directly is not this one,
-but editable installs (see below).
+dependency of your code and you want to try a forked version of bonobo with your software. You can use a `git+http`
+string in your `requirements.txt` file. However, the best option for development on bonobo is an editable install (see
+below).
 
 .. code-block:: shell-session
 
-    $ pip install git+https://github.com/python-bonobo/bonobo.git@master#egg=bonobo
+    $ pip install git+https://github.com/python-bonobo/bonobo.git@develop#egg=bonobo
 
 Editable install
-::::::::::::::::
+----------------
 
-If you plan on making patches to Bonobo, you should install it as an "editable" package, which is a really great pip feature.
-Pip will clone your repository in a source directory and create a symlink for it in the site-package directory of your
-python interpreter.
+If you plan on making patches to Bonobo, you should install it as an "editable" package, which is a really great pip
+feature. Pip will clone your repository in a source directory and create a symlink for it in the site-package directory
+of your python interpreter.
 
 .. code-block:: shell-session
 
@@ -63,20 +74,17 @@ I usually name the git remote for the main bonobo repository "upstream", and my 
     
     $ git remote rename origin upstream
     $ git remote add origin git@github.com:hartym/bonobo.git
+    $ git fetch --all
 
 Of course, replace my github username by the one you used to fork bonobo. You should be good to go!
 
 Windows support
 :::::::::::::::
 
-There are problems on the windows platform, mostly due to the fact bonobo was not developed by experienced windows users.
+There are minor issues on the windows platform, mostly due to the fact bonobo was not developed by experienced windows
+users.
 
 We're trying to look into that but energy available to provide serious support on windows is very limited.
+
 If you have experience in this domain and you're willing to help, you're more than welcome!
-
-
-
-.. todo::
-
-    Better install docs, especially on how to use different forks or branches, etc.
 

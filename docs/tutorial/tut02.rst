@@ -23,16 +23,18 @@ When run, the execution strategy wraps every component in a thread (assuming you
 :class:`bonobo.strategies.ThreadPoolExecutorStrategy`).
 
 Bonobo will send each line of data in the input node's thread (here, `A`). Now, each time `A` *yields* or *returns*
-something, it will be pushed on `B` input :class:`queue.Queue`, and will be consumed by `B`'s thread.
+something, it will be pushed on `B` input :class:`queue.Queue`, and will be consumed by `B`'s thread. Meanwhile, `A`
+will continue to run, if it's not done.
 
-When there is more than one node linked as the output of a node (for example, with `B`, `C`, and `D`) , the same thing
+When there is more than one node linked as the output of a node (for example, with `B`, `C`, and `D`), the same thing
 happens except that each result coming out of `B` will be sent to both on `C` and `D` input :class:`queue.Queue`.
 
 One thing to keep in mind here is that as the objects are passed from thread to thread, you need to write "pure"
 transformations (see :doc:`/guide/purity`).
 
 You generally don't have to think about it. Just be aware that your nodes will run in parallel, and don't worry
-too much about blocking nodes, as they won't block other nodes.
+too much about nodes running blocking operations, as they will run in parallel. As soon as a line of output is ready,
+the next nodes will start consuming it.
 
 That being said, let's manipulate some files.
 
@@ -52,17 +54,32 @@ We'll use a text file that was generated using Bonobo from the "liste-des-cafes-
 Mairie de Paris under the Open Database License (ODbL). You can `explore the original dataset
 <https://opendata.paris.fr/explore/dataset/liste-des-cafes-a-un-euro/information/>`_.
 
-You'll need the `example dataset <https://github.com/python-bonobo/bonobo/blob/master/bonobo/examples/datasets/coffeeshops.txt>`_,
-available in **Bonobo**'s repository.
+You'll need the `"coffeeshops.txt" example dataset <https://github.com/python-bonobo/bonobo/blob/master/bonobo/examples/datasets/coffeeshops.txt>`_,
+available in **Bonobo**'s repository:
+
+.. code-block:: shell-session
+
+    $ curl https://raw.githubusercontent.com/python-bonobo/bonobo/master/bonobo/examples/datasets/coffeeshops.txt > `python -c 'import bonobo; print(bonobo.get_examples_path("datasets/coffeeshops.txt"))'`
+
+.. note::
+
+    The "example dataset download" step will be easier in the future.
+
+    https://github.com/python-bonobo/bonobo/issues/134
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02e01_read.py
     :language: python
 
-You can run this example as a module:
+You can also run this example as a module (but you'll still need the dataset...):
 
 .. code-block:: shell-session
 
     $ bonobo run -m bonobo.examples.tutorials.tut02e01_read
+
+.. note::
+
+    Don't focus too much on the `get_services()` function for now. It is required, with this exact name, but we'll get
+    into that in a few minutes.
 
 Writing to files
 ::::::::::::::::

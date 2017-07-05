@@ -5,7 +5,10 @@ graph = bonobo.Graph(
     print,
 )
 
+
+def get_services():
+    return {'fs': bonobo.open_examples_fs('datasets')}
+
+
 if __name__ == '__main__':
-    bonobo.run(
-        graph, services={'fs': bonobo.open_examples_fs('datasets')}
-    )
+    bonobo.run(graph, services=get_services())
