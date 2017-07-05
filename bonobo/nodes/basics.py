@@ -69,7 +69,7 @@ def _count_counter(self, context):
 
 class PrettyPrinter(Configurable):
     def call(self, *args, **kwargs):
-        formater = self._format_quiet if settings.QUIET else self._format_console
+        formater = self._format_quiet if settings.QUIET.get() else self._format_console
 
         for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
             print(formater(i, item, value))

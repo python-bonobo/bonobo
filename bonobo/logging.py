@@ -75,4 +75,4 @@ def get_logger(name='bonobo'):
 getLogger = get_logger
 
 # Setup formating and level.
-setup(level=settings.LOGGING_LEVEL)
+setup(level=settings.LOGGING_LEVEL.get())

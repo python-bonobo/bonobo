@@ -31,10 +31,10 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     from bonobo import Graph, run, settings
 
     if quiet:
-        settings.QUIET = True
+        settings.QUIET.set(True)
 
     if verbose:
-        settings.DEBUG = True
+        settings.DEBUG.set(True)
 
     if filename:
         if os.path.isdir(filename):

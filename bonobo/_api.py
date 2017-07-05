@@ -45,7 +45,7 @@ def run(graph, strategy=None, plugins=None, services=None):
     from bonobo import settings
     settings.check()
 
-    if not settings.QUIET:  # pragma: no cover
+    if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
             from bonobo.ext.console import ConsoleOutputPlugin
             if ConsoleOutputPlugin not in plugins:
