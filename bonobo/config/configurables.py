@@ -51,7 +51,7 @@ class ConfigurableMeta(type):
         return (processor for _, processor in cls.__processors)
 
     def __repr__(self):
-        return ' '.join(('<Configurable', super(ConfigurableMeta, self).__repr__().split(' ', 1)[1],))
+        return ' '.join(('<Configurable', super(ConfigurableMeta, self).__repr__().split(' ', 1)[1], ))
 
 
 try:
@@ -61,6 +61,7 @@ except:
 
     PartiallyConfigured = functools.partial
 else:
+
     class PartiallyConfigured(_functools.partial):
         @property  # TODO XXX cache this shit
         def _options_values(self):
@@ -160,9 +161,7 @@ class Configurable(metaclass=ConfigurableMeta):
 
     def __init__(self, *args, **kwargs):
         # initialize option's value dictionary, used by descriptor implementation (see Option).
-        self._options_values = {
-            **kwargs
-        }
+        self._options_values = {**kwargs}
 
         # set option values.
         for name, value in kwargs.items():

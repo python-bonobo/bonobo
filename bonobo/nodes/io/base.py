@@ -12,7 +12,7 @@ class IOFormatEnabled(Configurable):
             if len(args) != 1 or len(kwargs):
                 raise UnrecoverableValueError(
                     'Wrong input formating: IOFORMAT=ARG0 implies one arg and no kwargs, got args={!r} and kwargs={!r}.'.
-                        format(args, kwargs)
+                    format(args, kwargs)
                 )
             return args[0]
 
@@ -20,7 +20,7 @@ class IOFormatEnabled(Configurable):
             if len(args) or not len(kwargs):
                 raise UnrecoverableValueError(
                     'Wrong input formating: IOFORMAT=KWARGS ioformat implies no arg, got args={!r} and kwargs={!r}.'.
-                        format(args, kwargs)
+                    format(args, kwargs)
                 )
             return kwargs
 

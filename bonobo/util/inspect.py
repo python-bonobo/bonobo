@@ -68,14 +68,15 @@ def istype(mixed):
     return isinstance(mixed, type)
 
 
-ConfigurableInspection = namedtuple('ConfigurableInspection',
-                                    [
-                                        'type',
-                                        'instance',
-                                        'options',
-                                        'processors',
-                                        'partial',
-                                    ])
+ConfigurableInspection = namedtuple(
+    'ConfigurableInspection', [
+        'type',
+        'instance',
+        'options',
+        'processors',
+        'partial',
+    ]
+)
 
 ConfigurableInspection.__enter__ = lambda self: self
 ConfigurableInspection.__exit__ = lambda *exc_details: None
@@ -103,7 +104,8 @@ def inspect_node(mixed, *, _partial=None):
         return inspect_node(mixed.func, _partial=(mixed.args, mixed.keywords))
     else:
         raise TypeError(
-            'Not a Configurable, nor a Configurable instance and not even a partially configured Configurable. Check your inputs.')
+            'Not a Configurable, nor a Configurable instance and not even a partially configured Configurable. Check your inputs.'
+        )
 
     return ConfigurableInspection(
         typ,

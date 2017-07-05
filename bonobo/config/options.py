@@ -130,13 +130,12 @@ class Method(Option):
 
     def __set__(self, inst, value):
         if not hasattr(value, '__call__'):
-            raise TypeError('Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.format(
-                type(self).__name__, type(value).__name__))
+            raise TypeError(
+                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.
+                format(type(self).__name__, type(value).__name__)
+            )
         inst._options_values[self.name] = self.type(value) if self.type else value
 
     def __call__(self, *args, **kwargs):
         # only here to trick IDEs into thinking this is callable.
         raise NotImplementedError('You cannot call the descriptor')
-
-
-

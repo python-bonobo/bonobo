@@ -99,9 +99,7 @@ def test_exclusive():
 def test_requires():
     vcr = VCR()
 
-    services = Container(
-        output=vcr.append
-    )
+    services = Container(output=vcr.append)
 
     @requires('output')
     def append(out, x):
@@ -110,7 +108,3 @@ def test_requires():
     svcargs = services.args_for(append)
     assert len(svcargs) == 1
     assert svcargs[0] == vcr.append
-
-
-
-

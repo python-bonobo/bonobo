@@ -134,4 +134,3 @@ def test_no_opt_configurable():
 
     with inspect_node(o) as ni:
         assert not ni.partial
-
