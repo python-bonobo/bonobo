@@ -1,16 +1,16 @@
 import functools
-from pprint import pprint as _pprint
-
 import itertools
+
 from colorama import Fore, Style
 
 from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.structs.bags import Bag
+from bonobo.util.compat import deprecated
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
-from bonobo.constants import NOT_MODIFIED
 
 __all__ = [
     'identity',
@@ -87,8 +87,12 @@ class PrettyPrinter(Configurable):
         )
 
 
-pprint = PrettyPrinter()
-pprint.__name__ = 'pprint'
+_pprint = PrettyPrinter()
+
+
+@deprecated
+def pprint(*args, **kwargs):
+    return _pprint(*args, **kwargs)
 
 
 def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):

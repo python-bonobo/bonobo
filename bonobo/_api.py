@@ -1,6 +1,6 @@
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrinter, PickleWriter, PickleReader, Tee, count, identity, noop, pprint
+    PrettyPrinter, PickleWriter, PickleReader, RateLimited, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
@@ -104,6 +104,7 @@ register_api_group(
     PrettyPrinter,
     PickleReader,
     PickleWriter,
+    RateLimited,
     Tee,
     count,
     identity,

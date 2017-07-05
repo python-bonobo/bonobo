@@ -27,7 +27,7 @@ class Setting:
             self.validator = None
 
     def __repr__(self):
-        return '<Setting {}={!r}>'.format(self.name, self.value)
+        return '<Setting {}={!r}>'.format(self.name, self.get())
 
     def set(self, value):
         if self.validator and not self.validator(value):
