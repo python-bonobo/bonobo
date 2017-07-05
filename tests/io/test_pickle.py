@@ -2,24 +2,22 @@ import pickle
 
 import pytest
 
-from bonobo import Bag, PickleReader, PickleWriter, open_fs, settings
+from bonobo import Bag, PickleReader, PickleWriter, settings
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
-from bonobo.util.testing import CapturingNodeExecutionContext
+from bonobo.util.testing import CapturingNodeExecutionContext, FilesystemTester
+
+pickle_tester = FilesystemTester('pkl', mode='wb')
+pickle_tester.input_data = pickle.dumps([['a', 'b', 'c'], ['a foo', 'b foo', 'c foo'], ['a bar', 'b bar', 'c bar']])
 
 
 def test_write_pickled_dict_to_file(tmpdir):
-    fs, filename = open_fs(tmpdir), 'output.pkl'
+    fs, filename, services = pickle_tester.get_services_for_writer(tmpdir)
 
-    writer = PickleWriter(filename, ioformat=settings.IOFORMAT_ARG0)
-    context = NodeExecutionContext(writer, services={'fs': fs})
-
-    context.write(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
-
-    context.start()
-    context.step()
-    context.step()
-    context.stop()
+    with NodeExecutionContext(PickleWriter(filename, ioformat=settings.IOFORMAT_ARG0), services=services) as context:
+        context.write(BEGIN, Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}), END)
+        context.step()
+        context.step()
 
     with fs.open(filename, 'rb') as fp:
         assert pickle.loads(fp.read()) == {'foo': 'bar'}
@@ -29,18 +27,13 @@ def test_write_pickled_dict_to_file(tmpdir):
 
 
 def test_read_pickled_list_from_file(tmpdir):
-    fs, filename = open_fs(tmpdir), 'input.pkl'
-    with fs.open(filename, 'wb') as fp:
-        fp.write(pickle.dumps([['a', 'b', 'c'], ['a foo', 'b foo', 'c foo'], ['a bar', 'b bar', 'c bar']]))
+    fs, filename, services = pickle_tester.get_services_for_reader(tmpdir)
 
-    reader = PickleReader(filename, ioformat=settings.IOFORMAT_ARG0)
-
-    context = CapturingNodeExecutionContext(reader, services={'fs': fs})
-
-    context.start()
-    context.write(BEGIN, Bag(), END)
-    context.step()
-    context.stop()
+    with CapturingNodeExecutionContext(
+        PickleReader(filename, ioformat=settings.IOFORMAT_ARG0), services=services
+    ) as context:
+        context.write(BEGIN, Bag(), END)
+        context.step()
 
     assert len(context.send.mock_calls) == 2
 

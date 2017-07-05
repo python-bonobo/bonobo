@@ -27,9 +27,9 @@ def entrypoint(args=None):
 
     args = parser.parse_args(args).__dict__
     if args.pop('debug', False):
-        settings.DEBUG = True
-        settings.LOGGING_LEVEL = logging.DEBUG
-        logging.set_level(settings.LOGGING_LEVEL)
+        settings.DEBUG.set(True)
+        settings.LOGGING_LEVEL.set(logging.DEBUG)
+        logging.set_level(settings.LOGGING_LEVEL.get())
 
     logger.debug('Command: ' + args['command'] + ' Arguments: ' + repr(args))
     commands[args.pop('command')](**args)

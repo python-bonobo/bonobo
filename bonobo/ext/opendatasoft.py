@@ -13,13 +13,13 @@ def path_str(path):
 
 
 class OpenDataSoftAPI(Configurable):
-    dataset = Option(str, required=True)
+    dataset = Option(str, positional=True)
     endpoint = Option(str, default='{scheme}://{netloc}{path}')
     scheme = Option(str, default='https')
     netloc = Option(str, default='data.opendatasoft.com')
     path = Option(path_str, default='/api/records/1.0/search/')
     rows = Option(int, default=500)
-    limit = Option(int, default=None)
+    limit = Option(int, required=False)
     timezone = Option(str, default='Europe/Paris')
     kwargs = Option(dict, default=dict)
 

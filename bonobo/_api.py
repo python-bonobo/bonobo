@@ -1,6 +1,6 @@
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrinter, PickleWriter, PickleReader, Tee, count, identity, noop, pprint
+    PrettyPrinter, PickleWriter, PickleReader, RateLimited, Tee, count, identity, noop
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
@@ -45,7 +45,7 @@ def run(graph, strategy=None, plugins=None, services=None):
     from bonobo import settings
     settings.check()
 
-    if not settings.QUIET:  # pragma: no cover
+    if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
             from bonobo.ext.console import ConsoleOutputPlugin
             if ConsoleOutputPlugin not in plugins:
@@ -68,7 +68,7 @@ register_api(create_strategy)
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
 @register_api
-def open_fs(fs_url, *args, **kwargs):
+def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
     
@@ -83,6 +83,10 @@ def open_fs(fs_url, *args, **kwargs):
     """
     from fs import open_fs as _open_fs
     from os.path import expanduser
+    from os import getcwd
+
+    if fs_url is None:
+        fs_url = getcwd()
 
     return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
@@ -100,11 +104,11 @@ register_api_group(
     PrettyPrinter,
     PickleReader,
     PickleWriter,
+    RateLimited,
     Tee,
     count,
     identity,
     noop,
-    pprint,
 )
 
 

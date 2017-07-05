@@ -77,6 +77,12 @@ class Input(Queue, Readable, Writable):
 
         return Queue.put(self, data, block, timeout)
 
+    def _decrement_runlevel(self):
+        if self._runlevel == 1:
+            self.on_finalize()
+        self._runlevel -= 1
+        self.on_end()
+
     def get(self, block=True, timeout=None):
         if not self.alive:
             raise InactiveReadableError('Cannot get() on an inactive {}.'.format(Readable.__name__))
@@ -84,13 +90,7 @@ class Input(Queue, Readable, Writable):
         data = Queue.get(self, block, timeout)
 
         if data == END:
-            if self._runlevel == 1:
-                self.on_finalize()
-
-            self._runlevel -= 1
-
-            # callback
-            self.on_end()
+            self._decrement_runlevel()
 
             if not self.alive:
                 raise InactiveReadableError(
@@ -99,6 +99,10 @@ class Input(Queue, Readable, Writable):
             return self.get(block, timeout)
 
         return data
+
+    def shutdown(self):
+        while self._runlevel >= 1:
+            self._decrement_runlevel()
 
     def empty(self):
         self.mutex.acquire()

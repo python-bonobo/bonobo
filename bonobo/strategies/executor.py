@@ -1,6 +1,5 @@
 import time
 import traceback
-
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
 from bonobo.constants import BEGIN, END
@@ -31,12 +30,11 @@ class ExecutorStrategy(Strategy):
         for plugin_context in context.plugins:
 
             def _runner(plugin_context=plugin_context):
-                try:
-                    plugin_context.start()
-                    plugin_context.loop()
-                    plugin_context.stop()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=plugin_context)
+                with plugin_context:
+                    try:
+                        plugin_context.loop()
+                    except Exception as exc:
+                        print_error(exc, traceback.format_exc(), context=plugin_context)
 
             futures.append(executor.submit(_runner))
 

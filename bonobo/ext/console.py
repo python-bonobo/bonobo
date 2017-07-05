@@ -65,7 +65,7 @@ class ConsoleOutputPlugin(Plugin):
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
-            name_suffix = '({})'.format(i) if settings.DEBUG else ''
+            name_suffix = '({})'.format(i) if settings.DEBUG.get() else ''
             if node.alive:
                 _line = ''.join(
                     (
@@ -100,7 +100,7 @@ class ConsoleOutputPlugin(Plugin):
             print(MOVE_CURSOR_UP(t_cnt + 2), file=sys.stderr)
 
     def _write(self, graph_context, rewind):
-        if settings.PROFILE:
+        if settings.PROFILE.get():
             if self.counter % 10 and self._append_cache:
                 append = self._append_cache
             else:

@@ -5,6 +5,7 @@ import pytest
 import bonobo
 from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import NOT_MODIFIED
+from bonobo.util.inspect import inspect_node
 
 
 def test_count():
