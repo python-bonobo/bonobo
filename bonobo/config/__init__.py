@@ -3,7 +3,7 @@ from bonobo.config.options import Method, Option
 from bonobo.config.processors import ContextProcessor
 from bonobo.config.services import Container, Exclusive, Service, requires
 
-# bonobo.config public programming interface
+# Bonobo's Config API
 __all__ = [
     'Configurable',
     'Container',

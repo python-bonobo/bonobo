@@ -74,8 +74,7 @@ class ContextCurrifier:
     def __init__(self, wrapped, *initial_context):
         self.wrapped = wrapped
         self.context = tuple(initial_context)
-        self._stack = []
-        self._stack_values = []
+        self._stack, self._stack_values = None, None
 
     def __iter__(self):
         yield from self.wrapped
@@ -86,8 +85,10 @@ class ContextCurrifier:
         return self.wrapped(*self.context, *args, **kwargs)
 
     def setup(self, *context):
-        if len(self._stack):
+        if self._stack is not None:
             raise RuntimeError('Cannot setup context currification twice.')
+
+        self._stack, self._stack_values = list(), list()
         for processor in resolve_processors(self.wrapped):
             _processed = processor(self.wrapped, *context, *self.context)
             _append_to_context = next(_processed)
@@ -97,7 +98,7 @@ class ContextCurrifier:
             self._stack.append(_processed)
 
     def teardown(self):
-        while len(self._stack):
+        while self._stack:
             processor = self._stack.pop()
             try:
                 # todo yield from ? how to ?
@@ -108,6 +109,7 @@ class ContextCurrifier:
             else:
                 # No error ? We should have had StopIteration ...
                 raise RuntimeError('Context processors should not yield more than once.')
+        self._stack, self._stack_values = None, None
 
     @contextmanager
     def as_contextmanager(self, *context):

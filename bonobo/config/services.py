@@ -53,7 +53,7 @@ class Service(Option):
         super().__init__(str, required=False, default=name)
 
     def __set__(self, inst, value):
-        inst.__options_values__[self.name] = validate_service_name(value)
+        inst._options_values[self.name] = validate_service_name(value)
 
     def resolve(self, inst, services):
         try:
@@ -75,7 +75,7 @@ class Container(dict):
 
     def args_for(self, mixed):
         try:
-            options = mixed.__options__
+            options = dict(mixed.__options__)
         except AttributeError:
             options = {}
 
