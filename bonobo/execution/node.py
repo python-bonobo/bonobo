@@ -95,6 +95,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                 continue
             except UnrecoverableError as exc:
                 self.handle_error(exc, traceback.format_exc())
+                self.input.shutdown()
                 break
             except Exception as exc:  # pylint: disable=broad-except
                 self.handle_error(exc, traceback.format_exc())

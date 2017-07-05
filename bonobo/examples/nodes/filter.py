@@ -9,13 +9,16 @@ class OddOnlyFilter(Filter):
 
 
 @Filter
-def MultiplesOfThreeOnlyFilter(self, i):
+def multiples_of_three(i):
     return not (i % 3)
 
 
 graph = bonobo.Graph(
     lambda: tuple(range(50)),
     OddOnlyFilter(),
-    MultiplesOfThreeOnlyFilter(),
+    multiples_of_three,
     print,
 )
+
+if __name__ == '__main__':
+    bonobo.run(graph)
