@@ -19,7 +19,7 @@ can run.
 
 .. code-block:: shell-session
 
-    bonobo init tutorial
+    $ bonobo init tutorial
 
 This will create a `tutorial` directory (`content description here <https://www.bonobo-project.org/with/cookiecutter>`_).
 
@@ -27,15 +27,15 @@ To run this project, use:
 
 .. code-block:: shell-session
 
-    bonobo run tutorial
+    $ bonobo run tutorial
 
 
 Write a first transformation
 ::::::::::::::::::::::::::::
 
-Open `tutorial/__main__.py`, and delete all the code here.
+Open `tutorial/main.py`, and delete all the code here.
 
-A transformation can be whatever python can call, having inputs and outputs. Simplest transformations are functions.
+A transformation can be whatever python can call. Simplest transformations are functions and generators.
 
 Let's write one:
 
@@ -48,10 +48,10 @@ Easy.
 
 .. note::
 
-    This is about the same as :func:`str.upper`, and in the real world, you'd use it directly.
+    This function is very similar to :func:`str.upper`, which you can use directly.
 
 Let's write two more transformations for the "extract" and "load" steps. In this example, we'll generate the data from
-scratch, and we'll use stdout to simulate data-persistence.
+scratch, and we'll use stdout to "simulate" data-persistence.
 
 .. code-block:: python
 
@@ -68,16 +68,16 @@ on things returned, and a normal function will just be seen as a generator that 
 
 .. note::
 
-    Once again, :func:`print` would be used directly in a real-world transformation.
+    Once again, you should use the builtin :func:`print` directly instead of this `load()` function.
 
 
 Create a transformation graph
 :::::::::::::::::::::::::::::
 
-Bonobo main roles are two things:
+Amongst other features, Bonobo will mostly help you there with the following:
 
 * Execute the transformations in independant threads
-* Pass the outputs of one thread to other(s) thread(s).
+* Pass the outputs of one thread to other(s) thread(s) inputs.
 
 To do this, it needs to know what data-flow you want to achieve, and you'll use a :class:`bonobo.Graph` to describe it.
 
@@ -109,17 +109,17 @@ To do this, it needs to know what data-flow you want to achieve, and you'll use 
 Execute the job
 :::::::::::::::
 
-Save `tutorial/__main__.py` and execute your transformation:
+Save `tutorial/main.py` and execute your transformation again:
 
 .. code-block:: shell-session
 
-    bonobo run tutorial
+    $ bonobo run tutorial
 
 This example is available in :mod:`bonobo.examples.tutorials.tut01e01`, and you can also run it as a module:
 
 .. code-block:: shell-session
 
-    bonobo run -m bonobo.examples.tutorials.tut01e01
+    $ bonobo run -m bonobo.examples.tutorials.tut01e01
 
 
 Rewrite it using builtins
@@ -127,27 +127,17 @@ Rewrite it using builtins
 
 There is a much simpler way to describe an equivalent graph:
 
-.. code-block:: python
+.. literalinclude:: ../../bonobo/examples/tutorials/tut01e02.py
+    :language: python
 
-    import bonobo
+The `extract()` generator has been replaced by a list, as Bonobo will interpret non-callable iterables as a no-input
+generator.
 
-    graph = bonobo.Graph(
-        ['foo', 'bar', 'baz',],
-        str.upper,
-        print,
-    )
-
-    if __name__ == '__main__':
-        bonobo.run(graph)
-
-We use a shortcut notation for the generator, with a list. Bonobo will wrap an iterable as a generator by itself if it
-is added in a graph.
-
-This example is available in :mod:`bonobo.examples.tutorials.tut01e02`, and you can also run it as a module:
+This example is also available in :mod:`bonobo.examples.tutorials.tut01e02`, and you can also run it as a module:
 
 .. code-block:: shell-session
 
-    bonobo run -m bonobo.examples.tutorials.tut01e02
+    $ bonobo run -m bonobo.examples.tutorials.tut01e02
 
 You can now jump to the next part (:doc:`tut02`), or read a small summary of concepts and definitions introduced here
 below.
@@ -188,19 +178,19 @@ cases.
 Concepts and definitions
 ::::::::::::::::::::::::
 
-* Transformation: a callable that takes input (as call parameters) and returns output(s), either as its return value or
+* **Transformation**: a callable that takes input (as call parameters) and returns output(s), either as its return value or
   by yielding values (a.k.a returning a generator).
 
-* Transformation graph (or Graph): a set of transformations tied together in a :class:`bonobo.Graph` instance, which is
+* **Transformation graph (or Graph)**: a set of transformations tied together in a :class:`bonobo.Graph` instance, which is
   a directed acyclic graph (or DAG).
 
-* Node: a graph element, most probably a transformation in a graph.
+* **Node**: a graph element, most probably a transformation in a graph.
 
-* Execution strategy (or strategy): a way to run a transformation graph. It's responsibility is mainly to parallelize
+* **Execution strategy (or strategy)**: a way to run a transformation graph. It's responsibility is mainly to parallelize
   (or not) the transformations, on one or more process and/or computer, and to setup the right queuing mechanism for
   transformations' inputs and outputs.
 
-* Execution context (or context): a wrapper around a node that holds the state for it. If the node needs state, there
+* **Execution context (or context)**: a wrapper around a node that holds the state for it. If the node needs state, there
   are tools available in bonobo to feed it to the transformation using additional call parameters, keeping
   transformations stateless.
 
