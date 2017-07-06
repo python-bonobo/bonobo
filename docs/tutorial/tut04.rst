@@ -39,17 +39,21 @@ Open your `_services.py` file and replace the code:
 
 .. code-block:: python
 
-    import bonobo
-    import dotenv
-
+    import bonobo, dotenv, logging, os
     from bonobo_sqlalchemy.util import create_postgresql_engine
 
     dotenv.load_dotenv(dotenv.find_dotenv())
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
     def get_services():
         return {
-            'fs': bonobo.open_fs(),
-            'db': create_postgresql_engine(name='tutorial')
+            'fs': bonobo.open_examples_fs('datasets'),
+            'fs.output': bonobo.open_fs(),
+            'sqlalchemy.engine': create_postgresql_engine(**{
+                    'name': 'tutorial',
+                    'user': 'tutorial',
+                    'pass': 'tutorial',
+                })
         }
 
 The `create_postgresql_engine` is a tiny function building the DSN from reasonable defaults, that you can override
@@ -125,15 +129,15 @@ Now, let's use a little trick and add this section to `pgdb.py`:
 
 .. code-block:: python
 
-    import logging, sys
-
-    from bonobo.commands.run import get_default_services
+    import sys
     from sqlalchemy import Table, Column, String, Integer, MetaData
 
     def main():
+        from bonobo.commands.run import get_default_services
         services = get_default_services(__file__)
-
-        if len(sys.argv) == 2 and sys.argv[1] == 'reset':
+        if len(sys.argv) == 1:
+            return bonobo.run(graph, services=services)
+        elif len(sys.argv) == 2 and sys.argv[1] == 'reset':
             engine = services.get('sqlalchemy.engine')
             metadata = MetaData()
 
@@ -145,11 +149,10 @@ Now, let's use a little trick and add this section to `pgdb.py`:
                 Column('address', String(255)),
             )
 
-            logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
             metadata.drop_all(engine)
             metadata.create_all(engine)
         else:
-           return bonobo.run(graph, services=services)
+            raise NotImplementedError('I do not understand.')
 
     if __name__ == '__main__':
         main()
