@@ -1,4 +1,6 @@
-import bonobo, json
+import json
+
+import bonobo
 
 
 def split_one_to_map(line):
@@ -18,10 +20,16 @@ class MyJsonWriter(bonobo.JsonWriter):
 graph = bonobo.Graph(
     bonobo.FileReader('coffeeshops.txt'),
     split_one_to_map,
-    MyJsonWriter('coffeeshops.json'),
+    MyJsonWriter('coffeeshops.json', fs='fs.output', ioformat='arg0'),
 )
 
+
+def get_services():
+    return {
+        'fs': bonobo.open_examples_fs('datasets'),
+        'fs.output': bonobo.open_fs(),
+    }
+
+
 if __name__ == '__main__':
-    bonobo.run(
-        graph, services={'fs': bonobo.open_examples_fs('datasets')}
-    )
+    bonobo.run(graph, services=get_services())
