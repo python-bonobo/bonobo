@@ -18,8 +18,8 @@ specialized packages, like SQLAlchemy, or other database access libraries from t
 First, read https://www.bonobo-project.org/with/sqlalchemy for instructions on how to install. You **do need** the
 bleeding edge version of `bonobo` and `bonobo-sqlalchemy` to make this work.
 
-Additional requirements
-:::::::::::::::::::::::
+Requirements
+::::::::::::
 
 Once you installed `bonobo_sqlalchemy` (read https://www.bonobo-project.org/with/sqlalchemy to use bleeding edge
 version), install the following additional packages:
@@ -61,6 +61,9 @@ either by providing kwargs, or with system environment variables. If you want to
 file and add values for one or more of `POSTGRES_NAME`, `POSTGRES_USER`, 'POSTGRES_PASS`, `POSTGRES_HOST`,
 `POSTGRES_PORT`. Please note that kwargs always have precedence on environment, but that you should prefer using
 environment variables for anything that is not immutable from one platform to another.
+
+Add database operation to the graph
+:::::::::::::::::::::::::::::::::::
 
 Let's create a `tutorial/pgdb.py` job:
 
@@ -109,6 +112,9 @@ If we run this transformation (with `bonobo run tutorial/pgdb.py`), we should ge
 
 The database we requested do not exist. It is not the role of bonobo to do database administration, and thus there is
 no tool here to create neither the database, nor the tables we want to use.
+
+Create database and table
+:::::::::::::::::::::::::
 
 There are however tools in `sqlalchemy` to manage tables, so we'll create the database by ourselves, and ask sqlalchemy
 to create the table:
@@ -170,6 +176,9 @@ Now run:
 
 Database and table should now exist.
 
+Format the data
+:::::::::::::::
+
 Let's prepare our data for database, and change the `.add_chain(..)` call to do it prior to `InsertOrUpdate(...)`
 
 .. code-block:: python
@@ -192,6 +201,9 @@ Let's prepare our data for database, and change the `.add_chain(..)` call to do 
         bonobo_sqlalchemy.InsertOrUpdate('coffeeshops'),
         _input=split_one_to_map
     )
+
+Run!
+::::
 
 You can now run the script (either with `bonobo run tutorial/pgdb.py` or directly with the python interpreter, as we
 added a "main" section) and the dataset should be inserted in your database. If you run it again, no new rows are
