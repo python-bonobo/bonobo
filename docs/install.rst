@@ -13,7 +13,7 @@ Creating a project and starting to write code should take less than a minute:
     $ bonobo run my-etl-project
 
 Once you bootstrapped a project, you can start editing the default example transformation by editing
-`my-etl-project/main.py`.
+`my-etl-project/main.py`. Now, you can head to :doc:`tutorial/index`.
 
 Other installation options
 ::::::::::::::::::::::::::
