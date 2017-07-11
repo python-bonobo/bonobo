@@ -10,11 +10,13 @@ from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
 
 __all__ = [
-    'identity',
     'Limit',
-    'Tee',
-    'count',
     'PrettyPrinter',
+    'Tee',
+    'arg0_to_kwargs',
+    'count',
+    'identity',
+    'kwargs_to_arg0',
     'noop',
 ]
 
@@ -86,3 +88,11 @@ class PrettyPrinter(Configurable):
 def noop(*args, **kwargs):  # pylint: disable=unused-argument
     from bonobo.constants import NOT_MODIFIED
     return NOT_MODIFIED
+
+
+def arg0_to_kwargs(row):
+    return Bag(**row)
+
+
+def kwargs_to_arg0(**row):
+    return Bag(row)
