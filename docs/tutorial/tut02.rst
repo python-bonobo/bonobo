@@ -59,7 +59,7 @@ available in **Bonobo**'s repository:
 
 .. code-block:: shell-session
 
-    $ curl https://raw.githubusercontent.com/python-bonobo/bonobo/master/bonobo/examples/datasets/coffeeshops.txt > `python -c 'import bonobo; print(bonobo.get_examples_path("datasets/coffeeshops.txt"))'`
+    $ curl https://raw.githubusercontent.com/python-bonobo/bonobo/master/bonobo/examples/datasets/coffeeshops.txt > `python3 -c 'import bonobo; print(bonobo.get_examples_path("datasets/coffeeshops.txt"))'`
 
 .. note::
 
