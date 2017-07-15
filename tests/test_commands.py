@@ -1,3 +1,4 @@
+import os
 import runpy
 import sys
 from unittest.mock import patch
@@ -68,6 +69,24 @@ def test_run_path(runner, capsys):
     assert out[0].startswith('Foo ')
     assert out[1].startswith('Bar ')
     assert out[2].startswith('Baz ')
+
+
+@all_runners
+def test_install_requirements_for_dir(runner):
+    dirname = get_examples_path('types')
+    with patch('pip.main') as pip_mock:
+        runner('run', '--install', dirname)
+    pip_mock.assert_called_once_with(
+        ['install', '-r', os.path.join(dirname, 'requirements.txt')])
+
+
+@all_runners
+def test_install_requirements_for_file(runner):
+    dirname = get_examples_path('types')
+    with patch('pip.main') as pip_mock:
+        runner('run', '--install', os.path.join(dirname, 'strings.py'))
+    pip_mock.assert_called_once_with(
+        ['install', '-r', os.path.join(dirname, 'requirements.txt')])
 
 
 @all_runners
