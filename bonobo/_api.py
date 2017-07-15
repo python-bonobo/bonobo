@@ -47,24 +47,30 @@ def run(graph, strategy=None, plugins=None, services=None):
     from bonobo import settings
     settings.check()
 
-    if not settings.QUIET.get():  # pragma: no cover
-        if _is_interactive_console():
-            from bonobo.ext.console import ConsoleOutputPlugin
-            if ConsoleOutputPlugin not in plugins:
-                plugins.append(ConsoleOutputPlugin)
-
-        if _is_jupyter_notebook():
-            try:
-                from bonobo.ext.jupyter import JupyterOutputPlugin
-            except ImportError:
-                logging.warning(
-                    'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" ' 'dependencies with «pip install bonobo[jupyter]», but you can also install a specific ' 'version by yourself.')
-            else:
-                if JupyterOutputPlugin not in plugins:
-                    plugins.append(JupyterOutputPlugin)
+    if not settings.DISABLE_DEFAULT_PLUGINS.get():
+        for default_plugin in _get_default_plugins(settings):
+            if default_plugin is not in plugins:
+                plugins.append(default_plugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
+
+def _get_default_plugins(settings):
+    """Return a list of default plugins if they are applicable ot the env."""
+    plugins = []
+    if not settings.QUIET.get() and _is_interactive_console():
+        from bonobo.ext.console import ConsoleOutputPlugin
+        plugins.append(ConsoleOutputPlugin)
+
+    if not settings.QUIET.get() and _is_jupyter_notebook():
+        try:
+            from bonobo.ext.jupyter import JupyterOutputPlugin
+        except ImportError:
+            logging.warning(
+                'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" ' 'dependencies with «pip install bonobo[jupyter]», but you can also install a specific ' 'version by yourself.')
+        else:
+            plugins.append(JupyterOutputPlugin)
+    return plugins
 
 # bonobo.structs
 register_api_group(Bag, Graph, Token)

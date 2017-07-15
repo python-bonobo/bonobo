@@ -74,6 +74,10 @@ PROFILE = Setting('PROFILE', formatter=to_bool, default=False)
 # Quiet mode.
 QUIET = Setting('QUIET', formatter=to_bool, default=False)
 
+# Disable default plugins.
+DISABLE_DEFAULT_PLUGINS = Setting(
+    'DISABLE_DEFAULT_PLUGINS', formatter=to_bool, default=False)
+
 # Logging level.
 LOGGING_LEVEL = Setting(
     'LOGGING_LEVEL',
