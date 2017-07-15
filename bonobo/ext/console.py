@@ -2,7 +2,9 @@ import io
 import sys
 from contextlib import redirect_stdout
 
-from colorama import Style, Fore
+from colorama import Style, Fore, init
+init(wrap=True)
+
 
 from bonobo import settings
 from bonobo.plugins import Plugin
@@ -23,7 +25,6 @@ class IOBuffer():
         finally:
             previous.close()
 
-
 class ConsoleOutputPlugin(Plugin):
     """
     Outputs status information to the connected stdout. Can be a TTY, with or without support for colors/cursor
@@ -43,11 +44,11 @@ class ConsoleOutputPlugin(Plugin):
 
         self._stdout = sys.stdout
         self.stdout = IOBuffer()
-        self.redirect_stdout = redirect_stdout(self.stdout)
+        self.redirect_stdout = redirect_stdout(self.stdout if sys.platform != 'win32' else self._stdout)
         self.redirect_stdout.__enter__()
 
     def run(self):
-        if self.isatty:
+        if self.isatty and sys.platform != 'win32':
             self._write(self.context.parent, rewind=True)
         else:
             pass  # not a tty
@@ -60,8 +61,13 @@ class ConsoleOutputPlugin(Plugin):
         t_cnt = len(context)
 
         buffered = self.stdout.switch()
-        for line in buffered.split('\n')[:-1]:
-            print(line + CLEAR_EOL, file=sys.stderr)
+
+        if sys.platform == 'win32':
+            for line in buffered.split('\n')[:-1]:
+                print(line, file=sys.stderr)
+        else:
+            for line in buffered.split('\n')[:-1]:
+                print(line + CLEAR_EOL, file=sys.stderr)
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
@@ -76,7 +82,7 @@ class ConsoleOutputPlugin(Plugin):
             else:
                 _line = ''.join(
                     (
-                        ' ', Fore.BLACK, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
+                        ' ', Style.BRIGHT+Fore.BLACK, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
                         Style.RESET_ALL, ' ',
                     )
                 )
