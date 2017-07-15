@@ -8,6 +8,30 @@ from bonobo.structs.bags import Bag
 from bonobo.util.errors import print_error
 
 
+def _plugin_runner(plugin_context):
+    with plugin_context:
+        try:
+            plugin_context.loop()
+        except Exception as exc:
+            print_error(exc, traceback.format_exc(), context=plugin_context)
+
+
+def _node_runner(node_context):
+    try:
+        node_context.start()
+    except Exception as exc:
+        print_error(exc, traceback.format_exc(), context=node_context, method='start')
+        node_context.input.on_end()
+    else:
+        node_context.loop()
+
+    try:
+        node_context.stop()
+    except Exception as exc:
+        print_error(exc, traceback.format_exc(), context=node_context, method='stop')
+
+
+
 class ExecutorStrategy(Strategy):
     """
     Strategy based on a concurrent.futures.Executor subclass (or similar interface).
@@ -28,33 +52,10 @@ class ExecutorStrategy(Strategy):
         futures = []
 
         for plugin_context in context.plugins:
-
-            def _runner(plugin_context=plugin_context):
-                with plugin_context:
-                    try:
-                        plugin_context.loop()
-                    except Exception as exc:
-                        print_error(exc, traceback.format_exc(), context=plugin_context)
-
-            futures.append(executor.submit(_runner))
+            futures.append(executor.submit(_plugin_runner))
 
         for node_context in context.nodes:
-
-            def _runner(node_context=node_context):
-                try:
-                    node_context.start()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node_context, method='start')
-                    node_context.input.on_end()
-                else:
-                    node_context.loop()
-
-                try:
-                    node_context.stop()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node_context, method='stop')
-
-            futures.append(executor.submit(_runner))
+            futures.append(executor.submit(_node_runner))
 
         while context.alive:
             time.sleep(0.2)
