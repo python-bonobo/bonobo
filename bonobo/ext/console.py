@@ -23,6 +23,9 @@ class IOBuffer():
         finally:
             previous.close()
 
+    def flush(self):
+        self.current.flush()
+
 
 class ConsoleOutputPlugin(Plugin):
     """
