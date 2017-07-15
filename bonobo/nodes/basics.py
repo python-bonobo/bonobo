@@ -91,8 +91,22 @@ def noop(*args, **kwargs):  # pylint: disable=unused-argument
 
 
 def arg0_to_kwargs(row):
+    """
+    Transform items in a stream from "arg0" format (each call only has one positional argument, which is a dict-like
+    object) to "kwargs" format (each call only has keyword arguments that represent a row).
+
+    :param row:
+    :return: bonobo.Bag
+    """
     return Bag(**row)
 
 
 def kwargs_to_arg0(**row):
+    """
+    Transform items in a stream from "kwargs" format (each call only has keyword arguments that represent a row) to
+    "arg0" format (each call only has one positional argument, which is a dict-like object) .
+
+    :param **row:
+    :return: bonobo.Bag
+    """
     return Bag(row)
