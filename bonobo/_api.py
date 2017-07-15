@@ -1,3 +1,5 @@
+import logging
+
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PrettyPrinter, PickleWriter, PickleReader, RateLimited, Tee, count, identity, noop
@@ -52,9 +54,14 @@ def run(graph, strategy=None, plugins=None, services=None):
                 plugins.append(ConsoleOutputPlugin)
 
         if _is_jupyter_notebook():
-            from bonobo.ext.jupyter import JupyterOutputPlugin
-            if JupyterOutputPlugin not in plugins:
-                plugins.append(JupyterOutputPlugin)
+            try:
+                from bonobo.ext.jupyter import JupyterOutputPlugin
+            except ImportError:
+                logging.warning(
+                    'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" ' 'dependencies with «pip install bonobo[jupyter]», but you can also install a specific ' 'version by yourself.')
+            else:
+                if JupyterOutputPlugin not in plugins:
+                    plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
