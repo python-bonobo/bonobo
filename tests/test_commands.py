@@ -10,10 +10,12 @@ from bonobo.commands import entrypoint
 
 
 def runner_entrypoint(*args):
+    """ Run bonobo using the python command entrypoint directly (bonobo.commands.entrypoint). """
     return entrypoint(list(args))
 
 
 def runner_module(*args):
+    """ Run bonobo using the bonobo.__main__ file, which is equivalent as doing "python -m bonobo ..."."""
     with patch.object(sys, 'argv', ['bonobo', *args]):
         return runpy.run_path(__main__.__file__, run_name='__main__')
 
