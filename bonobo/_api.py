@@ -2,7 +2,7 @@ import logging
 
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrinter, PickleWriter, PickleReader, RateLimited, Tee, count, identity, noop, arg0_to_kwargs, kwargs_to_arg0
+    PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
