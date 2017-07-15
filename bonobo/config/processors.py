@@ -1,4 +1,3 @@
-import types
 from collections import Iterable
 from contextlib import contextmanager
 
@@ -10,6 +9,34 @@ _CONTEXT_PROCESSORS_ATTR = '__processors__'
 
 
 class ContextProcessor(Option):
+    """
+    A ContextProcessor is a kind of transformation decorator that can setup and teardown a transformation and runtime
+    related dependencies, at the execution level.
+
+    It works like a yielding context manager, and is the recommended way to setup and teardown objects you'll need
+    in the context of one execution. It's the way to overcome the stateless nature of transformations.
+
+    The yielded values will be passed as positional arguments to the next context processors (order do matter), and
+    finally to the __call__ method of the transformation.
+
+    Warning: this may change for a similar but simpler implementation, don't relly too much on it (yet).
+
+    Example:
+
+        >>> from bonobo.config import Configurable
+        >>> from bonobo.util.objects import ValueHolder
+
+        >>> class Counter(Configurable):
+        ...     @ContextProcessor
+        ...     def counter(self, context):
+        ...         yield ValueHolder(0)
+        ...
+        ...     def __call__(self, counter, *args, **kwargs):
+        ...         counter += 1
+        ...         yield counter.get()
+
+    """
+
     @property
     def __name__(self):
         return self.func.__name__
@@ -104,14 +131,7 @@ def resolve_processors(mixed):
     try:
         yield from mixed.__processors__
     except AttributeError:
-        # old code, deprecated usage
-        if isinstance(mixed, types.FunctionType):
-            yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
-
-        for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
-            yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
-
-    return ()
+        yield from ()
 
 
 get_context_processors = deprecated_alias('get_context_processors', resolve_processors)

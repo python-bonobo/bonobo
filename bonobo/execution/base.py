@@ -10,6 +10,14 @@ from bonobo.util.objects import Wrapper, get_name
 
 
 @contextmanager
+def recoverable(error_handler):
+    try:
+        yield
+    except Exception as exc:  # pylint: disable=broad-except
+        error_handler(exc, traceback.format_exc())
+
+
+@contextmanager
 def unrecoverable(error_handler):
     try:
         yield
@@ -50,15 +58,21 @@ class LoopingExecutionContext(Wrapper):
         # XXX enhancers
         self._enhancers = get_enhancers(self.wrapped)
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        self.stop()
+
     def start(self):
         if self.started:
             raise RuntimeError('Cannot start a node twice ({}).'.format(get_name(self)))
 
         self._started = True
-        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
 
-        with unrecoverable(self.handle_error):
-            self._stack.setup(self)
+        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
+        self._stack.setup(self)
 
         for enhancer in self._enhancers:
             with unrecoverable(self.handle_error):
@@ -82,7 +96,7 @@ class LoopingExecutionContext(Wrapper):
             return
 
         try:
-            with unrecoverable(self.handle_error):
+            if self._stack:
                 self._stack.teardown()
         finally:
             self._stopped = True

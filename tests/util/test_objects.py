@@ -1,4 +1,9 @@
+import operator
+
+import pytest
+
 from bonobo.util.objects import Wrapper, get_name, ValueHolder
+from bonobo.util.testing import optional_contextmanager
 
 
 class foo:
@@ -52,3 +57,56 @@ def test_valueholder():
     assert y == x
     assert y is not x
     assert repr(x) == repr(y) == repr(43)
+
+
+unsupported_operations = {
+    int: {operator.matmul},
+    str: {
+        operator.sub, operator.mul, operator.matmul, operator.floordiv, operator.truediv, operator.mod, divmod,
+        operator.pow, operator.lshift, operator.rshift, operator.and_, operator.xor, operator.or_
+    },
+}
+
+
+@pytest.mark.parametrize('x,y', [(5, 3), (0, 10), (0, 0), (1, 1), ('foo', 'bar'), ('', 'baz!')])
+@pytest.mark.parametrize(
+    'operation,inplace_operation', [
+        (operator.add, operator.iadd),
+        (operator.sub, operator.isub),
+        (operator.mul, operator.imul),
+        (operator.matmul, operator.imatmul),
+        (operator.truediv, operator.itruediv),
+        (operator.floordiv, operator.ifloordiv),
+        (operator.mod, operator.imod),
+        (divmod, None),
+        (operator.pow, operator.ipow),
+        (operator.lshift, operator.ilshift),
+        (operator.rshift, operator.irshift),
+        (operator.and_, operator.iand),
+        (operator.xor, operator.ixor),
+        (operator.or_, operator.ior),
+    ]
+)
+def test_valueholder_integer_operations(x, y, operation, inplace_operation):
+    v = ValueHolder(x)
+
+    is_supported = operation not in unsupported_operations.get(type(x), set())
+
+    isdiv = ('div' in operation.__name__) or ('mod' in operation.__name__)
+
+    # forward...
+    with optional_contextmanager(pytest.raises(TypeError), ignore=is_supported):
+        with optional_contextmanager(pytest.raises(ZeroDivisionError), ignore=y or not isdiv):
+            assert operation(x, y) == operation(v, y)
+
+    # backward...
+    with optional_contextmanager(pytest.raises(TypeError), ignore=is_supported):
+        with optional_contextmanager(pytest.raises(ZeroDivisionError), ignore=x or not isdiv):
+            assert operation(y, x) == operation(y, v)
+
+    # in place...
+    if inplace_operation is not None:
+        with optional_contextmanager(pytest.raises(TypeError), ignore=is_supported):
+            with optional_contextmanager(pytest.raises(ZeroDivisionError), ignore=y or not isdiv):
+                inplace_operation(v, y)
+                assert v == operation(x, y)

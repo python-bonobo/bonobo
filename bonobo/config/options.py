@@ -67,11 +67,11 @@ class Option:
     def __set__(self, inst, value):
         inst.__options_values__[self.name] = self.clean(value)
 
-    def get_default(self):
-        return self.default() if callable(self.default) else self.default
-
     def clean(self, value):
         return self.type(value) if self.type else value
+
+    def get_default(self):
+        return self.default() if callable(self.default) else self.default
 
 
 class Method(Option):
@@ -106,7 +106,7 @@ class Method(Option):
     """
 
     def __init__(self):
-        super().__init__(None, required=False, positional=True)
+        super().__init__(None, required=False)
 
     def __get__(self, inst, typ):
         if not self.name in inst.__options_values__:
@@ -114,6 +114,8 @@ class Method(Option):
         return inst.__options_values__[self.name]
 
     def __set__(self, inst, value):
+        if isinstance(value, str):
+            raise ValueError('should be callable')
         inst.__options_values__[self.name] = self.type(value) if self.type else value
 
     def clean(self, value):

@@ -81,9 +81,13 @@ Services
 
 .. autoclass:: bonobo.config.Service
 
-Method
-------
+Methods
+-------
 
 .. autoclass:: bonobo.config.Method
 
+ContextProcessors
+-----------------
+
+.. autoclass:: bonobo.config.ContextProcessor
 

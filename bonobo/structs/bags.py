@@ -75,6 +75,14 @@ class Bag:
 
         raise TypeError('Could not apply bag to {}.'.format(func_or_iter))
 
+    def get(self):
+        """
+        Get a 2 element tuple of this bag's args and kwargs.
+
+        :return: tuple
+        """
+        return self.args, self.kwargs
+
     def extend(self, *args, **kwargs):
         return type(self)(*args, _parent=self, **kwargs)
 

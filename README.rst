@@ -7,28 +7,29 @@ Data-processing for humans.
 .. image:: https://img.shields.io/pypi/v/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: PyPI
+
 .. image:: https://img.shields.io/pypi/pyversions/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: Versions
 
-.. image:: https://readthedocs.org/projects/bonobo/badge/?version=0.3
+.. image:: https://readthedocs.org/projects/bonobo/badge/?version=latest
     :target: http://docs.bonobo-project.org/
     :alt: Documentation
 
-.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=0.3
+.. image:: https://travis-ci.org/python-bonobo/bonobo.svg?branch=master
     :target: https://travis-ci.org/python-bonobo/bonobo
     :alt: Continuous Integration (Linux)
 
-.. image:: https://ci.appveyor.com/api/projects/status/github/python-bonobo/bonobo?retina=true&branch=0.3&svg=true
-    :target: https://ci.appveyor.com/project/hartym/bonobo?branch=0.3
+.. image:: https://ci.appveyor.com/api/projects/status/github/python-bonobo/bonobo?retina=true&branch=master&svg=true
+    :target: https://ci.appveyor.com/project/hartym/bonobo?branch=master
     :alt: Continuous Integration (Windows)
 
 .. image:: https://codeclimate.com/github/python-bonobo/bonobo/badges/gpa.svg
    :target: https://codeclimate.com/github/python-bonobo/bonobo
    :alt: Code Climate
 
-.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/0.3.svg
-    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=0.3
+.. image:: https://img.shields.io/coveralls/python-bonobo/bonobo/master.svg
+    :target: https://coveralls.io/github/python-bonobo/bonobo?branch=master
     :alt: Coverage
 
 Bonobo is an extract-transform-load framework for python 3.5+ (see comparisons with other data tools).
@@ -50,11 +51,11 @@ so as though it may not yet be complete or fully stable (please, allow us to rea
 
 ----
 
+Homepage: https://www.bonobo-project.org/ (`Roadmap <https://www.bonobo-project.org/roadmap>`_)
+
 Documentation: http://docs.bonobo-project.org/
 
 Issues: https://github.com/python-bonobo/bonobo/issues
-
-Roadmap: https://www.bonobo-project.org/roadmap
 
 Slack: https://bonobo-slack.herokuapp.com/
 

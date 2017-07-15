@@ -18,13 +18,19 @@ except NameError:
 
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+        long_description = f.read()
+except:
+    long_description = ''
 
 # Get the classifiers from the classifiers file
 tolines = lambda c: list(filter(None, map(lambda s: s.strip(), c.split('\n'))))
-with open(path.join(here, 'classifiers.txt'), encoding='utf-8') as f:
-    classifiers = tolines(f.read())
+try:
+    with open(path.join(here, 'classifiers.txt'), encoding='utf-8') as f:
+        classifiers = tolines(f.read())
+except:
+    classifiers = []
 
 version_ns = {}
 try:
@@ -35,41 +41,36 @@ else:
     version = version_ns.get('__version__', 'dev')
 
 setup(
-    name='bonobo',
+    author='Romain Dorgueil',
+    author_email='romain@dorgueil.net',
     description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
-    install_requires=[
-        'colorama >=0.3,<1.0', 'fs >=2.0,<3.0', 'psutil >=5.2,<6.0', 'requests >=2.0,<3.0', 'stevedore >=1.21,<2.0'
-    ],
+    name='bonobo',
     version=version,
     long_description=long_description,
     classifiers=classifiers,
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
-    data_files=[
-        (
-            'share/jupyter/nbextensions/bonobo-jupyter', [
-                'bonobo/ext/jupyter/static/extension.js', 'bonobo/ext/jupyter/static/index.js',
-                'bonobo/ext/jupyter/static/index.js.map'
-            ]
-        )
+    install_requires=[
+        'colorama (>= 0.3, < 1.0)', 'fs (>= 2.0, < 3.0)', 'packaging (>= 16, < 17)', 'psutil (>= 5.2, < 6.0)',
+        'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.21, < 2.0)'
     ],
     extras_require={
         'dev': [
-            'coverage >=4,<5', 'pylint >=1,<2', 'pytest >=3,<4', 'pytest-cov >=2,<3', 'pytest-timeout >=1,<2', 'sphinx',
-            'sphinx_rtd_theme', 'yapf'
+            'cookiecutter (>= 1.5, < 1.6)', 'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)',
+            'pytest-cov (>= 2.5, < 3.0)', 'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)',
+            'sphinx (>= 1.6, < 2.0)'
         ],
-        'jupyter': ['jupyter >=1.0,<1.1', 'ipywidgets >=6.0.0.beta5']
+        'docker': ['bonobo-docker'],
+        'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)']
     },
     entry_points={
         'bonobo.commands': [
             'init = bonobo.commands.init:register', 'run = bonobo.commands.run:register',
             'version = bonobo.commands.version:register'
         ],
-        'console_scripts': ['bonobo = bonobo.commands:entrypoint'],
-        'edgy.project.features': ['bonobo = '
-                                  'bonobo.ext.edgy.project.feature:BonoboFeature']
+        'console_scripts': ['bonobo = bonobo.commands:entrypoint']
     },
     url='https://www.bonobo-project.org/',
     download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.format(version=version),

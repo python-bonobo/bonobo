@@ -1,7 +1,6 @@
 var widgets = require('jupyter-js-widgets');
 var _ = require('underscore');
 
-
 // Custom Model. Custom widgets models must at least provide default values
 // for model attributes, including `_model_name`, `_view_name`, `_model_module`
 // and `_view_module` when different from the base class.

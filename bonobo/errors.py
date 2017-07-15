@@ -56,3 +56,7 @@ class ProhibitedOperationError(RuntimeError):
 
 class ConfigurationError(Exception):
     pass
+
+
+class MissingServiceImplementationError(KeyError):
+    pass

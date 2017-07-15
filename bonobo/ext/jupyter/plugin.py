@@ -19,6 +19,8 @@ class JupyterOutputPlugin(Plugin):
         IPython.core.display.display(self.widget)
 
     def run(self):
-        self.widget.value = [repr(node) for node in self.context.parent.nodes]
+        self.widget.value = [
+            str(self.context.parent[i]) for i in self.context.parent.graph.topologically_sorted_indexes
+        ]
 
     finalize = run

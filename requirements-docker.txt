@@ -1,0 +1,20 @@
+-e .[docker]
+appdirs==1.4.3
+bonobo-docker==0.2.9
+certifi==2017.4.17
+chardet==3.0.4
+colorama==0.3.9
+docker-pycreds==0.2.1
+docker==2.3.0
+fs==2.0.4
+idna==2.5
+packaging==16.8
+pbr==3.1.1
+psutil==5.2.2
+pyparsing==2.2.0
+pytz==2017.2
+requests==2.18.1
+six==1.10.0
+stevedore==1.23.0
+urllib3==1.21.1
+websocket-client==0.44.0

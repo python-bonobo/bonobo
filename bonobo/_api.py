@@ -1,8 +1,6 @@
-import warnings
-
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrint, Tee, count, identity, noop, pprint
+    PrettyPrinter, PickleWriter, PickleReader, Tee, count, identity, noop, pprint
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
@@ -44,15 +42,19 @@ def run(graph, strategy=None, plugins=None, services=None):
 
     plugins = plugins or []
 
-    if _is_interactive_console():  # pragma: no cover
-        from bonobo.ext.console import ConsoleOutputPlugin
-        if ConsoleOutputPlugin not in plugins:
-            plugins.append(ConsoleOutputPlugin)
+    from bonobo import settings
+    settings.check()
 
-    if _is_jupyter_notebook():  # pragma: no cover
-        from bonobo.ext.jupyter import JupyterOutputPlugin
-        if JupyterOutputPlugin not in plugins:
-            plugins.append(JupyterOutputPlugin)
+    if not settings.QUIET:  # pragma: no cover
+        if _is_interactive_console():
+            from bonobo.ext.console import ConsoleOutputPlugin
+            if ConsoleOutputPlugin not in plugins:
+                plugins.append(ConsoleOutputPlugin)
+
+        if _is_jupyter_notebook():
+            from bonobo.ext.jupyter import JupyterOutputPlugin
+            if JupyterOutputPlugin not in plugins:
+                plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
@@ -66,7 +68,7 @@ register_api(create_strategy)
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
 @register_api
-def open_fs(fs_url, *args, **kwargs):
+def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
     
@@ -80,7 +82,13 @@ def open_fs(fs_url, *args, **kwargs):
     :returns: :class:`~fs.base.FS` object
     """
     from fs import open_fs as _open_fs
-    return _open_fs(str(fs_url), *args, **kwargs)
+    from os.path import expanduser
+    from os import getcwd
+
+    if fs_url is None:
+        fs_url = getcwd()
+
+    return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
 
 # bonobo.nodes
@@ -93,7 +101,9 @@ register_api_group(
     JsonReader,
     JsonWriter,
     Limit,
-    PrettyPrint,
+    PrettyPrinter,
+    PickleReader,
+    PickleWriter,
     Tee,
     count,
     identity,

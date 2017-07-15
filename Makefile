@@ -1,7 +1,7 @@
 # This file has been auto-generated.
 # All changes will be lost, see Projectfile.
 #
-# Updated at 2017-05-03 18:02:59.359160
+# Updated at 2017-07-04 10:50:55.775681
 
 PACKAGE ?= bonobo
 PYTHON ?= $(shell which python)
@@ -18,10 +18,11 @@ SPHINX_BUILD ?= $(PYTHON_DIRNAME)/sphinx-build
 SPHINX_OPTIONS ?= 
 SPHINX_SOURCEDIR ?= docs
 SPHINX_BUILDDIR ?= $(SPHINX_SOURCEDIR)/_build
-YAPF ?= $(PYTHON_DIRNAME)/yapf
+YAPF ?= $(PYTHON) -m yapf
 YAPF_OPTIONS ?= -rip
+VERSION ?= $(shell git describe 2>/dev/null || echo dev)
 
-.PHONY: $(SPHINX_SOURCEDIR) clean format install install-dev lint test
+.PHONY: $(SPHINX_SOURCEDIR) clean format install install-dev test
 
 # Installs the local project dependencies.
 install:
@@ -39,9 +40,6 @@ install-dev:
 clean:
 	rm -rf build dist *.egg-info
 
-lint: install-dev
-	$(PYTHON_DIRNAME)/pylint --py3k $(PACKAGE) -f html > pylint.html
-
 test: install-dev
 	$(PYTEST) $(PYTEST_OPTIONS) tests
 
@@ -50,3 +48,4 @@ $(SPHINX_SOURCEDIR): install-dev
 
 format: install-dev
 	$(YAPF) $(YAPF_OPTIONS) .
+	$(YAPF) $(YAPF_OPTIONS) Projectfile
