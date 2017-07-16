@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v.0.4.3 - 16 july 2017
+::::::::::::::::::::::
+
+* #113 - Add flush() method to IOBuffer (Vitalii Vokhmin)
+* Dependencies updated.
+* Minor project artifacts updated.
+
 v.0.4.2 - 18 june 2017
 ::::::::::::::::::::::
 
