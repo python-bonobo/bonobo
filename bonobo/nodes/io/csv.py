@@ -26,7 +26,7 @@ class CsvHandler(FileHandler):
     """
     delimiter = Option(str, default=';')
     quotechar = Option(str, default='"')
-    headers = Option(tuple)
+    headers = Option(tuple, required=False)
 
 
 class CsvReader(IOFormatEnabled, FileReader, CsvHandler):

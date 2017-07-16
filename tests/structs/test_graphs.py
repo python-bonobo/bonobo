@@ -71,3 +71,23 @@ def test_graph_topological_sort():
     assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)
     assert g[3] == sentinel.b1
     assert g[4] == sentinel.b2
+
+
+def test_copy():
+    g1 = Graph()
+    g2 = g1.copy()
+
+    assert g1 is not g2
+
+    assert len(g1) == 0
+    assert len(g2) == 0
+
+    g1.add_chain([])
+
+    assert len(g1) == 1
+    assert len(g2) == 0
+
+    g2.add_chain([], identity)
+
+    assert len(g1) == 1
+    assert len(g2) == 2

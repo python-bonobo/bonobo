@@ -1,6 +1,8 @@
+import logging
+
 from bonobo.structs import Bag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PrettyPrinter, PickleWriter, PickleReader, Tee, count, identity, noop, pprint
+    PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.strategies import create_strategy
 from bonobo.util.objects import get_name
 
@@ -21,17 +23,17 @@ def register_api_group(*args):
 def run(graph, strategy=None, plugins=None, services=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
-    
+
     The only necessary argument is a :class:`Graph` instance, containing the logic you actually want to execute.
-    
+
     By default, this graph will be executed using the "threadpool" strategy: each graph node will be wrapped in a
     thread, and executed in a loop until there is no more input to this node.
-    
+
     You can provide plugins factory objects in the plugins list, this function will add the necessary plugins for
     interactive console execution and jupyter notebook execution if it detects correctly that it runs in this context.
-    
+
     You'll probably want to provide a services dictionary mapping service names to service instances.
-    
+
     :param Graph graph: The :class:`Graph` to execute.
     :param str strategy: The :class:`bonobo.strategies.base.Strategy` to use.
     :param list plugins: The list of plugins to enhance execution.
@@ -45,16 +47,24 @@ def run(graph, strategy=None, plugins=None, services=None):
     from bonobo import settings
     settings.check()
 
-    if not settings.QUIET:  # pragma: no cover
+    if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
             from bonobo.ext.console import ConsoleOutputPlugin
             if ConsoleOutputPlugin not in plugins:
                 plugins.append(ConsoleOutputPlugin)
 
         if _is_jupyter_notebook():
-            from bonobo.ext.jupyter import JupyterOutputPlugin
-            if JupyterOutputPlugin not in plugins:
-                plugins.append(JupyterOutputPlugin)
+            try:
+                from bonobo.ext.jupyter import JupyterOutputPlugin
+            except ImportError:
+                logging.warning(
+                    'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
+                    'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '
+                    'version by yourself.'
+                )
+            else:
+                if JupyterOutputPlugin not in plugins:
+                    plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
@@ -71,7 +81,7 @@ register_api(create_strategy)
 def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
-    
+
     :param str fs_url: A filesystem URL
     :param parse_result: A parsed filesystem URL.
     :type parse_result: :class:`ParseResult`
@@ -101,14 +111,16 @@ register_api_group(
     JsonReader,
     JsonWriter,
     Limit,
-    PrettyPrinter,
     PickleReader,
     PickleWriter,
+    PrettyPrinter,
+    RateLimited,
     Tee,
+    arg0_to_kwargs,
     count,
     identity,
+    kwargs_to_arg0,
     noop,
-    pprint,
 )
 
 

@@ -1,7 +1,7 @@
 -e .[jupyter]
 appnope==0.1.0
 bleach==2.0.0
-decorator==4.0.11
+decorator==4.1.1
 entrypoints==0.2.3
 html5lib==0.999999999
 ipykernel==4.6.1
@@ -26,7 +26,7 @@ pickleshare==0.7.4
 prompt-toolkit==1.0.14
 ptyprocess==0.5.2
 pygments==2.2.0
-python-dateutil==2.6.0
+python-dateutil==2.6.1
 pyzmq==16.0.2
 qtconsole==4.3.0
 simplegeneric==0.8.1

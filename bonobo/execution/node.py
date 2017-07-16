@@ -3,7 +3,7 @@ from queue import Empty
 from time import sleep
 
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
-from bonobo.errors import InactiveReadableError
+from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
@@ -93,6 +93,10 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             except Empty:
                 sleep(self.PERIOD)
                 continue
+            except UnrecoverableError as exc:
+                self.handle_error(exc, traceback.format_exc())
+                self.input.shutdown()
+                break
             except Exception as exc:  # pylint: disable=broad-except
                 self.handle_error(exc, traceback.format_exc())
 

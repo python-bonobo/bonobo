@@ -87,13 +87,11 @@ def display(row):
 
 
 graph = bonobo.Graph(
-    OpenDataSoftAPI(
-        dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
-    ),
+    OpenDataSoftAPI(dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
     normalize,
     bonobo.Filter(filter=lambda row: row.get('country') == 'France'),
+    bonobo.JsonWriter(path='fablabs.txt', ioformat='arg0'),
     bonobo.Tee(display),
-    bonobo.JsonWriter(path='fablabs.txt'),
 )
 
 if __name__ == '__main__':

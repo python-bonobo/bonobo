@@ -1,3 +1,5 @@
+from copy import copy
+
 from bonobo.constants import BEGIN
 
 
@@ -61,6 +63,15 @@ class Graph:
                 del self._topologcally_sorted_indexes_cache
 
         return self
+
+    def copy(self):
+        g = Graph()
+
+        g.edges = copy(self.edges)
+        g.named = copy(self.named)
+        g.nodes = copy(self.nodes)
+
+        return g
 
     @property
     def topologically_sorted_indexes(self):

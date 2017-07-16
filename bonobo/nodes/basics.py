@@ -1,24 +1,22 @@
 import functools
-from pprint import pprint as _pprint
-
 import itertools
-from colorama import Fore, Style
 
 from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
-from bonobo.constants import NOT_MODIFIED
 
 __all__ = [
-    'identity',
     'Limit',
-    'Tee',
-    'count',
-    'pprint',
     'PrettyPrinter',
+    'Tee',
+    'arg0_to_kwargs',
+    'count',
+    'identity',
+    'kwargs_to_arg0',
     'noop',
 ]
 
@@ -73,7 +71,7 @@ def _count_counter(self, context):
 
 class PrettyPrinter(Configurable):
     def call(self, *args, **kwargs):
-        formater = self._format_quiet if settings.QUIET else self._format_console
+        formater = self._format_quiet if settings.QUIET.get() else self._format_console
 
         for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
             print(formater(i, item, value))
@@ -87,48 +85,28 @@ class PrettyPrinter(Configurable):
         )
 
 
-pprint = PrettyPrinter()
-pprint.__name__ = 'pprint'
-
-
-def PrettyPrint(title_keys=('title', 'name', 'id'), print_values=True, sort=True):
-    from bonobo.constants import NOT_MODIFIED
-    from colorama import Fore, Style
-
-    def _pprint(*args, **kwargs):
-        nonlocal title_keys, sort, print_values
-
-        row = args[0]
-        for key in title_keys:
-            if key in row:
-                print(Style.BRIGHT, row.get(key), Style.RESET_ALL, sep='')
-                break
-
-        if print_values:
-            for k in sorted(row) if sort else row:
-                print(
-                    '  • ',
-                    Fore.BLUE,
-                    k,
-                    Style.RESET_ALL,
-                    ' : ',
-                    Fore.BLACK,
-                    '(',
-                    type(row[k]).__name__,
-                    ')',
-                    Style.RESET_ALL,
-                    ' ',
-                    repr(row[k]),
-                    CLEAR_EOL,
-                )
-
-        yield NOT_MODIFIED
-
-    _pprint.__name__ = 'pprint'
-
-    return _pprint
-
-
 def noop(*args, **kwargs):  # pylint: disable=unused-argument
     from bonobo.constants import NOT_MODIFIED
     return NOT_MODIFIED
+
+
+def arg0_to_kwargs(row):
+    """
+    Transform items in a stream from "arg0" format (each call only has one positional argument, which is a dict-like
+    object) to "kwargs" format (each call only has keyword arguments that represent a row).
+
+    :param row:
+    :return: bonobo.Bag
+    """
+    return Bag(**row)
+
+
+def kwargs_to_arg0(**row):
+    """
+    Transform items in a stream from "kwargs" format (each call only has keyword arguments that represent a row) to
+    "arg0" format (each call only has one positional argument, which is a dict-like object) .
+
+    :param **row:
+    :return: bonobo.Bag
+    """
+    return Bag(row)
