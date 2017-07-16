@@ -16,7 +16,8 @@ def get_format():
     yield '{b}][{w}'.join(('%(spent)04d', '%(name)s'))
     yield '{b}]'
     yield ' %(fg)s%(message)s{r}'
-    yield CLEAR_EOL
+    if not iswindows:
+        yield CLEAR_EOL
 
 
 colors = {
