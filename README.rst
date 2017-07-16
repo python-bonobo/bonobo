@@ -55,6 +55,8 @@ Homepage: https://www.bonobo-project.org/ (`Roadmap <https://www.bonobo-project.
 
 Documentation: http://docs.bonobo-project.org/
 
+Contributing guide: http://docs.bonobo-project.org/en/latest/contribute/index.html
+
 Issues: https://github.com/python-bonobo/bonobo/issues
 
 Slack: https://bonobo-slack.herokuapp.com/
@@ -64,7 +66,7 @@ Release announcements: http://eepurl.com/csHFKL
 ----
 
 Made with ♥ by `Romain Dorgueil <https://twitter.com/rdorgueil>`_ and `contributors <https://github.com/python-bonobo/bonobo/graphs/contributors>`_.
-    
+
 .. image:: https://img.shields.io/pypi/l/bonobo.svg
     :target: https://pypi.python.org/pypi/bonobo
     :alt: License
