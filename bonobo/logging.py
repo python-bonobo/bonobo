@@ -8,6 +8,8 @@ from colorama import Fore, Style
 from bonobo import settings
 from bonobo.util.term import CLEAR_EOL
 
+iswindows = (sys.platform == 'win32')
+
 
 def get_format():
     yield '{b}[%(fg)s%(levelname)s{b}][{w}'
@@ -18,9 +20,9 @@ def get_format():
 
 
 colors = {
-    'b': Fore.BLACK,
-    'w': Fore.LIGHTBLACK_EX,
-    'r': Style.RESET_ALL,
+    'b': '' if iswindows else Fore.BLACK,
+    'w': '' if iswindows else Fore.LIGHTBLACK_EX,
+    'r': '' if iswindows else Style.RESET_ALL,
 }
 format = (''.join(get_format())).format(**colors)
 
@@ -28,7 +30,9 @@ format = (''.join(get_format())).format(**colors)
 class Filter(logging.Filter):
     def filter(self, record):
         record.spent = record.relativeCreated // 1000
-        if record.levelname == 'DEBG':
+        if iswindows:
+            record.fg = ''
+        elif record.levelname == 'DEBG':
             record.fg = Fore.LIGHTBLACK_EX
         elif record.levelname == 'INFO':
             record.fg = Fore.LIGHTWHITE_EX
@@ -46,7 +50,10 @@ class Filter(logging.Filter):
 class Formatter(logging.Formatter):
     def formatException(self, ei):
         tb = super().formatException(ei)
-        return textwrap.indent(tb, Fore.BLACK + ' | ' + Fore.WHITE)
+        if iswindows:
+            return textwrap.indent(tb, ' | ')
+        else:
+            return textwrap.indent(tb, Fore.BLACK + ' | ' + Fore.WHITE)
 
 
 def setup(level):
