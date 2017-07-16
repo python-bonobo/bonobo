@@ -11,9 +11,10 @@ SHORTCUTS = {
 }
 
 REGISTRY = {
-    'text/plain': (bonobo.FileReader, bonobo.FileWriter),
-    'text/csv': (bonobo.CsvReader, bonobo.CsvWriter),
     'application/json': (bonobo.JsonReader, bonobo.JsonWriter),
+    'pickle': (bonobo.PickleReader, bonobo.PickleWriter),
+    'text/csv': (bonobo.CsvReader, bonobo.CsvWriter),
+    'text/plain': (bonobo.FileReader, bonobo.FileWriter),
 }
 
 
@@ -55,7 +56,7 @@ def register(parser):
     parser.add_argument('output')
     parser.add_argument('--reader', '-r')
     parser.add_argument('--writer', '-w')
-    parser.add_argument('--reader-option', '-ro', dest='reader_options')
-    parser.add_argument('--writer-option', '-wo', dest='writer_options')
-    parser.add_argument('--option', '-o', dest='options')
+    # parser.add_argument('--reader-option', '-ro', dest='reader_options')
+    # parser.add_argument('--writer-option', '-wo', dest='writer_options')
+    # parser.add_argument('--option', '-o', dest='options')
     return execute
