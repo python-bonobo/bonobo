@@ -130,10 +130,10 @@ Now let's see how to do it correctly:
 
 I hear you think «Yeah, but if I create like millions of dicts ...».
 
-Let's say we chosed the oposite way and copy the dict outside the transformation (in fact, `it's what we did in bonobo's
+Let's say we chose the opposite way and copied the dict outside the transformation (in fact, `it's what we did in bonobo's
 ancestor <https://github.com/rdcli/rdc.etl/blob/dev/rdc/etl/io/__init__.py#L187>`_). This means you will also create the
-same number of dicts, the difference is that you won't even notice it. Also, it means that if you want to yield 1 million
-times the same dict, going "pure" makes it efficient (you'll just yield the same object 1 million times) while going "copy
+same number of dicts, the difference is that you won't even notice it. Also, it means that if you want to yield the same
+dict 1 million times , going "pure" makes it efficient (you'll just yield the same object 1 million times) while going "copy
 crazy" will create 1 million objects.
 
 Using dicts like this will create a lot of dicts, but also free them as soon as all the future components that take this dict
