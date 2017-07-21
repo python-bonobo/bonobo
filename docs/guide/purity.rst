@@ -8,7 +8,7 @@ The major problem we have is that one message (underlying implementation: :class
 through more than one component, and at the same time. If you wanna be safe, you tend to :func:`copy.copy()` everything
 between two calls to two different components, but that's very expensive.
 
-Instead of that, we chosed the oposite: copies are never made, and you should not modify in place the inputs of your
+Instead, we chose the opposite: copies are never made, and you should not modify in place the inputs of your
 component before yielding them, and that mostly means that you want to recreate dicts and lists before yielding (or
 returning) them. Numeric values, strings and tuples being immutable in python, modifying a variable of one of those
 type will already return a different instance.
