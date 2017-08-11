@@ -1,7 +1,10 @@
 import re
+import threading
 import types
+from contextlib import ContextDecorator
 
 from bonobo.config.options import Option
+from bonobo.errors import MissingServiceImplementationError
 
 _service_name_re = re.compile(r"^[^\d\W]\w*(:?\.[^\d\W]\w*)*$", re.UNICODE)
 
@@ -39,6 +42,10 @@ class Service(Option):
             
     The main goal is not to tie transformations to actual dependencies, so the same can be run in different contexts
     (stages like preprod, prod, or tenants like client1, client2, or anything you want).
+
+    .. attribute:: name
+
+        Service name will be used to retrieve the implementation at runtime.
     
     """
 
@@ -46,10 +53,14 @@ class Service(Option):
         super().__init__(str, required=False, default=name)
 
     def __set__(self, inst, value):
-        inst.__options_values__[self.name] = validate_service_name(value)
+        inst._options_values[self.name] = validate_service_name(value)
 
     def resolve(self, inst, services):
-        return services.get(getattr(inst, self.name))
+        try:
+            name = getattr(inst, self.name)
+        except AttributeError:
+            name = self.name
+        return services.get(name)
 
 
 class Container(dict):
@@ -64,7 +75,7 @@ class Container(dict):
 
     def args_for(self, mixed):
         try:
-            options = mixed.__options__
+            options = dict(mixed.__options__)
         except AttributeError:
             options = {}
 
@@ -74,8 +85,64 @@ class Container(dict):
         if not name in self:
             if default:
                 return default
-            raise KeyError('Cannot resolve service {!r} using provided service collection.'.format(name))
+            raise MissingServiceImplementationError(
+                'Cannot resolve service {!r} using provided service collection.'.format(name)
+            )
         value = super().get(name)
+        # XXX this is not documented and can lead to errors.
         if isinstance(value, types.LambdaType):
             value = value(self)
         return value
+
+
+class Exclusive(ContextDecorator):
+    """
+    Decorator and context manager used to require exclusive usage of an object, most probably a service. It's usefull
+    for example if call order matters on a service implementation (think of an http api that requires a nonce or version
+    parameter ...).
+
+    Usage:
+
+        >>> def handler(some_service):
+        ...     with Exclusive(some_service):
+        ...         some_service.call_1()
+        ...         some_service.call_2()
+        ...         some_service.call_3()
+
+    This will ensure that nobody else is using the same service while in the "with" block, using a lock primitive to
+    ensure that.
+
+    """
+    _locks = {}
+
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+
+    def get_lock(self):
+        _id = id(self._wrapped)
+        if not _id in Exclusive._locks:
+            Exclusive._locks[_id] = threading.RLock()
+        return Exclusive._locks[_id]
+
+    def __enter__(self):
+        self.get_lock().acquire()
+        return self._wrapped
+
+    def __exit__(self, *exc):
+        self.get_lock().release()
+
+
+def requires(*service_names):
+    def decorate(mixed):
+        try:
+            options = mixed.__options__
+        except AttributeError:
+            mixed.__options__ = options = {}
+
+        for service_name in service_names:
+            service = Service(service_name)
+            service.name = service_name
+            options[service_name] = service
+        return mixed
+
+    return decorate

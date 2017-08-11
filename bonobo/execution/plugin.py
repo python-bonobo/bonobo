@@ -1,6 +1,4 @@
-import traceback
-
-from bonobo.execution.base import LoopingExecutionContext
+from bonobo.execution.base import LoopingExecutionContext, recoverable
 
 
 class PluginExecutionContext(LoopingExecutionContext):
@@ -14,21 +12,15 @@ class PluginExecutionContext(LoopingExecutionContext):
     def start(self):
         super().start()
 
-        try:
+        with recoverable(self.handle_error):
             self.wrapped.initialize()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
 
     def shutdown(self):
-        try:
-            self.wrapped.finalize()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())
-        finally:
-            self.alive = False
+        if self.started:
+            with recoverable(self.handle_error):
+                self.wrapped.finalize()
+        self.alive = False
 
     def step(self):
-        try:
+        with recoverable(self.handle_error):
             self.wrapped.run()
-        except Exception as exc:  # pylint: disable=broad-except
-            self.handle_error(exc, traceback.format_exc())

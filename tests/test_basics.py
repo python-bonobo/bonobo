@@ -1,9 +1,11 @@
 from unittest.mock import MagicMock
 
-import bonobo
 import pytest
+
+import bonobo
 from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import NOT_MODIFIED
+from bonobo.util.inspect import inspect_node
 
 
 def test_count():
@@ -12,12 +14,9 @@ def test_count():
 
     context = MagicMock()
 
-    currified = ContextCurrifier(bonobo.count)
-    currified.setup(context)
-
-    for i in range(42):
-        currified()
-    currified.teardown()
+    with ContextCurrifier(bonobo.count).as_contextmanager(context) as stack:
+        for i in range(42):
+            stack()
 
     assert len(context.method_calls) == 1
     bag = context.send.call_args[0][0]
@@ -32,18 +31,32 @@ def test_identity():
 
 
 def test_limit():
-    limit = bonobo.Limit(2)
-    results = []
-    for i in range(42):
-        results += list(limit())
+    context, results = MagicMock(), []
+
+    with ContextCurrifier(bonobo.Limit(2)).as_contextmanager(context) as stack:
+        for i in range(42):
+            results += list(stack())
+
     assert results == [NOT_MODIFIED] * 2
 
 
 def test_limit_not_there():
-    limit = bonobo.Limit(42)
-    results = []
-    for i in range(10):
-        results += list(limit())
+    context, results = MagicMock(), []
+
+    with ContextCurrifier(bonobo.Limit(42)).as_contextmanager(context) as stack:
+        for i in range(10):
+            results += list(stack())
+
+    assert results == [NOT_MODIFIED] * 10
+
+
+def test_limit_default():
+    context, results = MagicMock(), []
+
+    with ContextCurrifier(bonobo.Limit()).as_contextmanager(context) as stack:
+        for i in range(20):
+            results += list(stack())
+
     assert results == [NOT_MODIFIED] * 10
 
 

@@ -43,7 +43,7 @@ class Bag:
     def args(self):
         if self._parent is None:
             return self._args
-        return (*self._parent.args, *self._args,)
+        return (*self._parent.args, *self._args, )
 
     @property
     def kwargs(self):
@@ -67,15 +67,21 @@ class Bag:
                 iter(func_or_iter)
 
                 def generator():
-                    nonlocal func_or_iter
-                    for x in func_or_iter:
-                        yield x
+                    yield from func_or_iter
 
                 return generator()
             except TypeError as exc:
                 raise TypeError('Could not apply bag to {}.'.format(func_or_iter)) from exc
 
         raise TypeError('Could not apply bag to {}.'.format(func_or_iter))
+
+    def get(self):
+        """
+        Get a 2 element tuple of this bag's args and kwargs.
+
+        :return: tuple
+        """
+        return self.args, self.kwargs
 
     def extend(self, *args, **kwargs):
         return type(self)(*args, _parent=self, **kwargs)
@@ -85,7 +91,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __eq__(self, other):
         return isinstance(other, Bag) and other.args == self.args and other.kwargs == self.kwargs
@@ -93,7 +99,7 @@ class Bag:
     def __repr__(self):
         return '<{} ({})>'.format(
             type(self).__name__, ', '.
-                join(itertools.chain(
+            join(itertools.chain(
                 map(repr, self.args),
                 ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
             ))

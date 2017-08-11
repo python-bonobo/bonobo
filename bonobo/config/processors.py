@@ -1,16 +1,42 @@
-import functools
-
-import types
-
-from bonobo.util.compat import deprecated_alias, deprecated
+from collections import Iterable
+from contextlib import contextmanager
 
 from bonobo.config.options import Option
+from bonobo.util.compat import deprecated_alias
 from bonobo.util.iterators import ensure_tuple
 
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
 
 
 class ContextProcessor(Option):
+    """
+    A ContextProcessor is a kind of transformation decorator that can setup and teardown a transformation and runtime
+    related dependencies, at the execution level.
+
+    It works like a yielding context manager, and is the recommended way to setup and teardown objects you'll need
+    in the context of one execution. It's the way to overcome the stateless nature of transformations.
+
+    The yielded values will be passed as positional arguments to the next context processors (order do matter), and
+    finally to the __call__ method of the transformation.
+
+    Warning: this may change for a similar but simpler implementation, don't relly too much on it (yet).
+
+    Example:
+
+        >>> from bonobo.config import Configurable
+        >>> from bonobo.util.objects import ValueHolder
+
+        >>> class Counter(Configurable):
+        ...     @ContextProcessor
+        ...     def counter(self, context):
+        ...         yield ValueHolder(0)
+        ...
+        ...     def __call__(self, counter, *args, **kwargs):
+        ...         counter += 1
+        ...         yield counter.get()
+
+    """
+
     @property
     def __name__(self):
         return self.func.__name__
@@ -48,82 +74,66 @@ class ContextCurrifier:
     def __init__(self, wrapped, *initial_context):
         self.wrapped = wrapped
         self.context = tuple(initial_context)
-        self._stack = []
+        self._stack, self._stack_values = None, None
+
+    def __iter__(self):
+        yield from self.wrapped
+
+    def __call__(self, *args, **kwargs):
+        if not callable(self.wrapped) and isinstance(self.wrapped, Iterable):
+            return self.__iter__()
+        return self.wrapped(*self.context, *args, **kwargs)
 
     def setup(self, *context):
-        if len(self._stack):
+        if self._stack is not None:
             raise RuntimeError('Cannot setup context currification twice.')
+
+        self._stack, self._stack_values = list(), list()
         for processor in resolve_processors(self.wrapped):
             _processed = processor(self.wrapped, *context, *self.context)
             _append_to_context = next(_processed)
+            self._stack_values.append(_append_to_context)
             if _append_to_context is not None:
                 self.context += ensure_tuple(_append_to_context)
             self._stack.append(_processed)
 
-    def __call__(self, *args, **kwargs):
-        return self.wrapped(*self.context, *args, **kwargs)
-
     def teardown(self):
-        while len(self._stack):
+        while self._stack:
             processor = self._stack.pop()
             try:
                 # todo yield from ? how to ?
-                next(processor)
+                processor.send(self._stack_values.pop())
             except StopIteration as exc:
                 # This is normal, and wanted.
                 pass
             else:
                 # No error ? We should have had StopIteration ...
                 raise RuntimeError('Context processors should not yield more than once.')
+        self._stack, self._stack_values = None, None
 
+    @contextmanager
+    def as_contextmanager(self, *context):
+        """
+        Convenience method to use it as a contextmanager, mostly for test purposes.
 
-@deprecated
-def add_context_processor(cls_or_func, context_processor):
-    getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR).append(context_processor)
+        Example:
 
+            >>> with ContextCurrifier(node).as_contextmanager(context) as stack:
+            ...     stack()
 
-@deprecated
-def contextual(cls_or_func):
-    """
-    Make sure an element has the context processors collection.
-    
-    :param cls_or_func: 
-    """
-    if not add_context_processor.__name__ in cls_or_func.__dict__:
-        setattr(cls_or_func, add_context_processor.__name__, functools.partial(add_context_processor, cls_or_func))
-
-    if isinstance(cls_or_func, types.FunctionType):
-        try:
-            getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
-        except AttributeError:
-            setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
-        return cls_or_func
-
-    if not _CONTEXT_PROCESSORS_ATTR in cls_or_func.__dict__:
-        setattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR, [])
-
-    _processors = getattr(cls_or_func, _CONTEXT_PROCESSORS_ATTR)
-    for processor in cls_or_func.__dict__.values():
-        if isinstance(processor, ContextProcessor):
-            _processors.append(processor)
-
-    # This is needed for python 3.5, python 3.6 should be fine, but it's considered an implementation detail.
-    _processors.sort(key=lambda proc: proc._creation_counter)
-    return cls_or_func
+        :param context:
+        :return:
+        """
+        self.setup(*context)
+        yield self
+        self.teardown()
 
 
 def resolve_processors(mixed):
     try:
         yield from mixed.__processors__
     except AttributeError:
-        # old code, deprecated usage
-        if isinstance(mixed, types.FunctionType):
-            yield from getattr(mixed, _CONTEXT_PROCESSORS_ATTR, ())
-
-        for cls in reversed((mixed if isinstance(mixed, type) else type(mixed)).__mro__):
-            yield from cls.__dict__.get(_CONTEXT_PROCESSORS_ATTR, ())
-
-    return ()
+        yield from ()
 
 
 get_context_processors = deprecated_alias('get_context_processors', resolve_processors)

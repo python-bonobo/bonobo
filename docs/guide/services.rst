@@ -1,20 +1,18 @@
-Services and dependencies (draft implementation)
-================================================
+Services and dependencies
+=========================
 
-:Status: Draft implementation
-:Stability: Alpha
-:Last-Modified: 28 apr 2017
+:Last-Modified: 20 may 2017
 
-Most probably, you'll want to use external systems within your transformations. Those systems may include databases,
-apis (using http, for example), filesystems, etc.
+You'll probably want to use external systems within your transformations. Those systems may include databases, apis
+(using http, for example), filesystems, etc.
 
 You can start by hardcoding those services. That does the job, at first.
 
 If you're going a little further than that, you'll feel limited, for a few reasons:
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
-* Processing data on your laptop is great, but being able to do it on different systems (or stages), in different
-  environments, is more realistic? You probably want to contigure a different database on a staging environment,
+* Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
+  environments, is more realistic. You'll want to contigure a different database on a staging environment,
   preprod environment or production system. Maybe you have silimar systems for different clients and want to select
   the system at runtime. Etc.
 
@@ -52,10 +50,11 @@ injected to your calls under the parameter name "database".
 Function-based transformations
 ------------------------------
 
-No implementation yet, but expect something similar to CBT API, maybe using a `@Service(...)` decorator.
+No implementation yet, but expect something similar to CBT API, maybe using a `@Service(...)` decorator. See
+`issue #70 <https://github.com/python-bonobo/bonobo/issues/70>`_.
 
-Execution
----------
+Provide implementation at run time
+----------------------------------
 
 Let's see how to execute it:
 
@@ -81,6 +80,26 @@ A dictionary, or dictionary-like, "services" named argument can be passed to the
 "dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the implementation
 provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of the provided
 stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will use it.
+
+Solving concurrency problems
+----------------------------
+
+If a service cannot be used by more than one thread at a time, either because it's just not threadsafe, or because
+it requires to carefully order the calls made (apis that includes nonces, or work on results returned by previous
+calls are usually good candidates), you can use the :class:`bonobo.config.Exclusive` context processor to lock the
+use of a dependency for a time period.
+
+.. code-block:: python
+
+    from bonobo.config import Exclusive
+
+    def t1(api):
+        with Exclusive(api):
+            api.first_call()
+            api.second_call()
+            # ... etc
+            api.last_call()
+
 
 Service configuration (to be decided and implemented)
 :::::::::::::::::::::::::::::::::::::::::::::::::::::

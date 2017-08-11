@@ -3,15 +3,15 @@ from queue import Empty
 from time import sleep
 
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
-from bonobo.core.inputs import Input
-from bonobo.core.statistics import WithStatistics
-from bonobo.errors import InactiveReadableError
+from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
+from bonobo.structs.inputs import Input
 from bonobo.util.compat import deprecated_alias
 from bonobo.util.errors import is_error
 from bonobo.util.iterators import iter_if_not_sequence
 from bonobo.util.objects import get_name
+from bonobo.util.statistics import WithStatistics
 
 
 class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
@@ -22,7 +22,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     @property
     def alive(self):
         """todo check if this is right, and where it is used"""
-        return self.input.alive and self._started and not self._stopped
+        return self._started and not self._stopped
 
     @property
     def alive_str(self):
@@ -42,7 +42,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         name, type_name = get_name(self), get_name(type(self))
         return '<{}({}{}){}>'.format(type_name, self.alive_str, name, self.get_statistics_as_string(prefix=' '))
 
-    def write(self, *messages):  # XXX write() ? ( node.write(...) )
+    def write(self, *messages):
         """
         Push a message list to this context's input queue.
 
@@ -54,7 +54,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     # XXX deprecated alias
     recv = deprecated_alias('recv', write)
 
-    def send(self, value, _control=False):  # XXX self.send(....)
+    def send(self, value, _control=False):
         """
         Sends a message to all of this context's outputs.
 
@@ -93,6 +93,10 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             except Empty:
                 sleep(self.PERIOD)
                 continue
+            except UnrecoverableError as exc:
+                self.handle_error(exc, traceback.format_exc())
+                self.input.shutdown()
+                break
             except Exception as exc:  # pylint: disable=broad-except
                 self.handle_error(exc, traceback.format_exc())
 

@@ -1,10 +1,10 @@
-import warnings
+import logging
 
-from bonobo.basics import Limit, PrettyPrint, Tee, count, identity, noop, pprint
+from bonobo.structs import Bag, Graph, Token
+from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
+    PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.strategies import create_strategy
-from bonobo.structs import Bag, Graph
 from bonobo.util.objects import get_name
-from bonobo.io import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter
 
 __all__ = []
 
@@ -20,50 +20,57 @@ def register_api_group(*args):
 
 
 @register_api
-def run(graph, *chain, strategy=None, plugins=None, services=None):
+def run(graph, strategy=None, plugins=None, services=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
-    
+
     The only necessary argument is a :class:`Graph` instance, containing the logic you actually want to execute.
-    
+
     By default, this graph will be executed using the "threadpool" strategy: each graph node will be wrapped in a
     thread, and executed in a loop until there is no more input to this node.
-    
+
     You can provide plugins factory objects in the plugins list, this function will add the necessary plugins for
     interactive console execution and jupyter notebook execution if it detects correctly that it runs in this context.
-    
+
     You'll probably want to provide a services dictionary mapping service names to service instances.
-    
+
     :param Graph graph: The :class:`Graph` to execute.
     :param str strategy: The :class:`bonobo.strategies.base.Strategy` to use.
     :param list plugins: The list of plugins to enhance execution.
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    if len(chain):
-        warnings.warn('DEPRECATED. You should pass a Graph instance instead of a chain.')
-        from bonobo import Graph
-        graph = Graph(graph, *chain)
-
     strategy = create_strategy(strategy)
 
     plugins = plugins or []
 
-    if _is_interactive_console():
-        from bonobo.ext.console import ConsoleOutputPlugin
-        if ConsoleOutputPlugin not in plugins:
-            plugins.append(ConsoleOutputPlugin)
+    from bonobo import settings
+    settings.check()
 
-    if _is_jupyter_notebook():
-        from bonobo.ext.jupyter import JupyterOutputPlugin
-        if JupyterOutputPlugin not in plugins:
-            plugins.append(JupyterOutputPlugin)
+    if not settings.QUIET.get():  # pragma: no cover
+        if _is_interactive_console():
+            from bonobo.ext.console import ConsoleOutputPlugin
+            if ConsoleOutputPlugin not in plugins:
+                plugins.append(ConsoleOutputPlugin)
+
+        if _is_jupyter_notebook():
+            try:
+                from bonobo.ext.jupyter import JupyterOutputPlugin
+            except ImportError:
+                logging.warning(
+                    'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
+                    'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '
+                    'version by yourself.'
+                )
+            else:
+                if JupyterOutputPlugin not in plugins:
+                    plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
 
 
 # bonobo.structs
-register_api_group(Bag, Graph)
+register_api_group(Bag, Graph, Token)
 
 # bonobo.strategies
 register_api(create_strategy)
@@ -71,10 +78,10 @@ register_api(create_strategy)
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
 @register_api
-def open_fs(fs_url, *args, **kwargs):
+def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
-    
+
     :param str fs_url: A filesystem URL
     :param parse_result: A parsed filesystem URL.
     :type parse_result: :class:`ParseResult`
@@ -85,22 +92,36 @@ def open_fs(fs_url, *args, **kwargs):
     :returns: :class:`~fs.base.FS` object
     """
     from fs import open_fs as _open_fs
-    return _open_fs(str(fs_url), *args, **kwargs)
+    from os.path import expanduser
+    from os import getcwd
+
+    if fs_url is None:
+        fs_url = getcwd()
+
+    return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
 
-# bonobo.basics
+# bonobo.nodes
 register_api_group(
+    CsvReader,
+    CsvWriter,
+    FileReader,
+    FileWriter,
+    Filter,
+    JsonReader,
+    JsonWriter,
     Limit,
-    PrettyPrint,
+    PickleReader,
+    PickleWriter,
+    PrettyPrinter,
+    RateLimited,
     Tee,
+    arg0_to_kwargs,
     count,
     identity,
+    kwargs_to_arg0,
     noop,
-    pprint,
 )
-
-# bonobo.io
-register_api_group(CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter)
 
 
 def _is_interactive_console():

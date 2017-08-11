@@ -3,6 +3,9 @@ import os
 import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 
+DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py',)
+DEFAULT_GRAPH_ATTR = 'get_graph'
+
 
 def get_default_services(filename, services=None):
     dirname = os.path.dirname(filename)
@@ -14,10 +17,8 @@ def get_default_services(filename, services=None):
             '__name__': '__bonobo__',
             '__file__': services_filename,
         }
-        try:
-            exec(code, context)
-        except Exception:
-            raise
+        exec(code, context)
+
         return {
             **context[DEFAULT_SERVICES_ATTR](),
             **(services or {}),
@@ -25,26 +26,54 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def read_file(file):
-    with file:
-        code = compile(file.read(), file.name, 'exec')
+def _install_requirements(requirements):
+    """Install requirements given a path to requirements.txt file."""
+    import importlib
+    import pip
 
-    # TODO: A few special variables should be set before running the file:
-    #
-    # See:
-    #  - https://docs.python.org/3/reference/import.html#import-mod-attrs
-    #  - https://docs.python.org/3/library/runpy.html#runpy.run_module
-    context = {
-        '__name__': '__bonobo__',
-        '__file__': file.name,
-    }
+    pip.main(['install', '-r', requirements])
+    # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
+    # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
+    # python interpreter.
+    pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
+    import site
+    importlib.reload(site)
 
-    try:
-        exec(code, context)
-    except Exception as exc:
-        raise
 
-    graphs = dict((k, v) for k, v in context.items() if isinstance(v, bonobo.Graph))
+def execute(filename, module, install=False, quiet=False, verbose=False):
+    import runpy
+    from bonobo import Graph, settings
+
+    if quiet:
+        settings.QUIET.set(True)
+
+    if verbose:
+        settings.DEBUG.set(True)
+
+    if filename:
+        if os.path.isdir(filename):
+            if install:
+                requirements = os.path.join(filename, 'requirements.txt')
+                _install_requirements(requirements)
+
+            pathname = filename
+            for filename in DEFAULT_GRAPH_FILENAMES:
+                filename = os.path.join(pathname, filename)
+                if os.path.exists(filename):
+                    break
+            if not os.path.exists(filename):
+                raise IOError('Could not find entrypoint (candidates: {}).'.format(', '.join(DEFAULT_GRAPH_FILENAMES)))
+        elif install:
+            requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
+            _install_requirements(requirements)
+        context = runpy.run_path(filename, run_name='__bonobo__')
+    elif module:
+        context = runpy.run_module(module, run_name='__bonobo__')
+        filename = context['__file__']
+    else:
+        raise RuntimeError('UNEXPECTED: argparse should not allow this.')
+
+    graphs = dict((k, v) for k, v in context.items() if isinstance(v, Graph))
 
     assert len(graphs) == 1, (
         'Having zero or more than one graph definition in one file is unsupported for now, '
@@ -54,22 +83,27 @@ def read_file(file):
     graph = list(graphs.values())[0]
     plugins = []
     services = get_default_services(
-        file.name, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
+        filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
     )
 
-    return graph, plugins, services
+    return bonobo.run(
+        graph,
+        plugins=plugins,
+        services=services
+    )
 
 
-def execute(file, quiet=False):
-    graph, plugins, services = read_file(file)
-
-    # todo if console and not quiet, then add the console plugin
-    # todo when better console plugin, add it if console and just disable display
-    return bonobo.run(graph, plugins=plugins, services=services)
+def register_generic_run_arguments(parser, required=True):
+    source_group = parser.add_mutually_exclusive_group(required=required)
+    source_group.add_argument('filename', nargs='?', type=str)
+    source_group.add_argument('--module', '-m', type=str)
+    return parser
 
 
 def register(parser):
-    import argparse
-    parser.add_argument('file', type=argparse.FileType())
-    parser.add_argument('--quiet', action='store_true')
+    parser = register_generic_run_arguments(parser)
+    verbosity_group = parser.add_mutually_exclusive_group()
+    verbosity_group.add_argument('--quiet', '-q', action='store_true')
+    verbosity_group.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--install', '-I', action='store_true')
     return execute

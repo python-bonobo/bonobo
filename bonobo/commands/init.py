@@ -1,16 +1,20 @@
-import os
-
-
-def execute():
+def execute(name, branch):
     try:
-        from edgy.project.__main__ import handle_init
+        from cookiecutter.main import cookiecutter
     except ImportError as exc:
         raise ImportError(
-            'You must install "edgy.project" to use this command.\n\n $ pip install edgy.project\n'
+            'You must install "cookiecutter" to use this command.\n\n $ pip install cookiecutter\n'
         ) from exc
 
-    return handle_init(os.path.join(os.getcwd(), 'Projectfile'))
+    return cookiecutter(
+        'https://github.com/python-bonobo/cookiecutter-bonobo.git',
+        extra_context={'name': name},
+        no_input=True,
+        checkout=branch
+    )
 
 
 def register(parser):
+    parser.add_argument('name')
+    parser.add_argument('--branch', '-b', default='master')
     return execute

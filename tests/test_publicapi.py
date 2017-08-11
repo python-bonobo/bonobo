@@ -1,4 +1,4 @@
-import types
+import inspect
 
 
 def test_wildcard_import():
@@ -10,7 +10,7 @@ def test_wildcard_import():
         if name.startswith('_'):
             continue
         attr = getattr(bonobo, name)
-        if isinstance(attr, types.ModuleType):
+        if inspect.ismodule(attr):
             continue
 
         assert name in bonobo.__all__

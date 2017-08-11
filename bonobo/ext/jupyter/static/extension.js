@@ -42,7 +42,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// This file contains the javascript that is run when the notebook is loaded.
 	// It contains some requirejs configuration and the `load_ipython_extension`
@@ -66,5 +66,5 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }
+/***/ })
 /******/ ])});;

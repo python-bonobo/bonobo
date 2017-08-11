@@ -15,20 +15,23 @@ Install `bonobo` with the **jupyter** extra::
 
 Install the jupyter extension::
 
+    jupyter nbextension enable --py --sys-prefix widgetsnbextension
     jupyter nbextension enable --py --sys-prefix bonobo.ext.jupyter
 
 Development
 :::::::::::
+
+You should favor yarn over npm to install node packages. If you prefer to use npm, it's up to you to adapt the code.
 
 To install the widget for development, make sure you're using an editable install of bonobo (see install document)::
 
     jupyter nbextension install --py --symlink --sys-prefix bonobo.ext.jupyter
     jupyter nbextension enable --py --sys-prefix bonobo.ext.jupyter
 
-If you wanna change the javascript, you should run webpack in watch mode in some terminal::
+If you want to change the javascript, you should run webpack in watch mode in some terminal::
 
     cd bonobo/ext/jupyter/js
-    npm install
+    yarn install
     ./node_modules/.bin/webpack --watch
 
 To compile the widget into a distributable version (which gets packaged on PyPI when a release is made), just run

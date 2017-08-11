@@ -21,16 +21,12 @@ class GraphExecutionContext:
 
     def __init__(self, graph, plugins=None, services=None):
         self.graph = graph
-        self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph.nodes]
+        self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
         self.services = Container(services) if services else Container()
 
         for i, node_context in enumerate(self):
-            try:
-                node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
-            except KeyError:
-                continue
-
+            node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             node_context.input.on_begin = partial(node_context.send, BEGIN, _control=True)
             node_context.input.on_end = partial(node_context.send, END, _control=True)
             node_context.input.on_finalize = partial(node_context.stop)
