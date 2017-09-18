@@ -40,7 +40,7 @@ def _install_requirements(requirements):
     importlib.reload(site)
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False):
+def read(filename, module, install=False, quiet=False, verbose=False):
     import runpy
     from bonobo import Graph, settings
 
@@ -85,6 +85,12 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     services = get_default_services(
         filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
     )
+
+    return graph, plugins, services
+
+
+def execute(filename, module, install=False, quiet=False, verbose=False):
+    graph, plugins, services = read(filename, module, install, quiet, verbose)
 
     return bonobo.run(
         graph,
