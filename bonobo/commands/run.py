@@ -1,9 +1,9 @@
 import os
 
-DEFAULT_SERVICES_FILENAME = '_services.py'
-DEFAULT_SERVICES_ATTR = 'get_services'
+import bonobo
+from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 
-DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py', )
+DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py',)
 DEFAULT_GRAPH_ATTR = 'get_graph'
 
 
@@ -26,9 +26,23 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False):
+def _install_requirements(requirements):
+    """Install requirements given a path to requirements.txt file."""
+    import importlib
+    import pip
+
+    pip.main(['install', '-r', requirements])
+    # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
+    # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
+    # python interpreter.
+    pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
+    import site
+    importlib.reload(site)
+
+
+def read(filename, module, install=False, quiet=False, verbose=False):
     import runpy
-    from bonobo import Graph, run, settings
+    from bonobo import Graph, settings
 
     if quiet:
         settings.QUIET.set(True)
@@ -39,16 +53,8 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     if filename:
         if os.path.isdir(filename):
             if install:
-                import importlib
-                import pip
                 requirements = os.path.join(filename, 'requirements.txt')
-                pip.main(['install', '-r', requirements])
-                # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
-                # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
-                # python interpreter.
-                pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
-                import site
-                importlib.reload(site)
+                _install_requirements(requirements)
 
             pathname = filename
             for filename in DEFAULT_GRAPH_FILENAMES:
@@ -58,7 +64,8 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
             if not os.path.exists(filename):
                 raise IOError('Could not find entrypoint (candidates: {}).'.format(', '.join(DEFAULT_GRAPH_FILENAMES)))
         elif install:
-            raise RuntimeError('Cannot --install on a file (only available for dirs containing requirements.txt).')
+            requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
+            _install_requirements(requirements)
         context = runpy.run_path(filename, run_name='__bonobo__')
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
@@ -74,15 +81,21 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     ).format(len(graphs))
 
     graph = list(graphs.values())[0]
+    plugins = []
+    services = get_default_services(
+        filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
+    )
 
-    # todo if console and not quiet, then add the console plugin
-    # todo when better console plugin, add it if console and just disable display
-    return run(
+    return graph, plugins, services
+
+
+def execute(filename, module, install=False, quiet=False, verbose=False):
+    graph, plugins, services = read(filename, module, install, quiet, verbose)
+
+    return bonobo.run(
         graph,
-        plugins=[],
-        services=get_default_services(
-            filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
-        )
+        plugins=plugins,
+        services=services
     )
 
 

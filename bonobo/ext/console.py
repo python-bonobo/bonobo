@@ -2,7 +2,9 @@ import io
 import sys
 from contextlib import redirect_stdout
 
-from colorama import Style, Fore
+from colorama import Style, Fore, init
+
+init(wrap=True)
 
 from bonobo import settings
 from bonobo.plugins import Plugin
@@ -10,6 +12,13 @@ from bonobo.util.term import CLEAR_EOL, MOVE_CURSOR_UP
 
 
 class IOBuffer():
+    """
+    The role of IOBuffer is to overcome the problem of multiple threads wanting to write to stdout at the same time. It
+    works a bit like a videogame: there are two buffers, one that is used to write, and one which is used to read from.
+    On each cycle, we swap the buffers, and the console plugin handle output of the one which is not anymore "active".
+
+    """
+
     def __init__(self):
         self.current = io.StringIO()
         self.write = self.current.write
@@ -23,11 +32,17 @@ class IOBuffer():
         finally:
             previous.close()
 
+    def flush(self):
+        self.current.flush()
+
 
 class ConsoleOutputPlugin(Plugin):
     """
     Outputs status information to the connected stdout. Can be a TTY, with or without support for colors/cursor
     movements, or a non tty (pipe, file, ...). The features are adapted to terminal capabilities.
+
+    On Windows, we'll play a bit differently because we don't know how to manipulate cursor position. We'll only
+    display stats at the very end, and there won't be this "buffering" logic we need to display both stats and stdout.
 
     .. attribute:: prefix
 
@@ -40,17 +55,18 @@ class ConsoleOutputPlugin(Plugin):
         self.counter = 0
         self._append_cache = ''
         self.isatty = sys.stdout.isatty()
+        self.iswindows = (sys.platform == 'win32')
 
         self._stdout = sys.stdout
         self.stdout = IOBuffer()
-        self.redirect_stdout = redirect_stdout(self.stdout)
+        self.redirect_stdout = redirect_stdout(self._stdout if self.iswindows else self.stdout)
         self.redirect_stdout.__enter__()
 
     def run(self):
-        if self.isatty:
+        if self.isatty and not self.iswindows:
             self._write(self.context.parent, rewind=True)
         else:
-            pass  # not a tty
+            pass  # not a tty, or windows, so we'll ignore stats output
 
     def finalize(self):
         self._write(self.context.parent, rewind=False)
@@ -59,9 +75,13 @@ class ConsoleOutputPlugin(Plugin):
     def write(self, context, prefix='', rewind=True, append=None):
         t_cnt = len(context)
 
-        buffered = self.stdout.switch()
-        for line in buffered.split('\n')[:-1]:
-            print(line + CLEAR_EOL, file=sys.stderr)
+        if not self.iswindows:
+            buffered = self.stdout.switch()
+            for line in buffered.split('\n')[:-1]:
+                print(line + CLEAR_EOL, file=sys.stderr)
+
+        alive_color = Style.BRIGHT
+        dead_color = (Style.BRIGHT + Fore.BLACK) if self.iswindows else Fore.BLACK
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
@@ -69,14 +89,14 @@ class ConsoleOutputPlugin(Plugin):
             if node.alive:
                 _line = ''.join(
                     (
-                        ' ', Style.BRIGHT, '+', Style.RESET_ALL, ' ', node.name, name_suffix, ' ',
+                        ' ', alive_color, '+', Style.RESET_ALL, ' ', node.name, name_suffix, ' ',
                         node.get_statistics_as_string(), Style.RESET_ALL, ' ',
                     )
                 )
             else:
                 _line = ''.join(
                     (
-                        ' ', Fore.BLACK, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
+                        ' ', dead_color, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
                         Style.RESET_ALL, ' ',
                     )
                 )
