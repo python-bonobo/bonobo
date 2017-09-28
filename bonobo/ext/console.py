@@ -79,7 +79,7 @@ class ConsoleOutputPlugin(Plugin):
             else:
                 _line = ''.join(
                     (
-                        ' ', Fore.BLACK, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
+                        ' ', Fore.GREEN, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
                         Style.RESET_ALL, ' ',
                     )
                 )
