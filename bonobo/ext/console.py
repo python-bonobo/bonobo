@@ -81,7 +81,7 @@ class ConsoleOutputPlugin(Plugin):
                 print(line + CLEAR_EOL, file=sys.stderr)
 
         alive_color = Style.BRIGHT
-        dead_color = (Style.BRIGHT + Fore.BLACK) if self.iswindows else Fore.BLACK
+        dead_color = Style.BRIGHT + Fore.BLACK
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
