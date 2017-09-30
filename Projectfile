@@ -30,7 +30,7 @@ python.setup(
         ],
         'bonobo.commands': [
             'init = bonobo.commands.init:register',
-            'graph = bonobo.commands.graph:register',
+            'inspect = bonobo.commands.inspect:register',
             'run = bonobo.commands.run:register',
             'version = bonobo.commands.version:register',
         ],

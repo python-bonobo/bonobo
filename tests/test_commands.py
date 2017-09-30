@@ -101,11 +101,11 @@ def test_version(runner, capsys):
 
 @all_runners
 def test_run_with_env(runner, capsys):
-    runner('run', '--quiet',
-           str(pathlib.Path(os.path.dirname(__file__),
-                            'util', 'get_passed_env.py')),
-           '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-           '--env', "ENV_TEST_STRING='my_test_string'")
+    runner(
+        'run', '--quiet',
+        str(pathlib.Path(os.path.dirname(__file__), 'util', 'get_passed_env.py')), '--env', 'ENV_TEST_NUMBER=123',
+        '--env', 'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
+    )
     out, err = capsys.readouterr()
     out = out.split('\n')
     assert out[0] == 'cwandrews'
@@ -115,9 +115,10 @@ def test_run_with_env(runner, capsys):
 
 @all_runners
 def test_run_module_with_env(runner, capsys):
-    runner('run', '--quiet', '-m', 'tests.util.get_passed_env',
-           '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-           '--env', "ENV_TEST_STRING='my_test_string'")
+    runner(
+        'run', '--quiet', '-m', 'tests.util.get_passed_env', '--env', 'ENV_TEST_NUMBER=123', '--env',
+        'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
+    )
     out, err = capsys.readouterr()
     out = out.split('\n')
     assert out[0] == 'cwandrews'

@@ -67,7 +67,7 @@ setup(
     },
     entry_points={
         'bonobo.commands': [
-            'init = bonobo.commands.init:register', 'graph = bonobo.commands.graph:register',
+            'init = bonobo.commands.init:register', 'inspect = bonobo.commands.inspect:register',
             'run = bonobo.commands.run:register', 'version = bonobo.commands.version:register'
         ],
         'console_scripts': ['bonobo = bonobo.commands:entrypoint']

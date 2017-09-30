@@ -3,7 +3,7 @@ import os
 import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 
-DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py',)
+DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py', )
 DEFAULT_GRAPH_ATTR = 'get_graph'
 
 
@@ -99,11 +99,7 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
 def execute(filename, module, install=False, quiet=False, verbose=False, env=None):
     graph, plugins, services = read(filename, module, install, quiet, verbose, env)
 
-    return bonobo.run(
-        graph,
-        plugins=plugins,
-        services=services
-    )
+    return bonobo.run(graph, plugins=plugins, services=services)
 
 
 def register_generic_run_arguments(parser, required=True):
