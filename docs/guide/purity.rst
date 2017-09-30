@@ -8,7 +8,7 @@ The major problem we have is that one message (underlying implementation: :class
 through more than one component, and at the same time. If you wanna be safe, you tend to :func:`copy.copy()` everything
 between two calls to two different components, but that's very expensive.
 
-Instead of that, we chosed the oposite: copies are never made, and you should not modify in place the inputs of your
+Instead, we chose the opposite: copies are never made, and you should not modify in place the inputs of your
 component before yielding them, and that mostly means that you want to recreate dicts and lists before yielding (or
 returning) them. Numeric values, strings and tuples being immutable in python, modifying a variable of one of those
 type will already return a different instance.
@@ -130,10 +130,10 @@ Now let's see how to do it correctly:
 
 I hear you think «Yeah, but if I create like millions of dicts ...».
 
-Let's say we chosed the oposite way and copy the dict outside the transformation (in fact, `it's what we did in bonobo's
+Let's say we chose the opposite way and copied the dict outside the transformation (in fact, `it's what we did in bonobo's
 ancestor <https://github.com/rdcli/rdc.etl/blob/dev/rdc/etl/io/__init__.py#L187>`_). This means you will also create the
-same number of dicts, the difference is that you won't even notice it. Also, it means that if you want to yield 1 million
-times the same dict, going "pure" makes it efficient (you'll just yield the same object 1 million times) while going "copy
+same number of dicts, the difference is that you won't even notice it. Also, it means that if you want to yield the same
+dict 1 million times , going "pure" makes it efficient (you'll just yield the same object 1 million times) while going "copy
 crazy" will create 1 million objects.
 
 Using dicts like this will create a lot of dicts, but also free them as soon as all the future components that take this dict
