@@ -40,7 +40,8 @@ def _install_requirements(requirements):
     importlib.reload(site)
 
 
-def read(filename, module, install=False, quiet=False, verbose=False):
+def read(filename, module, install=False, quiet=False, verbose=False, env=None):
+    import re
     import runpy
     from bonobo import Graph, settings
 
@@ -49,6 +50,12 @@ def read(filename, module, install=False, quiet=False, verbose=False):
 
     if verbose:
         settings.DEBUG.set(True)
+
+    if env:
+        quote_killer = re.compile('["\']')
+        for e in env:
+            var_name, var_value = e.split('=')
+            os.environ[var_name] = quote_killer.sub('', var_value)
 
     if filename:
         if os.path.isdir(filename):
@@ -89,8 +96,8 @@ def read(filename, module, install=False, quiet=False, verbose=False):
     return graph, plugins, services
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False):
-    graph, plugins, services = read(filename, module, install, quiet, verbose)
+def execute(filename, module, install=False, quiet=False, verbose=False, env=None):
+    graph, plugins, services = read(filename, module, install, quiet, verbose, env)
 
     return bonobo.run(
         graph,
@@ -112,4 +119,5 @@ def register(parser):
     verbosity_group.add_argument('--quiet', '-q', action='store_true')
     verbosity_group.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--install', '-I', action='store_true')
+    parser.add_argument('--env', '-e', action='append')
     return execute
