@@ -17,7 +17,7 @@ class PickleHandler(FileHandler):
 
     """
 
-    item_names = Option(tuple)
+    item_names = Option(tuple, required=False)
 
 
 class PickleReader(IOFormatEnabled, FileReader, PickleHandler):

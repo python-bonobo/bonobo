@@ -1,3 +1,6 @@
+from bonobo.util.inspect import istype
+
+
 class Option:
     """
     An Option is a descriptor for Configurable's parameters.
@@ -14,7 +17,9 @@ class Option:
         If an option is required, an error will be raised if no value is provided (at runtime). If it is not, option
         will have the default value if user does not override it at runtime.
 
-        (default: False)
+        Ignored if a default is provided, meaning that the option cannot be required.
+
+        (default: True)
 
     .. attribute:: positional
 
@@ -48,10 +53,10 @@ class Option:
 
     _creation_counter = 0
 
-    def __init__(self, type=None, *, required=False, positional=False, default=None):
+    def __init__(self, type=None, *, required=True, positional=False, default=None):
         self.name = None
         self.type = type
-        self.required = required
+        self.required = required if default is None else False
         self.positional = positional
         self.default = default
 
@@ -60,12 +65,27 @@ class Option:
         Option._creation_counter += 1
 
     def __get__(self, inst, typ):
-        if not self.name in inst.__options_values__:
-            inst.__options_values__[self.name] = self.get_default()
-        return inst.__options_values__[self.name]
+        # XXX If we call this on the type, then either return overriden value or ... ???
+        if inst is None:
+            return vars(type).get(self.name, self)
+
+        if not self.name in inst._options_values:
+            inst._options_values[self.name] = self.get_default()
+
+        return inst._options_values[self.name]
 
     def __set__(self, inst, value):
-        inst.__options_values__[self.name] = self.clean(value)
+        inst._options_values[self.name] = self.clean(value)
+
+    def __repr__(self):
+        return '<{positional}{typename} {type}{name} default={default!r}{required}>'.format(
+            typename=type(self).__name__,
+            type='({})'.format(self.type) if istype(self.type) else '',
+            name=self.name,
+            positional='*' if self.positional else '**',
+            default=self.default,
+            required=' (required)' if self.required else '',
+        )
 
     def clean(self, value):
         return self.type(value) if self.type else value
@@ -105,20 +125,17 @@ class Method(Option):
 
     """
 
-    def __init__(self):
-        super().__init__(None, required=False)
-
-    def __get__(self, inst, typ):
-        if not self.name in inst.__options_values__:
-            inst.__options_values__[self.name] = getattr(inst, self.name)
-        return inst.__options_values__[self.name]
+    def __init__(self, *, required=True, positional=True):
+        super().__init__(None, required=required, positional=positional)
 
     def __set__(self, inst, value):
-        if isinstance(value, str):
-            raise ValueError('should be callable')
-        inst.__options_values__[self.name] = self.type(value) if self.type else value
-
-    def clean(self, value):
         if not hasattr(value, '__call__'):
-            raise ValueError('{} value must be callable.'.format(type(self).__name__))
-        return value
+            raise TypeError(
+                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.
+                format(type(self).__name__, type(value).__name__)
+            )
+        inst._options_values[self.name] = self.type(value) if self.type else value
+
+    def __call__(self, *args, **kwargs):
+        # only here to trick IDEs into thinking this is callable.
+        raise NotImplementedError('You cannot call the descriptor')

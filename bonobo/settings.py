@@ -5,6 +5,10 @@ from bonobo.errors import ValidationError
 
 
 def to_bool(s):
+    if s is None:
+        return False
+    if type(s) is bool:
+        return s
     if len(s):
         if s.lower() in ('f', 'false', 'n', 'no', '0'):
             return False
@@ -13,7 +17,18 @@ def to_bool(s):
 
 
 class Setting:
-    def __init__(self, name, default=None, validator=None):
+    __all__ = {}
+
+    @classmethod
+    def clear_all(cls):
+        for setting in Setting.__all__.values():
+            setting.clear()
+
+    def __new__(cls, name, *args, **kwargs):
+        Setting.__all__[name] = super().__new__(cls)
+        return Setting.__all__[name]
+
+    def __init__(self, name, default=None, validator=None, formatter=None):
         self.name = name
 
         if default:
@@ -21,15 +36,14 @@ class Setting:
         else:
             self.default = lambda: None
 
-        if validator:
-            self.validator = validator
-        else:
-            self.validator = None
+        self.validator = validator
+        self.formatter = formatter
 
     def __repr__(self):
-        return '<Setting {}={!r}>'.format(self.name, self.value)
+        return '<Setting {}={!r}>'.format(self.name, self.get())
 
     def set(self, value):
+        value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
             raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
         self.value = value
@@ -38,21 +52,35 @@ class Setting:
         try:
             return self.value
         except AttributeError:
-            self.value = self.default()
+            value = os.environ.get(self.name, None)
+            if value is None:
+                value = self.default()
+            self.set(value)
             return self.value
+
+    def clear(self):
+        try:
+            del self.value
+        except AttributeError:
+            pass
 
 
 # Debug/verbose mode.
-DEBUG = to_bool(os.environ.get('DEBUG', 'f'))
+DEBUG = Setting('DEBUG', formatter=to_bool, default=False)
 
 # Profile mode.
-PROFILE = to_bool(os.environ.get('PROFILE', 'f'))
+PROFILE = Setting('PROFILE', formatter=to_bool, default=False)
 
 # Quiet mode.
-QUIET = to_bool(os.environ.get('QUIET', 'f'))
+QUIET = Setting('QUIET', formatter=to_bool, default=False)
 
 # Logging level.
-LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
+LOGGING_LEVEL = Setting(
+    'LOGGING_LEVEL',
+    formatter=logging._checkLevel,
+    validator=logging._checkLevel,
+    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO
+)
 
 # Input/Output format for transformations
 IOFORMAT_ARG0 = 'arg0'
@@ -67,5 +95,8 @@ IOFORMAT = Setting('IOFORMAT', default=IOFORMAT_KWARGS, validator=IOFORMATS.__co
 
 
 def check():
-    if DEBUG and QUIET:
+    if DEBUG.get() and QUIET.get():
         raise RuntimeError('I cannot be verbose and quiet at the same time.')
+
+
+clear_all = Setting.clear_all

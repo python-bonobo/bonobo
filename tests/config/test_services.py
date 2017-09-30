@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from bonobo.config import Configurable, Container, Exclusive, Service
+from bonobo.config import Configurable, Container, Exclusive, Service, requires
 from bonobo.config.services import validate_service_name
 
 
@@ -94,3 +94,17 @@ def test_exclusive():
         'hello', '0 0', '0 1', '0 2', '0 3', '0 4', '1 0', '1 1', '1 2', '1 3', '1 4', '2 0', '2 1', '2 2', '2 3',
         '2 4', '3 0', '3 1', '3 2', '3 3', '3 4', '4 0', '4 1', '4 2', '4 3', '4 4'
     ]
+
+
+def test_requires():
+    vcr = VCR()
+
+    services = Container(output=vcr.append)
+
+    @requires('output')
+    def append(out, x):
+        out(x)
+
+    svcargs = services.args_for(append)
+    assert len(svcargs) == 1
+    assert svcargs[0] == vcr.append

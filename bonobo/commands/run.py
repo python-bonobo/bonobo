@@ -26,29 +26,44 @@ def get_default_services(filename, services=None):
     return services or {}
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False):
+def _install_requirements(requirements):
+    """Install requirements given a path to requirements.txt file."""
+    import importlib
+    import pip
+
+    pip.main(['install', '-r', requirements])
+    # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
+    # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
+    # python interpreter.
+    pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
+    import site
+    importlib.reload(site)
+
+
+def execute(filename, module, install=False, quiet=False, verbose=False,
+            env=None):
+    import re
+
     import runpy
     from bonobo import Graph, run, settings
 
     if quiet:
-        settings.QUIET = True
+        settings.QUIET.set(True)
 
     if verbose:
-        settings.DEBUG = True
+        settings.DEBUG.set(True)
+
+    if env:
+        quote_killer = re.compile('["\']')
+        for e in env:
+            var_name, var_value = e.split('=')
+            os.environ[var_name] = quote_killer.sub('', var_value)
 
     if filename:
         if os.path.isdir(filename):
             if install:
-                import importlib
-                import pip
                 requirements = os.path.join(filename, 'requirements.txt')
-                pip.main(['install', '-r', requirements])
-                # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
-                # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
-                # python interpreter.
-                pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
-                import site
-                importlib.reload(site)
+                _install_requirements(requirements)
 
             pathname = filename
             for filename in DEFAULT_GRAPH_FILENAMES:
@@ -58,7 +73,8 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
             if not os.path.exists(filename):
                 raise IOError('Could not find entrypoint (candidates: {}).'.format(', '.join(DEFAULT_GRAPH_FILENAMES)))
         elif install:
-            raise RuntimeError('Cannot --install on a file (only available for dirs containing requirements.txt).')
+            requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
+            _install_requirements(requirements)
         context = runpy.run_path(filename, run_name='__bonobo__')
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
@@ -99,4 +115,5 @@ def register(parser):
     verbosity_group.add_argument('--quiet', '-q', action='store_true')
     verbosity_group.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--install', '-I', action='store_true')
+    parser.add_argument('--env', '-e', action='append')
     return execute

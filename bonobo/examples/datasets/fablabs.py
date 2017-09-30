@@ -96,8 +96,8 @@ graph = bonobo.Graph(
     ),
     normalize,
     filter_france,
+    bonobo.JsonWriter(path='fablabs.txt', ioformat='arg0'),
     bonobo.Tee(display),
-    bonobo.JsonWriter(path='fablabs.txt'),
 )
 
 if __name__ == '__main__':

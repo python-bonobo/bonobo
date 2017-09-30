@@ -16,8 +16,9 @@ class PluginExecutionContext(LoopingExecutionContext):
             self.wrapped.initialize()
 
     def shutdown(self):
-        with recoverable(self.handle_error):
-            self.wrapped.finalize()
+        if self.started:
+            with recoverable(self.handle_error):
+                self.wrapped.finalize()
         self.alive = False
 
     def step(self):
