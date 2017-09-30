@@ -48,11 +48,6 @@ def normalize(row):
     return result
 
 
-def filter_france(row):
-    if row.get('country') == 'France':
-        yield row
-
-
 def display(row):
     print(Style.BRIGHT, row.get('name'), Style.RESET_ALL, sep='')
 
@@ -95,7 +90,7 @@ graph = bonobo.Graph(
         dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
     ),
     normalize,
-    filter_france,
+    bonobo.Filter(filter=lambda row: row.get('country') == 'France'),
     bonobo.JsonWriter(path='fablabs.txt', ioformat='arg0'),
     bonobo.Tee(display),
 )

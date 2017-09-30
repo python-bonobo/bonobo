@@ -1,0 +1,1 @@
+bonobo inspect --graph bonobo/examples/tutorials/tut02e03_writeasmap.py | dot -o test_output.png -T png && bin/imgcat test_output.png

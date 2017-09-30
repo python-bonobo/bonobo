@@ -1,7 +1,7 @@
 import os
 
-DEFAULT_SERVICES_FILENAME = '_services.py'
-DEFAULT_SERVICES_ATTR = 'get_services'
+import bonobo
+from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 
 DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py', )
 DEFAULT_GRAPH_ATTR = 'get_graph'
@@ -40,15 +40,22 @@ def _install_requirements(requirements):
     importlib.reload(site)
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False):
+def read(filename, module, install=False, quiet=False, verbose=False, env=None):
+    import re
     import runpy
-    from bonobo import Graph, run, settings
+    from bonobo import Graph, settings
 
     if quiet:
         settings.QUIET.set(True)
 
     if verbose:
         settings.DEBUG.set(True)
+
+    if env:
+        quote_killer = re.compile('["\']')
+        for e in env:
+            var_name, var_value = e.split('=')
+            os.environ[var_name] = quote_killer.sub('', var_value)
 
     if filename:
         if os.path.isdir(filename):
@@ -81,16 +88,18 @@ def execute(filename, module, install=False, quiet=False, verbose=False):
     ).format(len(graphs))
 
     graph = list(graphs.values())[0]
-
-    # todo if console and not quiet, then add the console plugin
-    # todo when better console plugin, add it if console and just disable display
-    return run(
-        graph,
-        plugins=[],
-        services=get_default_services(
-            filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
-        )
+    plugins = []
+    services = get_default_services(
+        filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
     )
+
+    return graph, plugins, services
+
+
+def execute(filename, module, install=False, quiet=False, verbose=False, env=None):
+    graph, plugins, services = read(filename, module, install, quiet, verbose, env)
+
+    return bonobo.run(graph, plugins=plugins, services=services)
 
 
 def register_generic_run_arguments(parser, required=True):
@@ -106,4 +115,5 @@ def register(parser):
     verbosity_group.add_argument('--quiet', '-q', action='store_true')
     verbosity_group.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--install', '-I', action='store_true')
+    parser.add_argument('--env', '-e', action='append')
     return execute

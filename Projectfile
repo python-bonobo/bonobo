@@ -29,7 +29,9 @@ python.setup(
             'bonobo = bonobo.commands:entrypoint',
         ],
         'bonobo.commands': [
+            'convert = bonobo.commands.convert:register',
             'init = bonobo.commands.init:register',
+            'inspect = bonobo.commands.inspect:register',
             'run = bonobo.commands.run:register',
             'version = bonobo.commands.version:register',
         ],
@@ -56,3 +58,5 @@ python.add_requirements(
         'ipywidgets >=6.0.0,<7',
     ]
 )
+
+# vim: ft=python:
