@@ -44,8 +44,9 @@ def resolve_factory(name, filename, factory_type):
 
     if not name in REGISTRY:
         raise RuntimeError(
-            'Could not resolve {factory_type} factory for {filename} ({name}). Try providing it explicitely using -{opt} <format>.'.format(
-                name=name, filename=filename, factory_type=factory_type, opt=factory_type[0]))
+            'Could not resolve {factory_type} factory for {filename} ({name}). Try providing it explicitely using -{opt} <format>.'.
+            format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
+        )
 
     if factory_type == READER:
         return REGISTRY[name][0]
@@ -62,9 +63,11 @@ def execute(input, output, reader=None, reader_options=None, writer=None, writer
     graph = bonobo.Graph()
     graph.add_chain(reader, writer)
 
-    return bonobo.run(graph, services={
-        'fs': bonobo.open_fs(),
-    })
+    return bonobo.run(
+        graph, services={
+            'fs': bonobo.open_fs(),
+        }
+    )
 
 
 def register(parser):

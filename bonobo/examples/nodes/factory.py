@@ -8,6 +8,7 @@ from bonobo.config import Configurable
 from bonobo.nodes.factory import Factory
 from bonobo.nodes.io.json import JsonDictReader
 
+
 @Factory
 def Normalize(self):
     self[0].str().title()
@@ -15,11 +16,11 @@ def Normalize(self):
     self.move(0, 'address')
 
 
-
-
 class PrettyPrinter(Configurable):
     def call(self, *args, **kwargs):
-        for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
+        for i, (
+            item, value
+        ) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
             print('  ' if i else '• ', item, '=', value)
 
 

@@ -1,8 +1,9 @@
 import functools
+import warnings
 from functools import partial
 
 from bonobo import Bag
-from bonobo.config import Configurable, Method
+from bonobo.config import Configurable
 
 _isarg = lambda item: type(item) is int
 _iskwarg = lambda item: type(item) is str
@@ -110,7 +111,10 @@ class Cursor():
             setattr(self, item, partial(_operation, self))
             return getattr(self, item)
 
-        raise AttributeError('Unknown operation {}.{}().'.format(type(self).__name__, item, ))
+        raise AttributeError('Unknown operation {}.{}().'.format(
+            type(self).__name__,
+            item,
+        ))
 
 
 CURSOR_TYPES['default'] = Cursor
@@ -139,12 +143,15 @@ CURSOR_TYPES['str'] = StringCursor
 
 
 class Factory(Configurable):
-    setup = Method()
-
     def __init__(self):
+        warnings.warn(
+            __file__ +
+            ' is experimental, API may change in the future, use it as a preview only and knowing the risks.',
+            FutureWarning
+        )
+        super(Factory, self).__init__()
         self.default_cursor_type = 'default'
         self.operations = []
-        self.setup()
 
     @factory_operation
     def move(self, _from, _to, *args, **kwargs):
@@ -186,7 +193,6 @@ if __name__ == '__main__':
 
     print('operations:', f.operations)
     print(f({'foo': 'bisou'}, foo='blah'))
-
 '''
 specs:
 

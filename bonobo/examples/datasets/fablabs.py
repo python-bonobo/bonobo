@@ -48,7 +48,6 @@ def normalize(row):
     return result
 
 
-
 def display(row):
     print(Style.BRIGHT, row.get('name'), Style.RESET_ALL, sep='')
 
@@ -69,15 +68,15 @@ def display(row):
 
     print(
         '  - {}address{}: {address}'.
-            format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address))
+        format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address))
     )
     print(
         '  - {}links{}: {links}'.
-            format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links']))
+        format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links']))
     )
     print(
         '  - {}geometry{}: {geometry}'.
-            format(Fore.BLUE, Style.RESET_ALL, **row)
+        format(Fore.BLUE, Style.RESET_ALL, **row)
     )
     print(
         '  - {}source{}: {source}'.format(
@@ -87,7 +86,9 @@ def display(row):
 
 
 graph = bonobo.Graph(
-    OpenDataSoftAPI(dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'),
+    OpenDataSoftAPI(
+        dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
+    ),
     normalize,
     bonobo.Filter(filter=lambda row: row.get('country') == 'France'),
     bonobo.JsonWriter(path='fablabs.txt', ioformat='arg0'),
