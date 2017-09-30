@@ -1,4 +1,3 @@
-
 def render_as_dot(graph):
     """
     
