@@ -41,15 +41,12 @@ class RateLimited(Configurable):
 
     @ContextProcessor
     def bucket(self, context):
-        print(context)
         bucket = RateLimitBucket(self.initial, self.amount, self.period)
         bucket.start()
-        print(bucket)
         yield bucket
         bucket.stop()
         bucket.join()
 
     def call(self, bucket, *args, **kwargs):
-        print(bucket, args, kwargs)
         bucket.wait()
         return self.handler(*args, **kwargs)
