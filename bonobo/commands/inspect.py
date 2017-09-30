@@ -6,6 +6,7 @@ from bonobo.util.objects import get_name
 
 OUTPUT_GRAPHVIZ = 'graphviz'
 
+
 def execute(*, output, **kwargs):
     graph, plugins, services = read(**kwargs)
 
