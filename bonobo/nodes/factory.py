@@ -3,7 +3,7 @@ import warnings
 from functools import partial
 
 from bonobo import Bag
-from bonobo.config import Configurable
+from bonobo.config import Configurable, Method
 
 _isarg = lambda item: type(item) is int
 _iskwarg = lambda item: type(item) is str
@@ -143,15 +143,20 @@ CURSOR_TYPES['str'] = StringCursor
 
 
 class Factory(Configurable):
-    def __init__(self):
+    initialize = Method(required=False)
+
+    def __init__(self, *args, **kwargs):
         warnings.warn(
             __file__ +
             ' is experimental, API may change in the future, use it as a preview only and knowing the risks.',
             FutureWarning
         )
-        super(Factory, self).__init__()
+        super(Factory, self).__init__(*args, **kwargs)
         self.default_cursor_type = 'default'
         self.operations = []
+
+        if self.initialize is not None:
+            self.initialize(self)
 
     @factory_operation
     def move(self, _from, _to, *args, **kwargs):
@@ -175,10 +180,10 @@ class Factory(Configurable):
             raise RuntimeError('Houston, we have a problem...')
 
     def __call__(self, *args, **kwargs):
-        # print('factory call on', args, kwargs)
+        print('factory call on', args, kwargs)
         for operation in self.operations:
             args, kwargs = operation.apply(*args, **kwargs)
-            # print(' ... after', operation, 'got', args, kwargs)
+            print(' ... after', operation, 'got', args, kwargs)
         return Bag(*args, **kwargs)
 
     def __getitem__(self, item):
