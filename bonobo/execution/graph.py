@@ -25,6 +25,9 @@ class GraphExecutionContext:
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
         self.services = Container(services) if services else Container()
 
+        # Probably not a good idea to use it unless you really know what you're doing. But you can access the context.
+        self.services['__graph_context'] = self
+
         for i, node_context in enumerate(self):
             node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
             node_context.input.on_begin = partial(node_context.send, BEGIN, _control=True)
