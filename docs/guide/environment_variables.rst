@@ -16,7 +16,7 @@ Setting environment variables for your graphs to use can be done in a variety of
 based-upon context. Perhaps the most immediate and simple way to set/override a variable for a given graph is 
 simply to use the optional ``--env`` argument when running bonobo from the shell (bash, command prompt, etc). 
 ``--env`` (or ``-e`` for short) should then be followed by the variable name and value using the
-syntax `VAR_NAME=VAR_VALUE`. Multiple environment variables can be passed by using multiple ``--env`` / ``-e`` flags. Additionally, in bash you can also set environment variables by listing those you wish to set before the `bonobo run` command with space separating the key-value pairs (i.e. `FIZZ=buzz bonobo run ...` or `FIZZ=buzz FOO=bar bonobo run ...`). 
+syntax ``VAR_NAME=VAR_VALUE``. Multiple environment variables can be passed by using multiple ``--env`` / ``-e`` flags (i.e. ``bonobo run --env FIZZ=buzz ...`` and ``bonobo run --env FIZZ=buzz --env Foo=bar ...``). Additionally, in bash you can also set environment variables by listing those you wish to set before the `bonobo run` command with space separating the key-value pairs (i.e. ``FIZZ=buzz bonobo run ...`` or ``FIZZ=buzz FOO=bar bonobo run ...``). 
 
 The Examples below demonstrate setting one or multiple variables using both of these methods:
 
@@ -39,7 +39,7 @@ The Examples below demonstrate setting one or multiple variables using both of t
 Accessing Environment Variables from within the Graph Context
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Environment variables, whether global or only for the scope of the graph,
+Environment variables, whether set globally or only for the scope of the graph,
 can be can be accessed using any of the normal means. It is important to note
 that whether set globally for the system or just for the graph context,
 environment variables are accessed by bonobo in the same way. In the example
