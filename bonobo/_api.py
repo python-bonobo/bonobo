@@ -1,6 +1,6 @@
 import logging
 
-from bonobo.structs import Bag, Graph, Token
+from bonobo.structs import Bag, ErrorBag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.strategies import create_strategy
@@ -70,7 +70,7 @@ def run(graph, strategy=None, plugins=None, services=None):
 
 
 # bonobo.structs
-register_api_group(Bag, Graph, Token)
+register_api_group(Bag, ErrorBag, Graph, Token)
 
 # bonobo.strategies
 register_api(create_strategy)

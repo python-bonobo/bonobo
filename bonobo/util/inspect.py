@@ -1,16 +1,6 @@
 from collections import namedtuple
 
-
-def isconfigurabletype(mixed):
-    """
-    Check if the given argument is an instance of :class:`bonobo.config.ConfigurableMeta`, meaning it has all the
-    plumbery necessary to build :class:`bonobo.config.Configurable`-like instances.
-
-    :param mixed:
-    :return: bool
-    """
-    from bonobo.config.configurables import ConfigurableMeta
-    return isinstance(mixed, ConfigurableMeta)
+from bonobo.constants import LOOPBACK
 
 
 def isconfigurable(mixed):
@@ -22,6 +12,18 @@ def isconfigurable(mixed):
     """
     from bonobo.config.configurables import Configurable
     return isinstance(mixed, Configurable)
+
+
+def isconfigurabletype(mixed):
+    """
+    Check if the given argument is an instance of :class:`bonobo.config.ConfigurableMeta`, meaning it has all the
+    plumbery necessary to build :class:`bonobo.config.Configurable`-like instances.
+
+    :param mixed:
+    :return: bool
+    """
+    from bonobo.config.configurables import ConfigurableMeta
+    return isinstance(mixed, ConfigurableMeta)
 
 
 def isoption(mixed):
@@ -66,6 +68,38 @@ def istype(mixed):
     :return: bool
     """
     return isinstance(mixed, type)
+
+
+def isbag(mixed):
+    """
+    Check if the given argument is an instance of a :class:`bonobo.Bag`.
+
+    :param mixed:
+    :return: bool
+    """
+    from bonobo.structs.bags import Bag
+    return isinstance(mixed, Bag)
+
+
+def iserrorbag(mixed):
+    """
+    Check if the given argument is an instance of an :class:`bonobo.ErrorBag`.
+
+    :param mixed:
+    :return: bool
+    """
+    from bonobo.structs.bags import ErrorBag
+    return isinstance(mixed, ErrorBag)
+
+
+def isloopbackbag(mixed):
+    """
+    Check if the given argument is an instance of a :class:`bonobo.Bag`, marked for loopback behaviour.
+
+    :param mixed:
+    :return: bool
+    """
+    return isbag(mixed) and LOOPBACK in mixed.flags
 
 
 ConfigurableInspection = namedtuple(
