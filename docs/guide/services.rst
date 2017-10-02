@@ -12,8 +12,8 @@ If you're going a little further than that, you'll feel limited, for a few reaso
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
 * Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
-  environments, is more realistic. You'll want to contigure a different database on a staging environment,
-  preprod environment or production system. Maybe you have silimar systems for different clients and want to select
+  environments, is more realistic. You'll want to configure a different database on a staging environment,
+  pre-production environment, or production system. Maybe you have similar systems for different clients and want to select
   the system at runtime. Etc.
 
 Service injection
@@ -44,7 +44,7 @@ Let's define such a transformation:
                 'category': database.get_category_name_for_sku(row['sku'])
             }
 
-This piece of code tells bonobo that your transformation expect a sercive called "primary_sql_database", that will be
+This piece of code tells bonobo that your transformation expect a service called "primary_sql_database", that will be
 injected to your calls under the parameter name "database".
 
 Function-based transformations
