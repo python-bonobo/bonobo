@@ -43,7 +43,7 @@ class GraphExecutionContext:
     def __iter__(self):
         yield from self.nodes
 
-    def recv(self, *messages):
+    def write(self, *messages):
         """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
         our graph."""
 
@@ -56,12 +56,12 @@ class GraphExecutionContext:
         for node in self.nodes:
             node.start()
 
-    def loop(self):
-        # todo use strategy
-        for node in self.nodes:
-            node.loop()
-
     def stop(self):
         # todo use strategy
         for node in self.nodes:
             node.stop()
+
+    def loop(self):
+        # todo use strategy
+        for node in self.nodes:
+            node.loop()

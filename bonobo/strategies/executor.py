@@ -21,7 +21,7 @@ class ExecutorStrategy(Strategy):
 
     def execute(self, graph, *args, plugins=None, services=None, **kwargs):
         context = self.create_graph_execution_context(graph, plugins=plugins, services=services)
-        context.recv(BEGIN, Bag(), END)
+        context.write(BEGIN, Bag(), END)
 
         executor = self.create_executor()
 
@@ -57,7 +57,7 @@ class ExecutorStrategy(Strategy):
             futures.append(executor.submit(_runner))
 
         while context.alive:
-            time.sleep(0.2)
+            time.sleep(0.1)
 
         for plugin_context in context.plugins:
             plugin_context.shutdown()

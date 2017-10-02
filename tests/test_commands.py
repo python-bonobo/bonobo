@@ -103,8 +103,8 @@ def test_version(runner, capsys):
 def test_run_with_env(runner, capsys):
     runner(
         'run', '--quiet',
-        get_examples_path('env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123',
-        '--env', 'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
+        get_examples_path('env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
+        'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
     )
     out, err = capsys.readouterr()
     out = out.split('\n')

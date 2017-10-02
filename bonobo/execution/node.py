@@ -2,7 +2,7 @@ import traceback
 from queue import Empty
 from time import sleep
 
-from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED, BEGIN, END
+from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
 from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
