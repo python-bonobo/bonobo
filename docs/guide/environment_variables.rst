@@ -12,13 +12,13 @@ are also the means by-which arguments can be passed to graphs.
 Passing / Setting Environment Variables
 ::::::::::::::::::::::::::::::::::::::::::::
 
-The recommended way to set environment variables for a given graph is simply to use
-the optional ``--env`` argument when running bonobo from the shell (bash, command prompt, etc).
+Setting environment variables for your graphs to use can be done in a variety of ways and which one used can vary
+based-upon context. Perhaps the most immediate and simple way to set/override a variable for a given graph is 
+simply to use the optional ``--env`` argument when running bonobo from the shell (bash, command prompt, etc). 
 ``--env`` (or ``-e`` for short) should then be followed by the variable name and value using the
-syntax `VAR_NAME=VAR_VALUE`. Multiple environment variables can be passed by using
-multiple ``--env`` / ``-e`` flags.
+syntax `VAR_NAME=VAR_VALUE`. Multiple environment variables can be passed by using multiple ``--env`` / ``-e`` flags. Additionally, in bash you can also set environment variables by listing those you wish to set before the `bonobo run` command with space separating the key-value pairs (i.e. `FIZZ=buzz bonobo run ...` or `FIZZ=buzz FOO=bar bonobo run ...`). 
 
-Example:
+The Examples below demonstrate setting one or multiple variables using both of these methods:
 
 .. code-block:: bash
 
@@ -33,6 +33,8 @@ Example:
 
     # Using multiple environment variables in bash (*bash only):
     SRC_FILE=inventory.txt DST_FILE=inventory_processed.csv bonobo run csvsanitizer
+    
+*Though not-yet implemented, the bonobo roadmap includes implementing environment / .env files as well.*
 
 Accessing Environment Variables from within the Graph Context
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
