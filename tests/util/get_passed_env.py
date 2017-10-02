@@ -1,6 +1,6 @@
 import os
 
-from bonobo import Graph
+import bonobo
 
 
 def extract():
@@ -14,9 +14,7 @@ def load(s: str):
     print(s)
 
 
-graph = Graph(extract, load)
+graph = bonobo.Graph(extract, load)
 
 if __name__ == '__main__':
-    from bonobo import run
-
-    run(graph)
+    bonobo.run(graph)
