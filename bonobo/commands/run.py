@@ -106,6 +106,7 @@ def register_generic_run_arguments(parser, required=True):
     source_group = parser.add_mutually_exclusive_group(required=required)
     source_group.add_argument('filename', nargs='?', type=str)
     source_group.add_argument('--module', '-m', type=str)
+    parser.add_argument('--env', '-e', action='append')
     return parser
 
 
@@ -115,5 +116,4 @@ def register(parser):
     verbosity_group.add_argument('--quiet', '-q', action='store_true')
     verbosity_group.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--install', '-I', action='store_true')
-    parser.add_argument('--env', '-e', action='append')
     return execute
