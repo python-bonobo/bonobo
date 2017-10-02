@@ -128,7 +128,7 @@ Now let's see how to do it correctly:
                 'index': i
             }
 
-I hear you think «Yeah, but if I create like millions of dicts ...».
+I bet you think «Yeah, but if I create like millions of dicts ...».
 
 Let's say we chose the opposite way and copied the dict outside the transformation (in fact, `it's what we did in bonobo's
 ancestor <https://github.com/rdcli/rdc.etl/blob/dev/rdc/etl/io/__init__.py#L187>`_). This means you will also create the
