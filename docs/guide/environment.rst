@@ -8,6 +8,10 @@ approach more secure, it also makes graphs more flexible by allowing adjustments
 for a variety of environments and contexts. Importantly, environment variables
 are also the means by-which arguments can be passed to graphs.
 
+.. note::
+
+    This document is about using your own settings and configuration values. If you're looking for bonobo's builtin
+    settings, also configurable using environment variables, please check :doc:`/reference/settings`.
 
 Passing / Setting Environment Variables
 :::::::::::::::::::::::::::::::::::::::
