@@ -9,6 +9,7 @@ means that the api is not yet 1.0-proof.
 
     api
     api_config
+    api_util
     commands
     settings
     examples
