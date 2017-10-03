@@ -12,7 +12,7 @@ There are a few things that you should know while writing transformations graphs
     purity
     transformations
     services
-    envrionmental_variables
+    envrionment_variables
 
 Third party integrations
 ::::::::::::::::::::::::
