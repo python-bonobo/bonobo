@@ -1,10 +1,7 @@
 Guides
 ======
 
-Concepts and best practices
-:::::::::::::::::::::::::::
-
-There are a few things that you should know while writing transformations graphs with bonobo.
+Here are a few guides and best practices to work with bonobo.
 
 .. toctree::
     :maxdepth: 2
@@ -14,10 +11,7 @@ There are a few things that you should know while writing transformations graphs
     services
     environment
 
-Third party integrations
-::::::::::::::::::::::::
-
-There is a few **bonobo** extensions that ease the use of the library with third party tools. Each integration is
+There is a also few extensions that ease the use of the library with third party tools. Each integration is
 available as an optional extra dependency, and the maturity stage of each extension vary.
 
 .. toctree::
