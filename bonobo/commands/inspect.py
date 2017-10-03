@@ -6,6 +6,8 @@ from bonobo.util.objects import get_name
 
 OUTPUT_GRAPHVIZ = 'graphviz'
 
+def _ident(graph, i):
+    return json.dumps(get_name(graph[i])+' ('+str(i)+')')
 
 def execute(*, output, **kwargs):
     graph, plugins, services = read(**kwargs)
@@ -16,11 +18,11 @@ def execute(*, output, **kwargs):
         print('  "BEGIN" [shape="point"];')
 
         for i in graph.outputs_of(BEGIN):
-            print('  "BEGIN" -> ' + json.dumps(get_name(graph[i])) + ';')
+            print('  "BEGIN" -> ' + _ident(graph, i)  + ';')
 
         for ix in graph.topologically_sorted_indexes:
             for iy in graph.outputs_of(ix):
-                print('  {} -> {};'.format(json.dumps(get_name(graph[ix])), json.dumps(get_name(graph[iy]))))
+                print('  {} -> {};'.format(_ident(graph, ix), _ident(graph, iy)))
 
         print('}')
     else:
