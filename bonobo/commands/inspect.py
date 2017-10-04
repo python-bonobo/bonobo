@@ -7,7 +7,7 @@ from bonobo.util.objects import get_name
 OUTPUT_GRAPHVIZ = 'graphviz'
 
 def _ident(graph, i):
-    return json.dumps(get_name(graph[i])+' ('+str(i)+')')
+	return json.dumps('{} [label="{}"]'.format(str(i),get_name(graph[i])))
 
 def execute(*, output, **kwargs):
     graph, plugins, services = read(**kwargs)
