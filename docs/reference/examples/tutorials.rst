@@ -42,7 +42,7 @@ Example 2: Write
 Example 3: Write as map
 -----------------------
 
-.. automodule:: bonobo.examples.tutorials.tut02e02_writeasmap
+.. automodule:: bonobo.examples.tutorials.tut02e03_writeasmap
     :members:
     :undoc-members:
     :show-inheritance:
