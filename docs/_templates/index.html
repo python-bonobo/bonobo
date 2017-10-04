@@ -9,14 +9,37 @@
 
 <p>
     {% trans %}
-    <strong>Bonobo</strong> is a line-by-line data-processing toolkit for python 3.5+ (extract-transform-load
-    framework, or ETL) emphasizing simple and atomic data transformations defined using a directed graph of plain old
-    python objects (functions, iterables, generators, ...).
+    <b>Bonobo</b> is an Extract Transform Load framework for the Python (3.5+) language.
     {% endtrans %}
 </p>
 
-<div style="border: 2px solid red; font-weight: bold; margin: 1em; padding: 1em">
-    Bonobo is <strong>ALPHA</strong> software. Some APIs will change.
+<p>
+    {% trans %}
+    It works by streaming data through a directed acyclic graph of python callables, one row at a time.
+    {% endtrans %}
+</p>
+
+<p>
+    {% trans %}
+    It is targeting <b>small scale data</b> (as in “not big data”), allowing it to be quick and easy to install (no
+    client-server, no daemon, lightweight requirements, no surprises).
+    {% endtrans %}
+</p>
+<p>
+    {% trans %}
+    Most common file formats (XML, CSV, JSON, Excel, ...) and basic services (SQL databases, REST web services, ...) can
+    be worked with using the built-in or extension libraries, other services can benefit the richness of PyPI.
+    {% endtrans %}
+</p>
+<p>
+    {% trans %}
+    In short, <b>Bonobo</b> contains the logic to execute efficiently an ETL process, the glue to use plain old python
+    ojects and common operations, readers and writers. For the rest, it's just python!
+    {% endtrans %}
+</p>
+
+<div style="border: 1px solid orange; margin: 0.5em; padding: 0.5em">
+    Bonobo is currently released as <strong>alpha</strong> version. Expect some APIs to change.
 </div>
 
 
@@ -65,53 +88,12 @@
     </tr>
 </table>
 
-<h2>Features</h2>
 
-<ul>
-    <li>
-        {% trans %}
-        <b>10 minutes to get started:</b> Know some python? Writing your first data processor is an affair
-        of minutes.
-        {% endtrans %}
-    </li>
-    <li>
-        {% trans %}
-        <b>Data sources and targets:</b> HTML, JSON, XML, SQL databases, NoSQL databases, HTTP/REST APIs,
-        streaming APIs, python objects...
-        {% endtrans %}
-    </li>
-    <li>
-        {% trans %}
-        <b>Service injection:</b> Abstract the transformation dependencies to easily switch data sources and
-        dependant libraries. You'll be able to specify the concrete implementations or configurations at
-        runtime, for example to switch a database connection string or an API endpoint.
-        {% endtrans %}
-    </li>
-    <li>
-        {% trans %}
-        <b>Plugins:</b> Easily add features to all your transformations by using builtin plugins (Jupyter,
-        Console, ...) or write your own.
-        {% endtrans %}
-    </li>
-    <li>
-        {% trans %}
-        Bonobo is young, and the todo-list is huge. Read the <a
-            href="https://www.bonobo-project.org/roadmap">roadmap</a>.
-        {% endtrans %}
-    </li>
-</ul>
-
-<p>{% trans %}
-    You can also download PDF/EPUB versions of the Bonobo documentation:
-    <a href="http://readthedocs.org/projects/bonobo/downloads/pdf/master/">PDF version</a>,
-    <a href="http://readthedocs.org/projects/bonobo/downloads/epub/master/">EPUB version</a>.
-    {% endtrans %}
-</p>
 
 <h2>Table of contents</h2>
-
 
 <div>
     {{ toctree(maxdepth=2, collapse=False)}}
 </div>
+
 {% endblock %}
