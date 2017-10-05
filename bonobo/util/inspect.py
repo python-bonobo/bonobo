@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-from bonobo.constants import LOOPBACK
 
 
 def isconfigurable(mixed):
@@ -99,6 +98,7 @@ def isloopbackbag(mixed):
     :param mixed:
     :return: bool
     """
+    from bonobo.constants import LOOPBACK
     return isbag(mixed) and LOOPBACK in mixed.flags
 
 

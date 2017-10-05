@@ -1,3 +1,4 @@
+from bonobo.util.collections import sortedlist
 from bonobo.util.inspect import (
     inspect_node,
     isbag,
@@ -10,11 +11,18 @@ from bonobo.util.inspect import (
     isoption,
     istype,
 )
+from bonobo.util.objects import (
+    get_name,
+    get_attribute_or_create,
+    ValueHolder
+)
 from bonobo.util.python import require
 
 # Bonobo's util API
 __all__ = [
-    'require',
+    'ValueHolder',
+    'get_attribute_or_create',
+    'get_name',
     'inspect_node',
     'isbag',
     'isconfigurable',
@@ -25,4 +33,5 @@ __all__ = [
     'ismethod',
     'isoption',
     'istype',
+    'require',
 ]

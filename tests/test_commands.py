@@ -3,7 +3,6 @@ import runpy
 import sys
 from unittest.mock import patch
 
-import pathlib
 import pkg_resources
 import pytest
 

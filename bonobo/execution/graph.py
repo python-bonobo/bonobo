@@ -1,6 +1,6 @@
 from functools import partial
 
-from bonobo.config.services import Container
+from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.execution.plugin import PluginExecutionContext
@@ -23,7 +23,7 @@ class GraphExecutionContext:
         self.graph = graph
         self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
-        self.services = Container(services) if services else Container()
+        self.services = create_container(services)
 
         # Probably not a good idea to use it unless you really know what you're doing. But you can access the context.
         self.services['__graph_context'] = self

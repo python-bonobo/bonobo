@@ -3,8 +3,9 @@ import time
 
 import pytest
 
+from bonobo.util import get_name
 from bonobo.config import Configurable, Container, Exclusive, Service, requires
-from bonobo.config.services import validate_service_name
+from bonobo.config.services import validate_service_name, create_container
 
 
 class PrinterInterface():
@@ -108,3 +109,23 @@ def test_requires():
     svcargs = services.args_for(append)
     assert len(svcargs) == 1
     assert svcargs[0] == vcr.append
+
+
+@pytest.mark.parametrize('services', [None, {}])
+def test_create_container_empty_values(services):
+    c = create_container(services)
+    assert len(c) == 2
+    assert 'fs' in c and get_name(c['fs']) == 'OSFS'
+    assert 'http' in c and get_name(c['http']) == 'requests'
+
+
+def test_create_container_override():
+    c = create_container({
+        'http': 'http',
+        'fs': 'fs',
+    })
+    assert len(c) == 2
+    assert 'fs' in c and c['fs'] == 'fs'
+    assert 'http' in c and c['http'] == 'http'
+
+

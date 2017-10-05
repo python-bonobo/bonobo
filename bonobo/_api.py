@@ -1,10 +1,10 @@
 import logging
 
-from bonobo.structs import Bag, ErrorBag, Graph, Token
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.strategies import create_strategy
-from bonobo.util.objects import get_name
+from bonobo.structs import Bag, ErrorBag, Graph, Token
+from bonobo.util import get_name
 
 __all__ = []
 

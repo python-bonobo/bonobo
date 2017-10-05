@@ -95,6 +95,30 @@ class Container(dict):
         return value
 
 
+def create_container(services=None, factory=Container):
+    """
+    Create a container with reasonable default service implementations for commonly use, standard-named, services.
+
+    Services:
+    - `fs` defaults to a fs2 instance based on current working directory
+    - `http`defaults to requests
+
+    :param services:
+    :return:
+    """
+    container = factory(services) if services else factory()
+
+    if not 'fs' in container:
+        import bonobo
+        container.setdefault('fs', bonobo.open_fs())
+
+    if not 'http' in container:
+        import requests
+        container.setdefault('http', requests)
+
+    return container
+
+
 class Exclusive(ContextDecorator):
     """
     Decorator and context manager used to require exclusive usage of an object, most probably a service. It's usefull

@@ -4,10 +4,11 @@ import itertools
 from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
-from bonobo.constants import NOT_MODIFIED
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
+
+from bonobo.constants import NOT_MODIFIED
 
 __all__ = [
     'Limit',

@@ -1,6 +1,5 @@
-from bonobo.util.inspect import isoption, iscontextprocessor
+from bonobo.util import isoption, iscontextprocessor, sortedlist
 from bonobo.errors import AbstractError
-from bonobo.util.collections import sortedlist
 
 __all__ = [
     'Configurable',
