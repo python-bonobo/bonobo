@@ -1,6 +1,6 @@
 from functools import partial
 
-from bonobo.config.services import Container
+from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.execution.plugin import PluginExecutionContext
@@ -23,7 +23,10 @@ class GraphExecutionContext:
         self.graph = graph
         self.nodes = [NodeExecutionContext(node, parent=self) for node in self.graph]
         self.plugins = [PluginExecutionContext(plugin, parent=self) for plugin in plugins or ()]
-        self.services = Container(services) if services else Container()
+        self.services = create_container(services)
+
+        # Probably not a good idea to use it unless you really know what you're doing. But you can access the context.
+        self.services['__graph_context'] = self
 
         for i, node_context in enumerate(self):
             node_context.outputs = [self[j].input for j in self.graph.outputs_of(i)]
@@ -40,7 +43,7 @@ class GraphExecutionContext:
     def __iter__(self):
         yield from self.nodes
 
-    def recv(self, *messages):
+    def write(self, *messages):
         """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
         our graph."""
 
@@ -53,12 +56,12 @@ class GraphExecutionContext:
         for node in self.nodes:
             node.start()
 
-    def loop(self):
-        # todo use strategy
-        for node in self.nodes:
-            node.loop()
-
     def stop(self):
         # todo use strategy
         for node in self.nodes:
             node.stop()
+
+    def loop(self):
+        # todo use strategy
+        for node in self.nodes:
+            node.loop()

@@ -1,13 +1,6 @@
 import sys
 from textwrap import indent
 
-from bonobo import settings
-from bonobo.structs.bags import ErrorBag
-
-
-def is_error(bag):
-    return isinstance(bag, ErrorBag)
-
 
 def _get_error_message(exc):
     if hasattr(exc, '__str__'):

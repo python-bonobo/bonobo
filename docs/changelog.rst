@@ -1,6 +1,70 @@
 Changelog
 =========
 
+v.0.5.0 - 5 october 2017
+::::::::::::::::::::::::
+
+Important highlights
+--------------------
+
+* `bonobo.pprint` and `bonobo.PrettyPrint` have been removed, in favor of `bonobo.PrettyPrinter` (BC break).
+* The `bonobo.config` API has suffered a major refactoring. It has been done carefully and most of your code should
+  work unchanged, but you may have surprises. This was necessary for this API to be more uniform (potential BC break).
+* bonobo.pprint and bonobo.PrettyPrint have been removed, in favor of new bonobo.PrettyPrinter() generic printer. If
+  you're still using the old versions, time to switch (BC break).
+* Secondary APIs start to be more uniform (bonobo.config, bonobo.util).
+
+New features
+------------
+
+Graphs & Nodes
+..............
+
+* Graphs now have a .copy() method.
+* New helper transformations arg0_to_kwargs and kwargs_to_arg0.
+* The unique pretty printer provided by the core library is now bonobo.PrettyPrinter().
+* Services now have "fs" and "http" configured by default.
+
+Command line
+............
+
+* New `bonobo convert` command now allows to run simple conversion jobs without coding anything.
+* New `bonobo inspect` command now allows to generate graphviz source for graph visualization.
+* Passing environment variables to graph executions now can be done using -e/--env. (cwandrews)
+* Add ability to install requirements with  for a requirements.txt residing in the same dir (Alex Vykaliuk)
+
+Preview
+.......
+
+* A "transformation factory" makes its first appearance. It is considered a preview unstable feature. Stay
+  tuned.
+
+Internals
+---------
+
+* Configurables have undergone a refactoring, all types of descriptors should now behave in the same way.
+* An UnrecoverrableError exception subclass allows for some errors to stop the whole execution.
+* Refactoring of Settings (bonobo.settings).
+* Add a reference to graph context (private) in service container.
+* Few internal APIs changes and refactorings.
+
+Bugfixes
+--------
+
+* Check if PluginExecutionContext was started before shutting it down. (Vitalii Vokhmin)
+* Move patch one level up because importlib brakes all the CI tools. (Alex Vykaliuk)
+* Do not fail in ipykernel without ipywidgets. (Alex Vykaliuk)
+* Escaping issues (Tomas Zubiri)
+
+Miscellaneous
+-------------
+
+* Windows console output should now be correct. (Parthiv20)
+* Various bugfixes.
+* More readable statistics on Ubuntu workstation standard terminal (spagoc)
+* Documentation, more documentation, documentation again.
+
+
 v.0.4.3 - 16 july 2017
 ::::::::::::::::::::::
 

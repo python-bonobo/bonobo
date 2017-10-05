@@ -22,7 +22,7 @@ underscores and lowercase names:
     def uppercase(s: str) -> str:
         return s.upper()
 
-If you're naming something which is configurable, that will need to be instanciated or called to obtain something that
+If you're naming something which is configurable, that will need to be instantiated or called to obtain something that
 can be used as a graph node, then use camelcase names:
 
 .. code-block:: python

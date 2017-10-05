@@ -1,6 +1,6 @@
 import itertools
 
-from bonobo.constants import INHERIT_INPUT
+from bonobo.constants import INHERIT_INPUT, LOOPBACK
 
 __all__ = [
     'Bag',
@@ -33,8 +33,10 @@ class Bag:
     
     """
 
+    default_flags = ()
+
     def __init__(self, *args, _flags=None, _parent=None, **kwargs):
-        self._flags = _flags or ()
+        self._flags = type(self).default_flags + (_flags or ())
         self._parent = _parent
         self._args = args
         self._kwargs = kwargs
@@ -104,6 +106,10 @@ class Bag:
                 ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
             ))
         )
+
+
+class LoopbackBag(Bag):
+    default_flags = (LOOPBACK, )
 
 
 class ErrorBag(Bag):

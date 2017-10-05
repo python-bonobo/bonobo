@@ -3,7 +3,8 @@ Settings & Environment
 
 .. module:: bonobo.settings
 
-All settings that you can find in the :module:`bonobo.settings` module.
+All settings that you can find in the :mod:`bonobo.settings` module. You can override those settings using
+environment variables. For you own settings and configuration values, see the :doc:`/guide/environment` guide.
 
 Debug
 :::::

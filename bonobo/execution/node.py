@@ -3,12 +3,12 @@ from queue import Empty
 from time import sleep
 
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
-from bonobo.errors import InactiveReadableError
+from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.util.compat import deprecated_alias
-from bonobo.util.errors import is_error
+from bonobo.util.inspect import iserrorbag, isloopbackbag
 from bonobo.util.iterators import iter_if_not_sequence
 from bonobo.util.objects import get_name
 from bonobo.util.statistics import WithStatistics
@@ -65,8 +65,10 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         if not _control:
             self.increment('out')
 
-        if is_error(value):
+        if iserrorbag(value):
             value.apply(self.handle_error)
+        elif isloopbackbag(value):
+            self.input.put(value)
         else:
             for output in self.outputs:
                 output.put(value)
@@ -93,6 +95,10 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             except Empty:
                 sleep(self.PERIOD)
                 continue
+            except UnrecoverableError as exc:
+                self.handle_error(exc, traceback.format_exc())
+                self.input.shutdown()
+                break
             except Exception as exc:  # pylint: disable=broad-except
                 self.handle_error(exc, traceback.format_exc())
 
@@ -133,7 +139,7 @@ def _resolve(input_bag, output):
     if output is NOT_MODIFIED:
         return input_bag
 
-    if is_error(output):
+    if iserrorbag(output):
         return output
 
     # If it does not look like a bag, let's create one for easier manipulation

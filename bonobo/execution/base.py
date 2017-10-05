@@ -2,7 +2,7 @@ import traceback
 from contextlib import contextmanager
 from time import sleep
 
-from bonobo.config import Container
+from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
 from bonobo.plugins import get_enhancers
 from bonobo.util.errors import print_error
@@ -48,7 +48,7 @@ class LoopingExecutionContext(Wrapper):
                 raise RuntimeError(
                     'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.'
                 )
-            self.services = Container(services) if services else Container()
+            self.services = create_container(services)
         else:
             self.services = None
 

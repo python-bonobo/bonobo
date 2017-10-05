@@ -53,7 +53,7 @@ class Service(Option):
         super().__init__(str, required=False, default=name)
 
     def __set__(self, inst, value):
-        inst.__options_values__[self.name] = validate_service_name(value)
+        inst._options_values[self.name] = validate_service_name(value)
 
     def resolve(self, inst, services):
         try:
@@ -75,7 +75,7 @@ class Container(dict):
 
     def args_for(self, mixed):
         try:
-            options = mixed.__options__
+            options = dict(mixed.__options__)
         except AttributeError:
             options = {}
 
@@ -93,6 +93,30 @@ class Container(dict):
         if isinstance(value, types.LambdaType):
             value = value(self)
         return value
+
+
+def create_container(services=None, factory=Container):
+    """
+    Create a container with reasonable default service implementations for commonly use, standard-named, services.
+
+    Services:
+    - `fs` defaults to a fs2 instance based on current working directory
+    - `http`defaults to requests
+
+    :param services:
+    :return:
+    """
+    container = factory(services) if services else factory()
+
+    if not 'fs' in container:
+        import bonobo
+        container.setdefault('fs', bonobo.open_fs())
+
+    if not 'http' in container:
+        import requests
+        container.setdefault('http', requests)
+
+    return container
 
 
 class Exclusive(ContextDecorator):

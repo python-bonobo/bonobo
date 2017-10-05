@@ -1,6 +1,7 @@
 Installation
 ============
 
+
 Create an ETL project
 :::::::::::::::::::::
 
@@ -15,6 +16,7 @@ Creating a project and starting to write code should take less than a minute:
 Once you bootstrapped a project, you can start editing the default example transformation by editing
 `my-etl-project/main.py`. Now, you can head to :doc:`tutorial/index`.
 
+
 Other installation options
 ::::::::::::::::::::::::::
 
@@ -26,6 +28,7 @@ You can install it directly from the `Python Package Index <https://pypi.python.
 .. code-block:: shell-session
 
     $ pip install bonobo
+
 
 Install from source
 -------------------
@@ -39,6 +42,13 @@ below).
 
     $ pip install git+https://github.com/python-bonobo/bonobo.git@develop#egg=bonobo
 
+.. note::
+
+    Here, we use the `develop` branch, which is the incoming unreleased minor version. It's the way to "live on the
+    edge", either to test your codebase with a future release, or to test unreleased features. You can use this
+    technique to install any branch you want, and even a branch in your own repository.
+
+
 Editable install
 ----------------
 
@@ -48,15 +58,20 @@ of your python interpreter.
 
 .. code-block:: shell-session
 
-    $ pip install --editable git+https://github.com/python-bonobo/bonobo.git@master#egg=bonobo
+    $ pip install --editable git+https://github.com/python-bonobo/bonobo.git@develop#egg=bonobo
 
-.. note:: You can also use the `-e` flag instead of the long version.
+.. note:: You can also use `-e`, the shorthand version of `--editable`.
+
+.. note:: Once again, we use `develop` here. New features should go to `develop`, while bugfixes can go to `master`.
 
 If you can't find the "source" directory, try trunning this:
 
 .. code-block:: shell-session
 
     $ python -c "import bonobo; print(bonobo.__path__)"
+
+Local clone
+-----------
 
 Another option is to have a "local" editable install, which means you create the clone by yourself and make an editable install
 from the local clone.
@@ -78,10 +93,25 @@ I usually name the git remote for the main bonobo repository "upstream", and my 
 
 Of course, replace my github username by the one you used to fork bonobo. You should be good to go!
 
-Windows support
-:::::::::::::::
+Supported platforms
+:::::::::::::::::::
 
-There are minor issues on the windows platform, mostly due to the fact bonobo was not developed by experienced windows
+Linux, OSX and other Unixes
+---------------------------
+
+Bonobo test suite runs continuously on Linux, and core developpers use both OSX and Linux machines. Also, there are jobs
+running on production linux machines everyday, so the support for those platforms should be quite excellent.
+
+If you're using some esotheric UNIX machine, there can be surprises (although we're not aware, yet). We do not support
+officially those platforms, but if you can actually fix the problems on those systems, we'll be glad to integrate
+your patches (as long as it is tested, for both existing linux environments and your strange systems).
+
+Windows
+-------
+
+Windows support is correct, as a few contributors helped us to test and fix the quirks.
+
+There may still be minor issues on the windows platform, mostly due to the fact bonobo was not developed by windows
 users.
 
 We're trying to look into that but energy available to provide serious support on windows is very limited.

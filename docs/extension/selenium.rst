@@ -1,5 +1,5 @@
-Bonobo with Selenium
-====================
+Selenium Extension
+==================
 
 .. todo:: The `bonobo-selenium` package is at a very alpha stage, and things will change. This section is here to give a
           brief overview but is neither complete nor definitive.

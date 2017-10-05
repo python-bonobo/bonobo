@@ -62,7 +62,7 @@ def test_simple_execution_context():
     assert not ctx.started
     assert not ctx.stopped
 
-    ctx.recv(BEGIN, Bag(), END)
+    ctx.write(BEGIN, Bag(), END)
 
     assert not ctx.alive
     assert not ctx.started

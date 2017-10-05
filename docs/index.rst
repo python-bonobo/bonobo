@@ -7,6 +7,7 @@ Bonobo
    install
    tutorial/index
    guide/index
+   extension/index
    reference/index
    faq
    contribute/index

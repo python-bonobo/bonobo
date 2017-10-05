@@ -98,7 +98,7 @@ string-options of the service names, and we provide an implementation at the las
 There are two ways of providing implementations:
 
 * Either file-wide, by providing a `get_services()` function that returns a dict of named implementations (we did so
-  with filesystems in the previous step, :doc:`tut02.rst`)
+  with filesystems in the previous step, :doc:`tut02`)
 * Either directory-wide, by providing a `get_services()` function in a specially named `_services.py` file.
 
 The first is simpler if you only have one transformation graph in one file, the second allows to group coherent

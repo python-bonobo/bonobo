@@ -56,8 +56,8 @@ Read about best development practices
 Read about integrating external tools with bonobo
 -------------------------------------------------
 
-* :doc:`../guide/ext/docker`: run transformation graphs in isolated containers.
-* :doc:`../guide/ext/jupyter`: run transformations within jupyter notebooks.
-* :doc:`../guide/ext/selenium`: crawl the web using a real browser and work with the gathered data.
-* :doc:`../guide/ext/sqlalchemy`: everything you need to interract with SQL databases.
+* :doc:`../extension/docker`: run transformation graphs in isolated containers.
+* :doc:`../extension/jupyter`: run transformations within jupyter notebooks.
+* :doc:`../extension/selenium`: crawl the web using a real browser and work with the gathered data.
+* :doc:`../extension/sqlalchemy`: everything you need to interract with SQL databases.
 

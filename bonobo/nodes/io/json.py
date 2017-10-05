@@ -4,6 +4,7 @@ from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
 from bonobo.nodes.io.file import FileReader, FileWriter
+from bonobo.structs.bags import Bag
 
 
 class JsonHandler(FileHandler):
@@ -17,6 +18,12 @@ class JsonReader(IOFormatEnabled, FileReader, JsonHandler):
     def read(self, fs, file):
         for line in self.loader(file):
             yield self.get_output(line)
+
+
+class JsonDictItemsReader(JsonReader):
+    def read(self, fs, file):
+        for line in self.loader(file).items():
+            yield Bag(*line)
 
 
 class JsonWriter(IOFormatEnabled, FileWriter, JsonHandler):
