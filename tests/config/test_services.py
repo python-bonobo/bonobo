@@ -127,5 +127,3 @@ def test_create_container_override():
     assert len(c) == 2
     assert 'fs' in c and c['fs'] == 'fs'
     assert 'http' in c and c['http'] == 'http'
-
-

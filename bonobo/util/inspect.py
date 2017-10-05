@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 
-
 def isconfigurable(mixed):
     """
     Check if the given argument is an instance of :class:`bonobo.config.Configurable`.

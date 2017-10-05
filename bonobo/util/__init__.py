@@ -11,11 +11,7 @@ from bonobo.util.inspect import (
     isoption,
     istype,
 )
-from bonobo.util.objects import (
-    get_name,
-    get_attribute_or_create,
-    ValueHolder
-)
+from bonobo.util.objects import (get_name, get_attribute_or_create, ValueHolder)
 from bonobo.util.python import require
 
 # Bonobo's util API
