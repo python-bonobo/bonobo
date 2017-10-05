@@ -15,6 +15,6 @@ pyparsing==2.2.0
 pytz==2017.2
 requests==2.18.4
 six==1.11.0
-stevedore==1.27.0
+stevedore==1.27.1
 urllib3==1.22
 websocket-client==0.44.0
