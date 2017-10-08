@@ -1,3 +1,4 @@
+import codecs
 import os
 
 import bonobo
@@ -41,7 +42,7 @@ def _install_requirements(requirements):
 
 
 def read(filename, module, install=False, quiet=False, verbose=False, env=None):
-    import re
+
     import runpy
     from bonobo import Graph, settings
 
@@ -52,10 +53,21 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
         settings.DEBUG.set(True)
 
     if env:
-        quote_killer = re.compile('["\']')
+        __escape_decoder = codecs.getdecoder('unicode_escape')
+
+        def decode_escaped(escaped):
+            return __escape_decoder(escaped)[0]
+
         for e in env:
-            var_name, var_value = e.split('=')
-            os.environ[var_name] = quote_killer.sub('', var_value)
+            ename, evalue = e.split('=', 1)
+
+            if len(evalue) > 0:
+                quoted = evalue[0] == evalue[len(evalue) - 1] in ['"', "'"]
+
+                if quoted:
+                    evalue = decode_escaped(evalue[1:-1])
+
+            os.environ[ename] = evalue
 
     if filename:
         if os.path.isdir(filename):
