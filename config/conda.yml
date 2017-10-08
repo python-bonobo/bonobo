@@ -10,3 +10,5 @@ dependencies:
   - psutil ==5.2.2
   - requests ==2.13.0
   - stevedore ==1.21.0
+  # for examples
+  - pycountry ==17.9.23

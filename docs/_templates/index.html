@@ -1,7 +1,8 @@
-{% extends "layout.html" %}
-{% set title = _('Bonobo — Data processing for humans') %}
-{% block body %}
+{% extends "base.html" %}
 
+{% set title = _('Bonobo — Data processing for humans') %}
+
+{% block body %}
 <h1 style="text-align: center">
     <img class="logo" src="{{ pathto('_static/bonobo.png', 1) }}" title="Bonobo" alt="Bonobo"
          style=" width: 128px; height: 128px;"/>
@@ -9,7 +10,7 @@
 
 <p>
     {% trans %}
-    <b>Bonobo</b> is an Extract Transform Load framework for the Python (3.5+) language.
+    <b>Bonobo</b> is an <b>Extract Transform Load</b> (or ETL) framework for the <b>Python (3.5+)</b> language.
     {% endtrans %}
 </p>
 
