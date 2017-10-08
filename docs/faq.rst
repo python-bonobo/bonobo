@@ -13,8 +13,7 @@ as input.
 By default, it uses a thread pool to execute all functions in parallel, and handle the movement of data rows in the
 directed graph using simple fifo queues.
 
-It allows the user to focus on the content of the transformations, and not optimizing blocking or long operations, nor
-thinking about threads or subprocesses.
+It allows the user to focus on the content of the transformations, rather than worrying about optimized blocking, long operations, threads, or subprocesses.
 
 It's lean manufacturing for data.
 
@@ -34,7 +33,7 @@ The main reasons about why 3.5+:
 
 * Creating a tool that works well under both python 2 and 3 is a lot more work.
 * Python 3 is nearly 10 years old. Consider moving on.
-* Python 3.5 contains syntaxic sugar that makes working with data a lot more convenient.
+* Python 3.5+ contains syntactic sugar that makes working with data a lot more convenient (and fun).
 
 
 Can a graph contain another graph?
