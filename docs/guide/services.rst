@@ -1,14 +1,10 @@
 Services and dependencies
 =========================
 
-:Last-Modified: 20 may 2017
+You'll want to use external systems within your transformations, including databases, HTTP APIs, other web services,
+filesystems, etc.
 
-You'll probably want to use external systems within your transformations. Those systems may include databases, apis
-(using http, for example), filesystems, etc.
-
-You can start by hardcoding those services. That does the job, at first.
-
-If you're going a little further than that, you'll feel limited, for a few reasons:
+Hardcoding those services is a good first step, but as your codebase grows, will show limits rather quickly.
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
 * Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
@@ -16,70 +12,77 @@ If you're going a little further than that, you'll feel limited, for a few reaso
   pre-production environment, or production system. Maybe you have similar systems for different clients and want to select
   the system at runtime. Etc.
 
-Service injection
-:::::::::::::::::
+Definition of service dependencies
+::::::::::::::::::::::::::::::::::
 
-To solve this problem, we introduce a light dependency injection system. It allows to define named dependencies in
+To solve this problem, we introduce a light dependency injection system. It allows to define **named dependencies** in
 your transformations, and provide an implementation at runtime.
 
-Class-based transformations
----------------------------
+For function-based transformations, you can use the :func:`bonobo.config.use` decorator to mark the dependencies. You'll
+still be able to call it manually, providing the implementation yourself, but in a bonobo execution context, it will
+be resolve and injected automatically, as long as you provided an implementation to the executor (more on that below).
 
-To define a service dependency in a class-based transformation, use :class:`bonobo.config.Service`, a special
-descriptor (and subclass of :class:`bonobo.config.Option`) that will hold the service names and act as a marker
-for runtime resolution of service instances.
+.. code-block:: python
 
-Let's define such a transformation:
+    from bonobo.config import use
+
+    @use('orders_database')
+    def select_all(database):
+        yield from database.query('SELECT * FROM foo;')
+
+For class based transformations, you can use :class:`bonobo.config.Service`, a special descriptor (and subclass of
+:class:`bonobo.config.Option`) that will hold the service names and act as a marker for runtime resolution of service
+instances.
 
 .. code-block:: python
 
     from bonobo.config import Configurable, Service
 
     class JoinDatabaseCategories(Configurable):
-        database = Service('primary_sql_database')
+        database = Service('orders_database')
 
-        def __call__(self, database, row):
+        def call(self, database, row):
             return {
                 **row,
                 'category': database.get_category_name_for_sku(row['sku'])
             }
 
-This piece of code tells bonobo that your transformation expect a service called "primary_sql_database", that will be
+Both pieces of code tells bonobo that your transformation expect a service called "orders_database", that will be
 injected to your calls under the parameter name "database".
 
-Function-based transformations
-------------------------------
+Providing implementations at run-time
+-------------------------------------
 
-No implementation yet, but expect something similar to CBT API, maybe using a `@Service(...)` decorator. See
-`issue #70 <https://github.com/python-bonobo/bonobo/issues/70>`_.
-
-Provide implementation at run time
-----------------------------------
-
-Let's see how to execute it:
+Bonobo will expect you to provide a dictionary of all service implementations required by your graph.
 
 .. code-block:: python
 
     import bonobo
 
-    graph = bonobo.graph(
-        *before,
-        JoinDatabaseCategories(),
-        *after,
-    )
+    graph = bonobo.graph(...)
+
+    def get_services():
+        return {
+            'orders_database': my_database_service,
+        }
     
     if __name__ == '__main__':
-        bonobo.run(
-            graph,
-            services={
-                'primary_sql_database': my_database_service,
-            }
-        )
-    
-A dictionary, or dictionary-like, "services" named argument can be passed to the :func:`bonobo.run` helper. The
-"dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the implementation
-provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of the provided
-stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will use it.
+        bonobo.run(graph, services=get_services())
+
+
+.. note::
+
+    A dictionary, or dictionary-like, "services" named argument can be passed to the :func:`bonobo.run` API method.
+    The "dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the
+    implementation provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of
+    the provided stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will
+    use it.
+
+Command line interface will look at services in two different places:
+
+* A `get_services()` function present at the same level of your graph definition.
+* A `get_services()` function in a `_services.py` file in the same directory as your graph's file, allowing to reuse the
+  same service implementations for more than one graph.
 
 Solving concurrency problems
 ----------------------------
@@ -87,7 +90,7 @@ Solving concurrency problems
 If a service cannot be used by more than one thread at a time, either because it's just not threadsafe, or because
 it requires to carefully order the calls made (apis that includes nonces, or work on results returned by previous
 calls are usually good candidates), you can use the :class:`bonobo.config.Exclusive` context processor to lock the
-use of a dependency for a time period.
+use of a dependency for the time of the context manager (`with` statement)
 
 .. code-block:: python
 
@@ -101,18 +104,10 @@ use of a dependency for a time period.
             api.last_call()
 
 
-Service configuration (to be decided and implemented)
-:::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-* There should be a way to configure default service implementation for a python file, a directory, a project ...
-* There should be a way to override services when running a transformation.
-* There should be a way to use environment for service configuration.
-
 Future and proposals
 ::::::::::::::::::::
 
-This is the first proposed implementation and it will evolve, but looks a lot like how we used bonobo ancestor in
-production.
+This first implementation and it will evolve. Base concepts will stay, though.
 
 May or may not happen, depending on discussions.
 

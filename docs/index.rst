@@ -11,6 +11,10 @@ Bonobo
    reference/index
    faq
    contribute/index
+
+
+.. toctree::
+   :hidden:
+
    genindex
    modindex
-

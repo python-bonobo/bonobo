@@ -1,13 +1,14 @@
 Guides
 ======
 
-Here are a few guides and best practices to work with bonobo.
+This section will guide you through your journey with Bonobo ETL.
 
 .. toctree::
     :maxdepth: 2
 
-    graphs
+    introduction
     transformations
+    graphs
     services
     environment
     purity
