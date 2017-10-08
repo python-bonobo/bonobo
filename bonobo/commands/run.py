@@ -62,9 +62,7 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
             ename, evalue = e.split('=', 1)
 
             if len(evalue) > 0:
-                quoted = evalue[0] == evalue[len(evalue) - 1] in ['"', "'"]
-
-                if quoted:
+                if evalue[0] == evalue[len(evalue) - 1] in ['"', "'"]:
                     evalue = decode_escaped(evalue[1:-1])
 
             os.environ[ename] = evalue
