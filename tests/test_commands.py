@@ -99,6 +99,33 @@ def test_version(runner, capsys):
 
 
 @all_runners
+def test_run_module_with_default_env_file(runner, capsys):
+    runner(
+        'run', '--quiet', get_examples_path('env_vars/get_passed_env_file.py')
+    )
+    out, err = capsys.readouterr()
+    out = out.split('\n')
+    assert out[0] == '321'
+    assert out[1] == 'sweetpassword'
+    assert out[2] != 'not_cwandrews_123'
+    assert out[3] != 'marzo'
+
+
+# @all_runners
+# def test_run_with_env_file(runner, capsys):
+#     runner(
+#         'run', '--quiet',
+#         get_examples_path('env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
+#         'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
+#     )
+#     out, err = capsys.readouterr()
+#     out = out.split('\n')
+#     assert out[0] == 'cwandrews'
+#     assert out[1] == '123'
+#     assert out[2] == 'my_test_string'
+
+
+@all_runners
 def test_run_with_env(runner, capsys):
     runner(
         'run', '--quiet',
