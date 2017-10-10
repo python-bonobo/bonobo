@@ -22,8 +22,11 @@
 
 <div class="footer">
     &copy; 2012-2017, <a href="https://romain.dorgueil.net" target="_blank">Romain Dorgueil</a> |
-    <a href="https://www.bonobo-project.org/">Bonobo ETL</a> |
-    <a href="{{ pathto('_sources/' + sourcename, true)|e }}" rel="nofollow">{{ _('Page source') }}</a>
+    <a href="https://www.bonobo-project.org/">Bonobo ETL</a>
+  
+    {%- if show_source and has_source and sourcename %}		
+      | <a href="{{ pathto('_sources/' + sourcename, true)|e }}" rel="nofollow">{{ _('Page source') }}</a>		
+    {%- endif %}
 </div>
 
 <a href="https://github.com/python-bonobo/bonobo" class="github">
