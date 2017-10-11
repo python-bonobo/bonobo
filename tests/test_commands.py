@@ -168,13 +168,13 @@ def test_run_file_with_default_env_file_and_env_file(runner, capsys):
 def test_run_file_with_default_env_file_and_env_file_and_env_vars(runner, capsys):
     runner(
         'run', '--quiet', '--default-env-file', '.env', '--env-file', '.env2',
-        '--env', 'TEST_USER_PASSWORD=SWEETpass', '--env', 'MY_SECRET=444',
+        '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env', 'MY_SECRET=444',
         get_examples_path('environment/env_files/get_passed_env_file.py')
     )
     out, err = capsys.readouterr()
     out = out.split('\n')
     assert out[0] == '444'
-    assert out[1] == 'SWEETpass'
+    assert out[1] == 'SWEETpassWORD'
     assert out[2] == 'abril'
 
 
