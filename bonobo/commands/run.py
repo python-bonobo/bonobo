@@ -83,12 +83,6 @@ def read(filename, module, install=False, quiet=False, verbose=False, default_en
         for f in default_env_file:
             env_file_path = env_dir.joinpath(f)
             load_dotenv(env_file_path)
-    else:
-        try:
-            env_file_path = env_dir.joinpath('.env')
-            load_dotenv(env_file_path)
-        except FileNotFoundError:
-            pass
 
     if default_env:
         for e in default_env:
