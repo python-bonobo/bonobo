@@ -77,9 +77,13 @@ def _shorten(s, w):
 
 
 class PrettyPrinter(Configurable):
-    max_width = Option(int, required=False, __doc__='''
+    max_width = Option(
+        int,
+        required=False,
+        __doc__='''
         If set, truncates the output values longer than this to this width.
-    ''')
+    '''
+    )
 
     def call(self, *args, **kwargs):
         formater = self._format_quiet if settings.QUIET.get() else self._format_console
