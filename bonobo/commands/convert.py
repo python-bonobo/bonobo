@@ -1,8 +1,6 @@
 import mimetypes
 import os
 
-import re
-
 import bonobo
 from bonobo.commands.util.arguments import parse_variable_argument
 
@@ -47,14 +45,13 @@ def resolve_factory(name, filename, factory_type, options=None):
 
     if options:
         options = dict(map(parse_variable_argument, options))
-
     else:
         options = dict()
 
     if not name in REGISTRY:
         raise RuntimeError(
             'Could not resolve {factory_type} factory for {filename} ({name}). Try providing it explicitely using -{opt} <format>.'.
-            format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
+                format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
         )
 
     if factory_type == READER:
