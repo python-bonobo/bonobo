@@ -18,5 +18,5 @@ def test_force_iterator_with_generator():
         yield 'ccc'
 
     iterator = force_iterator(generator())
-    assert type(iterator) == types.GeneratorType
+    assert isinstance(iterator, types.GeneratorType)
     assert list(iterator) == ['aaa', 'bbb', 'ccc']
