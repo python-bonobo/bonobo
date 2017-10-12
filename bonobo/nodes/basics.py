@@ -70,7 +70,17 @@ def _count_counter(self, context):
     context.send(Bag(counter._value))
 
 
+def _shorten(s, w):
+    if w and len(s) > w:
+        s = s[0:w - 3] + '...'
+    return s
+
+
 class PrettyPrinter(Configurable):
+    max_width = Option(int, required=False, __doc__='''
+        If set, truncates the output values longer than this to this width.
+    ''')
+
     def call(self, *args, **kwargs):
         formater = self._format_quiet if settings.QUIET.get() else self._format_console
 
@@ -82,7 +92,10 @@ class PrettyPrinter(Configurable):
 
     def _format_console(self, i, item, value):
         return ' '.join(
-            ((' ' if i else '•'), str(item), '=', str(value).strip().replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL)
+            (
+                (' ' if i else '•'), str(item), '=', _shorten(str(value).strip(),
+                                                              self.max_width).replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL
+            )
         )
 
 
