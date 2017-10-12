@@ -71,13 +71,13 @@ def read(filename, module, install=False, quiet=False, verbose=False, default_en
             requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
             _install_requirements(requirements)
         context = runpy.run_path(filename, run_name='__bonobo__')
-        env_dir = Path(filename).parent
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
         filename = context['__file__']
-        env_dir = Path(module)
     else:
         raise RuntimeError('UNEXPECTED: argparse should not allow this.')
+
+    env_dir = Path(filename).parent or Path(module).parent
 
     if default_env_file:
         for f in default_env_file:
