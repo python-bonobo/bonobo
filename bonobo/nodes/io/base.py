@@ -50,6 +50,7 @@ class FileHandler(Configurable):
     eol = Option(str, default='\n')  # type: str
     mode = Option(str)  # type: str
     encoding = Option(str, default='utf-8')  # type: str
+
     fs = Service('fs')  # type: str
 
     @ContextProcessor

@@ -34,20 +34,19 @@ Data-processing for humans.
 
 Bonobo is an extract-transform-load framework for python 3.5+ (see comparisons with other data tools).
 
-Bonobo uses plain old python objects (functions, generators and iterators), allows to link them in a directed graph and
-execute them using a parallelized strategy, without having to worry about the underlying complexity.
+Bonobo uses plain old python objects (functions, generators and iterators), allows them to be linked together in a directed graph, and then executed using a parallelized strategy, without having to worry about the underlying complexity.
 
-Developpers can focus on writing simple and atomic operations, that are by-design easy to unit-test, while the
-framework focus on applying them concurrently to rows of data.
+Developers can focus on writing simple and atomic operations, that are easy to unit-test by-design, while the focus of the
+framework is to apply them concurrently to rows of data.
 
 One thing to note: write pure transformations and you'll be safe.
 
-Bonobo is a young rewrite of an old python2.7 tool that ran millions of transformations per day for years on production,
-so as though it may not yet be complete or fully stable (please, allow us to reach 1.0), the basics are there.
+Bonobo is a young rewrite of an old python2.7 tool that ran millions of transformations per day for years on production.
+Although it may not yet be complete or fully stable (please, allow us to reach 1.0), the basics are there.
 
 ----
 
-*Bonobo is under heavy development, we're making the best efforts to keep the core as stable as possible but we also need to move forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we'd break in the process (feel free to complain on issues, so we notice breakages we did not expect)*
+*Bonobo is under heavy development, we're doing our best to keep the core as stable as possible while still moving forward. Please allow us to reach 1.0 stability and our sincere apologies for anything we break in the process (feel free to complain on issues, allowing us to correct breakages we did not expect)*
 
 ----
 

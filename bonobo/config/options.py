@@ -53,12 +53,14 @@ class Option:
 
     _creation_counter = 0
 
-    def __init__(self, type=None, *, required=True, positional=False, default=None):
+    def __init__(self, type=None, *, required=True, positional=False, default=None, __doc__=None):
         self.name = None
         self.type = type
         self.required = required if default is None else False
         self.positional = positional
         self.default = default
+
+        self.__doc__ = __doc__ or self.__doc__
 
         # This hack is necessary for python3.5
         self._creation_counter = Option._creation_counter

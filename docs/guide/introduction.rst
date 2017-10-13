@@ -68,6 +68,8 @@ processing while `B` and `C` are working.
         BEGIN2 -> "B" -> "C";
     }
 
+Now, we feed `C` with both `A` and `B` output. It is not a "join", or "cartesian product". It is just two different
+pipes plugged to `C` input, and whichever yields data will see this data feeded to `C`, one row at a time.
 
 What is it not?
 :::::::::::::::
