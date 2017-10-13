@@ -3,6 +3,9 @@ import os
 
 import bonobo
 from bonobo.commands.util.arguments import parse_variable_argument
+from bonobo.util import require
+from bonobo.util.iterators import tuplize
+from bonobo.util.python import WorkingDirectoryModulesRegistry
 
 SHORTCUTS = {
     'csv': 'text/csv',
@@ -51,7 +54,7 @@ def resolve_factory(name, filename, factory_type, options=None):
     if not name in REGISTRY:
         raise RuntimeError(
             'Could not resolve {factory_type} factory for {filename} ({name}). Try providing it explicitely using -{opt} <format>.'.
-                format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
+            format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
         )
 
     if factory_type == READER:
@@ -62,14 +65,42 @@ def resolve_factory(name, filename, factory_type, options=None):
         raise ValueError('Invalid factory type.')
 
 
-def execute(input, output, reader=None, reader_options=None, writer=None, writer_options=None, options=None):
-    reader_factory, reader_options = resolve_factory(reader, input, READER, (options or []) + (reader_options or []))
-    writer_factory, writer_options = resolve_factory(writer, output, WRITER, (options or []) + (writer_options or []))
+@tuplize
+def resolve_filters(filters):
+    registry = WorkingDirectoryModulesRegistry()
+    for f in filters:
+        try:
+            mod, attr = f.split(':', 1)
+            yield getattr(registry.require(mod), attr)
+        except ValueError:
+            yield getattr(bonobo, f)
+
+
+def execute(
+    input,
+    output,
+    reader=None,
+    reader_option=None,
+    writer=None,
+    writer_option=None,
+    option=None,
+    filter=None,
+    do_print=False
+):
+    reader_factory, reader_option = resolve_factory(reader, input, READER, (option or []) + (reader_option or []))
+
+    if output == '-':
+        writer_factory, writer_option = bonobo.PrettyPrinter, {}
+    else:
+        writer_factory, writer_option = resolve_factory(writer, output, WRITER, (option or []) + (writer_option or []))
+
+    filters = resolve_filters(filter)
 
     graph = bonobo.Graph()
     graph.add_chain(
-        reader_factory(input, **reader_options),
-        writer_factory(output, **writer_options),
+        reader_factory(input, **reader_option),
+        *filters,
+        writer_factory(output, **writer_option),
     )
 
     return bonobo.run(
@@ -93,24 +124,38 @@ def register(parser):
         help='Choose the writer factory if it cannot be detected from extension, or if detection is wrong.'
     )
     parser.add_argument(
+        '--filter',
+        '-f',
+        dest='filter',
+        action='append',
+        help='Add a filter between input and output',
+    )
+    parser.add_argument(
+        '--print',
+        '-p',
+        dest='do_print',
+        action='store_true',
+        help='Replace the output by a pretty printer.',
+    )
+    parser.add_argument(
         '--option',
         '-O',
-        dest='options',
+        dest='option',
         action='append',
-        help='Add a named option to both reader and writer factories (i.e. foo="bar").'
+        help='Add a named option to both reader and writer factories (i.e. foo="bar").',
     )
     parser.add_argument(
         '--' + READER + '-option',
         '-' + READER[0].upper(),
-        dest=READER + '_options',
+        dest=READER + '_option',
         action='append',
-        help='Add a named option to the reader factory.'
+        help='Add a named option to the reader factory.',
     )
     parser.add_argument(
         '--' + WRITER + '-option',
         '-' + WRITER[0].upper(),
-        dest=WRITER + '_options',
+        dest=WRITER + '_option',
         action='append',
-        help='Add a named option to the writer factory.'
+        help='Add a named option to the writer factory.',
     )
     return execute
