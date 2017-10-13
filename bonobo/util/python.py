@@ -11,7 +11,7 @@ class _RequiredModule:
 class _RequiredModulesRegistry(dict):
     @property
     def pathname(self):
-        return os.path.join(os.getcwd(), os.path.dirname(inspect.getfile(inspect.stack()[1][0])))
+        return os.path.join(os.getcwd(), os.path.dirname(inspect.getfile(inspect.stack()[2][0])))
 
     def require(self, name):
         if name not in self:

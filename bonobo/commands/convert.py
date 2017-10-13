@@ -85,7 +85,6 @@ def execute(
     writer_option=None,
     option=None,
     filter=None,
-    do_print=False
 ):
     reader_factory, reader_option = resolve_factory(reader, input, READER, (option or []) + (reader_option or []))
 
@@ -121,7 +120,7 @@ def register(parser):
     parser.add_argument(
         '--' + WRITER,
         '-w',
-        help='Choose the writer factory if it cannot be detected from extension, or if detection is wrong.'
+        help='Choose the writer factory if it cannot be detected from extension, or if detection is wrong (use - for console pretty print).'
     )
     parser.add_argument(
         '--filter',
@@ -129,13 +128,6 @@ def register(parser):
         dest='filter',
         action='append',
         help='Add a filter between input and output',
-    )
-    parser.add_argument(
-        '--print',
-        '-p',
-        dest='do_print',
-        action='store_true',
-        help='Replace the output by a pretty printer.',
     )
     parser.add_argument(
         '--option',
