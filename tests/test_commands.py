@@ -1,6 +1,7 @@
 import os
 import runpy
 import sys
+import shutil
 from unittest.mock import patch
 
 import pkg_resources
@@ -41,6 +42,27 @@ def test_no_command(runner, capsys):
         runner()
     _, err = capsys.readouterr()
     assert 'error: the following arguments are required: command' in err
+
+
+@all_runners
+def test_init(runner, capsys):
+    runner('init', 'project-name')
+    out, err = capsys.readouterr()
+    out = out.strip()
+    shutil.rmtree('project-name')
+    assert out == ''
+
+
+@all_runners
+def test_init_within_empty_directory(runner, capsys):
+    os.mkdir('empty-directory')
+    os.chdir('empty-directory')
+    runner('init', '.')
+    out, err = capsys.readouterr()
+    out = out.strip()
+    os.chdir('..')
+    shutil.rmtree('empty-directory')
+    assert out == ''
 
 
 @all_runners
