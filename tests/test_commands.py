@@ -234,7 +234,7 @@ class TestDefaultEnvVars(object):
         runner(
             'run', '--quiet',
             get_examples_path('environment/env_vars/get_passed_env.py'),
-            '--default-env', 'USER=clowncity'
+            '--default-env', 'USER=clowncity', '--env', 'USER=ted'
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
