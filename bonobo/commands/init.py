@@ -1,4 +1,6 @@
-def execute(name, branch):
+import os
+
+def execute(name, branch, overwrite_if_exists=False):
     try:
         from cookiecutter.main import cookiecutter
     except ImportError as exc:
@@ -6,11 +8,15 @@ def execute(name, branch):
             'You must install "cookiecutter" to use this command.\n\n $ pip install cookiecutter\n'
         ) from exc
 
+    if os.listdir(os.getcwd()) == []:
+        overwrite_if_exists = True
+
     return cookiecutter(
         'https://github.com/python-bonobo/cookiecutter-bonobo.git',
         extra_context={'name': name},
         no_input=True,
-        checkout=branch
+        checkout=branch,
+        overwrite_if_exists=overwrite_if_exists
     )
 
 
