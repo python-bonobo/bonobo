@@ -200,32 +200,87 @@ class TestEnvFile(object):
 
 
 @all_runners
-def test_run_file_with_default_env_file_and_env_file(runner, capsys):
-    runner(
-        'run', '--quiet',
-        get_examples_path('environment/env_files/get_passed_env_file.py'),
-        '--default-env-file', '.env_one', '--env-file', '.env_two',
-    )
-    out, err = capsys.readouterr()
-    out = out.split('\n')
-    assert out[0] == '321'
-    assert out[1] == 'not_sweet_password'
-    assert out[2] == 'abril'
+class TestEnvFileCombinations(object):
+    def test_run_file_with_default_env_file_and_env_file(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--default-env-file', '.env_one', '--env-file', '.env_two',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'not_sweet_password'
+        assert out[2] == 'abril'
+
+    def test_run_file_with_default_env_file_and_env_file_and_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--default-env-file', '.env_one', '--env-file', '.env_two',
+            '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env',
+            'MY_SECRET=444',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '444'
+        assert out[1] == 'SWEETpassWORD'
+        assert out[2] == 'abril'
 
 
 @all_runners
-def test_run_file_with_default_env_file_and_env_file_and_env_vars(runner, capsys):
-    runner(
-        'run', '--quiet',
-        get_examples_path('environment/env_files/get_passed_env_file.py'),
-        '--default-env-file', '.env_one', '--env-file', '.env_two',
-        '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env', 'MY_SECRET=444',
-    )
-    out, err = capsys.readouterr()
-    out = out.split('\n')
-    assert out[0] == '444'
-    assert out[1] == 'SWEETpassWORD'
-    assert out[2] == 'abril'
+class TestDefaultEnvVars(object):
+    def test_run_file_with_default_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--default-env', 'USER=clowncity'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'user'
+        assert out[1] == 'number'
+        assert out[2] == 'string'
+        assert out[3] != 'clowncity'
+
+    def test_run_file_with_default_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--default-env', "ENV_TEST_STRING='my_test_string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
+
+    def test_run_module_with_default_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123',
+            '--default-env', 'ENV_TEST_STRING=string'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] != 'string'
+
+    def test_run_module_with_default_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--default-env', "ENV_TEST_STRING='string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] != 'string'
 
 
 @all_runners
@@ -240,7 +295,7 @@ class TestEnvVars(object):
         out = out.split('\n')
         assert out[0] != 'test_user'
         assert out[1] == '123'
-        assert out[2] == 'string'
+        assert out[2] == 'my_test_string'
 
     def test_run_file_with_env_vars(self, runner, capsys):
         runner(
