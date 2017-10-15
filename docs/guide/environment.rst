@@ -59,7 +59,7 @@ The Examples below demonstrate setting one or multiple variables using both of t
 
 .. code-block:: bash
 
-    # Using one environment variable via --env and --defualt-env flags:
+    # Using one environment variable via a --env or --defualt-env flag:
     bonobo run csvsanitizer --env SECRET_TOKEN=secret123
     bonobo run csvsanitizer --defaul-env SECRET_TOKEN=secret123
 
