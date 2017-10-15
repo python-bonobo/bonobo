@@ -74,10 +74,10 @@ The Examples below demonstrate setting one or multiple variables using both of t
     SRC_FILE=inventory.txt DST_FILE=inventory_processed.csv bonobo run csvsanitizer
 
     # Using an env file for default env values:
-    bonobo run csvsanitizer --default-env-file .default_env
+    bonobo run csvsanitizer --default-env-file .env
 
     # Using an env file for env values:
-    bonobo run csvsanitizer --env-file '.env'
+    bonobo run csvsanitizer --env-file '.env.private'
 
 
 ENV File Structure
