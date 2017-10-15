@@ -102,7 +102,7 @@ def test_version(runner, capsys):
 class TestDefaultEnvFile(object):
     def test_run_file_with_default_env_file(self, runner, capsys):
         runner(
-            'run', '--quiet', '--default-env-file', '.env',
+            'run', '--quiet', '--default-env-file', '.env_one',
             get_examples_path('environment/env_files/get_passed_env_file.py')
         )
         out, err = capsys.readouterr()
@@ -113,7 +113,7 @@ class TestDefaultEnvFile(object):
 
     def test_run_file_with_multiple_default_env_files(self, runner, capsys):
         runner(
-            'run', '--quiet', '--default-env-file', '.env',
+            'run', '--quiet', '--default-env-file', '.env_one',
             '--default-env-file', '.env_two',
             get_examples_path('environment/env_files/get_passed_env_file.py')
         )
@@ -127,7 +127,7 @@ class TestDefaultEnvFile(object):
         runner(
             'run', '--quiet', '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--default-env-file', '.env'
+            '--default-env-file', '.env_one'
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -139,7 +139,7 @@ class TestDefaultEnvFile(object):
         runner(
             'run', '--quiet', '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--default-env-file', '.env', '--default-env-file', '.env_two',
+            '--default-env-file', '.env_one', '--default-env-file', '.env_two',
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -154,7 +154,7 @@ class TestEnvFile(object):
         runner(
             'run', '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file', '.env',
+            '--env-file', '.env_one',
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -166,7 +166,7 @@ class TestEnvFile(object):
         runner(
             'run', '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file', '.env', '--env-file', '.env_two',
+            '--env-file', '.env_one', '--env-file', '.env_two',
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -178,7 +178,7 @@ class TestEnvFile(object):
         runner(
             'run', '--quiet', '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file', '.env',
+            '--env-file', '.env_one',
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -190,7 +190,7 @@ class TestEnvFile(object):
         runner(
             'run', '--quiet', '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file', '.env', '--env-file', '.env_two',
+            '--env-file', '.env_one', '--env-file', '.env_two',
         )
         out, err = capsys.readouterr()
         out = out.split('\n')
@@ -204,7 +204,7 @@ def test_run_file_with_default_env_file_and_env_file(runner, capsys):
     runner(
         'run', '--quiet',
         get_examples_path('environment/env_files/get_passed_env_file.py'),
-        '--default-env-file', '.env', '--env-file', '.env_two',
+        '--default-env-file', '.env_one', '--env-file', '.env_two',
     )
     out, err = capsys.readouterr()
     out = out.split('\n')
@@ -218,7 +218,7 @@ def test_run_file_with_default_env_file_and_env_file_and_env_vars(runner, capsys
     runner(
         'run', '--quiet',
         get_examples_path('environment/env_files/get_passed_env_file.py'),
-        '--default-env-file', '.env', '--env-file', '.env_two',
+        '--default-env-file', '.env_one', '--env-file', '.env_two',
         '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env', 'MY_SECRET=444',
     )
     out, err = capsys.readouterr()
