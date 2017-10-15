@@ -1,9 +1,8 @@
 from collections import Iterable
 from contextlib import contextmanager
 
-from bonobo.config.options import Option
-from bonobo.util.compat import deprecated_alias
-from bonobo.util.iterators import ensure_tuple
+from bonobo.config import Option
+from bonobo.util import deprecated_alias, ensure_tuple
 
 _CONTEXT_PROCESSORS_ATTR = '__processors__'
 
@@ -24,7 +23,7 @@ class ContextProcessor(Option):
     Example:
 
         >>> from bonobo.config import Configurable
-        >>> from bonobo.util.objects import ValueHolder
+        >>> from bonobo.util import ValueHolder
 
         >>> class Counter(Configurable):
         ...     @ContextProcessor
@@ -91,7 +90,10 @@ class ContextCurrifier:
         self._stack, self._stack_values = list(), list()
         for processor in resolve_processors(self.wrapped):
             _processed = processor(self.wrapped, *context, *self.context)
-            _append_to_context = next(_processed)
+            try:
+                _append_to_context = next(_processed)
+            except TypeError as exc:
+                raise TypeError('Context processor should be generators (using yield).') from exc
             self._stack_values.append(_append_to_context)
             if _append_to_context is not None:
                 self.context += ensure_tuple(_append_to_context)

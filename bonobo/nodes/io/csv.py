@@ -1,10 +1,11 @@
 import csv
 
 from bonobo.config import Option
+from bonobo.config.options import RemovedOption
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
+from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
 from bonobo.util.objects import ValueHolder
 
 
@@ -27,9 +28,10 @@ class CsvHandler(FileHandler):
     delimiter = Option(str, default=';')
     quotechar = Option(str, default='"')
     headers = Option(tuple, required=False)
+    ioformat = RemovedOption(positional=False, value='kwargs')
 
 
-class CsvReader(IOFormatEnabled, FileReader, CsvHandler):
+class CsvReader(FileReader, CsvHandler):
     """
     Reads a CSV and yield the values as dicts.
 
@@ -62,18 +64,17 @@ class CsvReader(IOFormatEnabled, FileReader, CsvHandler):
             if len(row) != field_count:
                 raise ValueError('Got a line with %d fields, expecting %d.' % (len(row), field_count, ))
 
-            yield self.get_output(dict(zip(_headers, row)))
+            yield dict(zip(_headers, row))
 
 
-class CsvWriter(IOFormatEnabled, FileWriter, CsvHandler):
+class CsvWriter(FileWriter, CsvHandler):
     @ContextProcessor
     def writer(self, context, fs, file, lineno):
         writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol)
         headers = ValueHolder(list(self.headers) if self.headers else None)
         yield writer, headers
 
-    def write(self, fs, file, lineno, writer, headers, *args, **kwargs):
-        row = self.get_input(*args, **kwargs)
+    def write(self, fs, file, lineno, writer, headers, **row):
         if not lineno:
             headers.set(headers.value or row.keys())
             writer.writerow(headers.get())
