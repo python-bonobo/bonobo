@@ -80,14 +80,14 @@ def read(filename, module, install=False, quiet=False, verbose=False, default_en
     env_dir = Path(filename).parent or Path(module).parent
     if default_env_file:
         for f in default_env_file:
-            env_file_path = env_dir.joinpath(f)
+            env_file_path = str(env_dir.joinpath(f))
             load_dotenv(env_file_path)
     if default_env:
         for e in default_env:
             set_env_var(e)
     if env_file:
         for f in env_file:
-            env_file_path = env_dir.joinpath(f)
+            env_file_path = str(env_dir.joinpath(f))
             load_dotenv(env_file_path, override=True)
     if env:
         for e in env:
