@@ -54,7 +54,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'colorama (>= 0.3, < 1.0)', 'fs (>= 2.0, < 3.0)', 'packaging (>= 16, < 17)', 'psutil (>= 5.2, < 6.0)',
-        'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.21, < 2.0)'
+        'python-dotenv (>= 0.7.1, < 1.0)', 'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.21, < 2.0)'
     ],
     extras_require={
         'dev': [

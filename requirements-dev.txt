@@ -23,7 +23,6 @@ pytest-sugar==0.8.0
 pytest-timeout==1.2.0
 pytest==3.2.3
 python-dateutil==2.6.1
-python-dotenv==0.7.1
 pytz==2017.2
 requests==2.18.4
 six==1.11.0
