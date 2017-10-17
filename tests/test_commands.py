@@ -99,27 +99,238 @@ def test_version(runner, capsys):
 
 
 @all_runners
-def test_run_with_env(runner, capsys):
-    runner(
-        'run', '--quiet',
-        get_examples_path('env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
-        'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
-    )
-    out, err = capsys.readouterr()
-    out = out.split('\n')
-    assert out[0] == 'cwandrews'
-    assert out[1] == '123'
-    assert out[2] == 'my_test_string'
+class TestDefaultEnvFile(object):
+    def test_run_file_with_default_env_file(self, runner, capsys):
+        runner(
+            'run', '--quiet', '--default-env-file', '.env_one',
+            get_examples_path('environment/env_files/get_passed_env_file.py')
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] != 'marzo'
+
+    def test_run_file_with_multiple_default_env_files(self, runner, capsys):
+        runner(
+            'run', '--quiet', '--default-env-file', '.env_one',
+            '--default-env-file', '.env_two',
+            get_examples_path('environment/env_files/get_passed_env_file.py')
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] != 'marzo'
+
+    def test_run_module_with_default_env_file(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_files.get_passed_env_file',
+            '--default-env-file', '.env_one'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] != 'marzo'
+
+    def test_run_module_with_multiple_default_env_files(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_files.get_passed_env_file',
+            '--default-env-file', '.env_one', '--default-env-file', '.env_two',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] != 'marzo'
 
 
 @all_runners
-def test_run_module_with_env(runner, capsys):
-    runner(
-        'run', '--quiet', '-m', 'bonobo.examples.env_vars.get_passed_env', '--env', 'ENV_TEST_NUMBER=123', '--env',
-        'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
-    )
-    out, err = capsys.readouterr()
-    out = out.split('\n')
-    assert out[0] == 'cwandrews'
-    assert out[1] == '123'
-    assert out[2] == 'my_test_string'
+class TestEnvFile(object):
+    def test_run_file_with_file(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--env-file', '.env_one',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] == 'marzo'
+
+    def test_run_file_with_multiple_files(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--env-file', '.env_one', '--env-file', '.env_two',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'not_sweet_password'
+        assert out[2] == 'abril'
+
+    def test_run_module_with_file(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_files.get_passed_env_file',
+            '--env-file', '.env_one',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'sweetpassword'
+        assert out[2] == 'marzo'
+
+    def test_run_module_with_multiple_files(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_files.get_passed_env_file',
+            '--env-file', '.env_one', '--env-file', '.env_two',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'not_sweet_password'
+        assert out[2] == 'abril'
+
+
+@all_runners
+class TestEnvFileCombinations(object):
+    def test_run_file_with_default_env_file_and_env_file(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--default-env-file', '.env_one', '--env-file', '.env_two',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '321'
+        assert out[1] == 'not_sweet_password'
+        assert out[2] == 'abril'
+
+    def test_run_file_with_default_env_file_and_env_file_and_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_files/get_passed_env_file.py'),
+            '--default-env-file', '.env_one', '--env-file', '.env_two',
+            '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env',
+            'MY_SECRET=444',
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == '444'
+        assert out[1] == 'SWEETpassWORD'
+        assert out[2] == 'abril'
+
+
+@all_runners
+class TestDefaultEnvVars(object):
+    def test_run_file_with_default_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--default-env', 'USER=clowncity', '--env', 'USER=ted'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'user'
+        assert out[1] == 'number'
+        assert out[2] == 'string'
+        assert out[3] != 'clowncity'
+
+    def test_run_file_with_default_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--default-env', "ENV_TEST_STRING='my_test_string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
+
+    def test_run_module_with_default_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123',
+            '--default-env', 'ENV_TEST_STRING=string'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] != 'string'
+
+    def test_run_module_with_default_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--default-env', "ENV_TEST_STRING='string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] != 'string'
+
+
+@all_runners
+class TestEnvVars(object):
+    def test_run_file_with_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--env', 'ENV_TEST_NUMBER=123'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] != 'test_user'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
+
+    def test_run_file_with_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet',
+            get_examples_path('environment/env_vars/get_passed_env.py'),
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--env', "ENV_TEST_STRING='my_test_string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
+
+    def test_run_module_with_env_var(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123'
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
+
+    def test_run_module_with_env_vars(self, runner, capsys):
+        runner(
+            'run', '--quiet', '-m',
+            'bonobo.examples.environment.env_vars.get_passed_env',
+            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
+            '--env', "ENV_TEST_STRING='my_test_string'"
+        )
+        out, err = capsys.readouterr()
+        out = out.split('\n')
+        assert out[0] == 'cwandrews'
+        assert out[1] == '123'
+        assert out[2] == 'my_test_string'
