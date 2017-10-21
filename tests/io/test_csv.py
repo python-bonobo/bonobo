@@ -18,9 +18,12 @@ def test_write_csv_ioformat_arg0(tmpdir):
         CsvReader(path=filename, delimiter=',', ioformat=settings.IOFORMAT_ARG0),
 
 
-@pytest.mark.parametrize('add_kwargs', ({}, {
-    'ioformat': settings.IOFORMAT_KWARGS,
-}, ))
+@pytest.mark.parametrize('add_kwargs', (
+    {},
+    {
+        'ioformat': settings.IOFORMAT_KWARGS,
+    },
+))
 def test_write_csv_to_file_kwargs(tmpdir, add_kwargs):
     fs, filename, services = csv_tester.get_services_for_writer(tmpdir)
 

@@ -19,9 +19,12 @@ def test_write_json_ioformat_arg0(tmpdir):
         JsonReader(filename, ioformat=settings.IOFORMAT_ARG0),
 
 
-@pytest.mark.parametrize('add_kwargs', ({}, {
-    'ioformat': settings.IOFORMAT_KWARGS,
-}, ))
+@pytest.mark.parametrize('add_kwargs', (
+    {},
+    {
+        'ioformat': settings.IOFORMAT_KWARGS,
+    },
+))
 def test_write_json_kwargs(tmpdir, add_kwargs):
     fs, filename, services = json_tester.get_services_for_writer(tmpdir)
 

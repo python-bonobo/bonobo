@@ -50,7 +50,10 @@ class ConfigurableMeta(type):
         return (processor for _, processor in cls.__processors)
 
     def __repr__(self):
-        return ' '.join(('<Configurable', super(ConfigurableMeta, self).__repr__().split(' ', 1)[1], ))
+        return ' '.join((
+            '<Configurable',
+            super(ConfigurableMeta, self).__repr__().split(' ', 1)[1],
+        ))
 
 
 try:

@@ -76,6 +76,7 @@ html_theme_options = {
     'github_user': 'python-bonobo',
     'github_repo': 'bonobo',
     'github_button': 'true',
+    'github_banner': 'true',
     'show_powered_by': 'false',
     'show_related': 'true',
 }
