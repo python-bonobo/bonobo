@@ -3,7 +3,7 @@ import pytest
 from bonobo import Bag, FileReader, FileWriter
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
-from bonobo.util.testing import CapturingNodeExecutionContext, FilesystemTester
+from bonobo.util.testing import BufferingNodeExecutionContext, FilesystemTester
 
 txt_tester = FilesystemTester('txt')
 txt_tester.input_data = 'Hello\nWorld\n'
@@ -41,16 +41,10 @@ def test_file_writer_in_context(tmpdir, lines, output):
 def test_file_reader(tmpdir):
     fs, filename, services = txt_tester.get_services_for_reader(tmpdir)
 
-    with CapturingNodeExecutionContext(FileReader(path=filename), services=services) as context:
-        context.write(BEGIN, Bag(), END)
-        context.step()
+    with BufferingNodeExecutionContext(FileReader(path=filename), services=services) as context:
+        context.write_sync(Bag())
+        output = context.get_buffer()
 
-    assert len(context.send.mock_calls) == 2
-
-    args0, kwargs0 = context.send.call_args_list[0]
-    assert len(args0) == 1 and not len(kwargs0)
-    args1, kwargs1 = context.send.call_args_list[1]
-    assert len(args1) == 1 and not len(kwargs1)
-
-    assert args0[0].args[0] == 'Hello'
-    assert args1[0].args[0] == 'World'
+    assert len(output) == 2
+    assert output[0] == 'Hello'
+    assert output[1] == 'World'

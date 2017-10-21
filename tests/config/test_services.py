@@ -28,9 +28,7 @@ SERVICES = Container(
 
 
 class MyServiceDependantConfigurable(Configurable):
-    printer = Service(
-        PrinterInterface,
-    )
+    printer = Service(PrinterInterface, )
 
     def __call__(self, printer: PrinterInterface, *args):
         return printer.print(*args)

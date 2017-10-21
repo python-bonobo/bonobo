@@ -45,7 +45,10 @@ class Bag:
     def args(self):
         if self._parent is None:
             return self._args
-        return (*self._parent.args, *self._args, )
+        return (
+            *self._parent.args,
+            *self._args,
+        )
 
     @property
     def kwargs(self):
@@ -96,15 +99,38 @@ class Bag:
         return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __eq__(self, other):
-        return isinstance(other, Bag) and other.args == self.args and other.kwargs == self.kwargs
+        # XXX there are overlapping cases, but this is very handy for now. Let's think about it later.
+
+        # bag
+        if isinstance(other, Bag) and other.args == self.args and other.kwargs == self.kwargs:
+            return True
+
+        # tuple of (tuple, dict)
+        if isinstance(other, tuple) and len(other) == 2 and other[0] == self.args and other[1] == self.kwargs:
+            return True
+
+        # tuple (aka args)
+        if isinstance(other, tuple) and other == self.args:
+            return True
+
+        # dict (aka kwargs)
+        if isinstance(other, dict) and not self.args and other == self.kwargs:
+            return True
+
+        # arg0
+        if len(self.args) == 1 and not len(self.kwargs) and self.args[0] == other:
+            return True
+
+        return False
 
     def __repr__(self):
         return '<{} ({})>'.format(
-            type(self).__name__, ', '.
-            join(itertools.chain(
-                map(repr, self.args),
-                ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
-            ))
+            type(self).__name__, ', '.join(
+                itertools.chain(
+                    map(repr, self.args),
+                    ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
+                )
+            )
         )
 
 

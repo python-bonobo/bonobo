@@ -4,13 +4,23 @@ from bonobo.structs.bags import Bag
 
 
 class NaiveStrategy(Strategy):
-    def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_graph_execution_context(graph, plugins=plugins)
+    # TODO: how to run plugins in "naive" mode ?
+
+    def execute(self, graph, **kwargs):
+        context = self.create_graph_execution_context(graph, **kwargs)
         context.write(BEGIN, Bag(), END)
 
-        # TODO: how to run plugins in "naive" mode ?
+        # start
         context.start()
-        context.loop()
+
+        # loop
+        nodes = list(context.nodes)
+        while len(nodes):
+            for node in nodes:
+                node.loop()
+            nodes = list(node for node in nodes if node.alive)
+
+        # stop
         context.stop()
 
         return context

@@ -12,4 +12,5 @@ def test_run_graph_noop():
 
     with patch('bonobo._api._is_interactive_console', side_effect=lambda: False):
         result = bonobo.run(graph)
+
     assert isinstance(result, GraphExecutionContext)

@@ -6,7 +6,10 @@ import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
 from dotenv import load_dotenv
 
-DEFAULT_GRAPH_FILENAMES = ('__main__.py', 'main.py', )
+DEFAULT_GRAPH_FILENAMES = (
+    '__main__.py',
+    'main.py',
+)
 DEFAULT_GRAPH_ATTR = 'get_graph'
 
 

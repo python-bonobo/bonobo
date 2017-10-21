@@ -1,39 +1,4 @@
-from bonobo import settings
 from bonobo.config import Configurable, ContextProcessor, Option, Service
-from bonobo.errors import UnrecoverableValueError, UnrecoverableNotImplementedError
-from bonobo.structs.bags import Bag
-
-
-class IOFormatEnabled(Configurable):
-    ioformat = Option(default=settings.IOFORMAT.get)
-
-    def get_input(self, *args, **kwargs):
-        if self.ioformat == settings.IOFORMAT_ARG0:
-            if len(args) != 1 or len(kwargs):
-                raise UnrecoverableValueError(
-                    'Wrong input formating: IOFORMAT=ARG0 implies one arg and no kwargs, got args={!r} and kwargs={!r}.'.
-                    format(args, kwargs)
-                )
-            return args[0]
-
-        if self.ioformat == settings.IOFORMAT_KWARGS:
-            if len(args) or not len(kwargs):
-                raise UnrecoverableValueError(
-                    'Wrong input formating: IOFORMAT=KWARGS ioformat implies no arg, got args={!r} and kwargs={!r}.'.
-                    format(args, kwargs)
-                )
-            return kwargs
-
-        raise UnrecoverableNotImplementedError('Unsupported format.')
-
-    def get_output(self, row):
-        if self.ioformat == settings.IOFORMAT_ARG0:
-            return row
-
-        if self.ioformat == settings.IOFORMAT_KWARGS:
-            return Bag(**row)
-
-        raise UnrecoverableNotImplementedError('Unsupported format.')
 
 
 class FileHandler(Configurable):

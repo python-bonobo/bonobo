@@ -68,6 +68,26 @@ def istype(mixed):
     return isinstance(mixed, type)
 
 
+def isdict(mixed):
+    """
+    Check if the given argument is a dict.
+
+    :param mixed:
+    :return: bool
+    """
+    return isinstance(mixed, dict)
+
+
+def istuple(mixed):
+    """
+    Check if the given argument is a tuple.
+
+    :param mixed:
+    :return: bool
+    """
+    return isinstance(mixed, tuple)
+
+
 def isbag(mixed):
     """
     Check if the given argument is an instance of a :class:`bonobo.Bag`.

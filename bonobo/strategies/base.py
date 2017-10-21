@@ -6,10 +6,13 @@ class Strategy:
     Base class for execution strategies.
 
     """
-    graph_execution_context_factory = GraphExecutionContext
+    GraphExecutionContextType = GraphExecutionContext
 
-    def create_graph_execution_context(self, graph, *args, **kwargs):
-        return self.graph_execution_context_factory(graph, *args, **kwargs)
+    def __init__(self, GraphExecutionContextType=None):
+        self.GraphExecutionContextType = GraphExecutionContextType or self.GraphExecutionContextType
+
+    def create_graph_execution_context(self, graph, *args, GraphExecutionContextType=None, **kwargs):
+        return (GraphExecutionContextType or self.GraphExecutionContextType)(graph, *args, **kwargs)
 
     def execute(self, graph, *args, **kwargs):
         raise NotImplementedError

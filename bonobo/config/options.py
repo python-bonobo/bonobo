@@ -66,10 +66,10 @@ class Option:
         self._creation_counter = Option._creation_counter
         Option._creation_counter += 1
 
-    def __get__(self, inst, typ):
+    def __get__(self, inst, type_):
         # XXX If we call this on the type, then either return overriden value or ... ???
         if inst is None:
-            return vars(type).get(self.name, self)
+            return vars(type_).get(self.name, self)
 
         if not self.name in inst._options_values:
             inst._options_values[self.name] = self.get_default()
@@ -94,6 +94,24 @@ class Option:
 
     def get_default(self):
         return self.default() if callable(self.default) else self.default
+
+
+class RemovedOption(Option):
+    def __init__(self, *args, value, **kwargs):
+        kwargs['required'] = False
+        super(RemovedOption, self).__init__(*args, **kwargs)
+        self.value = value
+
+    def clean(self, value):
+        if value != self.value:
+            raise ValueError(
+                'Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.'.
+                format(self.name, self.value)
+            )
+        return self.value
+
+    def get_default(self):
+        return self.value
 
 
 class Method(Option):
@@ -133,8 +151,9 @@ class Method(Option):
     def __set__(self, inst, value):
         if not hasattr(value, '__call__'):
             raise TypeError(
-                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.
-                format(type(self).__name__, type(value).__name__)
+                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.format(
+                    type(self).__name__, type(value).__name__
+                )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value
 

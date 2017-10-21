@@ -61,22 +61,27 @@ def display(row):
                             row.get('city', None)
                         )
                     )
-                ), row.get('county', None), row.get('country'),
+                ),
+                row.get('county', None),
+                row.get('country'),
             )
         )
     )
 
     print(
-        '  - {}address{}: {address}'.
-        format(Fore.BLUE, Style.RESET_ALL, address=', '.join(address))
+        '  - {}address{}: {address}'.format(
+            Fore.BLUE, Style.RESET_ALL, address=', '.join(address)
+        )
     )
     print(
-        '  - {}links{}: {links}'.
-        format(Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links']))
+        '  - {}links{}: {links}'.format(
+            Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links'])
+        )
     )
     print(
-        '  - {}geometry{}: {geometry}'.
-        format(Fore.BLUE, Style.RESET_ALL, **row)
+        '  - {}geometry{}: {geometry}'.format(
+            Fore.BLUE, Style.RESET_ALL, **row
+        )
     )
     print(
         '  - {}source{}: {source}'.format(

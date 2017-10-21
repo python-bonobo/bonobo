@@ -42,6 +42,9 @@ class Setting:
     def __repr__(self):
         return '<Setting {}={!r}>'.format(self.name, self.get())
 
+    def __eq__(self, other):
+        return self.get() == other
+
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):

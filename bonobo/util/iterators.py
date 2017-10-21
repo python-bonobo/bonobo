@@ -38,6 +38,11 @@ def tuplize(generator):
 
 
 def iter_if_not_sequence(mixed):
-    if isinstance(mixed, (dict, list, str)):
+    if isinstance(mixed, (
+        dict,
+        list,
+        str,
+        bytes,
+    )):
         raise TypeError(type(mixed).__name__)
     return iter(mixed)

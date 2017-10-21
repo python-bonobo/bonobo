@@ -19,42 +19,16 @@ class ExecutorStrategy(Strategy):
     def create_executor(self):
         return self.executor_factory()
 
-    def execute(self, graph, *args, plugins=None, services=None, **kwargs):
-        context = self.create_graph_execution_context(graph, plugins=plugins, services=services)
+    def execute(self, graph, **kwargs):
+        context = self.create_graph_execution_context(graph, **kwargs)
         context.write(BEGIN, Bag(), END)
 
         executor = self.create_executor()
 
         futures = []
 
-        for plugin_context in context.plugins:
-
-            def _runner(plugin_context=plugin_context):
-                with plugin_context:
-                    try:
-                        plugin_context.loop()
-                    except Exception as exc:
-                        print_error(exc, traceback.format_exc(), context=plugin_context)
-
-            futures.append(executor.submit(_runner))
-
-        for node_context in context.nodes:
-
-            def _runner(node_context=node_context):
-                try:
-                    node_context.start()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node_context, method='start')
-                    node_context.input.on_end()
-                else:
-                    node_context.loop()
-
-                try:
-                    node_context.stop()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node_context, method='stop')
-
-            futures.append(executor.submit(_runner))
+        context.start_plugins(self.get_plugin_starter(executor, futures))
+        context.start(self.get_starter(executor, futures))
 
         while context.alive:
             time.sleep(0.1)
@@ -62,9 +36,44 @@ class ExecutorStrategy(Strategy):
         for plugin_context in context.plugins:
             plugin_context.shutdown()
 
+        context.stop()
+
         executor.shutdown()
 
         return context
+
+    def get_starter(self, executor, futures):
+        def starter(node):
+            def _runner():
+                try:
+                    node.start()
+                except Exception as exc:
+                    print_error(exc, traceback.format_exc(), context=node, method='start')
+                    node.input.on_end()
+                else:
+                    node.loop()
+
+                try:
+                    node.stop()
+                except Exception as exc:
+                    print_error(exc, traceback.format_exc(), context=node, method='stop')
+
+            futures.append(executor.submit(_runner))
+
+        return starter
+
+    def get_plugin_starter(self, executor, futures):
+        def plugin_starter(plugin):
+            def _runner():
+                with plugin:
+                    try:
+                        plugin.loop()
+                    except Exception as exc:
+                        print_error(exc, traceback.format_exc(), context=plugin)
+
+            futures.append(executor.submit(_runner))
+
+        return plugin_starter
 
 
 class ThreadPoolExecutorStrategy(ExecutorStrategy):

@@ -53,7 +53,10 @@ def test_partial():
         assert len(ci.options) == 4
         assert len(ci.processors) == 1
         assert ci.partial
-        assert ci.partial[0] == (f1, f2, )
+        assert ci.partial[0] == (
+            f1,
+            f2,
+        )
         assert not len(ci.partial[1])
 
     c = C('foo')

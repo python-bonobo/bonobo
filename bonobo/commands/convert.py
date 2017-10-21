@@ -120,7 +120,8 @@ def register(parser):
     parser.add_argument(
         '--' + WRITER,
         '-w',
-        help='Choose the writer factory if it cannot be detected from extension, or if detection is wrong (use - for console pretty print).'
+        help=
+        'Choose the writer factory if it cannot be detected from extension, or if detection is wrong (use - for console pretty print).'
     )
     parser.add_argument(
         '--filter',

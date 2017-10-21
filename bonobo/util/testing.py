@@ -1,14 +1,8 @@
 from contextlib import contextmanager
-from unittest.mock import MagicMock
 
-from bonobo import open_fs
+from bonobo import open_fs, Token
+from bonobo.execution import GraphExecutionContext
 from bonobo.execution.node import NodeExecutionContext
-
-
-class CapturingNodeExecutionContext(NodeExecutionContext):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.send = MagicMock()
 
 
 @contextmanager
@@ -35,3 +29,38 @@ class FilesystemTester:
     def get_services_for_writer(self, tmpdir):
         fs, filename = open_fs(tmpdir), 'output.' + self.extension
         return fs, filename, {'fs': fs}
+
+
+class QueueList(list):
+    def append(self, item):
+        if not isinstance(item, Token):
+            super(QueueList, self).append(item)
+
+    put = append
+
+
+class BufferingContext:
+    def __init__(self, buffer=None):
+        if buffer is None:
+            buffer = QueueList()
+        self.buffer = buffer
+
+    def get_buffer(self):
+        return self.buffer
+
+
+class BufferingNodeExecutionContext(BufferingContext, NodeExecutionContext):
+    def __init__(self, *args, buffer=None, **kwargs):
+        BufferingContext.__init__(self, buffer)
+        NodeExecutionContext.__init__(self, *args, **kwargs, _outputs=[self.buffer])
+
+
+class BufferingGraphExecutionContext(BufferingContext, GraphExecutionContext):
+    NodeExecutionContextType = BufferingNodeExecutionContext
+
+    def __init__(self, *args, buffer=None, **kwargs):
+        BufferingContext.__init__(self, buffer)
+        GraphExecutionContext.__init__(self, *args, **kwargs)
+
+    def create_node_execution_context_for(self, node):
+        return self.NodeExecutionContextType(node, parent=self, buffer=self.buffer)

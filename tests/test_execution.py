@@ -51,31 +51,31 @@ def test_simple_execution_context():
     graph = Graph()
     graph.add_chain(*chain)
 
-    ctx = GraphExecutionContext(graph)
-    assert len(ctx.nodes) == len(chain)
-    assert not len(ctx.plugins)
+    context = GraphExecutionContext(graph)
+    assert len(context.nodes) == len(chain)
+    assert not len(context.plugins)
 
     for i, node in enumerate(chain):
-        assert ctx[i].wrapped is node
+        assert context[i].wrapped is node
 
-    assert not ctx.alive
-    assert not ctx.started
-    assert not ctx.stopped
+    assert not context.alive
+    assert not context.started
+    assert not context.stopped
 
-    ctx.write(BEGIN, Bag(), END)
+    context.write(BEGIN, Bag(), END)
 
-    assert not ctx.alive
-    assert not ctx.started
-    assert not ctx.stopped
+    assert not context.alive
+    assert not context.started
+    assert not context.stopped
 
-    ctx.start()
+    context.start()
 
-    assert ctx.alive
-    assert ctx.started
-    assert not ctx.stopped
+    assert context.alive
+    assert context.started
+    assert not context.stopped
 
-    ctx.stop()
+    context.stop()
 
-    assert not ctx.alive
-    assert ctx.started
-    assert ctx.stopped
+    assert not context.alive
+    assert context.started
+    assert context.stopped

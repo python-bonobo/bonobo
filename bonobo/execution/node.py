@@ -2,15 +2,15 @@ import traceback
 from queue import Empty
 from time import sleep
 
-from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED
+from bonobo import settings
+from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED, BEGIN, END
 from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
+from bonobo.util import get_name, iserrorbag, isloopbackbag, isdict, istuple
 from bonobo.util.compat import deprecated_alias
-from bonobo.util.inspect import iserrorbag, isloopbackbag
 from bonobo.util.iterators import iter_if_not_sequence
-from bonobo.util.objects import get_name
 from bonobo.util.statistics import WithStatistics
 
 
@@ -28,12 +28,12 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     def alive_str(self):
         return '+' if self.alive else '-'
 
-    def __init__(self, wrapped, parent=None, services=None):
+    def __init__(self, wrapped, parent=None, services=None, _input=None, _outputs=None):
         LoopingExecutionContext.__init__(self, wrapped, parent=parent, services=services)
         WithStatistics.__init__(self, 'in', 'out', 'err')
 
-        self.input = Input()
-        self.outputs = []
+        self.input = _input or Input()
+        self.outputs = _outputs or []
 
     def __str__(self):
         return self.alive_str + ' ' + self.__name__ + self.get_statistics_as_string(prefix=' ')
@@ -50,6 +50,11 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         """
         for message in messages:
             self.input.put(message)
+
+    def write_sync(self, *messages):
+        self.write(BEGIN, *messages, END)
+        for _ in messages:
+            self.step()
 
     # XXX deprecated alias
     recv = deprecated_alias('recv', write)
@@ -143,12 +148,18 @@ def _resolve(input_bag, output):
         return output
 
     # If it does not look like a bag, let's create one for easier manipulation
-    if hasattr(output, 'apply'):
+    if hasattr(output, 'apply'):  # XXX TODO use isbag() ?
         # Already a bag? Check if we need to set parent.
         if INHERIT_INPUT in output.flags:
             output.set_parent(input_bag)
-    else:
-        # Not a bag? Let's encapsulate it.
-        output = Bag(output)
+        return output
 
-    return output
+    # If we're using kwargs ioformat, then a dict means kwargs.
+    if settings.IOFORMAT == settings.IOFORMAT_KWARGS and isdict(output):
+        return Bag(**output)
+
+    if istuple(output):
+        return Bag(*output)
+
+    # Either we use arg0 format, either it's "just" a value.
+    return Bag(output)
