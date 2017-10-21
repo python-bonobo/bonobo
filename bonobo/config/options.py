@@ -133,8 +133,9 @@ class Method(Option):
     def __set__(self, inst, value):
         if not hasattr(value, '__call__'):
             raise TypeError(
-                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.
-                format(type(self).__name__, type(value).__name__)
+                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.format(
+                    type(self).__name__, type(value).__name__
+                )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value
 

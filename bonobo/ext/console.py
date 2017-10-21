@@ -89,15 +89,32 @@ class ConsoleOutputPlugin(Plugin):
             if node.alive:
                 _line = ''.join(
                     (
-                        ' ', alive_color, '+', Style.RESET_ALL, ' ', node.name, name_suffix, ' ',
-                        node.get_statistics_as_string(), Style.RESET_ALL, ' ',
+                        ' ',
+                        alive_color,
+                        '+',
+                        Style.RESET_ALL,
+                        ' ',
+                        node.name,
+                        name_suffix,
+                        ' ',
+                        node.get_statistics_as_string(),
+                        Style.RESET_ALL,
+                        ' ',
                     )
                 )
             else:
                 _line = ''.join(
                     (
-                        ' ', dead_color, '-', ' ', node.name, name_suffix, ' ', node.get_statistics_as_string(),
-                        Style.RESET_ALL, ' ',
+                        ' ',
+                        dead_color,
+                        '-',
+                        ' ',
+                        node.name,
+                        name_suffix,
+                        ' ',
+                        node.get_statistics_as_string(),
+                        Style.RESET_ALL,
+                        ' ',
                     )
                 )
             print(prefix + _line + '\033[0K', file=sys.stderr)
@@ -107,8 +124,8 @@ class ConsoleOutputPlugin(Plugin):
             print(
                 ''.join(
                     (
-                        ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v)
-                                          for k, v in append), CLEAR_EOL
+                        ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v) for k, v in append),
+                        CLEAR_EOL
                     )
                 ),
                 file=sys.stderr

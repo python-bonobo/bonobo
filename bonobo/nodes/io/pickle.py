@@ -52,7 +52,10 @@ class PickleReader(IOFormatEnabled, FileReader, PickleHandler):
 
         for i in iterator:
             if len(i) != item_count:
-                raise ValueError('Received an object with %d items, expecting %d.' % (len(i), item_count, ))
+                raise ValueError('Received an object with %d items, expecting %d.' % (
+                    len(i),
+                    item_count,
+                ))
 
             yield self.get_output(dict(zip(i)) if is_dict else dict(zip(pickle_headers.value, i)))
 
