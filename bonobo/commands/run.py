@@ -1,7 +1,10 @@
+import codecs
 import os
+from pathlib import Path
 
 import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
+from dotenv import load_dotenv
 
 DEFAULT_GRAPH_FILENAMES = (
     '__main__.py',
@@ -43,8 +46,8 @@ def _install_requirements(requirements):
     importlib.reload(site)
 
 
-def read(filename, module, install=False, quiet=False, verbose=False, env=None):
-    import re
+def read(filename, module, install=False, quiet=False, verbose=False, default_env_file=None, default_env=None, env_file=None, env=None):
+
     import runpy
     from bonobo import Graph, settings
 
@@ -53,12 +56,6 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
 
     if verbose:
         settings.DEBUG.set(True)
-
-    if env:
-        quote_killer = re.compile('["\']')
-        for e in env:
-            var_name, var_value = e.split('=')
-            os.environ[var_name] = quote_killer.sub('', var_value)
 
     if filename:
         if os.path.isdir(filename):
@@ -83,6 +80,22 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
     else:
         raise RuntimeError('UNEXPECTED: argparse should not allow this.')
 
+    env_dir = Path(filename).parent or Path(module).parent
+    if default_env_file:
+        for f in default_env_file:
+            env_file_path = str(env_dir.joinpath(f))
+            load_dotenv(env_file_path)
+    if default_env:
+        for e in default_env:
+            set_env_var(e)
+    if env_file:
+        for f in env_file:
+            env_file_path = str(env_dir.joinpath(f))
+            load_dotenv(env_file_path, override=True)
+    if env:
+        for e in env:
+            set_env_var(e, override=True)
+
     graphs = dict((k, v) for k, v in context.items() if isinstance(v, Graph))
 
     assert len(graphs) == 1, (
@@ -99,8 +112,25 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
     return graph, plugins, services
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False, env=None):
-    graph, plugins, services = read(filename, module, install, quiet, verbose, env)
+def set_env_var(e, override=False):
+    __escape_decoder = codecs.getdecoder('unicode_escape')
+    ename, evalue = e.split('=', 1)
+
+    def decode_escaped(escaped):
+        return __escape_decoder(escaped)[0]
+
+    if len(evalue) > 0:
+        if evalue[0] == evalue[len(evalue) - 1] in ['"', "'"]:
+            evalue = decode_escaped(evalue[1:-1])
+
+    if override:
+        os.environ[ename] = evalue
+    else:
+        os.environ.setdefault(ename, evalue)
+
+
+def execute(filename, module, install=False, quiet=False, verbose=False, default_env_file=None, default_env=None, env_file=None, env=None):
+    graph, plugins, services = read(filename, module, install, quiet, verbose, default_env_file, default_env, env_file, env)
 
     return bonobo.run(graph, plugins=plugins, services=services)
 
@@ -109,6 +139,9 @@ def register_generic_run_arguments(parser, required=True):
     source_group = parser.add_mutually_exclusive_group(required=required)
     source_group.add_argument('filename', nargs='?', type=str)
     source_group.add_argument('--module', '-m', type=str)
+    parser.add_argument('--default-env-file', action='append')
+    parser.add_argument('--default-env', action='append')
+    parser.add_argument('--env-file', action='append')
     parser.add_argument('--env', '-e', action='append')
     return parser
 
