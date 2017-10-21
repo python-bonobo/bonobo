@@ -49,8 +49,8 @@ class Service(Option):
     
     """
 
-    def __init__(self, name):
-        super().__init__(str, required=False, default=name)
+    def __init__(self, name, __doc__=None):
+        super().__init__(str, required=False, default=name, __doc__=__doc__)
 
     def __set__(self, inst, value):
         inst._options_values[self.name] = validate_service_name(value)
