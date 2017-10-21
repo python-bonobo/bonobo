@@ -1,6 +1,6 @@
-# bonobo (see github.com/python-edgy/project)
+# bonobo's description for medikit
 
-from edgy.project import require
+from medikit import require
 
 pytest = require('pytest')
 python = require('python')

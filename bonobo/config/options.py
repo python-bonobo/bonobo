@@ -53,21 +53,23 @@ class Option:
 
     _creation_counter = 0
 
-    def __init__(self, type=None, *, required=True, positional=False, default=None):
+    def __init__(self, type=None, *, required=True, positional=False, default=None, __doc__=None):
         self.name = None
         self.type = type
         self.required = required if default is None else False
         self.positional = positional
         self.default = default
 
+        self.__doc__ = __doc__ or self.__doc__
+
         # This hack is necessary for python3.5
         self._creation_counter = Option._creation_counter
         Option._creation_counter += 1
 
-    def __get__(self, inst, typ):
+    def __get__(self, inst, type_):
         # XXX If we call this on the type, then either return overriden value or ... ???
         if inst is None:
-            return vars(type).get(self.name, self)
+            return vars(type_).get(self.name, self)
 
         if not self.name in inst._options_values:
             inst._options_values[self.name] = self.get_default()
