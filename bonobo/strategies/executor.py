@@ -6,6 +6,7 @@ from bonobo.constants import BEGIN, END
 from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
 from bonobo.util.errors import print_error
+from whistle import EventDispatcher
 
 
 class ExecutorStrategy(Strategy):

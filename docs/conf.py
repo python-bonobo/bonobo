@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
+import datetime
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('_themes'))
@@ -36,8 +37,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Bonobo'
-copyright = '2012-2017, Romain Dorgueil'
 author = 'Romain Dorgueil'
+copyright = '2012-{}, {}'.format(datetime.datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

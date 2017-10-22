@@ -13,14 +13,14 @@ class PluginExecutionContext(LoopingExecutionContext):
         super().start()
 
         with recoverable(self.handle_error):
-            self.wrapped.initialize()
+            self.wrapped.on_start()
 
     def shutdown(self):
         if self.started:
             with recoverable(self.handle_error):
-                self.wrapped.finalize()
+                self.wrapped.on_stop()
         self.alive = False
 
     def step(self):
         with recoverable(self.handle_error):
-            self.wrapped.run()
+            self.wrapped.on_tick()

@@ -1,6 +1,6 @@
 import io
 import sys
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 
 from colorama import Style, Fore, init
 
@@ -50,35 +50,50 @@ class ConsoleOutputPlugin(Plugin):
 
     """
 
-    def initialize(self):
+    # Standard outputs descriptors backup here, also used to override if needed.
+    _stdout = sys.stdout
+    _stderr = sys.stderr
+
+    # When the plugin is started, we'll set the real value of this.
+    isatty = False
+
+    # Whether we're on windows, or a real operating system.
+    iswindows = (sys.platform == 'win32')
+
+    def on_start(self):
         self.prefix = ''
         self.counter = 0
         self._append_cache = ''
-        self.isatty = sys.stdout.isatty()
-        self.iswindows = (sys.platform == 'win32')
 
-        self._stdout = sys.stdout
+        self.isatty = self._stdout.isatty()
+
         self.stdout = IOBuffer()
         self.redirect_stdout = redirect_stdout(self._stdout if self.iswindows else self.stdout)
         self.redirect_stdout.__enter__()
 
-    def run(self):
+        self.stderr = IOBuffer()
+        self.redirect_stderr = redirect_stderr(self._stderr if self.iswindows else self.stderr)
+        self.redirect_stderr.__enter__()
+
+    def on_tick(self):
         if self.isatty and not self.iswindows:
             self._write(self.context.parent, rewind=True)
         else:
             pass  # not a tty, or windows, so we'll ignore stats output
 
-    def finalize(self):
+    def on_stop(self):
         self._write(self.context.parent, rewind=False)
+        self.redirect_stderr.__exit__(None, None, None)
         self.redirect_stdout.__exit__(None, None, None)
 
     def write(self, context, prefix='', rewind=True, append=None):
         t_cnt = len(context)
 
         if not self.iswindows:
-            buffered = self.stdout.switch()
-            for line in buffered.split('\n')[:-1]:
-                print(line + CLEAR_EOL, file=sys.stderr)
+            for line in self.stdout.switch().split('\n')[:-1]:
+                print(line + CLEAR_EOL, file=self._stdout)
+            for line in self.stderr.switch().split('\n')[:-1]:
+                print(line + CLEAR_EOL, file=self._stderr)
 
         alive_color = Style.BRIGHT
         dead_color = Style.BRIGHT + Fore.BLACK
@@ -117,7 +132,7 @@ class ConsoleOutputPlugin(Plugin):
                         ' ',
                     )
                 )
-            print(prefix + _line + '\033[0K', file=sys.stderr)
+            print(prefix + _line + CLEAR_EOL, file=self._stderr)
 
         if append:
             # todo handle multiline
@@ -128,13 +143,13 @@ class ConsoleOutputPlugin(Plugin):
                         CLEAR_EOL
                     )
                 ),
-                file=sys.stderr
+                file=self._stderr
             )
             t_cnt += 1
 
         if rewind:
-            print(CLEAR_EOL, file=sys.stderr)
-            print(MOVE_CURSOR_UP(t_cnt + 2), file=sys.stderr)
+            print(CLEAR_EOL, file=self._stderr)
+            print(MOVE_CURSOR_UP(t_cnt + 2), file=self._stderr)
 
     def _write(self, graph_context, rewind):
         if settings.PROFILE.get():
@@ -154,4 +169,4 @@ class ConsoleOutputPlugin(Plugin):
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2**20)
+    return process.memory_info()[0] / float(2 ** 20)
