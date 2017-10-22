@@ -99,21 +99,35 @@ def test_eq_operator_bag():
     assert Bag('foo') != Token('foo')
     assert Token('foo') != Bag('foo')
 
+
 def test_eq_operator_tuple_mixed():
     assert Bag('foo', bar='baz') == ('foo', {'bar': 'baz'})
     assert Bag('foo') == ('foo', {})
     assert Bag() == ({}, )
+
 
 def test_eq_operator_tuple_not_mixed():
     assert Bag('foo', 'bar') == ('foo', 'bar')
     assert Bag('foo') == ('foo', )
     assert Bag() == ()
 
+
 def test_eq_operator_dict():
     assert Bag(foo='bar') == {'foo': 'bar'}
-    assert Bag(foo='bar', corp='acme') == {'foo': 'bar', 'corp': 'acme', }
-    assert Bag(foo='bar', corp='acme') == {'corp': 'acme', 'foo': 'bar', }
+    assert Bag(
+        foo='bar', corp='acme'
+    ) == {
+        'foo': 'bar',
+        'corp': 'acme',
+    }
+    assert Bag(
+        foo='bar', corp='acme'
+    ) == {
+        'corp': 'acme',
+        'foo': 'bar',
+    }
     assert Bag() == {}
+
 
 def test_repr():
     bag = Bag('a', a=1)

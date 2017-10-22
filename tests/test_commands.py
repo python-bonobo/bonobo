@@ -129,8 +129,7 @@ class TestDefaultEnvFile(object):
 
     def test_run_file_with_multiple_default_env_files(self, runner):
         out, err = runner(
-            'run', '--quiet', '--default-env-file', '.env_one',
-            '--default-env-file', '.env_two',
+            'run', '--quiet', '--default-env-file', '.env_one', '--default-env-file', '.env_two',
             get_examples_path('environment/env_files/get_passed_env_file.py')
         )
         out = out.split('\n')
@@ -140,9 +139,8 @@ class TestDefaultEnvFile(object):
 
     def test_run_module_with_default_env_file(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
-            'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--default-env-file', '.env_one'
+            'run', '--quiet', '-m', 'bonobo.examples.environment.env_files.get_passed_env_file', '--default-env-file',
+            '.env_one'
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -151,9 +149,14 @@ class TestDefaultEnvFile(object):
 
     def test_run_module_with_multiple_default_env_files(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
+            'run',
+            '--quiet',
+            '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--default-env-file', '.env_one', '--default-env-file', '.env_two',
+            '--default-env-file',
+            '.env_one',
+            '--default-env-file',
+            '.env_two',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -165,9 +168,11 @@ class TestDefaultEnvFile(object):
 class TestEnvFile(object):
     def test_run_file_with_file(self, runner):
         out, err = runner(
-            'run', '--quiet',
+            'run',
+            '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file', '.env_one',
+            '--env-file',
+            '.env_one',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -176,9 +181,13 @@ class TestEnvFile(object):
 
     def test_run_file_with_multiple_files(self, runner):
         out, err = runner(
-            'run', '--quiet',
+            'run',
+            '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file', '.env_one', '--env-file', '.env_two',
+            '--env-file',
+            '.env_one',
+            '--env-file',
+            '.env_two',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -187,9 +196,12 @@ class TestEnvFile(object):
 
     def test_run_module_with_file(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
+            'run',
+            '--quiet',
+            '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file', '.env_one',
+            '--env-file',
+            '.env_one',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -198,9 +210,14 @@ class TestEnvFile(object):
 
     def test_run_module_with_multiple_files(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
+            'run',
+            '--quiet',
+            '-m',
             'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file', '.env_one', '--env-file', '.env_two',
+            '--env-file',
+            '.env_one',
+            '--env-file',
+            '.env_two',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -212,9 +229,13 @@ class TestEnvFile(object):
 class TestEnvFileCombinations:
     def test_run_file_with_default_env_file_and_env_file(self, runner):
         out, err = runner(
-            'run', '--quiet',
+            'run',
+            '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--default-env-file', '.env_one', '--env-file', '.env_two',
+            '--default-env-file',
+            '.env_one',
+            '--env-file',
+            '.env_two',
         )
         out = out.split('\n')
         assert out[0] == '321'
@@ -223,10 +244,16 @@ class TestEnvFileCombinations:
 
     def test_run_file_with_default_env_file_and_env_file_and_env_vars(self, runner):
         out, err = runner(
-            'run', '--quiet',
+            'run',
+            '--quiet',
             get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--default-env-file', '.env_one', '--env-file', '.env_two',
-            '--env', 'TEST_USER_PASSWORD=SWEETpassWORD', '--env',
+            '--default-env-file',
+            '.env_one',
+            '--env-file',
+            '.env_two',
+            '--env',
+            'TEST_USER_PASSWORD=SWEETpassWORD',
+            '--env',
             'MY_SECRET=444',
         )
         out = out.split('\n')
@@ -240,8 +267,8 @@ class TestDefaultEnvVars:
     def test_run_file_with_default_env_var(self, runner):
         out, err = runner(
             'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'),
-            '--default-env', 'USER=clowncity', '--env', 'USER=ted'
+            get_examples_path('environment/env_vars/get_passed_env.py'), '--default-env', 'USER=clowncity', '--env',
+            'USER=ted'
         )
         out = out.split('\n')
         assert out[0] == 'user'
@@ -252,9 +279,8 @@ class TestDefaultEnvVars:
     def test_run_file_with_default_env_vars(self, runner):
         out, err = runner(
             'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'),
-            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-            '--default-env', "ENV_TEST_STRING='my_test_string'"
+            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
+            'ENV_TEST_USER=cwandrews', '--default-env', "ENV_TEST_STRING='my_test_string'"
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'
@@ -263,10 +289,8 @@ class TestDefaultEnvVars:
 
     def test_run_module_with_default_env_var(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
-            'bonobo.examples.environment.env_vars.get_passed_env',
-            '--env', 'ENV_TEST_NUMBER=123',
-            '--default-env', 'ENV_TEST_STRING=string'
+            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
+            'ENV_TEST_NUMBER=123', '--default-env', 'ENV_TEST_STRING=string'
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'
@@ -275,10 +299,8 @@ class TestDefaultEnvVars:
 
     def test_run_module_with_default_env_vars(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
-            'bonobo.examples.environment.env_vars.get_passed_env',
-            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-            '--default-env', "ENV_TEST_STRING='string'"
+            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
+            'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews', '--default-env', "ENV_TEST_STRING='string'"
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'
@@ -291,8 +313,7 @@ class TestEnvVars:
     def test_run_file_with_env_var(self, runner):
         out, err = runner(
             'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'),
-            '--env', 'ENV_TEST_NUMBER=123'
+            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123'
         )
         out = out.split('\n')
         assert out[0] != 'test_user'
@@ -302,9 +323,8 @@ class TestEnvVars:
     def test_run_file_with_env_vars(self, runner):
         out, err = runner(
             'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'),
-            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-            '--env', "ENV_TEST_STRING='my_test_string'"
+            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
+            'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'
@@ -313,9 +333,8 @@ class TestEnvVars:
 
     def test_run_module_with_env_var(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
-            'bonobo.examples.environment.env_vars.get_passed_env',
-            '--env', 'ENV_TEST_NUMBER=123'
+            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
+            'ENV_TEST_NUMBER=123'
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'
@@ -324,10 +343,8 @@ class TestEnvVars:
 
     def test_run_module_with_env_vars(self, runner):
         out, err = runner(
-            'run', '--quiet', '-m',
-            'bonobo.examples.environment.env_vars.get_passed_env',
-            '--env', 'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews',
-            '--env', "ENV_TEST_STRING='my_test_string'"
+            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
+            'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
         )
         out = out.split('\n')
         assert out[0] == 'cwandrews'

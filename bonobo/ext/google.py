@@ -7,7 +7,7 @@ from oauth2client.file import Storage
 from oauth2client.tools import argparser
 
 HOME_DIR = os.path.expanduser('~')
-GOOGLE_SCOPES = ('https://www.googleapis.com/auth/spreadsheets',)
+GOOGLE_SCOPES = ('https://www.googleapis.com/auth/spreadsheets', )
 GOOGLE_SECRETS = os.path.join(HOME_DIR, '.cache/secrets/client_secrets.json')
 
 

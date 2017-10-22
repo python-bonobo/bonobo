@@ -96,7 +96,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __eq__(self, other):
         # XXX there are overlapping cases, but this is very handy for now. Let's think about it later.
@@ -136,7 +136,7 @@ class Bag:
 
 
 class LoopbackBag(Bag):
-    default_flags = (LOOPBACK,)
+    default_flags = (LOOPBACK, )
 
 
 class ErrorBag(Bag):

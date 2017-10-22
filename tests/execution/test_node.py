@@ -103,6 +103,7 @@ def test_node_dict_chained():
     assert output[0] == {'id': 1, 'name': 'FOO'}
     assert output[1] == {'id': 2, 'name': 'BAR'}
 
+
 def test_node_tuple():
     def f():
         return 'foo', 'bar'
@@ -125,6 +126,7 @@ def test_node_tuple():
         assert len(output) == 2
         assert output[0] == ('foo', 'bar')
         assert output[1] == ('foo', 'baz')
+
 
 def test_node_tuple_chained():
     strategy = NaiveStrategy(GraphExecutionContextType=BufferingGraphExecutionContext)
@@ -153,6 +155,7 @@ def test_node_tuple_chained():
     assert len(output) == 2
     assert output[0] == ('FOO', 'BAR')
     assert output[1] == ('FOO', 'BAZ')
+
 
 def test_node_tuple_dict():
     def f():

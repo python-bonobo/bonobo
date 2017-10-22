@@ -35,5 +35,3 @@ def tuplize(generator):
         return tuple(generator(*args, **kwargs))
 
     return tuplized
-
-
