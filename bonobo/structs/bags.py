@@ -96,7 +96,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
 
     def __eq__(self, other):
         # XXX there are overlapping cases, but this is very handy for now. Let's think about it later.
@@ -105,23 +105,24 @@ class Bag:
         if isinstance(other, Bag) and other.args == self.args and other.kwargs == self.kwargs:
             return True
 
-        # tuple of (tuple, dict)
-        if isinstance(other, tuple) and len(other) == 2 and other[0] == self.args and other[1] == self.kwargs:
-            return True
+        # tuple
+        if isinstance(other, tuple):
+            # self == ()
+            if not len(other):
+                return not self.args and not self.kwargs
 
-        # tuple (aka args)
-        if isinstance(other, tuple) and other == self.args:
-            return True
+            if isinstance(other[-1], dict):
+                # self == (*args, {**kwargs}) ?
+                return other[:-1] == self.args and other[-1] == self.kwargs
+
+            # self == (*args) ?
+            return other == self.args and not self.kwargs
 
         # dict (aka kwargs)
         if isinstance(other, dict) and not self.args and other == self.kwargs:
             return True
 
-        # arg0
-        if len(self.args) == 1 and not len(self.kwargs) and self.args[0] == other:
-            return True
-
-        return False
+        return len(self.args) == 1 and not self.kwargs and self.args[0] == other
 
     def __repr__(self):
         return '<{} ({})>'.format(
@@ -135,7 +136,7 @@ class Bag:
 
 
 class LoopbackBag(Bag):
-    default_flags = (LOOPBACK, )
+    default_flags = (LOOPBACK,)
 
 
 class ErrorBag(Bag):

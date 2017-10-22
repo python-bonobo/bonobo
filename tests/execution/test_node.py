@@ -12,7 +12,7 @@ def test_node_string():
         output = context.get_buffer()
 
         assert len(output) == 1
-        assert output[0] == (('foo', ), {})
+        assert output[0] == 'foo'
 
     def g():
         yield 'foo'
@@ -23,8 +23,8 @@ def test_node_string():
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == (('foo', ), {})
-        assert output[1] == (('bar', ), {})
+        assert output[0] == 'foo'
+        assert output[1] == 'bar'
 
 
 def test_node_bytes():
@@ -36,7 +36,7 @@ def test_node_bytes():
 
         output = context.get_buffer()
         assert len(output) == 1
-        assert output[0] == ((b'foo', ), {})
+        assert output[0] == b'foo'
 
     def g():
         yield b'foo'
@@ -47,8 +47,8 @@ def test_node_bytes():
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == ((b'foo', ), {})
-        assert output[1] == ((b'bar', ), {})
+        assert output[0] == b'foo'
+        assert output[1] == b'bar'
 
 
 def test_node_dict():
@@ -125,3 +125,54 @@ def test_node_tuple():
         assert len(output) == 2
         assert output[0] == ('foo', 'bar')
         assert output[1] == ('foo', 'baz')
+
+def test_node_tuple_chained():
+    strategy = NaiveStrategy(GraphExecutionContextType=BufferingGraphExecutionContext)
+
+    def uppercase(*args):
+        return tuple(map(str.upper, args))
+
+    def f():
+        return 'foo', 'bar'
+
+    graph = Graph(f, uppercase)
+    context = strategy.execute(graph)
+    output = context.get_buffer()
+
+    assert len(output) == 1
+    assert output[0] == ('FOO', 'BAR')
+
+    def g():
+        yield 'foo', 'bar'
+        yield 'foo', 'baz'
+
+    graph = Graph(g, uppercase)
+    context = strategy.execute(graph)
+    output = context.get_buffer()
+
+    assert len(output) == 2
+    assert output[0] == ('FOO', 'BAR')
+    assert output[1] == ('FOO', 'BAZ')
+
+def test_node_tuple_dict():
+    def f():
+        return 'foo', 'bar', {'id': 1}
+
+    with BufferingNodeExecutionContext(f) as context:
+        context.write_sync(Bag())
+        output = context.get_buffer()
+
+        assert len(output) == 1
+        assert output[0] == ('foo', 'bar', {'id': 1})
+
+    def g():
+        yield 'foo', 'bar', {'id': 1}
+        yield 'foo', 'baz', {'id': 2}
+
+    with BufferingNodeExecutionContext(g) as context:
+        context.write_sync(Bag())
+        output = context.get_buffer()
+
+        assert len(output) == 2
+        assert output[0] == ('foo', 'bar', {'id': 1})
+        assert output[1] == ('foo', 'baz', {'id': 2})
