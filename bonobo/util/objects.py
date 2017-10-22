@@ -1,7 +1,3 @@
-import functools
-from functools import partial
-
-
 def get_name(mixed):
     try:
         return mixed.__name__
@@ -146,10 +142,10 @@ class ValueHolder:
         return divmod(other, self._value)
 
     def __pow__(self, other):
-        return self._value**other
+        return self._value ** other
 
     def __rpow__(self, other):
-        return other**self._value
+        return other ** self._value
 
     def __ipow__(self, other):
         self._value **= other
@@ -219,6 +215,15 @@ class ValueHolder:
 
     def __len__(self):
         return len(self._value)
+
+    def __contains__(self, item):
+        return item in self._value
+
+    def __getitem__(self, item):
+        return self._value[item]
+
+    def __setitem__(self, key, value):
+        self._value[key] = value
 
 
 def get_attribute_or_create(obj, attr, default):
