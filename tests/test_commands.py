@@ -48,7 +48,7 @@ def test_no_command(runner, capsys):
 @all_runners
 def test_init(runner, tmpdir):
     name = 'project'
-    os.chdir(tmpdir)
+    tmpdir.chdir()
     runner('init', name)
     assert os.path.isdir(name)
     assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
@@ -57,7 +57,7 @@ def test_init(runner, tmpdir):
 @all_runners
 def test_init_in_empty_directory(runner, tmpdir):
     name = 'project'
-    os.chdir(tmpdir)
+    tmpdir.chdir()
     os.mkdir(name)
     runner('init', name)
     assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
@@ -66,7 +66,7 @@ def test_init_in_empty_directory(runner, tmpdir):
 @all_runners
 def test_init_in_non_empty_directory(runner, tmpdir):
     name = 'project'
-    os.chdir(tmpdir)
+    tmpdir.chdir()
     runner('init', name)
     with pytest.raises(OutputDirExistsException):
         runner('init', name)
@@ -74,7 +74,7 @@ def test_init_in_non_empty_directory(runner, tmpdir):
 
 @all_runners
 def test_init_within_empty_directory(runner, tmpdir):
-    os.chdir(tmpdir)
+    tmpdir.chdir()
     runner('init', '.')
     assert set(os.listdir()) & set(DEFAULT_GRAPH_FILENAMES)
 
