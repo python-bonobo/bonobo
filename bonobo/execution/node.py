@@ -159,6 +159,8 @@ def _resolve(input_bag, output):
         return Bag(**output)
 
     if istuple(output):
+        if len(output) > 1 and isdict(output[-1]):
+            return Bag(*output[0:-1], **output[-1])
         return Bag(*output)
 
     # Either we use arg0 format, either it's "just" a value.

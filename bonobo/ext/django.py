@@ -1,6 +1,7 @@
+from logging import getLogger
+
 from colorama import Fore, Back, Style
 from django.core.management.base import BaseCommand, OutputWrapper
-from logging import getLogger
 
 import bonobo
 import bonobo.util
