@@ -6,9 +6,11 @@ from unittest.mock import patch
 
 import pkg_resources
 import pytest
+from cookiecutter.exceptions import OutputDirExistsException
 
 from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint
+from bonobo.commands.run import DEFAULT_GRAPH_FILENAMES
 
 
 def runner_entrypoint(*args):
@@ -45,24 +47,37 @@ def test_no_command(runner, capsys):
 
 
 @all_runners
-def test_init(runner, capsys):
-    runner('init', 'project-name')
-    out, err = capsys.readouterr()
-    out = out.strip()
-    shutil.rmtree('project-name')
-    assert out == ''
+def test_init(runner, tmpdir):
+    name = 'project'
+    os.chdir(tmpdir)
+    runner('init', name)
+    assert os.path.isdir(name)
+    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
 
 
 @all_runners
-def test_init_within_empty_directory(runner, capsys):
-    os.mkdir('empty-directory')
-    os.chdir('empty-directory')
+def test_init_in_empty_directory(runner, tmpdir):
+    name = 'project'
+    os.chdir(tmpdir)
+    os.mkdir(name)
+    runner('init', name)
+    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
+
+
+@all_runners
+def test_init_in_non_empty_directory(runner, tmpdir):
+    name = 'project'
+    os.chdir(tmpdir)
+    runner('init', name)
+    with pytest.raises(OutputDirExistsException):
+        runner('init', name)
+
+
+@all_runners
+def test_init_within_empty_directory(runner, tmpdir):
+    os.chdir(tmpdir)
     runner('init', '.')
-    out, err = capsys.readouterr()
-    out = out.strip()
-    os.chdir('..')
-    shutil.rmtree('empty-directory')
-    assert out == ''
+    assert set(os.listdir()) & set(DEFAULT_GRAPH_FILENAMES)
 
 
 @all_runners
