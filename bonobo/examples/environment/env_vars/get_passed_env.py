@@ -8,7 +8,11 @@ def extract():
     env_test_number = os.getenv('ENV_TEST_NUMBER', 'number')
     env_test_string = os.getenv('ENV_TEST_STRING', 'string')
     env_user = os.getenv('USER')
-    return env_test_user, env_test_number, env_test_string, env_user
+
+    yield env_test_user
+    yield env_test_number
+    yield env_test_string
+    yield env_user
 
 
 def load(s: str):

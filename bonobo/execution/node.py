@@ -1,6 +1,7 @@
 import traceback
 from queue import Empty
 from time import sleep
+from types import GeneratorType
 
 from bonobo import settings
 from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED, BEGIN, END
@@ -10,7 +11,6 @@ from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.util import get_name, iserrorbag, isloopbackbag, isdict, istuple
 from bonobo.util.compat import deprecated_alias
-from bonobo.util.iterators import iter_if_not_sequence
 from bonobo.util.statistics import WithStatistics
 
 
@@ -120,23 +120,21 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     def handle_results(self, input_bag, results):
         # self._exec_time += timer.duration
         # Put data onto output channels
-        try:
-            results = iter_if_not_sequence(results)
-        except TypeError:  # not an iterator
-            if results:
-                self.send(_resolve(input_bag, results))
-            else:
-                # case with no result, an execution went through anyway, use for stats.
-                # self._exec_count += 1
-                pass
-        else:
-            while True:  # iterator
+
+        if isinstance(results, GeneratorType):
+            while True:
                 try:
                     result = next(results)
                 except StopIteration:
                     break
                 else:
                     self.send(_resolve(input_bag, result))
+        elif results:
+            self.send(_resolve(input_bag, results))
+        else:
+            # case with no result, an execution went through anyway, use for stats.
+            # self._exec_count += 1
+            pass
 
 
 def _resolve(input_bag, output):

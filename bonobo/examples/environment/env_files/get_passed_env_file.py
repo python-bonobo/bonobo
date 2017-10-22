@@ -8,7 +8,9 @@ def extract():
     test_user_password = os.getenv('TEST_USER_PASSWORD')
     path = os.getenv('PATH')
 
-    return my_secret, test_user_password, path
+    yield my_secret
+    yield test_user_password
+    yield path
 
 
 def load(s: str):

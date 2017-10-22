@@ -102,3 +102,26 @@ def test_node_dict_chained():
     assert len(output) == 2
     assert output[0] == {'id': 1, 'name': 'FOO'}
     assert output[1] == {'id': 2, 'name': 'BAR'}
+
+def test_node_tuple():
+    def f():
+        return 'foo', 'bar'
+
+    with BufferingNodeExecutionContext(f) as context:
+        context.write_sync(Bag())
+        output = context.get_buffer()
+
+        assert len(output) == 1
+        assert output[0] == ('foo', 'bar')
+
+    def g():
+        yield 'foo', 'bar'
+        yield 'foo', 'baz'
+
+    with BufferingNodeExecutionContext(g) as context:
+        context.write_sync(Bag())
+        output = context.get_buffer()
+
+        assert len(output) == 2
+        assert output[0] == ('foo', 'bar')
+        assert output[1] == ('foo', 'baz')
