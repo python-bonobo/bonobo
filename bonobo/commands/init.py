@@ -1,6 +1,6 @@
 import os
 
-def execute(name, branch, overwrite_if_exists=False):
+def execute(name, branch):
     try:
         from cookiecutter.main import cookiecutter
     except ImportError as exc:
@@ -8,7 +8,9 @@ def execute(name, branch, overwrite_if_exists=False):
             'You must install "cookiecutter" to use this command.\n\n $ pip install cookiecutter\n'
         ) from exc
 
-    if os.listdir(os.getcwd()) == []:
+    overwrite_if_exists = False
+    project_path = os.path.join(os.getcwd(), name)
+    if os.path.isdir(project_path) and not os.listdir(project_path):
         overwrite_if_exists = True
 
     return cookiecutter(
