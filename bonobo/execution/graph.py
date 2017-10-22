@@ -5,7 +5,6 @@ from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.execution.plugin import PluginExecutionContext
-from whistle import EventDispatcher
 
 
 class GraphExecutionContext:
@@ -23,14 +22,6 @@ class GraphExecutionContext:
     @property
     def alive(self):
         return any(node.alive for node in self.nodes)
-
-    @property
-    def dispatcher(self):
-        try:
-            return self._dispatcher
-        except AttributeError:
-            self._dispatcher = EventDispatcher()
-            return self._dispatcher
 
     def __init__(self, graph, plugins=None, services=None):
         self.graph = graph
