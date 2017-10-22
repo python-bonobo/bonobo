@@ -1,7 +1,6 @@
 import os
 import runpy
 import sys
-import shutil
 from unittest.mock import patch
 
 import pkg_resources
