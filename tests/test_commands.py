@@ -8,9 +8,11 @@ from unittest.mock import patch
 
 import pkg_resources
 import pytest
+from cookiecutter.exceptions import OutputDirExistsException
 
 from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint
+from bonobo.commands.run import DEFAULT_GRAPH_FILENAMES
 
 
 def runner(f):
@@ -62,6 +64,40 @@ def test_no_command(runner):
     _, err, exc = runner()
     assert type(exc) == SystemExit
     assert 'error: the following arguments are required: command' in err
+
+
+@all_runners
+def test_init(runner, tmpdir):
+    name = 'project'
+    tmpdir.chdir()
+    runner('init', name)
+    assert os.path.isdir(name)
+    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
+
+
+@all_runners
+def test_init_in_empty_directory(runner, tmpdir):
+    name = 'project'
+    tmpdir.chdir()
+    os.mkdir(name)
+    runner('init', name)
+    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
+
+
+@all_runners
+def test_init_in_non_empty_directory(runner, tmpdir):
+    name = 'project'
+    tmpdir.chdir()
+    runner('init', name)
+    with pytest.raises(OutputDirExistsException):
+        runner('init', name)
+
+
+@all_runners
+def test_init_within_empty_directory(runner, tmpdir):
+    tmpdir.chdir()
+    runner('init', '.')
+    assert set(os.listdir()) & set(DEFAULT_GRAPH_FILENAMES)
 
 
 @all_runners
