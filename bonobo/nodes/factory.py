@@ -75,24 +75,24 @@ class Cursor():
         self.item = item
 
     @operation('dict')
-    def dict(self, x):
+    def as_dict(self, x):
         return x if isinstance(x, dict) else dict(x)
 
     @operation('int')
-    def int(self):
-        pass
+    def as_int(self, x):
+        return x if isinstance(x, int) else int(x)
 
     @operation('str')
-    def str(self, x):
+    def as_str(self, x):
         return x if isinstance(x, str) else str(x)
 
     @operation('list')
-    def list(self):
-        pass
+    def as_list(self, x):
+        return x if isinstance(x, list) else list(x)
 
     @operation('tuple')
-    def tuple(self):
-        pass
+    def as_tuple(self, x):
+        return x if isinstance(x, tuple) else tuple(x)
 
     def __getattr__(self, item):
         """
@@ -147,7 +147,7 @@ class Factory(Configurable):
 
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            __file__ +
+            type(self).__name__ +
             ' is experimental, API may change in the future, use it as a preview only and knowing the risks.',
             FutureWarning
         )
@@ -180,40 +180,9 @@ class Factory(Configurable):
             raise RuntimeError('Houston, we have a problem...')
 
     def __call__(self, *args, **kwargs):
-        print('factory call on', args, kwargs)
         for operation in self.operations:
             args, kwargs = operation.apply(*args, **kwargs)
-            print(' ... after', operation, 'got', args, kwargs)
         return Bag(*args, **kwargs)
 
     def __getitem__(self, item):
         return CURSOR_TYPES[self.default_cursor_type](self, item)
-
-
-if __name__ == '__main__':
-    f = Factory()
-
-    f[0].dict().map_keys({'foo': 'F00'})
-    f['foo'].str().upper()
-
-    print('operations:', f.operations)
-    print(f({'foo': 'bisou'}, foo='blah'))
-'''
-specs:
-
-- rename keys of an input dict (in args, or kwargs) using a translation map.
-
-
-f = Factory()
-
-f[0]
-f['xxx'] = 
-    
-f[0].dict().get('foo.bar').move_to('foo.baz').apply(str.upper)
-f[0].get('foo.*').items().map(str.lower)
-
-f['foo'].keys_map({
-    'a': 'b'
-})
-
-'''

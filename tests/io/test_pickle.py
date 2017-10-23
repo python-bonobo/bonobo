@@ -14,7 +14,7 @@ def test_write_pickled_dict_to_file(tmpdir):
     fs, filename, services = pickle_tester.get_services_for_writer(tmpdir)
 
     with NodeExecutionContext(PickleWriter(filename), services=services) as context:
-        context.write_sync(Bag({'foo': 'bar'}), Bag({'foo': 'baz', 'ignore': 'this'}))
+        context.write_sync(Bag(({'foo': 'bar'}, {})), Bag(({'foo': 'baz', 'ignore': 'this'}, {})))
 
     with fs.open(filename, 'rb') as fp:
         assert pickle.loads(fp.read()) == {'foo': 'bar'}
@@ -27,7 +27,7 @@ def test_read_pickled_list_from_file(tmpdir):
     fs, filename, services = pickle_tester.get_services_for_reader(tmpdir)
 
     with BufferingNodeExecutionContext(PickleReader(filename), services=services) as context:
-        context.write_sync(Bag())
+        context.write_sync(())
         output = context.get_buffer()
 
     assert len(output) == 2

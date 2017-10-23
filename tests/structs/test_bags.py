@@ -1,8 +1,10 @@
 import pickle
 from unittest.mock import Mock
 
+import pytest
+
 from bonobo import Bag
-from bonobo.constants import INHERIT_INPUT
+from bonobo.constants import INHERIT_INPUT, BEGIN
 from bonobo.structs import Token
 
 args = (
@@ -29,6 +31,32 @@ def test_basic():
 
     my_callable1.assert_called_once_with(*args, **kwargs)
     my_callable2.assert_called_once_with(*args, **kwargs)
+
+
+def test_constructor_empty():
+    a, b = Bag(), Bag()
+    assert a == b
+    assert a.args is ()
+    assert a.kwargs == {}
+
+
+@pytest.mark.parametrize(('arg_in', 'arg_out'), (
+    ((), ()),
+    ({}, ()),
+    (('a', 'b', 'c'), None),
+))
+def test_constructor_shorthand(arg_in, arg_out):
+    if arg_out is None:
+        arg_out = arg_in
+    assert Bag(arg_in) == arg_out
+
+
+def test_constructor_kwargs_only():
+    assert Bag(foo='bar') == {'foo': 'bar'}
+
+
+def test_constructor_identity():
+    assert Bag(BEGIN) is BEGIN
 
 
 def test_inherit():

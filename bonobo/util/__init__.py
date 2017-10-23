@@ -1,5 +1,4 @@
-from bonobo.util.collections import sortedlist
-from bonobo.util.iterators import ensure_tuple
+from bonobo.util.collections import sortedlist, ensure_tuple
 from bonobo.util.compat import deprecated, deprecated_alias
 from bonobo.util.inspect import (
     inspect_node,

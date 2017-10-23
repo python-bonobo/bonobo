@@ -1,105 +1,34 @@
-import mimetypes
-import os
-
 import bonobo
-from bonobo.commands.util.arguments import parse_variable_argument
-from bonobo.util import require
-from bonobo.util.iterators import tuplize
-from bonobo.util.python import WorkingDirectoryModulesRegistry
-
-SHORTCUTS = {
-    'csv': 'text/csv',
-    'json': 'application/json',
-    'pickle': 'pickle',
-    'plain': 'text/plain',
-    'text': 'text/plain',
-    'txt': 'text/plain',
-}
-
-REGISTRY = {
-    'application/json': (bonobo.JsonReader, bonobo.JsonWriter),
-    'pickle': (bonobo.PickleReader, bonobo.PickleWriter),
-    'text/csv': (bonobo.CsvReader, bonobo.CsvWriter),
-    'text/plain': (bonobo.FileReader, bonobo.FileWriter),
-}
-
-READER = 'reader'
-WRITER = 'writer'
-
-
-def resolve_factory(name, filename, factory_type, options=None):
-    """
-    Try to resolve which transformation factory to use for this filename. User eventually provided a name, which has
-    priority, otherwise we try to detect it using the mimetype detection on filename.
-
-    """
-    if name is None:
-        name = mimetypes.guess_type(filename)[0]
-
-    if name in SHORTCUTS:
-        name = SHORTCUTS[name]
-
-    if name is None:
-        _, _ext = os.path.splitext(filename)
-        if _ext:
-            _ext = _ext[1:]
-        if _ext in SHORTCUTS:
-            name = SHORTCUTS[_ext]
-
-    if options:
-        options = dict(map(parse_variable_argument, options))
-    else:
-        options = dict()
-
-    if not name in REGISTRY:
-        raise RuntimeError(
-            'Could not resolve {factory_type} factory for {filename} ({name}). Try providing it explicitely using -{opt} <format>.'.
-            format(name=name, filename=filename, factory_type=factory_type, opt=factory_type[0])
-        )
-
-    if factory_type == READER:
-        return REGISTRY[name][0], options
-    elif factory_type == WRITER:
-        return REGISTRY[name][1], options
-    else:
-        raise ValueError('Invalid factory type.')
-
-
-@tuplize
-def resolve_filters(filters):
-    registry = WorkingDirectoryModulesRegistry()
-    for f in filters:
-        try:
-            mod, attr = f.split(':', 1)
-            yield getattr(registry.require(mod), attr)
-        except ValueError:
-            yield getattr(bonobo, f)
+from bonobo.registry import READER, WRITER, default_registry
+from bonobo.util.resolvers import _resolve_transformations, _resolve_options
 
 
 def execute(
-    input,
-    output,
+    input_filename,
+    output_filename,
     reader=None,
     reader_option=None,
     writer=None,
     writer_option=None,
     option=None,
-    filter=None,
+    transformation=None,
 ):
-    reader_factory, reader_option = resolve_factory(reader, input, READER, (option or []) + (reader_option or []))
+    reader_factory = default_registry.get_reader_factory_for(input_filename, format=reader)
+    reader_options = _resolve_options((option or []) + (reader_option or []))
 
-    if output == '-':
-        writer_factory, writer_option = bonobo.PrettyPrinter, {}
+    if output_filename == '-':
+        writer_factory = bonobo.PrettyPrinter
     else:
-        writer_factory, writer_option = resolve_factory(writer, output, WRITER, (option or []) + (writer_option or []))
+        writer_factory = default_registry.get_writer_factory_for(output_filename, format=writer)
+    writer_options = _resolve_options((option or []) + (writer_option or []))
 
-    filters = resolve_filters(filter)
+    transformations = _resolve_transformations(transformation)
 
     graph = bonobo.Graph()
     graph.add_chain(
-        reader_factory(input, **reader_option),
-        *filters,
-        writer_factory(output, **writer_option),
+        reader_factory(input_filename, **reader_options),
+        *transformations,
+        writer_factory(output_filename, **writer_options),
     )
 
     return bonobo.run(
@@ -110,8 +39,8 @@ def execute(
 
 
 def register(parser):
-    parser.add_argument('input', help='Input filename.')
-    parser.add_argument('output', help='Output filename.')
+    parser.add_argument('input-filename', help='Input filename.')
+    parser.add_argument('output-filename', help='Output filename.')
     parser.add_argument(
         '--' + READER,
         '-r',
@@ -124,11 +53,11 @@ def register(parser):
         'Choose the writer factory if it cannot be detected from extension, or if detection is wrong (use - for console pretty print).'
     )
     parser.add_argument(
-        '--filter',
-        '-f',
-        dest='filter',
+        '--transformation',
+        '-t',
+        dest='transformation',
         action='append',
-        help='Add a filter between input and output',
+        help='Add a transformation between input and output (can be used multiple times, order is preserved).',
     )
     parser.add_argument(
         '--option',

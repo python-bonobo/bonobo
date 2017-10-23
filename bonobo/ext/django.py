@@ -44,7 +44,7 @@ class ETLCommand(BaseCommand):
         return self.GraphType(not_implemented)
 
     def get_services(self):
-        return get_default_services(type(self).__file__)
+        return {}
 
     @property
     def logger(self):

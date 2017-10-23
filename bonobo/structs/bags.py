@@ -1,5 +1,6 @@
 import itertools
 
+from bonobo.structs.tokens import Token
 from bonobo.constants import INHERIT_INPUT, LOOPBACK
 
 __all__ = [
@@ -35,11 +36,55 @@ class Bag:
 
     default_flags = ()
 
+    def __new__(cls, *args, _flags=None, _parent=None, **kwargs):
+        # Handle the special case where we call Bag's constructor with only one bag or token as argument.
+        if len(args) == 1 and len(kwargs) == 0:
+            if isinstance(args[0], Bag):
+                raise ValueError('Bag cannot be instanciated with a bag (for now ...).')
+
+            if isinstance(args[0], Token):
+                return args[0]
+
+        # Otherwise, type will handle that for us.
+        return super().__new__(cls)
+
     def __init__(self, *args, _flags=None, _parent=None, **kwargs):
         self._flags = type(self).default_flags + (_flags or ())
         self._parent = _parent
-        self._args = args
-        self._kwargs = kwargs
+
+        if len(args) == 1 and len(kwargs) == 0:
+            # If we only have one argument, that may be because we're using the shorthand syntax.
+            mixed = args[0]
+
+            if isinstance(mixed, Bag):
+                # Just duplicate the bag.
+                self._args = mixed.args
+                self._kwargs = mixed.kwargs
+            elif isinstance(mixed, tuple):
+                if not len(mixed):
+                    # Empty bag.
+                    self._args = ()
+                    self._kwargs = {}
+                elif isinstance(mixed[-1], dict):
+                    # Args + Kwargs
+                    self._args = mixed[:-1]
+                    self._kwargs = mixed[-1]
+                else:
+                    # Args only
+                    self._args = mixed
+                    self._kwargs = {}
+            elif isinstance(mixed, dict):
+                # Kwargs only
+                self._args = ()
+                self._kwargs = mixed
+            else:
+                self._args = args
+                self._kwargs = {}
+
+        else:
+            # Otherwise, lets get args/kwargs from the constructor.
+            self._args = args
+            self._kwargs = kwargs
 
     @property
     def args(self):
