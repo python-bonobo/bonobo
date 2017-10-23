@@ -11,7 +11,7 @@ from bonobo.util.testing import BufferingNodeExecutionContext
 class FactoryTypeTest(TestCase):
     def execute_node(self, node, *rows):
         with BufferingNodeExecutionContext(node) as context:
-            context.write_sync(*map(Bag, rows))
+            context.write_sync(*rows)
         return context.get_buffer()
 
     def test_args_as_str(self):

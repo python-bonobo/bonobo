@@ -9,7 +9,7 @@ from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.structs.tokens import Token
-from bonobo.util import get_name, iserrorbag, isloopbackbag
+from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag
 from bonobo.util.compat import deprecated_alias
 from bonobo.util.statistics import WithStatistics
 
@@ -142,7 +142,7 @@ def _resolve(input_bag, output):
     if output is NOT_MODIFIED:
         return input_bag
 
-    if iserrorbag(output):
+    if isbag(output):
         return output
 
     return Bag(output)
