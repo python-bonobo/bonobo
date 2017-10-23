@@ -17,11 +17,15 @@ from bonobo.commands.run import DEFAULT_GRAPH_FILENAMES
 
 def runner(f):
     @functools.wraps(f)
-    def wrapped_runner(*args):
+    def wrapped_runner(*args, catch_errors=False):
         with redirect_stdout(io.StringIO()) as stdout, redirect_stderr(io.StringIO()) as stderr:
             try:
                 f(list(args))
             except BaseException as exc:
+                if not catch_errors:
+                    raise
+                elif isinstance(catch_errors, BaseException) and not isinstance(exc, catch_errors):
+                    raise
                 return stdout.getvalue(), stderr.getvalue(), exc
         return stdout.getvalue(), stderr.getvalue()
 
@@ -42,6 +46,7 @@ def runner_module(args):
 
 
 all_runners = pytest.mark.parametrize('runner', [runner_entrypoint, runner_module])
+single_runner = pytest.mark.parametrize('runner', [runner_module])
 
 
 def test_entrypoint():
@@ -61,7 +66,7 @@ def test_entrypoint():
 
 @all_runners
 def test_no_command(runner):
-    _, err, exc = runner()
+    _, err, exc = runner(catch_errors=True)
     assert type(exc) == SystemExit
     assert 'error: the following arguments are required: command' in err
 
@@ -74,26 +79,22 @@ def test_init(runner, tmpdir):
     assert os.path.isdir(name)
     assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
 
-
-@all_runners
-def test_init_in_empty_directory(runner, tmpdir):
+@single_runner
+def test_init_in_empty_then_nonempty_directory(runner, tmpdir):
     name = 'project'
     tmpdir.chdir()
     os.mkdir(name)
+
+    # run in empty dir
     runner('init', name)
     assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
 
-
-@all_runners
-def test_init_in_non_empty_directory(runner, tmpdir):
-    name = 'project'
-    tmpdir.chdir()
-    runner('init', name)
+    # run in non empty dir
     with pytest.raises(OutputDirExistsException):
         runner('init', name)
 
 
-@all_runners
+@single_runner
 def test_init_within_empty_directory(runner, tmpdir):
     tmpdir.chdir()
     runner('init', '.')
