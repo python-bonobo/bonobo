@@ -28,9 +28,7 @@ def test_write_csv_to_file_kwargs(tmpdir, add_kwargs):
     fs, filename, services = csv_tester.get_services_for_writer(tmpdir)
 
     with NodeExecutionContext(CsvWriter(filename, **add_kwargs), services=services) as context:
-        context.write(BEGIN, Bag(**{'foo': 'bar'}), Bag(**{'foo': 'baz', 'ignore': 'this'}), END)
-        context.step()
-        context.step()
+        context.write_sync({'foo': 'bar'}, {'foo': 'baz', 'ignore': 'this'})
 
     with fs.open(filename) as fp:
         assert fp.read() == 'foo\nbar\nbaz\n'

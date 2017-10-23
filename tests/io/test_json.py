@@ -1,7 +1,6 @@
 import pytest
 
-from bonobo import Bag, JsonReader, JsonWriter, settings
-from bonobo.constants import BEGIN, END
+from bonobo import JsonReader, JsonWriter, settings
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import FilesystemTester
 
@@ -29,8 +28,7 @@ def test_write_json_kwargs(tmpdir, add_kwargs):
     fs, filename, services = json_tester.get_services_for_writer(tmpdir)
 
     with NodeExecutionContext(JsonWriter(filename, **add_kwargs), services=services) as context:
-        context.write(BEGIN, Bag(**{'foo': 'bar'}), END)
-        context.step()
+        context.write_sync({'foo': 'bar'})
 
     with fs.open(filename) as fp:
         assert fp.read() == '[{"foo": "bar"}]'

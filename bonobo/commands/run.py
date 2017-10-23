@@ -46,7 +46,17 @@ def _install_requirements(requirements):
     importlib.reload(site)
 
 
-def read(filename, module, install=False, quiet=False, verbose=False, default_env_file=None, default_env=None, env_file=None, env=None):
+def read(
+    filename,
+    module,
+    install=False,
+    quiet=False,
+    verbose=False,
+    default_env_file=None,
+    default_env=None,
+    env_file=None,
+    env=None
+):
 
     import runpy
     from bonobo import Graph, settings
@@ -129,8 +139,20 @@ def set_env_var(e, override=False):
         os.environ.setdefault(ename, evalue)
 
 
-def execute(filename, module, install=False, quiet=False, verbose=False, default_env_file=None, default_env=None, env_file=None, env=None):
-    graph, plugins, services = read(filename, module, install, quiet, verbose, default_env_file, default_env, env_file, env)
+def execute(
+    filename,
+    module,
+    install=False,
+    quiet=False,
+    verbose=False,
+    default_env_file=None,
+    default_env=None,
+    env_file=None,
+    env=None
+):
+    graph, plugins, services = read(
+        filename, module, install, quiet, verbose, default_env_file, default_env, env_file, env
+    )
 
     return bonobo.run(graph, plugins=plugins, services=services)
 

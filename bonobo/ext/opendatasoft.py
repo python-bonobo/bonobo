@@ -14,14 +14,14 @@ def path_str(path):
 
 class OpenDataSoftAPI(Configurable):
     dataset = Option(str, positional=True)
-    endpoint = Option(str, default='{scheme}://{netloc}{path}')
-    scheme = Option(str, default='https')
-    netloc = Option(str, default='data.opendatasoft.com')
-    path = Option(path_str, default='/api/records/1.0/search/')
-    rows = Option(int, default=500)
+    endpoint = Option(str, required=False, default='{scheme}://{netloc}{path}')
+    scheme = Option(str, required=False, default='https')
+    netloc = Option(str, required=False, default='data.opendatasoft.com')
+    path = Option(path_str, required=False, default='/api/records/1.0/search/')
+    rows = Option(int, required=False, default=500)
     limit = Option(int, required=False)
-    timezone = Option(str, default='Europe/Paris')
-    kwargs = Option(dict, default=dict)
+    timezone = Option(str, required=False, default='Europe/Paris')
+    kwargs = Option(dict, required=False, default=dict)
 
     @ContextProcessor
     def compute_path(self, context):
@@ -44,7 +44,11 @@ class OpenDataSoftAPI(Configurable):
                 break
 
             for row in records:
-                yield {**row.get('fields', {}), 'geometry': row.get('geometry', {})}
+                yield {
+                    **row.get('fields', {}),
+                    'geometry': row.get('geometry', {}),
+                    'recordid': row.get('recordid'),
+                }
 
             start += self.rows
 

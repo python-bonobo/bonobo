@@ -1,16 +1,16 @@
 import traceback
 from queue import Empty
 from time import sleep
+from types import GeneratorType
 
-from bonobo import settings
-from bonobo.constants import INHERIT_INPUT, NOT_MODIFIED, BEGIN, END
+from bonobo.constants import NOT_MODIFIED, BEGIN, END
 from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
-from bonobo.util import get_name, iserrorbag, isloopbackbag, isdict, istuple
+from bonobo.structs.tokens import Token
+from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag
 from bonobo.util.compat import deprecated_alias
-from bonobo.util.iterators import iter_if_not_sequence
 from bonobo.util.statistics import WithStatistics
 
 
@@ -49,7 +49,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         :param mixed value: message
         """
         for message in messages:
-            self.input.put(message)
+            self.input.put(message if isinstance(message, (Bag, Token)) else Bag(message))
 
     def write_sync(self, *messages):
         self.write(BEGIN, *messages, END)
@@ -120,23 +120,21 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     def handle_results(self, input_bag, results):
         # self._exec_time += timer.duration
         # Put data onto output channels
-        try:
-            results = iter_if_not_sequence(results)
-        except TypeError:  # not an iterator
-            if results:
-                self.send(_resolve(input_bag, results))
-            else:
-                # case with no result, an execution went through anyway, use for stats.
-                # self._exec_count += 1
-                pass
-        else:
-            while True:  # iterator
+
+        if isinstance(results, GeneratorType):
+            while True:
                 try:
                     result = next(results)
                 except StopIteration:
                     break
                 else:
                     self.send(_resolve(input_bag, result))
+        elif results:
+            self.send(_resolve(input_bag, results))
+        else:
+            # case with no result, an execution went through anyway, use for stats.
+            # self._exec_count += 1
+            pass
 
 
 def _resolve(input_bag, output):
@@ -144,22 +142,7 @@ def _resolve(input_bag, output):
     if output is NOT_MODIFIED:
         return input_bag
 
-    if iserrorbag(output):
+    if isbag(output):
         return output
 
-    # If it does not look like a bag, let's create one for easier manipulation
-    if hasattr(output, 'apply'):  # XXX TODO use isbag() ?
-        # Already a bag? Check if we need to set parent.
-        if INHERIT_INPUT in output.flags:
-            output.set_parent(input_bag)
-        return output
-
-    # If we're using kwargs ioformat, then a dict means kwargs.
-    if settings.IOFORMAT == settings.IOFORMAT_KWARGS and isdict(output):
-        return Bag(**output)
-
-    if istuple(output):
-        return Bag(*output)
-
-    # Either we use arg0 format, either it's "just" a value.
     return Bag(output)

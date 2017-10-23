@@ -4,8 +4,7 @@ from time import sleep
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
-from bonobo.plugins import get_enhancers
-from bonobo.util import inspect_node, isconfigurabletype
+from bonobo.util import isconfigurabletype
 from bonobo.util.errors import print_error
 from bonobo.util.objects import Wrapper, get_name
 
@@ -56,9 +55,6 @@ class LoopingExecutionContext(Wrapper):
         self._started, self._stopped = False, False
         self._stack = None
 
-        # XXX enhancers
-        self._enhancers = get_enhancers(self.wrapped)
-
     def __enter__(self):
         self.start()
         return self
@@ -79,14 +75,8 @@ class LoopingExecutionContext(Wrapper):
             raise TypeError(
                 'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
             )
-            # XXX enhance that, maybe giving hints on what's missing.
-            # print(inspect_node(self.wrapped))
 
         self._stack.setup(self)
-
-        for enhancer in self._enhancers:
-            with unrecoverable(self.handle_error):
-                enhancer.start(self)
 
     def loop(self):
         """Generic loop. A bit boring. """
