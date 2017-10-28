@@ -11,7 +11,7 @@ def split_one_to_map(line):
 class MyJsonWriter(bonobo.JsonWriter):
     prefix, suffix = '{', '}'
 
-    def write(self, fs, file, lineno, row):
+    def write(self, fs, file, lineno, **row):
         return bonobo.FileWriter.write(
             self, fs, file, lineno, json.dumps(row)[1:-1]
         )
@@ -20,7 +20,7 @@ class MyJsonWriter(bonobo.JsonWriter):
 graph = bonobo.Graph(
     bonobo.FileReader('coffeeshops.txt'),
     split_one_to_map,
-    MyJsonWriter('coffeeshops.json', fs='fs.output', ioformat='arg0'),
+    MyJsonWriter('coffeeshops.json', fs='fs.output'),
 )
 
 
