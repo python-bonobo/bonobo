@@ -69,8 +69,7 @@ setup(
         'bonobo.commands': [
             'convert = bonobo.commands.convert:register', 'init = bonobo.commands.init:register',
             'inspect = bonobo.commands.inspect:register', 'run = bonobo.commands.run:register',
-            'version = bonobo.commands.version:register',
-            'download = bonobo.commands.download:register',
+            'version = bonobo.commands.version:register', 'download = bonobo.commands.download:register'
         ],
         'console_scripts': ['bonobo = bonobo.commands:entrypoint']
     },
