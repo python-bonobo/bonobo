@@ -1,4 +1,6 @@
+from importlib.util import spec_from_file_location, module_from_spec
 import os
+import sys
 
 import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
@@ -76,7 +78,12 @@ def read(filename, module, install=False, quiet=False, verbose=False, env=None):
         elif install:
             requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
             _install_requirements(requirements)
-        context = runpy.run_path(filename, run_name='__bonobo__')
+        spec = spec_from_file_location('__bonobo__', filename)
+        main = sys.modules['__bonobo__'] = module_from_spec(spec)
+        main.__path__ = [os.path.dirname(filename)]
+        main.__package__ = '__bonobo__'
+        spec.loader.exec_module(main)
+        context = main.__dict__
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
         filename = context['__file__']
