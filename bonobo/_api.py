@@ -2,6 +2,7 @@ import logging
 
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
+from bonobo.nodes import LdjsonReader, LdjsonWriter
 from bonobo.strategies import create_strategy
 from bonobo.structs import Bag, ErrorBag, Graph, Token
 from bonobo.util import get_name
@@ -110,6 +111,8 @@ register_api_group(
     Filter,
     JsonReader,
     JsonWriter,
+    LdjsonReader,
+    LdjsonWriter,
     Limit,
     PickleReader,
     PickleWriter,
