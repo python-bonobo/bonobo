@@ -1,10 +1,13 @@
 import codecs
 import os
+import sys
+from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 import bonobo
 from bonobo.constants import DEFAULT_SERVICES_ATTR, DEFAULT_SERVICES_FILENAME
-from dotenv import load_dotenv
 
 DEFAULT_GRAPH_FILENAMES = (
     '__main__.py',
@@ -47,17 +50,16 @@ def _install_requirements(requirements):
 
 
 def read(
-    filename,
-    module,
-    install=False,
-    quiet=False,
-    verbose=False,
-    default_env_file=None,
-    default_env=None,
-    env_file=None,
-    env=None
+        filename,
+        module,
+        install=False,
+        quiet=False,
+        verbose=False,
+        default_env_file=None,
+        default_env=None,
+        env_file=None,
+        env=None
 ):
-
     import runpy
     from bonobo import Graph, settings
 
@@ -83,7 +85,12 @@ def read(
         elif install:
             requirements = os.path.join(os.path.dirname(filename), 'requirements.txt')
             _install_requirements(requirements)
-        context = runpy.run_path(filename, run_name='__bonobo__')
+        spec = spec_from_file_location('__bonobo__', filename)
+        main = sys.modules['__bonobo__'] = module_from_spec(spec)
+        main.__path__ = [os.path.dirname(filename)]
+        main.__package__ = '__bonobo__'
+        spec.loader.exec_module(main)
+        context = main.__dict__
     elif module:
         context = runpy.run_module(module, run_name='__bonobo__')
         filename = context['__file__']
@@ -140,15 +147,15 @@ def set_env_var(e, override=False):
 
 
 def execute(
-    filename,
-    module,
-    install=False,
-    quiet=False,
-    verbose=False,
-    default_env_file=None,
-    default_env=None,
-    env_file=None,
-    env=None
+        filename,
+        module,
+        install=False,
+        quiet=False,
+        verbose=False,
+        default_env_file=None,
+        default_env=None,
+        env_file=None,
+        env=None
 ):
     graph, plugins, services = read(
         filename, module, install, quiet, verbose, default_env_file, default_env, env_file, env
