@@ -164,6 +164,12 @@ def test_download_works_for_examples(runner):
         def iter_content(self, *args, **kwargs):
             return [expected_bytes]
 
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args, **kwargs):
+            pass
+
     fout = io.BytesIO()
     fout.close = lambda: None
 

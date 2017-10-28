@@ -29,8 +29,7 @@ def execute(path, *args, **kwargs):
         raise ValueError('download command currently supports examples only')
     examples_path = re.sub('^examples/', '', path)
     output_path = bonobo.get_examples_path(examples_path)
-    response = _open_url(EXAMPLES_BASE_URL + examples_path)
-    with open(output_path, 'wb') as fout:
+    with _open_url(EXAMPLES_BASE_URL + examples_path) as response, open(output_path, 'wb') as fout:
         _write_response(response, fout)
     print('saved to {}'.format(output_path))
 
