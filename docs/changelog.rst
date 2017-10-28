@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Unreleased
+::::::::::
+
+New features
+------------
+
+Command line
+............
+
+* `bonobo download /examples/datasets/coffeeshops.txt` now downloads the coffeeshops example
+
 v.0.5.0 - 5 october 2017
 ::::::::::::::::::::::::
 

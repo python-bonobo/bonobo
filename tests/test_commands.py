@@ -4,7 +4,7 @@ import os
 import runpy
 import sys
 from contextlib import redirect_stdout, redirect_stderr
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pkg_resources
 import pytest
@@ -13,6 +13,7 @@ from cookiecutter.exceptions import OutputDirExistsException
 from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint
 from bonobo.commands.run import DEFAULT_GRAPH_FILENAMES
+from bonobo.commands.download import EXAMPLES_BASE_URL
 
 
 def runner(f):
@@ -150,6 +151,43 @@ def test_version(runner):
     out = out.strip()
     assert out.startswith('bonobo ')
     assert __version__ in out
+
+
+@all_runners
+def test_download_works_for_examples(runner):
+    expected_bytes = b'hello world'
+
+    class MockResponse(object):
+        def __init__(self):
+            self.status_code = 200
+
+        def iter_content(self, *args, **kwargs):
+            return [expected_bytes]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args, **kwargs):
+            pass
+
+    fout = io.BytesIO()
+    fout.close = lambda: None
+
+    with patch('bonobo.commands.download._open_url') as mock_open_url, \
+            patch('bonobo.commands.download.open') as mock_open:
+        mock_open_url.return_value = MockResponse()
+        mock_open.return_value = fout
+        runner('download', 'examples/datasets/coffeeshops.txt')
+    expected_url = EXAMPLES_BASE_URL + 'datasets/coffeeshops.txt'
+    mock_open_url.assert_called_once_with(expected_url)
+
+    assert fout.getvalue() == expected_bytes
+
+
+@all_runners
+def test_download_fails_non_example(runner):
+    with pytest.raises(ValueError):
+        runner('download', '/something/entirely/different.txt')
 
 
 @all_runners
