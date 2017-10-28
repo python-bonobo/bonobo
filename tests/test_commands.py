@@ -4,7 +4,7 @@ import os
 import runpy
 import sys
 from contextlib import redirect_stdout, redirect_stderr
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pkg_resources
 import pytest
@@ -155,13 +155,21 @@ def test_version(runner):
 
 @all_runners
 def test_download_works_for_examples(runner):
+    expected_bytes = b'hello world'
+
+    class MockResponse(object):
+        def __init__(self):
+            self.status_code = 200
+
+        def iter_content(self, *args, **kwargs):
+            return [expected_bytes]
+
     fout = io.BytesIO()
     fout.close = lambda: None
 
-    expected_bytes = b'hello world'
     with patch('bonobo.commands.download._open_url') as mock_open_url, \
             patch('bonobo.commands.download.open') as mock_open:
-        mock_open_url.return_value = io.BytesIO(expected_bytes)
+        mock_open_url.return_value = MockResponse()
         mock_open.return_value = fout
         runner('download', 'examples/datasets/coffeeshops.txt')
     expected_url = EXAMPLES_BASE_URL + 'datasets/coffeeshops.txt'

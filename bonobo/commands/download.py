@@ -1,6 +1,7 @@
 import io
 import re
-import urllib.request
+
+import requests
 
 import bonobo
 
@@ -8,21 +9,17 @@ EXAMPLES_BASE_URL = 'https://raw.githubusercontent.com/python-bonobo/bonobo/mast
 """The URL to our git repository, in raw mode."""
 
 
-def _save_stream(fin, fout):
-    """Read the input stream and write it to the output stream block-by-block."""
-    while True:
-        data = fin.read(io.DEFAULT_BUFFER_SIZE)
-        if data:
-            fout.write(data)
-        else:
-            break
+def _write_response(response, fout):
+    """Read the response and write it to the output stream in chunks."""
+    for chunk in response.iter_content(io.DEFAULT_BUFFER_SIZE):
+        fout.write(chunk)
 
 
 def _open_url(url):
     """Open a HTTP connection to the URL and return a file-like object."""
-    response = urllib.request.urlopen(url)
-    if response.getcode() != 200:
-        raise IOError('unable to download {}, HTTP {}'.format(url, response.getcode()))
+    response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        raise IOError('unable to download {}, HTTP {}'.format(url, response.status_code))
     return response
 
 
@@ -32,9 +29,9 @@ def execute(path, *args, **kwargs):
         raise ValueError('download command currently supports examples only')
     examples_path = re.sub('^examples/', '', path)
     output_path = bonobo.get_examples_path(examples_path)
-    fin = _open_url(EXAMPLES_BASE_URL + examples_path)
+    response = _open_url(EXAMPLES_BASE_URL + examples_path)
     with open(output_path, 'wb') as fout:
-        _save_stream(fin, fout)
+        _write_response(response, fout)
     print('saved to {}'.format(output_path))
 
 
