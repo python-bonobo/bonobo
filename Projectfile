@@ -34,6 +34,7 @@ python.setup(
             'inspect = bonobo.commands.inspect:register',
             'run = bonobo.commands.run:register',
             'version = bonobo.commands.version:register',
+            'download = bonobo.commands.download:register',
         ],
     }
 )
