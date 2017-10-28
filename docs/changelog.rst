@@ -12,6 +12,11 @@ Command line
 
 * `bonobo download /examples/datasets/coffeeshops.txt` now downloads the coffeeshops example
 
+Graphs and Nodes
+................
+
+* New `LdjsonReader` and `LdjsonWriter` nodes for handling `line-delimited JSON <https://en.wikipedia.org/wiki/JSON_Streaming>`_.
+
 v.0.5.0 - 5 october 2017
 ::::::::::::::::::::::::
 

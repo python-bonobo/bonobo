@@ -45,3 +45,21 @@ class JsonWriter(FileWriter, JsonHandler):
         self._write_line(file, (self.eol if lineno.value else '') + json.dumps(row))
         lineno += 1
         return NOT_MODIFIED
+
+
+class LdjsonReader(FileReader):
+    """Read a stream of JSON objects, one object per line."""
+    loader = staticmethod(json.loads)
+
+    def read(self, fs, file):
+        for line in file:
+            print(line)
+            yield self.loader(line)
+
+
+class LdjsonWriter(FileWriter):
+    """Write a stream of JSON objects, one object per line."""
+    def write(self, fs, file, lineno, **row):
+        lineno += 1  # class-level variable
+        file.write(json.dumps(row) + '\n')
+        return NOT_MODIFIED
