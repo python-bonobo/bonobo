@@ -105,6 +105,9 @@ To do this, it needs to know what data-flow you want to achieve, and you'll use 
     The `if __name__ == '__main__':` section is not required, unless you want to run it directly using the python
     interpreter.
 
+    The name of the `graph` variable is arbitrary, but this variable must be global and available unconditionally.
+    Do not put it in its own function or in the `if __name__ == '__main__':` section.
+
 
 Execute the job
 :::::::::::::::
