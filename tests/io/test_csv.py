@@ -44,18 +44,18 @@ def test_read_csv_from_file_kwargs(tmpdir):
         CsvReader(path=filename, delimiter=','),
         services=services,
     ) as context:
-        context.write(BEGIN, Bag(), END)
-        context.step()
-        output = context.get_buffer()
+        context.write_sync(())
 
-    assert len(output) == 2
-    assert output[0] == {
-        'a': 'a foo',
-        'b': 'b foo',
-        'c': 'c foo',
-    }
-    assert output[1] == {
-        'a': 'a bar',
-        'b': 'b bar',
-        'c': 'c bar',
-    }
+    assert context.get_buffer() == [
+        {
+            'a': 'a foo',
+            'b': 'b foo',
+            'c': 'c foo',
+        },
+        {
+            'a': 'a bar',
+            'b': 'b bar',
+            'c': 'c bar',
+        }
+    ]
+
