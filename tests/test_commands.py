@@ -12,7 +12,6 @@ from cookiecutter.exceptions import OutputDirExistsException
 
 from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint
-from bonobo.commands.run import DEFAULT_GRAPH_FILENAMES
 from bonobo.commands.download import EXAMPLES_BASE_URL
 
 
@@ -70,36 +69,6 @@ def test_no_command(runner):
     _, err, exc = runner(catch_errors=True)
     assert type(exc) == SystemExit
     assert 'error: the following arguments are required: command' in err
-
-
-@all_runners
-def test_init(runner, tmpdir):
-    name = 'project'
-    tmpdir.chdir()
-    runner('init', name)
-    assert os.path.isdir(name)
-    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
-
-@single_runner
-def test_init_in_empty_then_nonempty_directory(runner, tmpdir):
-    name = 'project'
-    tmpdir.chdir()
-    os.mkdir(name)
-
-    # run in empty dir
-    runner('init', name)
-    assert set(os.listdir(name)) & set(DEFAULT_GRAPH_FILENAMES)
-
-    # run in non empty dir
-    with pytest.raises(OutputDirExistsException):
-        runner('init', name)
-
-
-@single_runner
-def test_init_within_empty_directory(runner, tmpdir):
-    tmpdir.chdir()
-    runner('init', '.')
-    assert set(os.listdir()) & set(DEFAULT_GRAPH_FILENAMES)
 
 
 @all_runners

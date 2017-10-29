@@ -6,13 +6,13 @@ from bonobo.commands import BaseCommand
 
 
 class InitCommand(BaseCommand):
-    TEMPLATES = {'job'}
+    TEMPLATES = {'default'}
     TEMPLATES_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
     def add_arguments(self, parser):
-        parser.add_argument('template', choices=self.TEMPLATES)
         parser.add_argument('filename')
         parser.add_argument('--force', '-f', default=False, action='store_true')
+        parser.add_argument('--template', '-t', choices=self.TEMPLATES, default='default')
 
     def handle(self, *, template, filename, force=False):
         template_name = template

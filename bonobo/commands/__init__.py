@@ -3,10 +3,10 @@ import codecs
 import os
 import os.path
 import runpy
+import sys
 from contextlib import contextmanager
-from functools import partial
 
-from bonobo import settings, logging
+from bonobo import settings, logging, get_argument_parser, patch_environ
 from bonobo.constants import DEFAULT_SERVICES_FILENAME, DEFAULT_SERVICES_ATTR
 from bonobo.util import get_name
 
@@ -44,11 +44,8 @@ class BaseGraphCommand(BaseCommand):
         source_group.add_argument('file', nargs='?', type=str)
         source_group.add_argument('-m', dest='mod', type=str)
 
-        # arguments to enforce system environment.
-        parser.add_argument('--default-env-file', action='append')
-        parser.add_argument('--default-env', action='append')
-        parser.add_argument('--env-file', action='append')
-        parser.add_argument('--env', '-e', action='append')
+        # add arguments to enforce system environment.
+        parser = get_argument_parser(parser)
 
         return parser
 
@@ -58,33 +55,29 @@ class BaseGraphCommand(BaseCommand):
     def _run_module(self, mod):
         return runpy.run_module(mod, run_name='__main__')
 
-    def read(self, *, file, mod, **options):
-
-        """
-
-        get_default_services(
-            filename, context.get(DEFAULT_SERVICES_ATTR)() if DEFAULT_SERVICES_ATTR in context else None
-        )
-        
-        """
-
+    def read(self, *, file, mod, args=None, **options):
         _graph, _options = None, None
 
         def _record(graph, **options):
             nonlocal _graph, _options
             _graph, _options = graph, options
 
-        with _override_runner(_record), _override_environment():
-            if file:
-                self._run_path(file)
-            elif mod:
-                self._run_module(mod)
-            else:
-                raise RuntimeError('No target provided.')
+        with _override_runner(_record), patch_environ(options):
+            _argv = sys.argv
+            try:
+                if file:
+                    sys.argv = [file] + list(args) if args else [file]
+                    self._run_path(file)
+                elif mod:
+                    sys.argv = [mod, *(args or ())]
+                    self._run_module(mod)
+                else:
+                    raise RuntimeError('No target provided.')
+            finally:
+                sys.argv = _argv
 
         if _graph is None:
             raise RuntimeError('Could not find graph.')
-
 
         return _graph, _options
 
@@ -120,45 +113,41 @@ def entrypoint(args=None):
     mgr = ExtensionManager(namespace='bonobo.commands')
     mgr.map(register_extension)
 
-    args = parser.parse_args(args).__dict__
-    if args.pop('debug', False):
+    parsed_args, remaining = parser.parse_known_args(args)
+    parsed_args = parsed_args.__dict__
+
+    if parsed_args.pop('debug', False):
         settings.DEBUG.set(True)
         settings.LOGGING_LEVEL.set(logging.DEBUG)
         logging.set_level(settings.LOGGING_LEVEL.get())
 
-    logger.debug('Command: ' + args['command'] + ' Arguments: ' + repr(args))
-    commands[args.pop('command')](**args)
+    logger.debug('Command: ' + parsed_args['command'] + ' Arguments: ' + repr(parsed_args))
+
+    # Get command handler
+    command = commands[parsed_args.pop('command')]
+
+    if len(remaining):
+        command(_remaining_args=remaining, **parsed_args)
+    else:
+        command(**parsed_args)
 
 
 @contextmanager
 def _override_runner(runner):
     import bonobo
-    _runner_backup = bonobo.run
+    _get_argument_parser = bonobo.get_argument_parser
+    _run = bonobo.run
     try:
+        def get_argument_parser(parser=None):
+            return parser or argparse.ArgumentParser()
+
+        bonobo.get_argument_parser = get_argument_parser
         bonobo.run = runner
+
         yield runner
     finally:
-        bonobo.run = _runner_backup
-
-
-@contextmanager
-def _override_environment(root_dir=None, **options):
-    yield
-    return
-    if default_env_file:
-        for f in default_env_file:
-            env_file_path = str(env_dir.joinpath(f))
-            load_dotenv(env_file_path)
-    if default_env:
-        for e in default_env:
-            set_env_var(e)
-    if env_file:
-        for f in env_file:
-            env_file_path = str(env_dir.joinpath(f))
-            load_dotenv(env_file_path, override=True)
-    if env:
-        for e in env:
-            set_env_var(e, override=True)
+        bonobo.get_argument_parser = _get_argument_parser
+        bonobo.run = _run
 
 
 def get_default_services(filename, services=None):

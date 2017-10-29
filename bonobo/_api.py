@@ -1,3 +1,7 @@
+import argparse
+from contextlib import contextmanager
+
+import os
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.nodes import LdjsonReader, LdjsonWriter
@@ -19,7 +23,60 @@ def register_api_group(*args):
 
 
 @register_api
-def run(graph, *, plugins=None, services=None, **options):
+def get_argument_parser(parser=None):
+    if parser is None:
+        import argparse
+        parser = argparse.ArgumentParser()
+
+    parser.add_argument('--default-env-file', action='append')
+    parser.add_argument('--default-env', action='append')
+    parser.add_argument('--env-file', action='append')
+    parser.add_argument('--env', '-e', action='append')
+
+    return parser
+
+
+@register_api
+@contextmanager
+def parse_args(parser, *, args=None, namespace=None):
+    options = parser.parse_args(args=args, namespace=namespace)
+
+    with patch_environ(options) as options:
+        yield options
+
+
+@register_api
+@contextmanager
+def patch_environ(options):
+    from dotenv import load_dotenv
+    from bonobo.commands import set_env_var
+
+    options = options if isinstance(options, dict) else options.__dict__
+
+    default_env_file = options.pop('default_env_file', [])
+    default_env = options.pop('default_env', [])
+    env_file = options.pop('env_file', [])
+    env = options.pop('env', [])
+
+    if default_env_file:
+        for f in default_env_file:
+            load_dotenv(os.path.join(os.getcwd(), f))
+    if default_env:
+        for e in default_env:
+            set_env_var(e)
+    if env_file:
+        for f in env_file:
+            load_dotenv(os.path.join(os.getcwd(), f), override=True)
+    if env:
+        for e in env:
+            set_env_var(e, override=True)
+
+    yield options
+    ## TODO XXX put it back !!!
+
+
+@register_api
+def run(graph, *, plugins=None, services=None, strategy=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
 
@@ -39,7 +96,7 @@ def run(graph, *, plugins=None, services=None, **options):
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    strategy = create_strategy(options.pop('strategy', None))
+    strategy = create_strategy(strategy)
 
     plugins = plugins or []
 

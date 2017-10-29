@@ -32,14 +32,14 @@ class RunCommand(BaseGraphCommand):
 
         return super()._run_module(mod)
 
-    def handle(self, *args, quiet=False, verbose=False, install=False, **options):
+    def handle(self, quiet=False, verbose=False, install=False, _remaining_args=None, **options):
         from bonobo import settings
 
         settings.QUIET.set_if_true(quiet)
         settings.DEBUG.set_if_true(verbose)
         self.install = install
 
-        graph, params = self.read(**options)
+        graph, params = self.read(args=_remaining_args, **options)
 
         params['plugins'] = set(params.pop('plugins', ())).union(set(options.pop('plugins', ())))
 

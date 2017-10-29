@@ -54,12 +54,15 @@ python.add_requirements(
         'pytest-timeout >=1,<2',
     ],
     docker=[
-        'bonobo-docker',
+        'bonobo-docker >=0.5.0',
     ],
     jupyter=[
         'jupyter >=1.0,<1.1',
         'ipywidgets >=6.0.0,<7',
-    ]
+    ],
+    sqlalchemy=[
+        'bonobo-sqlalchemy >=0.5.1',
+    ],
 )
 
 # vim: ft=python:
