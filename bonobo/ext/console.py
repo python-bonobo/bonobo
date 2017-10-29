@@ -50,13 +50,15 @@ class ConsoleOutputPlugin(Plugin):
 
     """
 
-    def initialize(self):
+    def __init__(self, context):
+        super(ConsoleOutputPlugin, self).__init__(context)
         self.prefix = ''
         self.counter = 0
         self._append_cache = ''
         self.isatty = sys.stdout.isatty()
         self.iswindows = (sys.platform == 'win32')
 
+    def initialize(self):
         self._stdout = sys.stdout
         self.stdout = IOBuffer()
         self.redirect_stdout = redirect_stdout(self._stdout if self.iswindows else self.stdout)
