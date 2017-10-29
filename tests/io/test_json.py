@@ -20,10 +20,10 @@ def test_write_json_ioformat_arg0(tmpdir):
 
 
 @pytest.mark.parametrize('add_kwargs', (
-    {},
-    {
-        'ioformat': settings.IOFORMAT_KWARGS,
-    },
+        {},
+        {
+            'ioformat': settings.IOFORMAT_KWARGS,
+        },
 ))
 def test_write_json_kwargs(tmpdir, add_kwargs):
     fs, filename, services = json_tester.get_services_for_writer(tmpdir)
@@ -55,8 +55,10 @@ def test_write_stream_json(tmpdir):
 
     with BufferingNodeExecutionContext(LdjsonWriter(filename),
                                        services=services) as context:
-        context.write_sync({'foo': 'bar'})
-        context.write_sync({'baz': 'boz'})
+        context.write_sync(
+            {'foo': 'bar'},
+            {'baz': 'boz'},
+        )
 
     expected = '''{"foo": "bar"}\n{"baz": "boz"}\n'''
     with fs.open(filename) as fin:
