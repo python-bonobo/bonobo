@@ -14,7 +14,7 @@ Extracts a list of parisian bars where you can buy a coffee for a reasonable pri
 """
 
 import bonobo
-from bonobo.commands.run import get_default_services
+from bonobo.commands import get_default_services
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 filename = 'coffeeshops.txt'

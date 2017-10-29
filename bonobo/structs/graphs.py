@@ -1,6 +1,8 @@
+import json
 from copy import copy
 
 from bonobo.constants import BEGIN
+from bonobo.util import get_name
 
 
 class Graph:
@@ -110,6 +112,24 @@ class Graph:
             self._topologcally_sorted_indexes_cache = tuple(filter(lambda i: type(i) is int, reversed(order)))
             return self._topologcally_sorted_indexes_cache
 
+    def _repr_dot_(self):
+        src = [
+            'digraph {',
+            '  rankdir = LR;',
+            '  "BEGIN" [shape="point"];',
+        ]
+
+        for i in self.outputs_of(BEGIN):
+            src.append('  "BEGIN" -> ' + _get_graphviz_node_id(self, i) + ';')
+
+        for ix in self.topologically_sorted_indexes:
+            for iy in self.outputs_of(ix):
+                src.append('  {} -> {};'.format(_get_graphviz_node_id(self, ix), _get_graphviz_node_id(self, iy)))
+
+        src.append('}')
+
+        return '\n'.join(src)
+
     def _resolve_index(self, mixed):
         """ Find the index based on various strategies for a node, probably an input or output of chain. Supported inputs are indexes, node values or names.
         """
@@ -126,3 +146,9 @@ class Graph:
             return self.nodes.index(mixed)
 
         raise ValueError('Cannot find node matching {!r}.'.format(mixed))
+
+
+def _get_graphviz_node_id(graph, i):
+    escaped_index = str(i)
+    escaped_name = json.dumps(get_name(graph[i]))
+    return '{{{} [label={}]}}'.format(escaped_index, escaped_name)

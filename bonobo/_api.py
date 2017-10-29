@@ -1,5 +1,3 @@
-import logging
-
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.nodes import LdjsonReader, LdjsonWriter
@@ -21,7 +19,7 @@ def register_api_group(*args):
 
 
 @register_api
-def run(graph, strategy=None, plugins=None, services=None):
+def run(graph, *, plugins=None, services=None, **options):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
 
@@ -41,7 +39,7 @@ def run(graph, strategy=None, plugins=None, services=None):
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    strategy = create_strategy(strategy)
+    strategy = create_strategy(options.pop('strategy', None))
 
     plugins = plugins or []
 
@@ -58,6 +56,7 @@ def run(graph, strategy=None, plugins=None, services=None):
             try:
                 from bonobo.ext.jupyter import JupyterOutputPlugin
             except ImportError:
+                import logging
                 logging.warning(
                     'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
                     'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '

@@ -28,7 +28,7 @@ messages categorized as spam, and (3) prints the output.
 '''
 
 import bonobo
-from bonobo.commands.run import get_default_services
+from bonobo.commands import get_default_services
 from fs.tarfs import TarFS
 
 

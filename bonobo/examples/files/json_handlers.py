@@ -1,6 +1,6 @@
 import bonobo
 from bonobo import Bag
-from bonobo.commands.run import get_default_services
+from bonobo.commands import get_default_services
 
 
 def get_fields(**row):

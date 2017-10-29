@@ -29,24 +29,25 @@ python.setup(
             'bonobo = bonobo.commands:entrypoint',
         ],
         'bonobo.commands': [
-            'convert = bonobo.commands.convert:register',
-            'init = bonobo.commands.init:register',
-            'inspect = bonobo.commands.inspect:register',
-            'run = bonobo.commands.run:register',
-            'version = bonobo.commands.version:register',
-            'download = bonobo.commands.download:register',
+            'convert = bonobo.commands.convert:ConvertCommand',
+            'init = bonobo.commands.init:InitCommand',
+            'inspect = bonobo.commands.inspect:InspectCommand',
+            'run = bonobo.commands.run:RunCommand',
+            'version = bonobo.commands.version:VersionCommand',
+            'download = bonobo.commands.download:DownloadCommand',
         ],
     }
 )
 
 python.add_requirements(
-    'colorama >=0.3,<1.0',
-    'fs >=2.0,<3.0',
+    'colorama >=0.3,<0.4',
+    'fs >=2.0,<2.1',
+    'jinja2 >=2.9,<2.10',
     'packaging >=16,<17',
-    'psutil >=5.2,<6.0',
+    'psutil >=5.4,<6.0',
+    'python-dotenv >=0.7,<0.8',
     'requests >=2.0,<3.0',
-    'stevedore >=1.21,<2.0',
-    'python-dotenv >=0.7.1,<1.0',
+    'stevedore >=1.27,<1.28',
     dev=[
         'cookiecutter >=1.5,<1.6',
         'pytest-sugar >=0.8,<0.9',
