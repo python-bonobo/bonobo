@@ -54,7 +54,7 @@ class ConsoleOutputPlugin(Plugin):
         super(ConsoleOutputPlugin, self).__init__(context)
         self._reset()
 
-    def _reset()
+    def _reset():
         self.prefix = ''
         self.counter = 0
         self._append_cache = ''
