@@ -9,7 +9,7 @@ from bonobo.execution.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.structs.tokens import Token
-from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag
+from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag, istuple
 from bonobo.util.compat import deprecated_alias
 from bonobo.util.statistics import WithStatistics
 
@@ -137,12 +137,47 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             pass
 
 
-def _resolve(input_bag, output):
-    # NotModified means to send the input unmodified to output.
-    if output is NOT_MODIFIED:
-        return input_bag
+def isflag(param):
+    return isinstance(param, Token) and param in (NOT_MODIFIED,)
 
+
+def split_tokens(output):
+    """
+    Split an output into token tuple, real output tuple.
+
+    :param output:
+    :return: tuple, tuple
+    """
+    if isinstance(output, Token):
+        # just a flag
+        return (output,), ()
+
+    if not istuple(output):
+        # no flag
+        return (), (output,)
+
+    i = 0
+    while isflag(output[i]):
+        i += 1
+
+    return output[:i], output[i:]
+
+
+def _resolve(input_bag, output):
+    """
+    This function is key to how bonobo works (and internal, too). It transforms a pair of input/output into what is the
+    real output.
+
+    :param input_bag: Bag
+    :param output: mixed
+    :return: Bag
+    """
     if isbag(output):
         return output
 
-    return Bag(output)
+    tokens, output = split_tokens(output)
+
+    if len(tokens) == 1 and tokens[0] is NOT_MODIFIED:
+        return input_bag
+
+    return output if isbag(output) else Bag(output)

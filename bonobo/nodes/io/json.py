@@ -53,7 +53,6 @@ class LdjsonReader(FileReader):
 
     def read(self, fs, file):
         for line in file:
-            print(line)
             yield self.loader(line)
 
 
