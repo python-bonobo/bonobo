@@ -150,25 +150,6 @@ def _override_runner(runner):
         bonobo.run = _run
 
 
-def get_default_services(filename, services=None):
-    dirname = os.path.dirname(filename)
-    services_filename = os.path.join(dirname, DEFAULT_SERVICES_FILENAME)
-    if os.path.exists(services_filename):
-        with open(services_filename) as file:
-            code = compile(file.read(), services_filename, 'exec')
-        context = {
-            '__name__': '__services__',
-            '__file__': services_filename,
-        }
-        exec(code, context)
-
-        return {
-            **context[DEFAULT_SERVICES_ATTR](),
-            **(services or {}),
-        }
-    return services or {}
-
-
 def set_env_var(e, override=False):
     __escape_decoder = codecs.getdecoder('unicode_escape')
     ename, evalue = e.split('=', 1)
