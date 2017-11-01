@@ -1,11 +1,11 @@
 import argparse
 import traceback
+import logging
+import mondrian
 
-from bonobo import settings, logging
+from bonobo import settings
 from bonobo.commands.base import BaseCommand, BaseGraphCommand
 from bonobo.util.errors import print_error
-
-logger = logging.get_logger()
 
 
 def entrypoint(args=None):
@@ -15,6 +15,8 @@ def entrypoint(args=None):
     Will load commands from "bonobo.commands" entrypoints, using stevedore.
 
     """
+
+    logger = mondrian.getLogger()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', '-D', action='store_true')
@@ -48,7 +50,7 @@ def entrypoint(args=None):
     if parsed_args.pop('debug', False):
         settings.DEBUG.set(True)
         settings.LOGGING_LEVEL.set(logging.DEBUG)
-        logging.set_level(settings.LOGGING_LEVEL.get())
+        logger.setLevel(settings.LOGGING_LEVEL.get())
 
     logger.debug('Command: ' + parsed_args['command'] + ' Arguments: ' + repr(parsed_args))
 

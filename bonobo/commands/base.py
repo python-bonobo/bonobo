@@ -1,12 +1,12 @@
 import argparse
+import logging
 import runpy
 import sys
 from contextlib import contextmanager
 
 import bonobo.util.environ
-from bonobo import logging
-from bonobo.util.environ import get_argument_parser, parse_args
 from bonobo.util import get_name
+from bonobo.util.environ import get_argument_parser, parse_args
 
 
 class BaseCommand:
@@ -20,7 +20,7 @@ class BaseCommand:
         try:
             return self._logger
         except AttributeError:
-            self._logger = logging.get_logger(get_name(self))
+            self._logger = logging.getLogger(get_name(self))
             return self._logger
 
     def add_arguments(self, parser):
