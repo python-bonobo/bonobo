@@ -3,6 +3,8 @@ from queue import Empty
 from time import sleep
 from types import GeneratorType
 
+import sys
+
 from bonobo.constants import NOT_MODIFIED, BEGIN, END
 from bonobo.errors import InactiveReadableError, UnrecoverableError
 from bonobo.execution.base import LoopingExecutionContext
@@ -101,11 +103,11 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
                 sleep(self.PERIOD)
                 continue
             except UnrecoverableError as exc:
-                self.handle_error(exc, traceback.format_exc())
+                self.handle_error(*sys.exc_info())
                 self.input.shutdown()
                 break
             except Exception as exc:  # pylint: disable=broad-except
-                self.handle_error(exc, traceback.format_exc())
+                self.handle_error(*sys.exc_info())
 
     def step(self):
         # Pull data from the first available input channel.

@@ -1,12 +1,17 @@
-import traceback
+import logging
 from contextlib import contextmanager
+from logging import WARNING, ERROR
 from time import sleep
+
+import sys
+
+import mondrian
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
 from bonobo.util import isconfigurabletype
-from bonobo.util.errors import print_error
 from bonobo.util.objects import Wrapper, get_name
+from bonobo.execution import logger
 
 
 @contextmanager
@@ -14,7 +19,7 @@ def recoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(exc, traceback.format_exc())
+        error_handler(*sys.exc_info(), level=ERROR)
 
 
 @contextmanager
@@ -22,7 +27,7 @@ def unrecoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(exc, traceback.format_exc())
+        error_handler(*sys.exc_info(), level=ERROR)
         raise  # raise unrecoverableerror from x ?
 
 
@@ -101,8 +106,10 @@ class LoopingExecutionContext(Wrapper):
         finally:
             self._stopped = True
 
-    def handle_error(self, exc, trace):
-        return print_error(exc, trace, context=self.wrapped)
+    def handle_error(self, exctype, exc, tb):
+        mondrian.excepthook(
+            exctype, exc, tb, level=WARNING, context='{} in {}'.format(exctype.__name__, get_name(self)), logger=logger
+        )
 
     def _get_initial_context(self):
         if self.parent:

@@ -40,7 +40,6 @@ def run(graph, *, plugins=None, services=None, strategy=None):
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    strategy = create_strategy(strategy)
 
     plugins = plugins or []
 
@@ -49,6 +48,10 @@ def run(graph, *, plugins=None, services=None, strategy=None):
 
     if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
+            import mondrian
+            mondrian.setup()
+            mondrian.setupExceptHook()
+
             from bonobo.ext.console import ConsoleOutputPlugin
             if ConsoleOutputPlugin not in plugins:
                 plugins.append(ConsoleOutputPlugin)
@@ -67,7 +70,7 @@ def run(graph, *, plugins=None, services=None, strategy=None):
                 if JupyterOutputPlugin not in plugins:
                     plugins.append(JupyterOutputPlugin)
 
-    return strategy.execute(graph, plugins=plugins, services=services)
+    return create_strategy(strategy).execute(graph, plugins=plugins, services=services)
 
 
 def _inspect_as_graph(graph):

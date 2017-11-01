@@ -164,7 +164,7 @@ def test_download_works_for_examples(runner):
 @all_runners
 def test_download_fails_non_example(runner):
     with pytest.raises(ValueError):
-        runner('download', '/something/entirely/different.txt')
+        runner('download', 'something/entirely/different.txt')
 
 
 @pytest.fixture

@@ -1,11 +1,9 @@
 import argparse
-import traceback
 import logging
-import mondrian
 
+import mondrian
 from bonobo import settings
 from bonobo.commands.base import BaseCommand, BaseGraphCommand
-from bonobo.util.errors import print_error
 
 
 def entrypoint(args=None):
@@ -16,7 +14,10 @@ def entrypoint(args=None):
 
     """
 
-    logger = mondrian.getLogger()
+    mondrian.setup()
+    mondrian.setupExceptHook()
+
+    logger = logging.getLogger()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', '-D', action='store_true')
@@ -56,9 +57,6 @@ def entrypoint(args=None):
 
     # Get command handler, execute, rince.
     command = commands[parsed_args.pop('command')]
+    command(**parsed_args)
 
-    try:
-        command(**parsed_args)
-    except Exception as exc:
-        print_error(exc, traceback.format_exc())
-        return 255
+    return 0

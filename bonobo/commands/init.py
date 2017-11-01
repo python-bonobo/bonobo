@@ -13,7 +13,7 @@ class InitCommand(BaseCommand):
         parser.add_argument('filename')
         parser.add_argument('--force', '-f', default=False, action='store_true')
 
-        target_group = parser.add_mutually_exclusive_group(required=True)
+        target_group = parser.add_mutually_exclusive_group(required=False)
         target_group.add_argument('--template', '-t', choices=self.TEMPLATES, default='default')
         target_group.add_argument('--package', '-p', action='store_true', default=False)
 
@@ -41,11 +41,13 @@ class InitCommand(BaseCommand):
             import medikit.commands
         except ImportError as exc:
             raise ImportError(
-                'To initialize a package, you need to install medikit (pip install --upgrade medikit).') from exc
+                'To initialize a package, you need to install medikit (pip install --upgrade medikit).'
+            ) from exc
 
         package_name = os.path.basename(filename)
-        medikit.commands.handle_init(os.path.join(os.getcwd(), filename, 'Projectfile'), name=package_name,
-                                     requirements=['bonobo'])
+        medikit.commands.handle_init(
+            os.path.join(os.getcwd(), filename, 'Projectfile'), name=package_name, requirements=['bonobo']
+        )
 
         self.logger.info('Generated "{}" package with medikit.'.format(package_name))
         self.create_file_from_template(template='default', filename=os.path.join(filename, package_name, '__main__.py'))

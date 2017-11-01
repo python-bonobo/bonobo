@@ -12,7 +12,6 @@ EXAMPLES_BASE_URL = 'https://raw.githubusercontent.com/python-bonobo/bonobo/mast
 
 class DownloadCommand(BaseCommand):
     def handle(self, *, path, **options):
-        path = path.lstrip('/')
         if not path.startswith('examples'):
             raise ValueError('Download command currently supports examples only')
         examples_path = re.sub('^examples/', '', path)
