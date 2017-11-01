@@ -16,16 +16,6 @@ Syntax: `bonobo convert [-r reader] input_filename [-w writer] output_filename`
     to read from csv and write to csv too (or other format) but adding a geocoder filter that would add some fields.
 
 
-Bonobo Init
-:::::::::::
-
-Create an empty project, ready to use bonobo.
-
-Syntax: `bonobo init`
-
-Requires `cookiecutter`.
-
-
 Bonobo Inspect
 ::::::::::::::
 

@@ -4,8 +4,6 @@ Jupyter Extension
 There is a builtin plugin that integrates (somewhat minimallistically, for now) bonobo within jupyter notebooks, so
 you can read the execution status of a graph within a nice (ok, not so nice) html/javascript widget.
 
-See https://github.com/jupyter-widgets/widget-cookiecutter for the base template used.
-
 Installation
 ::::::::::::
 

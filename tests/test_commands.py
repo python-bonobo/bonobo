@@ -4,11 +4,10 @@ import os
 import runpy
 import sys
 from contextlib import redirect_stdout, redirect_stderr
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 import pkg_resources
 import pytest
-from cookiecutter.exceptions import OutputDirExistsException
 
 from bonobo import __main__, __version__, get_examples_path
 from bonobo.commands import entrypoint

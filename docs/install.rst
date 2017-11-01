@@ -5,16 +5,18 @@ Installation
 Create an ETL project
 :::::::::::::::::::::
 
-Creating a project and starting to write code should take less than a minute:
+Let's create a job.
 
 .. code-block:: shell-session
 
-    $ pip install --upgrade bonobo cookiecutter
-    $ bonobo init my-etl-project
-    $ bonobo run my-etl-project
+    $ pip install --upgrade bonobo
+    $ bonobo create my-etl.py
+    $ python my-etl.py
 
-Once you bootstrapped a project, you can start editing the default example transformation by editing
-`my-etl-project/main.py`. Now, you can head to :doc:`tutorial/index`.
+This job only uses one python file, and you can run it using the python interpreter. For bigger jobs or jobs that
+relates to multiple files, you should create a python package.
+
+Now, you can head to :doc:`tutorial/index`.
 
 
 Other installation options

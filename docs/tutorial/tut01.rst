@@ -1,8 +1,7 @@
 Let's get started!
 ==================
 
-To begin with Bonobo, you need to install it in a working python 3.5+ environment, and you'll also need cookiecutter
-to bootstrap your project.
+To get started with Bonobo, you need to install it in a working python 3.5+ environment:
 
 .. code-block:: shell-session
 
@@ -14,21 +13,24 @@ See :doc:`/install` for more options.
 Create an empty project
 :::::::::::::::::::::::
 
-Your ETL code will live in ETL projects, which are basically a bunch of files, including python code, that bonobo
-can run.
+Your ETL code will live in standard python files and packages.
 
 .. code-block:: shell-session
 
-    $ bonobo init tutorial
+    $ bonobo create tutorial.py
 
-This will create a `tutorial` directory (`content description here <https://www.bonobo-project.org/with/cookiecutter>`_).
+This will create a simple example job in a `tutorial.py` file.
 
-To run this project, use:
+Now, try to execute it:
 
 .. code-block:: shell-session
 
-    $ bonobo run tutorial
+    $ python tutorial.py
 
+Congratulations, you just ran your first ETL job!
+
+
+.. todo:: XXX **CHANGES NEEDED BELOW THIS POINTS BEFORE 0.6** XXX
 
 Write a first transformation
 ::::::::::::::::::::::::::::
@@ -131,9 +133,9 @@ Rewrite it using builtins
 There is a much simpler way to describe an equivalent graph:
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut01e02.py
-    :language: python
+:language: python
 
-The `extract()` generator has been replaced by a list, as Bonobo will interpret non-callable iterables as a no-input
+    The `extract()` generator has been replaced by a list, as Bonobo will interpret non-callable iterables as a no-input
 generator.
 
 This example is also available in :mod:`bonobo.examples.tutorials.tut01e02`, and you can also run it as a module:
