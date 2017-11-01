@@ -1,7 +1,9 @@
 import argparse
+import traceback
 
 from bonobo import settings, logging
 from bonobo.commands.base import BaseCommand, BaseGraphCommand
+from bonobo.util.errors import print_error
 
 logger = logging.get_logger()
 
@@ -52,4 +54,9 @@ def entrypoint(args=None):
 
     # Get command handler, execute, rince.
     command = commands[parsed_args.pop('command')]
-    command(**parsed_args)
+
+    try:
+        command(**parsed_args)
+    except Exception as exc:
+        print_error(exc, traceback.format_exc())
+        return 255
