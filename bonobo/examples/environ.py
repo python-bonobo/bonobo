@@ -23,6 +23,5 @@ def get_graph():
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
     parser = bonobo.get_argument_parser()
-    parser.add_argument('-v', action='append', dest='vars')
     with bonobo.parse_args(parser):
         bonobo.run(get_graph())
