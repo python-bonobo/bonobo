@@ -119,6 +119,16 @@ def test_version(runner):
     assert out.startswith('bonobo ')
     assert __version__ in out
 
+    out, err = runner('version', '-q')
+    out = out.strip()
+    assert out.startswith('bonobo ')
+    assert __version__ in out
+
+    out, err = runner('version', '-qq')
+    out = out.strip()
+    assert not out.startswith('bonobo ')
+    assert __version__ in out
+
 
 @all_runners
 def test_download_works_for_examples(runner):
