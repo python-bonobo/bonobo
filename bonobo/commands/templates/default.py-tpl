@@ -1,5 +1,6 @@
 import bonobo
 
+
 def extract():
     """Placeholder, change, rename, remove... """
     yield 'hello'
@@ -46,5 +47,6 @@ def get_services():
 
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
-    # Although you're not required to use it, bonobo's graph related commands will hook to this call (inspect, run, ...).
-    bonobo.run(get_graph(), services=get_services())
+    parser = bonobo.get_argument_parser()
+    with bonobo.parse_args(parser):
+        bonobo.run(get_graph(), services=get_services())
