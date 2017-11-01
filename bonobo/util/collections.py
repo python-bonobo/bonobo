@@ -22,9 +22,9 @@ def ensure_tuple(tuple_or_mixed):
 
 
 def tuplize(generator):
-    """ Takes a generator and make it a tuple-returning function. As a side
-    effect, it can also decorate any iterator-returning function to force
-    return value to be a tuple.
+    """
+    Decorates a generator and make it a tuple-returning function. As a side effect, it can also decorate any
+    iterator-returning function to force return value to be a tuple.
 
     >>> tuplized_lambda = tuplize(lambda: [1, 2, 3])
     >>> tuplized_lambda()

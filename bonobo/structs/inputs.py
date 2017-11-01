@@ -15,7 +15,6 @@
 # limitations under the License.
 
 from abc import ABCMeta, abstractmethod
-
 from queue import Queue
 
 from bonobo.constants import BEGIN, END
