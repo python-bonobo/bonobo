@@ -138,7 +138,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
 
 
 def isflag(param):
-    return isinstance(param, Token) and param in (NOT_MODIFIED,)
+    return isinstance(param, Token) and param in (NOT_MODIFIED, )
 
 
 def split_tokens(output):
@@ -150,11 +150,11 @@ def split_tokens(output):
     """
     if isinstance(output, Token):
         # just a flag
-        return (output,), ()
+        return (output, ), ()
 
     if not istuple(output):
         # no flag
-        return (), (output,)
+        return (), (output, )
 
     i = 0
     while isflag(output[i]):

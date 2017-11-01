@@ -45,7 +45,6 @@ def runner_module(args):
 
 
 all_runners = pytest.mark.parametrize('runner', [runner_entrypoint, runner_module])
-single_runner = pytest.mark.parametrize('runner', [runner_module])
 
 
 def test_entrypoint():
@@ -158,238 +157,141 @@ def test_download_fails_non_example(runner):
         runner('download', '/something/entirely/different.txt')
 
 
-@all_runners
-class TestDefaultEnvFile(object):
-    def test_run_file_with_default_env_file(self, runner):
-        out, err = runner(
-            'run', '--quiet', '--default-env-file', '.env_one',
-            get_examples_path('environment/env_files/get_passed_env_file.py')
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] != 'marzo'
+@pytest.fixture
+def env1(tmpdir):
+    env_file = tmpdir.join('.env_one')
+    env_file.write('\n'.join((
+        'SECRET=unknown',
+        'PASSWORD=sweet',
+        'PATH=first',
+    )))
+    return str(env_file)
 
-    def test_run_file_with_multiple_default_env_files(self, runner):
-        out, err = runner(
-            'run', '--quiet', '--default-env-file', '.env_one', '--default-env-file', '.env_two',
-            get_examples_path('environment/env_files/get_passed_env_file.py')
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] != 'marzo'
 
-    def test_run_module_with_default_env_file(self, runner):
-        out, err = runner(
-            'run', '--quiet', '-m', 'bonobo.examples.environment.env_files.get_passed_env_file', '--default-env-file',
-            '.env_one'
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] != 'marzo'
+@pytest.fixture
+def env2(tmpdir):
+    env_file = tmpdir.join('.env_two')
+    env_file.write('\n'.join((
+        'PASSWORD=bitter',
+        "PATH='second'",
+    )))
+    return str(env_file)
 
-    def test_run_module_with_multiple_default_env_files(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
+
+all_environ_targets = pytest.mark.parametrize(
+    'target', [
+        (get_examples_path('environ.py'), ),
+        (
             '-m',
-            'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--default-env-file',
-            '.env_one',
-            '--default-env-file',
-            '.env_two',
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] != 'marzo'
+            'bonobo.examples.environ',
+        ),
+    ]
+)
 
 
 @all_runners
-class TestEnvFile(object):
-    def test_run_file_with_file(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file',
-            '.env_one',
+@all_environ_targets
+class EnvironmentTestCase():
+    def run_quiet(self, runner, *args):
+        return runner('run', '--quiet', *args)
+
+    def run_environ(self, runner, *args, environ=None):
+        _environ = {'PATH': '/usr/bin'}
+        if environ:
+            _environ.update(environ)
+
+        with patch.dict('os.environ', _environ, clear=True):
+            out, err = self.run_quiet(runner, *args)
+            assert 'SECRET' not in os.environ
+            assert 'PASSWORD' not in os.environ
+            if 'PATH' in _environ:
+                assert 'PATH' in os.environ
+                assert os.environ['PATH'] == _environ['PATH']
+
+        assert err == ''
+        return dict(map(lambda line: line.split(' ', 1), filter(None, out.split('\n'))))
+
+
+class TestDefaultEnvFile(EnvironmentTestCase):
+    def test_run_with_default_env_file(self, runner, target, env1):
+        env = self.run_environ(runner, *target, '--default-env-file', env1)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'sweet'
+        assert env.get('PATH') == '/usr/bin'
+
+    def test_run_with_multiple_default_env_files(self, runner, target, env1, env2):
+        env = self.run_environ(runner, *target, '--default-env-file', env1, '--default-env-file', env2)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'sweet'
+        assert env.get('PATH') == '/usr/bin'
+
+        env = self.run_environ(runner, *target, '--default-env-file', env2, '--default-env-file', env1)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'bitter'
+        assert env.get('PATH') == '/usr/bin'
+
+
+class TestEnvFile(EnvironmentTestCase):
+    def test_run_with_file(self, runner, target, env1):
+        env = self.run_environ(runner, *target, '--env-file', env1)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'sweet'
+        assert env.get('PATH') == 'first'
+
+    def test_run_with_multiple_files(self, runner, target, env1, env2):
+        env = self.run_environ(runner, *target, '--env-file', env1, '--env-file', env2)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'bitter'
+        assert env.get('PATH') == 'second'
+
+        env = self.run_environ(runner, *target, '--env-file', env2, '--env-file', env1)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'sweet'
+        assert env.get('PATH') == 'first'
+
+
+class TestEnvFileCombinations(EnvironmentTestCase):
+    def test_run_with_both_env_files(self, runner, target, env1, env2):
+        env = self.run_environ(runner, *target, '--default-env-file', env1, '--env-file', env2)
+        assert env.get('SECRET') == 'unknown'
+        assert env.get('PASSWORD') == 'bitter'
+        assert env.get('PATH') == 'second'
+
+    def test_run_with_both_env_files_then_overrides(self, runner, target, env1, env2):
+        env = self.run_environ(
+            runner, *target, '--default-env-file', env1, '--env-file', env2, '--env', 'PASSWORD=mine', '--env',
+            'SECRET=s3cr3t'
         )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] == 'marzo'
+        assert env.get('SECRET') == 's3cr3t'
+        assert env.get('PASSWORD') == 'mine'
+        assert env.get('PATH') == 'second'
 
-    def test_run_file_with_multiple_files(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--env-file',
-            '.env_one',
-            '--env-file',
-            '.env_two',
+
+class TestEnvVars(EnvironmentTestCase):
+    def test_run_no_env(self, runner, target):
+        env = self.run_environ(runner, *target, environ={'USER': 'romain'})
+        assert env.get('USER') == 'romain'
+
+    def test_run_env(self, runner, target):
+        env = self.run_environ(runner, *target, '--env', 'USER=serious', environ={'USER': 'romain'})
+        assert env.get('USER') == 'serious'
+
+    def test_run_env_mixed(self, runner, target):
+        env = self.run_environ(runner, *target, '--env', 'ONE=1', '--env', 'TWO="2"', environ={'USER': 'romain'})
+        assert env.get('USER') == 'romain'
+        assert env.get('ONE') == '1'
+        assert env.get('TWO') == '2'
+
+    def test_run_default_env(self, runner, target):
+        env = self.run_environ(runner, *target, '--default-env', 'USER=clown')
+        assert env.get('USER') == 'clown'
+
+        env = self.run_environ(runner, *target, '--default-env', 'USER=clown', environ={'USER': 'romain'})
+        assert env.get('USER') == 'romain'
+
+        env = self.run_environ(
+            runner, *target, '--env', 'USER=serious', '--default-env', 'USER=clown', environ={
+                'USER': 'romain'
+            }
         )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'not_sweet_password'
-        assert out[2] == 'abril'
-
-    def test_run_module_with_file(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            '-m',
-            'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file',
-            '.env_one',
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'sweetpassword'
-        assert out[2] == 'marzo'
-
-    def test_run_module_with_multiple_files(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            '-m',
-            'bonobo.examples.environment.env_files.get_passed_env_file',
-            '--env-file',
-            '.env_one',
-            '--env-file',
-            '.env_two',
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'not_sweet_password'
-        assert out[2] == 'abril'
-
-
-@all_runners
-class TestEnvFileCombinations:
-    def test_run_file_with_default_env_file_and_env_file(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--default-env-file',
-            '.env_one',
-            '--env-file',
-            '.env_two',
-        )
-        out = out.split('\n')
-        assert out[0] == '321'
-        assert out[1] == 'not_sweet_password'
-        assert out[2] == 'abril'
-
-    def test_run_file_with_default_env_file_and_env_file_and_env_vars(self, runner):
-        out, err = runner(
-            'run',
-            '--quiet',
-            get_examples_path('environment/env_files/get_passed_env_file.py'),
-            '--default-env-file',
-            '.env_one',
-            '--env-file',
-            '.env_two',
-            '--env',
-            'TEST_USER_PASSWORD=SWEETpassWORD',
-            '--env',
-            'MY_SECRET=444',
-        )
-        out = out.split('\n')
-        assert out[0] == '444'
-        assert out[1] == 'SWEETpassWORD'
-        assert out[2] == 'abril'
-
-
-@all_runners
-class TestDefaultEnvVars:
-    def test_run_file_with_default_env_var(self, runner):
-        out, err = runner(
-            'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'), '--default-env', 'USER=clowncity', '--env',
-            'USER=ted'
-        )
-        out = out.split('\n')
-        assert out[0] == 'user'
-        assert out[1] == 'number'
-        assert out[2] == 'string'
-        assert out[3] != 'clowncity'
-
-    def test_run_file_with_default_env_vars(self, runner):
-        out, err = runner(
-            'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
-            'ENV_TEST_USER=cwandrews', '--default-env', "ENV_TEST_STRING='my_test_string'"
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] == 'my_test_string'
-
-    def test_run_module_with_default_env_var(self, runner):
-        out, err = runner(
-            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
-            'ENV_TEST_NUMBER=123', '--default-env', 'ENV_TEST_STRING=string'
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] != 'string'
-
-    def test_run_module_with_default_env_vars(self, runner):
-        out, err = runner(
-            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
-            'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews', '--default-env', "ENV_TEST_STRING='string'"
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] != 'string'
-
-
-@all_runners
-class TestEnvVars:
-    def test_run_file_with_env_var(self, runner):
-        out, err = runner(
-            'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123'
-        )
-        out = out.split('\n')
-        assert out[0] != 'test_user'
-        assert out[1] == '123'
-        assert out[2] == 'my_test_string'
-
-    def test_run_file_with_env_vars(self, runner):
-        out, err = runner(
-            'run', '--quiet',
-            get_examples_path('environment/env_vars/get_passed_env.py'), '--env', 'ENV_TEST_NUMBER=123', '--env',
-            'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] == 'my_test_string'
-
-    def test_run_module_with_env_var(self, runner):
-        out, err = runner(
-            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
-            'ENV_TEST_NUMBER=123'
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] == 'my_test_string'
-
-    def test_run_module_with_env_vars(self, runner):
-        out, err = runner(
-            'run', '--quiet', '-m', 'bonobo.examples.environment.env_vars.get_passed_env', '--env',
-            'ENV_TEST_NUMBER=123', '--env', 'ENV_TEST_USER=cwandrews', '--env', "ENV_TEST_STRING='my_test_string'"
-        )
-        out = out.split('\n')
-        assert out[0] == 'cwandrews'
-        assert out[1] == '123'
-        assert out[2] == 'my_test_string'
+        assert env.get('USER') == 'serious'

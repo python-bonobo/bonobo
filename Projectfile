@@ -66,8 +66,6 @@ python.add_requirements(
 
 # Following requirements are not enforced, because some dependencies enforce them so we don't want to break
 # the packaging in case it changes in dep.
-python.add_requirements(
-    'colorama >=0.3',
-)
+python.add_requirements('colorama >=0.3', )
 
 # vim: ft=python:

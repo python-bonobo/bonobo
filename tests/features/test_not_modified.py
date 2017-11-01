@@ -9,8 +9,12 @@ def useless(*args, **kwargs):
 def test_not_modified():
     input_messages = [
         ('foo', 'bar'),
-        {'foo': 'bar'},
-        ('foo', {'bar': 'baz'}),
+        {
+            'foo': 'bar'
+        },
+        ('foo', {
+            'bar': 'baz'
+        }),
         (),
     ]
 
@@ -18,7 +22,3 @@ def test_not_modified():
         context.write_sync(*input_messages)
 
     assert context.get_buffer() == input_messages
-
-
-
-

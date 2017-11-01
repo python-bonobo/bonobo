@@ -1,13 +1,10 @@
-import argparse
-from contextlib import contextmanager
-
-import os
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.nodes import LdjsonReader, LdjsonWriter
 from bonobo.strategies import create_strategy
 from bonobo.structs import Bag, ErrorBag, Graph, Token
 from bonobo.util import get_name
+from bonobo.util.environ import parse_args, get_argument_parser
 
 __all__ = []
 
@@ -20,59 +17,6 @@ def register_api(x, __all__=__all__):
 def register_api_group(*args):
     for attr in args:
         register_api(attr)
-
-
-@register_api
-def get_argument_parser(parser=None):
-    if parser is None:
-        import argparse
-        parser = argparse.ArgumentParser()
-
-    parser.add_argument('--default-env-file', action='append')
-    parser.add_argument('--default-env', action='append')
-    parser.add_argument('--env-file', action='append')
-    parser.add_argument('--env', '-e', action='append')
-
-    return parser
-
-
-@register_api
-@contextmanager
-def parse_args(parser, *, args=None, namespace=None):
-    options = parser.parse_args(args=args, namespace=namespace)
-
-    with patch_environ(options) as options:
-        yield options
-
-
-@register_api
-@contextmanager
-def patch_environ(options):
-    from dotenv import load_dotenv
-    from bonobo.commands import set_env_var
-
-    options = options if isinstance(options, dict) else options.__dict__
-
-    default_env_file = options.pop('default_env_file', [])
-    default_env = options.pop('default_env', [])
-    env_file = options.pop('env_file', [])
-    env = options.pop('env', [])
-
-    if default_env_file:
-        for f in default_env_file:
-            load_dotenv(os.path.join(os.getcwd(), f))
-    if default_env:
-        for e in default_env:
-            set_env_var(e)
-    if env_file:
-        for f in env_file:
-            load_dotenv(os.path.join(os.getcwd(), f), override=True)
-    if env:
-        for e in env:
-            set_env_var(e, override=True)
-
-    yield options
-    ## TODO XXX put it back !!!
 
 
 @register_api
@@ -124,6 +68,24 @@ def run(graph, *, plugins=None, services=None, strategy=None):
                     plugins.append(JupyterOutputPlugin)
 
     return strategy.execute(graph, plugins=plugins, services=services)
+
+
+def _inspect_as_graph(graph):
+    return graph._repr_dot_()
+
+
+_inspect_formats = {'graph': _inspect_as_graph}
+
+
+@register_api
+def inspect(graph, *, format):
+    if not format in _inspect_formats:
+        raise NotImplementedError(
+            'Output format {} not implemented. Choices are: {}.'.format(
+                format, ', '.join(sorted(_inspect_formats.keys()))
+            )
+        )
+    print(_inspect_formats[format](graph))
 
 
 # bonobo.structs
@@ -205,3 +167,6 @@ def get_examples_path(*pathsegments):
 @register_api
 def open_examples_fs(*pathsegments):
     return open_fs(get_examples_path(*pathsegments))
+
+
+register_api_group(get_argument_parser, parse_args)

@@ -6,6 +6,7 @@ from bonobo.commands import BaseGraphCommand
 
 class RunCommand(BaseGraphCommand):
     install = False
+    handler = staticmethod(bonobo.run)
 
     def add_arguments(self, parser):
         super(RunCommand, self).add_arguments(parser)
@@ -16,7 +17,15 @@ class RunCommand(BaseGraphCommand):
 
         parser.add_argument('--install', '-I', action='store_true')
 
+    def parse_options(self, *, quiet=False, verbose=False, install=False, **options):
+        from bonobo import settings
+        settings.QUIET.set_if_true(quiet)
+        settings.DEBUG.set_if_true(verbose)
+        self.install = install
+        return options
+
     def _run_path(self, file):
+        # add install logic
         if self.install:
             if os.path.isdir(file):
                 requirements = os.path.join(file, 'requirements.txt')
@@ -27,23 +36,11 @@ class RunCommand(BaseGraphCommand):
         return super()._run_path(file)
 
     def _run_module(self, mod):
+        # install not implemented for a module, not sure it even make sense.
         if self.install:
             raise RuntimeError('--install behaviour when running a module is not defined.')
 
         return super()._run_module(mod)
-
-    def handle(self, quiet=False, verbose=False, install=False, _remaining_args=None, **options):
-        from bonobo import settings
-
-        settings.QUIET.set_if_true(quiet)
-        settings.DEBUG.set_if_true(verbose)
-        self.install = install
-
-        graph, params = self.read(args=_remaining_args, **options)
-
-        params['plugins'] = set(params.pop('plugins', ())).union(set(options.pop('plugins', ())))
-
-        return bonobo.run(graph, **params)
 
 
 def register_generic_run_arguments(parser, required=True):

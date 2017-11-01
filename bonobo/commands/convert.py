@@ -48,8 +48,17 @@ class ConvertCommand(BaseCommand):
             help='Add a named option to the writer factory.',
         )
 
-    def handle(self, input_filename, output_filename, reader=None, reader_option=None, writer=None, writer_option=None,
-               option=None, transformation=None):
+    def handle(
+        self,
+        input_filename,
+        output_filename,
+        reader=None,
+        reader_option=None,
+        writer=None,
+        writer_option=None,
+        option=None,
+        transformation=None
+    ):
         reader_factory = default_registry.get_reader_factory_for(input_filename, format=reader)
         reader_options = _resolve_options((option or []) + (reader_option or []))
 

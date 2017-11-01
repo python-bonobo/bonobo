@@ -51,11 +51,9 @@ def test_read_csv_from_file_kwargs(tmpdir):
             'a': 'a foo',
             'b': 'b foo',
             'c': 'c foo',
-        },
-        {
+        }, {
             'a': 'a bar',
             'b': 'b bar',
             'c': 'c bar',
         }
     ]
-
