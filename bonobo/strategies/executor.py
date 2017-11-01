@@ -1,11 +1,15 @@
 import time
+
+import sys
+
+import mondrian
 import traceback
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
+from bonobo.util import get_name
 from bonobo.constants import BEGIN, END
 from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
-from bonobo.util.errors import print_error
 
 
 class ExecutorStrategy(Strategy):
@@ -47,16 +51,16 @@ class ExecutorStrategy(Strategy):
             def _runner():
                 try:
                     node.start()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node, method='start')
+                except Exception:
+                    mondrian.excepthook(*sys.exc_info(), context='Could not start node {}.'.format(get_name(node)))
                     node.input.on_end()
                 else:
                     node.loop()
 
                 try:
                     node.stop()
-                except Exception as exc:
-                    print_error(exc, traceback.format_exc(), context=node, method='stop')
+                except Exception:
+                    mondrian.excepthook(*sys.exc_info(), context='Could not stop node {}.'.format(get_name(node)))
 
             futures.append(executor.submit(_runner))
 
@@ -68,8 +72,8 @@ class ExecutorStrategy(Strategy):
                 with plugin:
                     try:
                         plugin.loop()
-                    except Exception as exc:
-                        print_error(exc, traceback.format_exc(), context=plugin)
+                    except Exception:
+                        mondrian.excepthook(*sys.exc_info(), context='In plugin loop for {}...'.format(get_name(plugin)))
 
             futures.append(executor.submit(_runner))
 
