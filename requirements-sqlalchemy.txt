@@ -1,13 +1,11 @@
--e .
+-e .[sqlalchemy]
 appdirs==1.4.3
+bonobo-sqlalchemy==0.5.1
 certifi==2017.7.27.1
 chardet==3.0.4
 colorama==0.3.9
 fs==2.0.12
 idna==2.6
-jinja2==2.9.6
-markupsafe==1.0
-mondrian==0.2.0
 packaging==16.8
 pbr==3.1.1
 psutil==5.4.0
@@ -15,5 +13,6 @@ pyparsing==2.2.0
 pytz==2017.3
 requests==2.18.4
 six==1.11.0
+sqlalchemy==1.1.14
 stevedore==1.27.1
 urllib3==1.22

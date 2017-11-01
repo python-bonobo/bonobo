@@ -13,7 +13,7 @@ jinja2==2.9.6
 jsonschema==2.6.0
 jupyter-client==5.1.0
 jupyter-console==5.2.0
-jupyter-core==4.3.0
+jupyter-core==4.4.0
 jupyter==1.0.0
 markupsafe==1.0
 mistune==0.8
@@ -28,7 +28,7 @@ prompt-toolkit==1.0.15
 ptyprocess==0.5.2
 pygments==2.2.0
 python-dateutil==2.6.1
-pyzmq==16.0.2
+pyzmq==16.0.3
 qtconsole==4.3.1
 simplegeneric==0.8.1
 six==1.11.0

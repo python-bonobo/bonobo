@@ -53,18 +53,17 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'colorama (>= 0.3, < 0.4)', 'fs (>= 2.0, < 2.1)', 'jinja2 (>= 2.9, < 2.10)', 'packaging (>= 16, < 17)',
-        'psutil (>= 5.4, < 6.0)', 'python-dotenv (>= 0.7, < 0.8)', 'requests (>= 2.0, < 3.0)',
-        'stevedore (>= 1.27, < 1.28)'
+        'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'jinja2 (>= 2.9, < 2.10)', 'mondrian (>= 0.2, < 0.3)',
+        'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6.0)', 'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.27, < 1.28)'
     ],
     extras_require={
         'dev': [
-            'cookiecutter (>= 1.5, < 1.6)', 'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)',
-            'pytest-cov (>= 2.5, < 3.0)', 'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)',
-            'sphinx (>= 1.6, < 2.0)'
+            'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)', 'pytest-cov (>= 2.5, < 3.0)',
+            'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)', 'sphinx (>= 1.6, < 2.0)', 'yapf'
         ],
-        'docker': ['bonobo-docker'],
-        'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)']
+        'docker': ['bonobo-docker (>= 0.5.0)'],
+        'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)'],
+        'sqlalchemy': ['bonobo-sqlalchemy (>= 0.5.1)']
     },
     entry_points={
         'bonobo.commands': [

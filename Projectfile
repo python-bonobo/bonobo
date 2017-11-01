@@ -45,7 +45,6 @@ python.add_requirements(
     'mondrian >=0.2,<0.3',
     'packaging >=16,<17',
     'psutil >=5.4,<6.0',
-    'python-dotenv >=0.7,<0.8',
     'requests >=2.0,<3.0',
     'stevedore >=1.27,<1.28',
     dev=[
