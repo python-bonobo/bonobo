@@ -1,7 +1,6 @@
 import pytest
 
-from bonobo import Bag, CsvReader, CsvWriter, settings
-from bonobo.constants import BEGIN, END
+from bonobo import CsvReader, CsvWriter, settings
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext
 

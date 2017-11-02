@@ -1,17 +1,14 @@
-import logging
+import sys
 from contextlib import contextmanager
 from logging import WARNING, ERROR
 from time import sleep
 
-import sys
-
 import mondrian
-
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
+from bonobo.execution import logger
 from bonobo.util import isconfigurabletype
 from bonobo.util.objects import Wrapper, get_name
-from bonobo.execution import logger
 
 
 @contextmanager

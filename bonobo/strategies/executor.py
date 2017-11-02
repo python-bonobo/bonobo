@@ -73,7 +73,9 @@ class ExecutorStrategy(Strategy):
                     try:
                         plugin.loop()
                     except Exception:
-                        mondrian.excepthook(*sys.exc_info(), context='In plugin loop for {}...'.format(get_name(plugin)))
+                        mondrian.excepthook(
+                            *sys.exc_info(), context='In plugin loop for {}...'.format(get_name(plugin))
+                        )
 
             futures.append(executor.submit(_runner))
 

@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from bonobo import open_fs, Token
-from bonobo.execution import GraphExecutionContext
+from bonobo.execution.graph import GraphExecutionContext
 from bonobo.execution.node import NodeExecutionContext
 
 
