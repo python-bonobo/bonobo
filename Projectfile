@@ -47,7 +47,7 @@ python.add_requirements(
     'psutil >=5.4,<6.0',
     'requests >=2.0,<3.0',
     'stevedore >=1.27,<1.28',
-    'whistle ==1.0a3',
+    'whistle >=1.0,<1.1',
     dev=[
         'pytest-sugar >=0.8,<0.9',
         'pytest-timeout >=1,<2',
