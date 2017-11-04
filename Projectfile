@@ -42,11 +42,12 @@ python.setup(
 python.add_requirements(
     'fs >=2.0,<2.1',
     'jinja2 >=2.9,<2.10',
-    'mondrian ==0.4a0',
+    'mondrian ==0.4a1',
     'packaging >=16,<17',
     'psutil >=5.4,<6.0',
     'requests >=2.0,<3.0',
     'stevedore >=1.27,<1.28',
+    'whistle ==1.0a3',
     dev=[
         'pytest-sugar >=0.8,<0.9',
         'pytest-timeout >=1,<2',

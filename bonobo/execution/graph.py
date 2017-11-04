@@ -1,8 +1,11 @@
-import time
 from functools import partial
+from time import sleep
+
+from whistle import EventDispatcher
 
 from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
+from bonobo.execution import events
 from bonobo.execution.node import NodeExecutionContext
 from bonobo.execution.plugin import PluginExecutionContext
 
@@ -10,6 +13,8 @@ from bonobo.execution.plugin import PluginExecutionContext
 class GraphExecutionContext:
     NodeExecutionContextType = NodeExecutionContext
     PluginExecutionContextType = PluginExecutionContext
+
+    TICK_PERIOD = 0.25
 
     @property
     def started(self):
@@ -23,7 +28,8 @@ class GraphExecutionContext:
     def alive(self):
         return any(node.alive for node in self.nodes)
 
-    def __init__(self, graph, plugins=None, services=None):
+    def __init__(self, graph, plugins=None, services=None, dispatcher=None):
+        self.dispatcher = dispatcher or EventDispatcher()
         self.graph = graph
         self.nodes = [self.create_node_execution_context_for(node) for node in self.graph]
         self.plugins = [self.create_plugin_execution_context_for(plugin) for plugin in plugins or ()]
@@ -53,6 +59,8 @@ class GraphExecutionContext:
         return self.NodeExecutionContextType(node, parent=self)
 
     def create_plugin_execution_context_for(self, plugin):
+        if isinstance(plugin, type):
+            plugin = plugin()
         return self.PluginExecutionContextType(plugin, parent=self)
 
     def write(self, *messages):
@@ -63,23 +71,45 @@ class GraphExecutionContext:
             for message in messages:
                 self[i].write(message)
 
+    def dispatch(self, name):
+        self.dispatcher.dispatch(name, events.ExecutionEvent(self))
+
     def start(self, starter=None):
+        self.register_plugins()
+        self.dispatch(events.START)
+        self.tick()
         for node in self.nodes:
             if starter is None:
                 node.start()
             else:
                 starter(node)
+        self.dispatch(events.STARTED)
 
-    def start_plugins(self, starter=None):
-        for plugin in self.plugins:
-            if starter is None:
-                plugin.start()
-            else:
-                starter(plugin)
+    def tick(self):
+        self.dispatch(events.TICK)
+        sleep(self.TICK_PERIOD)
+
+    def kill(self):
+        self.dispatch(events.KILL)
+        for node_context in self.nodes:
+            node_context.kill()
+        self.tick()
 
     def stop(self, stopper=None):
-        for node in self.nodes:
+        self.dispatch(events.STOP)
+        for node_context in self.nodes:
             if stopper is None:
-                node.stop()
+                node_context.stop()
             else:
-                stopper(node)
+                stopper(node_context)
+        self.tick()
+        self.dispatch(events.STOPPED)
+        self.unregister_plugins()
+
+    def register_plugins(self):
+        for plugin_context in self.plugins:
+            plugin_context.register()
+
+    def unregister_plugins(self):
+        for plugin_context in self.plugins:
+            plugin_context.unregister()

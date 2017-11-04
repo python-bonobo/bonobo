@@ -1,10 +1,8 @@
-import time
-
+import functools
+import logging
 import sys
-
-import mondrian
-import traceback
-from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor, wait, FIRST_EXCEPTION
+from time import sleep
 
 from bonobo.util import get_name
 from bonobo.constants import BEGIN, END
@@ -27,59 +25,37 @@ class ExecutorStrategy(Strategy):
         context = self.create_graph_execution_context(graph, **kwargs)
         context.write(BEGIN, Bag(), END)
 
-        executor = self.create_executor()
-
         futures = []
 
-        context.start_plugins(self.get_plugin_starter(executor, futures))
-        context.start(self.get_starter(executor, futures))
+        with self.create_executor() as executor:
+            context.start(self.get_starter(executor, futures))
 
-        while context.alive:
-            time.sleep(0.1)
+            while context.alive:
+                try:
+                    context.tick()
+                except KeyboardInterrupt:
+                    logging.getLogger(__name__).warning('KeyboardInterrupt received. Trying to terminate the nodes gracefully.')
+                    context.kill()
+                    break
 
-        for plugin_context in context.plugins:
-            plugin_context.shutdown()
-
-        context.stop()
-
-        executor.shutdown()
+            context.stop()
 
         return context
 
     def get_starter(self, executor, futures):
         def starter(node):
+            @functools.wraps(node)
             def _runner():
                 try:
-                    node.start()
-                except Exception:
-                    mondrian.excepthook(*sys.exc_info(), context='Could not start node {}.'.format(get_name(node)))
-                    node.input.on_end()
-                else:
-                    node.loop()
-
-                try:
-                    node.stop()
-                except Exception:
-                    mondrian.excepthook(*sys.exc_info(), context='Could not stop node {}.'.format(get_name(node)))
+                    with node:
+                        node.loop()
+                except BaseException as exc:
+                    logging.getLogger(__name__).info('Got {} in {} runner.'.format(get_name(exc), node),
+                                                     exc_info=sys.exc_info())
 
             futures.append(executor.submit(_runner))
 
         return starter
-
-    def get_plugin_starter(self, executor, futures):
-        def plugin_starter(plugin):
-            def _runner():
-                with plugin:
-                    try:
-                        plugin.loop()
-                    except Exception:
-                        mondrian.excepthook(
-                            *sys.exc_info(), context='In plugin loop for {}...'.format(get_name(plugin))
-                        )
-
-            futures.append(executor.submit(_runner))
-
-        return plugin_starter
 
 
 class ThreadPoolExecutorStrategy(ExecutorStrategy):

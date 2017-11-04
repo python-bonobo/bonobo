@@ -10,5 +10,14 @@ class Plugin:
 
     """
 
-    def __init__(self, context):
-        self.context = context
+    def register(self, dispatcher):
+        """
+        :param dispatcher: whistle.EventDispatcher
+        """
+        pass
+
+    def unregister(self, dispatcher):
+        """
+        :param dispatcher: whistle.EventDispatcher
+        """
+        pass

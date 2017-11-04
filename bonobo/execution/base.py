@@ -29,8 +29,7 @@ def unrecoverable(error_handler):
 
 
 class LoopingExecutionContext(Wrapper):
-    alive = True
-    PERIOD = 0.25
+    PERIOD = 0.5
 
     @property
     def started(self):
@@ -39,6 +38,19 @@ class LoopingExecutionContext(Wrapper):
     @property
     def stopped(self):
         return self._stopped
+
+    @property
+    def alive(self):
+        return self._started and not self._stopped
+
+    @property
+    def status(self):
+        """One character status for this node. """
+        if not self.started:
+            return ' '
+        if not self.stopped:
+            return '+'
+        return '-'
 
     def __init__(self, wrapped, parent, services=None):
         super().__init__(wrapped)
@@ -84,7 +96,6 @@ class LoopingExecutionContext(Wrapper):
         """Generic loop. A bit boring. """
         while self.alive:
             self.step()
-            sleep(self.PERIOD)
 
     def step(self):
         """Left as an exercise for the children."""

@@ -1,9 +1,8 @@
-import traceback
+import sys
+import threading
 from queue import Empty
 from time import sleep
 from types import GeneratorType
-
-import sys
 
 from bonobo.constants import NOT_MODIFIED, BEGIN, END
 from bonobo.errors import InactiveReadableError, UnrecoverableError
@@ -22,13 +21,8 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     """
 
     @property
-    def alive(self):
-        """todo check if this is right, and where it is used"""
-        return self._started and not self._stopped
-
-    @property
-    def alive_str(self):
-        return '+' if self.alive else '-'
+    def killed(self):
+        return self._killed
 
     def __init__(self, wrapped, parent=None, services=None, _input=None, _outputs=None):
         LoopingExecutionContext.__init__(self, wrapped, parent=parent, services=services)
@@ -36,13 +30,19 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
 
         self.input = _input or Input()
         self.outputs = _outputs or []
+        self._killed = False
 
     def __str__(self):
-        return self.alive_str + ' ' + self.__name__ + self.get_statistics_as_string(prefix=' ')
+        return self.__name__ + self.get_statistics_as_string(prefix=' ')
 
     def __repr__(self):
         name, type_name = get_name(self), get_name(type(self))
-        return '<{}({}{}){}>'.format(type_name, self.alive_str, name, self.get_statistics_as_string(prefix=' '))
+        return '<{}({}{}){}>'.format(type_name, self.status, name, self.get_statistics_as_string(prefix=' '))
+
+    def get_flags_as_string(self):
+        if self.killed:
+            return '[killed]'
+        return ''
 
     def write(self, *messages):
         """
@@ -92,22 +92,26 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         return row
 
     def loop(self):
-        while True:
+        while not self._killed:
             try:
                 self.step()
             except KeyboardInterrupt:
-                raise
+                self.handle_error(*sys.exc_info())
+                break
             except InactiveReadableError:
                 break
             except Empty:
                 sleep(self.PERIOD)
                 continue
-            except UnrecoverableError as exc:
+            except UnrecoverableError:
                 self.handle_error(*sys.exc_info())
                 self.input.shutdown()
                 break
-            except Exception as exc:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.handle_error(*sys.exc_info())
+            except BaseException:
+                self.handle_error(*sys.exc_info())
+                break
 
     def step(self):
         # Pull data from the first available input channel.
@@ -119,6 +123,15 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         # todo add timer
         self.handle_results(input_bag, input_bag.apply(self._stack))
 
+    def kill(self):
+        if not self.started:
+            raise RuntimeError('Cannot kill a node context that has not started yet.')
+
+        if self.stopped:
+            raise RuntimeError('Cannot kill a node context that has already stopped.')
+
+        self._killed = True
+
     def handle_results(self, input_bag, results):
         # self._exec_time += timer.duration
         # Put data onto output channels
@@ -126,6 +139,9 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         if isinstance(results, GeneratorType):
             while True:
                 try:
+                    # if kill flag was step, stop iterating.
+                    if self._killed:
+                        break
                     result = next(results)
                 except StopIteration:
                     break
@@ -140,7 +156,7 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
 
 
 def isflag(param):
-    return isinstance(param, Token) and param in (NOT_MODIFIED, )
+    return isinstance(param, Token) and param in (NOT_MODIFIED,)
 
 
 def split_tokens(output):
@@ -152,11 +168,11 @@ def split_tokens(output):
     """
     if isinstance(output, Token):
         # just a flag
-        return (output, ), ()
+        return (output,), ()
 
     if not istuple(output):
         # no flag
-        return (), (output, )
+        return (), (output,)
 
     i = 0
     while isflag(output[i]):

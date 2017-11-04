@@ -53,8 +53,8 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'jinja2 (>= 2.9, < 2.10)', 'mondrian (== 0.4a0)',
-        'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6.0)', 'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.27, < 1.28)'
+        'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'jinja2 (>= 2.9, < 2.10)', 'mondrian', 'packaging (>= 16, < 17)',
+        'psutil (>= 5.4, < 6.0)', 'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.27, < 1.28)', 'whistle (== 1.0a3)'
     ],
     extras_require={
         'dev': [

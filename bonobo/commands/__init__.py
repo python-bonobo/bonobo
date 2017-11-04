@@ -14,9 +14,7 @@ def entrypoint(args=None):
 
     """
 
-    mondrian.setup()
-    mondrian.setupExceptHook()
-
+    mondrian.setup(excepthook=True)
     logger = logging.getLogger()
 
     parser = argparse.ArgumentParser()

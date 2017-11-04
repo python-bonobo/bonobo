@@ -2,38 +2,14 @@ import io
 import sys
 from contextlib import redirect_stdout, redirect_stderr
 
-from colorama import Style, Fore, init
-
-init(wrap=True)
+from colorama import Style, Fore, init as initialize_colorama_output_wrappers
 
 from bonobo import settings
+from bonobo.execution import events
 from bonobo.plugins import Plugin
 from bonobo.util.term import CLEAR_EOL, MOVE_CURSOR_UP
 
-
-class IOBuffer():
-    """
-    The role of IOBuffer is to overcome the problem of multiple threads wanting to write to stdout at the same time. It
-    works a bit like a videogame: there are two buffers, one that is used to write, and one which is used to read from.
-    On each cycle, we swap the buffers, and the console plugin handle output of the one which is not anymore "active".
-
-    """
-
-    def __init__(self):
-        self.current = io.StringIO()
-        self.write = self.current.write
-
-    def switch(self):
-        previous = self.current
-        self.current = io.StringIO()
-        self.write = self.current.write
-        try:
-            return previous.getvalue()
-        finally:
-            previous.close()
-
-    def flush(self):
-        self.current.flush()
+initialize_colorama_output_wrappers(wrap=True)
 
 
 class ConsoleOutputPlugin(Plugin):
@@ -60,12 +36,23 @@ class ConsoleOutputPlugin(Plugin):
     # Whether we're on windows, or a real operating system.
     iswindows = (sys.platform == 'win32')
 
-    def on_start(self):
+    def __init__(self):
+        self.isatty = self._stdout.isatty()
+
+    def register(self, dispatcher):
+        dispatcher.add_listener(events.START, self.setup)
+        dispatcher.add_listener(events.TICK, self.tick)
+        dispatcher.add_listener(events.STOPPED, self.teardown)
+
+    def unregister(self, dispatcher):
+        dispatcher.remove_listener(events.STOPPED, self.teardown)
+        dispatcher.remove_listener(events.TICK, self.tick)
+        dispatcher.remove_listener(events.START, self.setup)
+
+    def setup(self, event):
         self.prefix = ''
         self.counter = 0
         self._append_cache = ''
-
-        self.isatty = self._stdout.isatty()
 
         self.stdout = IOBuffer()
         self.redirect_stdout = redirect_stdout(self._stdout if self.iswindows else self.stdout)
@@ -75,14 +62,14 @@ class ConsoleOutputPlugin(Plugin):
         self.redirect_stderr = redirect_stderr(self._stderr if self.iswindows else self.stderr)
         self.redirect_stderr.__enter__()
 
-    def on_tick(self):
+    def tick(self, event):
         if self.isatty and not self.iswindows:
-            self._write(self.context.parent, rewind=True)
+            self._write(event.graph_context, rewind=True)
         else:
             pass  # not a tty, or windows, so we'll ignore stats output
 
-    def on_stop(self):
-        self._write(self.context.parent, rewind=False)
+    def teardown(self, event):
+        self._write(event.graph_context, rewind=False)
         self.redirect_stderr.__exit__(None, None, None)
         self.redirect_stdout.__exit__(None, None, None)
 
@@ -113,6 +100,8 @@ class ConsoleOutputPlugin(Plugin):
                         name_suffix,
                         ' ',
                         node.get_statistics_as_string(),
+                        ' ',
+                        node.get_flags_as_string(),
                         Style.RESET_ALL,
                         ' ',
                     )
@@ -128,6 +117,8 @@ class ConsoleOutputPlugin(Plugin):
                         name_suffix,
                         ' ',
                         node.get_statistics_as_string(),
+                        ' ',
+                        node.get_flags_as_string(),
                         Style.RESET_ALL,
                         ' ',
                     )
@@ -166,7 +157,32 @@ class ConsoleOutputPlugin(Plugin):
         self.counter += 1
 
 
+class IOBuffer():
+    """
+    The role of IOBuffer is to overcome the problem of multiple threads wanting to write to stdout at the same time. It
+    works a bit like a videogame: there are two buffers, one that is used to write, and one which is used to read from.
+    On each cycle, we swap the buffers, and the console plugin handle output of the one which is not anymore "active".
+
+    """
+
+    def __init__(self):
+        self.current = io.StringIO()
+        self.write = self.current.write
+
+    def switch(self):
+        previous = self.current
+        self.current = io.StringIO()
+        self.write = self.current.write
+        try:
+            return previous.getvalue()
+        finally:
+            previous.close()
+
+    def flush(self):
+        self.current.flush()
+
+
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2**20)
+    return process.memory_info()[0] / float(2 ** 20)
