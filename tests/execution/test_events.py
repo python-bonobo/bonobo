@@ -10,6 +10,7 @@ def test_names():
         event_name = getattr(events, name.upper())
         assert event_name == '.'.join(('execution', name))
 
+
 def test_event_object():
     # Same logic as above.
     c = Mock()

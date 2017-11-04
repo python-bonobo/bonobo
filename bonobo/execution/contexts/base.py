@@ -1,3 +1,4 @@
+import logging
 import sys
 from contextlib import contextmanager
 from logging import WARNING, ERROR
@@ -39,12 +40,18 @@ class LoopingExecutionContext(Wrapper):
         return self._stopped
 
     @property
+    def defunct(self):
+        return self._defunct
+
+    @property
     def alive(self):
         return self._started and not self._stopped
 
     @property
     def status(self):
         """One character status for this node. """
+        if self._defunct:
+            return '!'
         if not self.started:
             return ' '
         if not self.stopped:
@@ -65,7 +72,7 @@ class LoopingExecutionContext(Wrapper):
         else:
             self.services = None
 
-        self._started, self._stopped = False, False
+        self._started, self._stopped, self._defunct = False, False, False
         self._stack = None
 
     def __enter__(self):
@@ -81,15 +88,17 @@ class LoopingExecutionContext(Wrapper):
 
         self._started = True
 
-        self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
-        if isconfigurabletype(self.wrapped):
-            # Not normal to have a partially configured object here, so let's warn the user instead of having get into
-            # the hard trouble of understanding that by himself.
-            raise TypeError(
-                'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
-            )
-
-        self._stack.setup(self)
+        try:
+            self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
+            if isconfigurabletype(self.wrapped):
+                # Not normal to have a partially configured object here, so let's warn the user instead of having get into
+                # the hard trouble of understanding that by himself.
+                raise TypeError(
+                    'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
+                )
+            self._stack.setup(self)
+        except Exception:
+            return self.fatal(sys.exc_info())
 
     def loop(self):
         """Generic loop. A bit boring. """
@@ -113,14 +122,17 @@ class LoopingExecutionContext(Wrapper):
         finally:
             self._stopped = True
 
-    def handle_error(self, exctype, exc, tb):
-        mondrian.excepthook(
-            exctype, exc, tb, level=WARNING, context='{} in {}'.format(exctype.__name__, get_name(self)), logger=logger
-        )
-
     def _get_initial_context(self):
         if self.parent:
             return self.parent.services.args_for(self.wrapped)
         if self.services:
             return self.services.args_for(self.wrapped)
         return ()
+
+    def handle_error(self, exctype, exc, tb, *, level=logging.ERROR):
+        logging.getLogger(__name__).log(level, repr(self), exc_info=(exctype, exc, tb))
+
+    def fatal(self, exc_info):
+        self._defunct = True
+        self.input.shutdown()
+        self.handle_error(*exc_info, level=logging.CRITICAL)

@@ -72,6 +72,7 @@ def _resolve_transformations(transformations):
     :return: tuple(object)
     """
     registry = _ModulesRegistry()
+    transformations = transformations or []
     for t in transformations:
         try:
             mod, attr = t.split(':', 1)

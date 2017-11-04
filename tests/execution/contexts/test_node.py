@@ -185,6 +185,7 @@ def test_node_tuple_dict():
         assert output[0] == ('foo', 'bar', {'id': 1})
         assert output[1] == ('foo', 'baz', {'id': 2})
 
+
 def test_node_lifecycle_natural():
     func = MagicMock()
 
@@ -202,6 +203,7 @@ def test_node_lifecycle_natural():
 
     ctx.stop()
     assert all((ctx.started, ctx.stopped)) and not any((ctx.alive, ctx.killed))
+
 
 def test_node_lifecycle_with_kill():
     func = MagicMock()
@@ -223,7 +225,3 @@ def test_node_lifecycle_with_kill():
 
     ctx.stop()
     assert all((ctx.started, ctx.killed, ctx.stopped)) and not ctx.alive
-
-
-
-

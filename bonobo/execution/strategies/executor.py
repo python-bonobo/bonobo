@@ -27,7 +27,11 @@ class ExecutorStrategy(Strategy):
         futures = []
 
         with self.create_executor() as executor:
-            context.start(self.get_starter(executor, futures))
+            try:
+                context.start(self.get_starter(executor, futures))
+            except:
+                logging.getLogger(__name__
+                                  ).warning('KeyboardInterrupt received. Trying to terminate the nodes gracefully.')
 
             while context.alive:
                 try:
@@ -50,12 +54,17 @@ class ExecutorStrategy(Strategy):
                 try:
                     with node:
                         node.loop()
-                except BaseException as exc:
-                    logging.getLogger(__name__).info(
-                        'Got {} in {} runner.'.format(get_name(exc), node), exc_info=sys.exc_info()
+                except:
+                    logging.getLogger(__name__).critical(
+                        'Uncaught exception in node execution for {}.'.format(node), exc_info=True
                     )
+                    node.shutdown()
+                    node.stop()
 
-            futures.append(executor.submit(_runner))
+            try:
+                futures.append(executor.submit(_runner))
+            except:
+                logging.getLogger(__name__).critical('futures.append', exc_info=sys.exc_info())
 
         return starter
 

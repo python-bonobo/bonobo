@@ -1,3 +1,4 @@
+import logging
 import sys
 from queue import Empty
 from time import sleep
@@ -12,6 +13,7 @@ from bonobo.structs.tokens import Token
 from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag, istuple
 from bonobo.util.compat import deprecated_alias
 from bonobo.util.statistics import WithStatistics
+from mondrian import term
 
 
 class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
@@ -39,10 +41,12 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         return '<{}({}{}){}>'.format(type_name, self.status, name, self.get_statistics_as_string(prefix=' '))
 
     def get_flags_as_string(self):
+        if self._defunct:
+            return term.red('[defunct]')
         if self.killed:
-            return '[killed]'
+            return term.lightred('[killed]')
         if self.stopped:
-            return '[done]'
+            return term.lightblack('[done]')
         return ''
 
     def write(self, *messages):
@@ -92,13 +96,13 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         self.increment('in')
         return row
 
+    def should_loop(self):
+        return not any((self.defunct, self.killed))
+
     def loop(self):
-        while not self._killed:
+        while self.should_loop():
             try:
                 self.step()
-            except KeyboardInterrupt:
-                self.handle_error(*sys.exc_info())
-                break
             except InactiveReadableError:
                 break
             except Empty:

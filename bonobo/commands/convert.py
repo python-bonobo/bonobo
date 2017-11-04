@@ -6,8 +6,8 @@ from bonobo.util.resolvers import _resolve_transformations, _resolve_options
 
 class ConvertCommand(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('input-filename', help='Input filename.')
-        parser.add_argument('output-filename', help='Output filename.')
+        parser.add_argument('input_filename', help='Input filename.')
+        parser.add_argument('output_filename', help='Output filename.')
         parser.add_argument(
             '--' + READER,
             '-r',

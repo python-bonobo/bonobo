@@ -152,3 +152,13 @@ def parse_args(mixed=None):
                 del os.environ[name]
             else:
                 os.environ[name] = value
+
+
+@contextmanager
+def change_working_directory(path):
+    old_dir = os.getcwd()
+    os.chdir(str(path))
+    try:
+        yield
+    finally:
+        os.chdir(old_dir)

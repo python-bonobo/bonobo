@@ -1,4 +1,7 @@
+from fs.errors import ResourceNotFound
+
 from bonobo.config import Configurable, ContextProcessor, Option, Service
+from bonobo.errors import UnrecoverableError
 
 
 class FileHandler(Configurable):
