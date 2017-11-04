@@ -30,7 +30,7 @@ class ConsoleOutputPlugin(Plugin):
     _stdout = sys.stdout
     _stderr = sys.stderr
 
-    # When the plugin is started, we'll set the real value of this.
+    # When the plugin is instanciated, we'll set the real value of this.
     isatty = False
 
     # Whether we're on windows, or a real operating system.
@@ -50,6 +50,10 @@ class ConsoleOutputPlugin(Plugin):
         dispatcher.remove_listener(events.START, self.setup)
 
     def setup(self, event):
+        # TODO this wont work if one instance is registered with more than one context.
+        # Two options:
+        # - move state to context
+        # - forbid registering more than once
         self.prefix = ''
         self.counter = 0
         self._append_cache = ''
@@ -88,41 +92,22 @@ class ConsoleOutputPlugin(Plugin):
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
             name_suffix = '({})'.format(i) if settings.DEBUG.get() else ''
-            if node.alive:
-                _line = ''.join(
-                    (
-                        ' ',
-                        alive_color,
-                        '+',
-                        Style.RESET_ALL,
-                        ' ',
-                        node.name,
-                        name_suffix,
-                        ' ',
-                        node.get_statistics_as_string(),
-                        ' ',
-                        node.get_flags_as_string(),
-                        Style.RESET_ALL,
-                        ' ',
-                    )
+
+            liveliness_color = alive_color if node.alive else dead_color
+            liveliness_prefix = ' {}{}{} '.format(liveliness_color, node.status, Style.RESET_ALL)
+            _line = ''.join(
+                (
+                    liveliness_prefix,
+                    node.name,
+                    name_suffix,
+                    ' ',
+                    node.get_statistics_as_string(),
+                    ' ',
+                    node.get_flags_as_string(),
+                    Style.RESET_ALL,
+                    ' ',
                 )
-            else:
-                _line = ''.join(
-                    (
-                        ' ',
-                        dead_color,
-                        '-',
-                        ' ',
-                        node.name,
-                        name_suffix,
-                        ' ',
-                        node.get_statistics_as_string(),
-                        ' ',
-                        node.get_flags_as_string(),
-                        Style.RESET_ALL,
-                        ' ',
-                    )
-                )
+            )
             print(prefix + _line + CLEAR_EOL, file=self._stderr)
 
         if append:
@@ -185,4 +170,4 @@ class IOBuffer():
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2**20)
+    return process.memory_info()[0] / float(2 ** 20)

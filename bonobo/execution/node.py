@@ -42,6 +42,8 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
     def get_flags_as_string(self):
         if self.killed:
             return '[killed]'
+        if self.stopped:
+            return '[done]'
         return ''
 
     def write(self, *messages):

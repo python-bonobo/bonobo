@@ -77,7 +77,7 @@ class GraphExecutionContext:
     def start(self, starter=None):
         self.register_plugins()
         self.dispatch(events.START)
-        self.tick()
+        self.tick(pause=False)
         for node in self.nodes:
             if starter is None:
                 node.start()
@@ -85,9 +85,10 @@ class GraphExecutionContext:
                 starter(node)
         self.dispatch(events.STARTED)
 
-    def tick(self):
+    def tick(self, pause=True):
         self.dispatch(events.TICK)
-        sleep(self.TICK_PERIOD)
+        if pause:
+            sleep(self.TICK_PERIOD)
 
     def kill(self):
         self.dispatch(events.KILL)
@@ -102,7 +103,7 @@ class GraphExecutionContext:
                 node_context.stop()
             else:
                 stopper(node_context)
-        self.tick()
+        self.tick(pause=False)
         self.dispatch(events.STOPPED)
         self.unregister_plugins()
 
