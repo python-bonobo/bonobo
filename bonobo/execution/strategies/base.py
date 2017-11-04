@@ -1,4 +1,4 @@
-from bonobo.execution.graph import GraphExecutionContext
+from bonobo.execution.contexts.graph import GraphExecutionContext
 
 
 class Strategy:

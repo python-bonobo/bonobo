@@ -202,7 +202,7 @@ def env2(tmpdir):
 
 all_environ_targets = pytest.mark.parametrize(
     'target', [
-        (get_examples_path('environ.py'),),
+        (get_examples_path('environ.py'), ),
         (
             '-m',
             'bonobo.examples.environ',

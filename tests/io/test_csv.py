@@ -1,7 +1,7 @@
 import pytest
 
 from bonobo import CsvReader, CsvWriter, settings
-from bonobo.execution.node import NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext
 
 csv_tester = FilesystemTester('csv')

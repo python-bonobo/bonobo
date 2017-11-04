@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import bonobo
 from bonobo.execution import events
-from bonobo.execution.graph import GraphExecutionContext
+from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.plugins.console import ConsoleOutputPlugin
 from whistle import EventDispatcher
 

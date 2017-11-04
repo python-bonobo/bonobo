@@ -1,5 +1,5 @@
 from bonobo import Bag, Graph
-from bonobo.strategies import NaiveStrategy
+from bonobo.execution.strategies import NaiveStrategy
 from bonobo.util.testing import BufferingNodeExecutionContext, BufferingGraphExecutionContext
 
 

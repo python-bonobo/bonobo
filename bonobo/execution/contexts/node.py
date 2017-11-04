@@ -1,12 +1,11 @@
 import sys
-import threading
 from queue import Empty
 from time import sleep
 from types import GeneratorType
 
 from bonobo.constants import NOT_MODIFIED, BEGIN, END
 from bonobo.errors import InactiveReadableError, UnrecoverableError
-from bonobo.execution.base import LoopingExecutionContext
+from bonobo.execution.contexts.base import LoopingExecutionContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.structs.tokens import Token

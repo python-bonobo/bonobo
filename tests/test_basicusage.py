@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 import bonobo
-from bonobo.execution.graph import GraphExecutionContext
+from bonobo.execution.contexts.graph import GraphExecutionContext
 
 
 @pytest.mark.timeout(2)

@@ -2,7 +2,7 @@ import pytest
 
 from bonobo import JsonReader, JsonWriter, settings
 from bonobo import LdjsonReader, LdjsonWriter
-from bonobo.execution.node import NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext
 
 json_tester = FilesystemTester('json')

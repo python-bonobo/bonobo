@@ -1,4 +1,4 @@
-from bonobo.execution.base import LoopingExecutionContext, recoverable
+from bonobo.execution.contexts.base import LoopingExecutionContext
 
 
 class PluginExecutionContext(LoopingExecutionContext):

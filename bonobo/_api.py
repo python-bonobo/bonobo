@@ -1,7 +1,7 @@
+from bonobo.execution.strategies import create_strategy
 from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
     PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
 from bonobo.nodes import LdjsonReader, LdjsonWriter
-from bonobo.strategies import create_strategy
 from bonobo.structs import Bag, ErrorBag, Graph, Token
 from bonobo.util import get_name
 from bonobo.util.environ import parse_args, get_argument_parser
@@ -35,7 +35,7 @@ def run(graph, *, plugins=None, services=None, strategy=None):
     You'll probably want to provide a services dictionary mapping service names to service instances.
 
     :param Graph graph: The :class:`Graph` to execute.
-    :param str strategy: The :class:`bonobo.strategies.base.Strategy` to use.
+    :param str strategy: The :class:`bonobo.execution.strategies.base.Strategy` to use.
     :param list plugins: The list of plugins to enhance execution.
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
@@ -93,10 +93,10 @@ def inspect(graph, *, format):
     print(_inspect_formats[format](graph))
 
 
-# bonobo.structs
+# data structures
 register_api_group(Bag, ErrorBag, Graph, Token)
 
-# bonobo.strategies
+# execution strategies
 register_api(create_strategy)
 
 
@@ -125,7 +125,7 @@ def open_fs(fs_url=None, *args, **kwargs):
     return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
 
-# bonobo.nodes
+# standard transformations
 register_api_group(
     CsvReader,
     CsvWriter,

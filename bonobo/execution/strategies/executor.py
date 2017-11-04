@@ -1,13 +1,12 @@
 import functools
 import logging
 import sys
-from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor, wait, FIRST_EXCEPTION
-from time import sleep
+from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
-from bonobo.util import get_name
-from bonobo.constants import BEGIN, END
-from bonobo.strategies.base import Strategy
 from bonobo.structs.bags import Bag
+from bonobo.constants import BEGIN, END
+from bonobo.execution.strategies.base import Strategy
+from bonobo.util import get_name
 
 
 class ExecutorStrategy(Strategy):
