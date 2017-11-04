@@ -34,7 +34,9 @@ class ExecutorStrategy(Strategy):
                 try:
                     context.tick()
                 except KeyboardInterrupt:
-                    logging.getLogger(__name__).warning('KeyboardInterrupt received. Trying to terminate the nodes gracefully.')
+                    logging.getLogger(__name__).warning(
+                        'KeyboardInterrupt received. Trying to terminate the nodes gracefully.'
+                    )
                     context.kill()
                     break
 
@@ -50,8 +52,9 @@ class ExecutorStrategy(Strategy):
                     with node:
                         node.loop()
                 except BaseException as exc:
-                    logging.getLogger(__name__).info('Got {} in {} runner.'.format(get_name(exc), node),
-                                                     exc_info=sys.exc_info())
+                    logging.getLogger(__name__).info(
+                        'Got {} in {} runner.'.format(get_name(exc), node), exc_info=sys.exc_info()
+                    )
 
             futures.append(executor.submit(_runner))
 

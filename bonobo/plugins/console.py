@@ -185,4 +185,4 @@ class IOBuffer():
 def memory_usage():
     import os, psutil
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2 ** 20)
+    return process.memory_info()[0] / float(2**20)

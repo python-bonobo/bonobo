@@ -14,11 +14,12 @@ def extract():
 def get_graph():
     graph = bonobo.Graph()
     graph.add_chain(
-            extract,
-            print,
+        extract,
+        print,
     )
 
     return graph
+
 
 if __name__ == '__main__':
     parser = bonobo.get_argument_parser()

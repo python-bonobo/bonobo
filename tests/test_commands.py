@@ -113,6 +113,17 @@ def test_install_requirements_for_file(runner):
 
 
 @all_runners
+def test_init_file(runner, tmpdir):
+    target = tmpdir.join('foo.py')
+    runner('init', str(target))
+    assert os.path.exists(target)
+
+    out, err = runner('run', str(target))
+    assert out.replace('\n', ' ').strip() == 'Hello World'
+    assert not err
+
+
+@all_runners
 def test_version(runner):
     out, err = runner('version')
     out = out.strip()
