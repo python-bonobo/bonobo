@@ -115,10 +115,11 @@ def test_install_requirements_for_file(runner):
 @all_runners
 def test_init_file(runner, tmpdir):
     target = tmpdir.join('foo.py')
-    runner('init', str(target))
-    assert os.path.exists(target)
+    target_filename = str(target)
+    runner('init', target_filename)
+    assert os.path.exists(target_filename)
 
-    out, err = runner('run', str(target))
+    out, err = runner('run', target_filename)
     assert out.replace('\n', ' ').strip() == 'Hello World'
     assert not err
 
@@ -201,7 +202,7 @@ def env2(tmpdir):
 
 all_environ_targets = pytest.mark.parametrize(
     'target', [
-        (get_examples_path('environ.py'), ),
+        (get_examples_path('environ.py'),),
         (
             '-m',
             'bonobo.examples.environ',
