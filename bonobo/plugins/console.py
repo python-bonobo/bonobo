@@ -68,12 +68,12 @@ class ConsoleOutputPlugin(Plugin):
 
     def tick(self, event):
         if self.isatty and not self.iswindows:
-            self._write(event.graph_context, rewind=True)
+            self._write(event.context, rewind=True)
         else:
             pass  # not a tty, or windows, so we'll ignore stats output
 
     def teardown(self, event):
-        self._write(event.graph_context, rewind=False)
+        self._write(event.context, rewind=False)
         self.redirect_stderr.__exit__(None, None, None)
         self.redirect_stdout.__exit__(None, None, None)
 
@@ -127,7 +127,7 @@ class ConsoleOutputPlugin(Plugin):
             print(CLEAR_EOL, file=self._stderr)
             print(MOVE_CURSOR_UP(t_cnt + 2), file=self._stderr)
 
-    def _write(self, graph_context, rewind):
+    def _write(self, context, rewind):
         if settings.PROFILE.get():
             if self.counter % 10 and self._append_cache:
                 append = self._append_cache
@@ -138,7 +138,7 @@ class ConsoleOutputPlugin(Plugin):
                 )
         else:
             append = ()
-        self.write(graph_context, prefix=self.prefix, append=append, rewind=rewind)
+        self.write(context, prefix=self.prefix, append=append, rewind=rewind)
         self.counter += 1
 
 

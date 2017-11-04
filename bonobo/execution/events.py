@@ -9,5 +9,5 @@ KILL = 'execution.kill'
 
 
 class ExecutionEvent(Event):
-    def __init__(self, graph_context):
-        self.graph_context = graph_context
+    def __init__(self, context):
+        self.context = context
