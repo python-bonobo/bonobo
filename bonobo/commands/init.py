@@ -6,7 +6,7 @@ from bonobo.commands import BaseCommand
 
 
 class InitCommand(BaseCommand):
-    TEMPLATES = {'default'}
+    TEMPLATES = {'bare', 'default'}
     TEMPLATES_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
     def add_arguments(self, parser):
