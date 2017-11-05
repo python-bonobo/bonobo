@@ -17,47 +17,43 @@ Bonobo uses simple python and should be quick and easy to learn.
 Tutorial
 ::::::::
 
-.. note::
+.. toctree::
+    :maxdepth: 1
 
-    Good documentation is not easy to write. We do our best to make it better and better.
+    1-init
+    2-jobs
+    3-files
+    4-services
+    5-packaging
 
-    Although all content here should be accurate, you may feel a lack of completeness, for which we plead guilty and
-    apologize.
-
-    If you're stuck, please come and ask on our `slack channel <https://bonobo-slack.herokuapp.com/>`_, we'll figure
-    something out.
-
-    If you're not stuck but had trouble understanding something, please consider contributing to the docs (via GitHub
-    pull requests).
+More
+::::
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    tut01
-    tut02
-    tut03
-    tut04
-
+    django
+    notebooks
+    sqlalchemy
 
 What's next?
 ::::::::::::
 
-Read a few examples
--------------------
+* :doc:`The Bonobo Guide <../guide/index>`
+* :doc:`Extensions <../extension/index>`
 
-* :doc:`../reference/examples`
 
-Read about best development practices
--------------------------------------
+We're there!
+::::::::::::
 
-* :doc:`../guide/index`
-* :doc:`../guide/purity`
+Good documentation is not easy to write.
 
-Read about integrating external tools with bonobo
--------------------------------------------------
+Although all content here should be accurate, you may feel a lack of completeness, for which we plead guilty and
+apologize.
 
-* :doc:`../extension/docker`: run transformation graphs in isolated containers.
-* :doc:`../extension/jupyter`: run transformations within jupyter notebooks.
-* :doc:`../extension/selenium`: crawl the web using a real browser and work with the gathered data.
-* :doc:`../extension/sqlalchemy`: everything you need to interract with SQL databases.
+If you're stuck, please come to the `Bonobo Slack Channel <https://bonobo-slack.herokuapp.com/>`_ and we'll figure it
+out.
+
+If you're not stuck but had trouble understanding something, please consider contributing to the docs (using GitHub
+pull requests).
 

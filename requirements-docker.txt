@@ -12,7 +12,7 @@ packaging==16.8
 pbr==3.1.1
 psutil==5.4.0
 pyparsing==2.2.0
-pytz==2017.2
+pytz==2017.3
 requests==2.18.4
 six==1.11.0
 stevedore==1.27.1

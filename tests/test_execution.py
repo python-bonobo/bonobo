@@ -1,7 +1,7 @@
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import BEGIN, END
-from bonobo.execution.graph import GraphExecutionContext
-from bonobo.strategies import NaiveStrategy
+from bonobo.execution.contexts.graph import GraphExecutionContext
+from bonobo.execution.strategies import NaiveStrategy
 from bonobo.structs import Bag, Graph
 
 

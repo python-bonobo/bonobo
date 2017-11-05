@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ::::::::::
 
+* Cookiecutter usage is removed. Linked to the fact that bonobo now use either a single file (up to you to get python
+  imports working as you want) or a regular fully fledged python package, we do not need it anymore.
+
 New features
 ------------
 

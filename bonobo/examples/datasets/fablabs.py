@@ -19,7 +19,7 @@ import json
 from colorama import Fore, Style
 
 import bonobo
-from bonobo.commands.run import get_default_services
+from bonobo.commands import get_default_services
 from bonobo.ext.opendatasoft import OpenDataSoftAPI
 
 try:

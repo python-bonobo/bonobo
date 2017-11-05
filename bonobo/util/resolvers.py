@@ -4,10 +4,29 @@ This package is considered private, and should only be used within bonobo.
 """
 
 import json
+import os
+import runpy
 
 import bonobo
 from bonobo.util.collections import tuplize
-from bonobo.util.python import WorkingDirectoryModulesRegistry
+
+
+class _RequiredModule:
+    def __init__(self, dct):
+        self.__dict__ = dct
+
+
+class _ModulesRegistry(dict):
+    @property
+    def pathname(self):
+        return os.getcwd()
+
+    def require(self, name):
+        if name not in self:
+            bits = name.split('.')
+            filename = os.path.join(self.pathname, *bits[:-1], bits[-1] + '.py')
+            self[name] = _RequiredModule(runpy.run_path(filename, run_name=name))
+        return self[name]
 
 
 def _parse_option(option):
@@ -52,7 +71,8 @@ def _resolve_transformations(transformations):
     :param transformations: tuple(str)
     :return: tuple(object)
     """
-    registry = WorkingDirectoryModulesRegistry()
+    registry = _ModulesRegistry()
+    transformations = transformations or []
     for t in transformations:
         try:
             mod, attr = t.split(':', 1)

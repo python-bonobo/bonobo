@@ -1,5 +1,5 @@
 import bonobo
-from bonobo.commands.run import get_default_services
+from bonobo.commands import get_default_services
 
 graph = bonobo.Graph(
     bonobo.CsvReader('datasets/coffeeshops.txt', headers=('item', )),

@@ -1,8 +1,7 @@
 import pytest
 
-from bonobo import Bag, CsvReader, CsvWriter, settings
-from bonobo.constants import BEGIN, END
-from bonobo.execution.node import NodeExecutionContext
+from bonobo import CsvReader, CsvWriter, settings
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext
 
 csv_tester = FilesystemTester('csv')
@@ -51,11 +50,9 @@ def test_read_csv_from_file_kwargs(tmpdir):
             'a': 'a foo',
             'b': 'b foo',
             'c': 'c foo',
-        },
-        {
+        }, {
             'a': 'a bar',
             'b': 'b bar',
             'c': 'c bar',
         }
     ]
-

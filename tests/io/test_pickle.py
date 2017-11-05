@@ -3,7 +3,7 @@ import pickle
 import pytest
 
 from bonobo import Bag, PickleReader, PickleWriter
-from bonobo.execution.node import NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import BufferingNodeExecutionContext, FilesystemTester
 
 pickle_tester = FilesystemTester('pkl', mode='wb')

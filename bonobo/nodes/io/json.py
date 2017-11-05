@@ -53,12 +53,12 @@ class LdjsonReader(FileReader):
 
     def read(self, fs, file):
         for line in file:
-            print(line)
             yield self.loader(line)
 
 
 class LdjsonWriter(FileWriter):
     """Write a stream of JSON objects, one object per line."""
+
     def write(self, fs, file, lineno, **row):
         lineno += 1  # class-level variable
         file.write(json.dumps(row) + '\n')

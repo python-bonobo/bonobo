@@ -5,8 +5,7 @@ from django.core.management.base import BaseCommand, OutputWrapper
 
 import bonobo
 import bonobo.util
-from bonobo.commands.run import get_default_services
-from bonobo.ext.console import ConsoleOutputPlugin
+from bonobo.plugins.console import ConsoleOutputPlugin
 from bonobo.util.term import CLEAR_EOL
 
 

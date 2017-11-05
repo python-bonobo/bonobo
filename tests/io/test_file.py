@@ -2,7 +2,7 @@ import pytest
 
 from bonobo import Bag, FileReader, FileWriter
 from bonobo.constants import BEGIN, END
-from bonobo.execution.node import NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import BufferingNodeExecutionContext, FilesystemTester
 
 txt_tester = FilesystemTester('txt')
