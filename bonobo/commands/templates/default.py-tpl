@@ -19,7 +19,7 @@ def load(*args):
     print(*args)
 
 
-def get_graph():
+def get_graph(**options):
     """
     This function builds the graph that needs to be executed.
 
@@ -32,7 +32,7 @@ def get_graph():
     return graph
 
 
-def get_services():
+def get_services(**options):
     """
     This function builds the services dictionary, which is a simple dict of names-to-implementation used by bonobo
     for runtime injection.
@@ -48,5 +48,8 @@ def get_services():
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
     parser = bonobo.get_argument_parser()
-    with bonobo.parse_args(parser):
-        bonobo.run(get_graph(), services=get_services())
+    with bonobo.parse_args(parser) as options:
+        bonobo.run(
+            get_graph(**options),
+            services=get_services(**options)
+        )

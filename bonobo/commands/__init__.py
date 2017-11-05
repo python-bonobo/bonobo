@@ -16,6 +16,7 @@ def entrypoint(args=None):
 
     mondrian.setup(excepthook=True)
     logger = logging.getLogger()
+    logger.setLevel(settings.LOGGING_LEVEL.get())
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', '-D', action='store_true')
