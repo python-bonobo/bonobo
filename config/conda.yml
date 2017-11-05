@@ -1,9 +1,9 @@
 name: py35
 dependencies:
-- pip=9.0.1=py35_0
-- python=3.5.4=0
-- setuptools=36.6.0=py35_0
-- wheel=0.30.0=py35_0
+- pip=9.0.1
+- python=3.5
+- setuptools=36.5.0
+- wheel=0.29.0
 - pip:
   - appdirs==1.4.3
   - certifi==2017.7.27.1
