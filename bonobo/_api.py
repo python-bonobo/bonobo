@@ -10,8 +10,25 @@ __all__ = []
 
 
 def register_api(x, __all__=__all__):
+    """Register a function as being part of Bonobo's API, then returns the original function."""
     __all__.append(get_name(x))
     return x
+
+
+def register_graph_api(x, __all__=__all__):
+    """
+    Register a function as being part of Bonobo's API, after checking that its signature contains the right parameters
+    to work correctly, then returns the original function.
+    """
+    from inspect import signature
+    parameters = list(signature(x).parameters)
+    required_parameters = {'plugins', 'services', 'strategy'}
+    assert parameters[0] == 'graph', 'First parameter of a graph api function must be "graph".'
+    assert required_parameters.intersection(
+        parameters) == required_parameters, 'Graph api functions must define the following parameters: ' + ', '.join(
+        sorted(required_parameters))
+
+    return register_api(x, __all__=__all__)
 
 
 def register_api_group(*args):
@@ -19,7 +36,7 @@ def register_api_group(*args):
         register_api(attr)
 
 
-@register_api
+@register_graph_api
 def run(graph, *, plugins=None, services=None, strategy=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
@@ -82,8 +99,8 @@ def _inspect_as_graph(graph):
 _inspect_formats = {'graph': _inspect_as_graph}
 
 
-@register_api
-def inspect(graph, *, format):
+@register_graph_api
+def inspect(graph, *, plugins=None, services=None, strategy=None, format):
     if not format in _inspect_formats:
         raise NotImplementedError(
             'Output format {} not implemented. Choices are: {}.'.format(

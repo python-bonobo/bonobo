@@ -1,3 +1,19 @@
 svg {
     border: 2px solid green
 }
+
+div.related {
+    width: 940px;
+    margin: 30px auto 0 auto;
+}
+
+@media screen and (max-width: 875px) {
+    div.related {
+        visibility: hidden;
+        display: none;
+    }
+}
+
+.brand {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+}
