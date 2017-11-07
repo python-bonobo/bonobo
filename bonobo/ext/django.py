@@ -1,16 +1,20 @@
 from logging import getLogger
 
-from colorama import Fore, Back, Style
-from django.core.management.base import BaseCommand, OutputWrapper
-
 import bonobo
 import bonobo.util
 from bonobo.plugins.console import ConsoleOutputPlugin
 from bonobo.util.term import CLEAR_EOL
+from colorama import Fore, Back, Style
+from django.core.management.base import BaseCommand, OutputWrapper
 
 
 class ETLCommand(BaseCommand):
     GraphType = bonobo.Graph
+
+    def create_parser(self, prog_name, subcommand):
+        return bonobo.get_argument_parser(
+            super().create_parser(prog_name, subcommand)
+        )
 
     def create_or_update(self, model, *, defaults=None, save=True, **kwargs):
         """
@@ -63,10 +67,12 @@ class ETLCommand(BaseCommand):
         self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
         self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
 
-        result = bonobo.run(
-            self.get_graph(*args, **options),
-            services=self.get_services(),
-        )
-        self.stdout = _stdout_backup
+        with bonobo.parse_args(options) as options:
+            result = bonobo.run(
+                self.get_graph(*args, **options),
+                services=self.get_services(),
+            )
+
+        self.stdout, self.stderr = _stdout_backup, _stderr_backup
 
         return '\nReturn Value: ' + str(result)
