@@ -1,5 +1,5 @@
 conda:
-  file: config/conda.yml
+  file: readthedocs-conda.yml
 python:
   extra_requirements:
     - dev
