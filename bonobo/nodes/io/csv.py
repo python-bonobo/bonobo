@@ -3,43 +3,33 @@ import csv
 from bonobo.config import Option
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
-from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
+from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.util.objects import ValueHolder
 
 
 class CsvHandler(FileHandler):
-    """
-
-    .. attribute:: delimiter
-
-        The CSV delimiter.
-
-    .. attribute:: quotechar
-
-        The CSV quote character.
-
-    .. attribute:: headers
-
-        The list of column names, if the CSV does not contain it as its first line.
-
-    """
-    delimiter = Option(str, default=';')
-    quotechar = Option(str, default='"')
-    headers = Option(tuple, required=False)
+    delimiter = Option(str, default=';', __doc__='''
+        Delimiter used between values.
+    ''')
+    quotechar = Option(str, default='"', __doc__='''
+        Character used for quoting values.
+    ''')
+    headers = Option(tuple, required=False, __doc__='''
+        Tuple of headers to use, if provided.
+        Readers will try to guess that from first line, unless this option is provided.
+        Writers will guess from kwargs keys, unless this option is provided.
+    ''')
 
 
 class CsvReader(IOFormatEnabled, FileReader, CsvHandler):
     """
     Reads a CSV and yield the values as dicts.
-
-    .. attribute:: skip
-
-        The amount of lines to skip before it actually yield output.
-
     """
 
-    skip = Option(int, default=0)
+    skip = Option(int, default=0, __doc__='''
+        If set and greater than zero, the reader will skip this amount of lines.
+    ''')
 
     @ContextProcessor
     def csv_headers(self, context, fs, file):

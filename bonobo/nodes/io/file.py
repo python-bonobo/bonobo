@@ -12,7 +12,9 @@ class FileReader(Reader, FileHandler):
     present. Extending it is usually the right way to create more specific file readers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='r')
+    mode = Option(str, default='r', __doc__='''
+        What mode to use for open() call.
+    ''')  # type: str
 
     def read(self, fs, file):
         """
@@ -30,7 +32,9 @@ class FileWriter(Writer, FileHandler):
     usually the right way to create more specific file writers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='w+')
+    mode = Option(str, default='w+', __doc__='''
+        What mode to use for open() call.
+    ''')  # type: str
 
     @ContextProcessor
     def lineno(self, context, fs, file):

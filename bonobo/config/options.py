@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from bonobo.util.inspect import istype
 
 
@@ -60,7 +62,12 @@ class Option:
         self.positional = positional
         self.default = default
 
-        self.__doc__ = __doc__ or self.__doc__
+        # Docstring formating
+        self.__doc__ = __doc__ or None
+        if self.__doc__:
+            self.__doc__ = dedent(self.__doc__.strip('\n')).strip()
+            if default:
+                self.__doc__ += '\nDefault: {!r}'.format(default)
 
         # This hack is necessary for python3.5
         self._creation_counter = Option._creation_counter

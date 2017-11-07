@@ -1,5 +1,5 @@
-from bonobo.util import isoption, iscontextprocessor, sortedlist
 from bonobo.errors import AbstractError
+from bonobo.util import isoption, iscontextprocessor, sortedlist, get_name
 
 __all__ = [
     'Configurable',
@@ -36,6 +36,26 @@ class ConfigurableMeta(type):
                 if not name in cls.__names:
                     cls.__names.add(name)
                     cls.__options.insort((not value.positional, value._creation_counter, name, value))
+
+        # Docstring formating
+        _options_doc = []
+        for _positional, _counter, _name, _value in cls.__options:
+            _param = _name
+            if _value.type:
+                _param = get_name(_value.type) + ' ' + _param
+
+            prefix = ':param {}: '.format(_param)
+            for lineno, line in enumerate((_value.__doc__ or '').split('\n')):
+                _options_doc.append((' ' * len(prefix) if lineno else prefix) + line)
+        cls.__doc__ = '\n\n'.join(
+            map(
+                str.strip,
+                filter(None, (
+                    cls.__doc__,
+                    '\n'.join(_options_doc)
+                ))
+            )
+        )
 
     @property
     def __options__(cls):

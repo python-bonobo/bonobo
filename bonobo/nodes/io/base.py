@@ -5,14 +5,16 @@ from bonobo.structs.bags import Bag
 
 
 class IOFormatEnabled(Configurable):
-    ioformat = Option(default=settings.IOFORMAT.get)
+    ioformat = Option(default=settings.IOFORMAT.get, __doc__='''
+        Input/output format for rows. This will be removed in 0.6, so please use the kwargs format.
+    ''')
 
     def get_input(self, *args, **kwargs):
         if self.ioformat == settings.IOFORMAT_ARG0:
             if len(args) != 1 or len(kwargs):
                 raise UnrecoverableValueError(
                     'Wrong input formating: IOFORMAT=ARG0 implies one arg and no kwargs, got args={!r} and kwargs={!r}.'.
-                    format(args, kwargs)
+                        format(args, kwargs)
                 )
             return args[0]
 
@@ -20,7 +22,7 @@ class IOFormatEnabled(Configurable):
             if len(args) or not len(kwargs):
                 raise UnrecoverableValueError(
                     'Wrong input formating: IOFORMAT=KWARGS ioformat implies no arg, got args={!r} and kwargs={!r}.'.
-                    format(args, kwargs)
+                        format(args, kwargs)
                 )
             return kwargs
 
@@ -40,17 +42,26 @@ class FileHandler(Configurable):
     """Abstract component factory for file-related components.
 
     Args:
-        path (str): which path to use within the provided filesystem.
-        eol (str): which character to use to separate lines.
+        eol (str): which
         mode (str): which mode to use when opening the file.
         fs (str): service name to use for filesystem.
     """
 
-    path = Option(str, required=True, positional=True)  # type: str
-    eol = Option(str, default='\n')  # type: str
-    mode = Option(str)  # type: str
-    encoding = Option(str, default='utf-8')  # type: str
-    fs = Service('fs')  # type: str
+    path = Option(str, required=True, positional=True, __doc__='''
+        Path to use within the provided filesystem.
+    ''')  # type: str
+    eol = Option(str, default='\n', __doc__='''
+        Character to use as line separator.
+    ''')  # type: str
+    mode = Option(str, __doc__='''
+        What mode to use for open() call.
+    ''')  # type: str
+    encoding = Option(str, default='utf-8', __doc__='''
+        Encoding.
+    ''')  # type: str
+    fs = Service('fs', __doc__='''
+        The filesystem instance to use.
+    ''')  # type: str
 
     @ContextProcessor
     def file(self, context, fs):
