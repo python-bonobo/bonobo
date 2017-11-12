@@ -1,4 +1,5 @@
 import csv
+import warnings
 
 from bonobo.config import Option
 from bonobo.config.options import RemovedOption
@@ -60,12 +61,9 @@ class CsvReader(FileReader, CsvHandler):
             for _ in range(0, self.skip):
                 next(reader)
 
-        for row in reader:
+        for lineno, row in enumerate(reader):
             if len(row) != field_count:
-                raise ValueError('Got a line with %d fields, expecting %d.' % (
-                    len(row),
-                    field_count,
-                ))
+                warnings.warn('Got %d fields on line #%d, expecting %d.' % (len(row), lineno, field_count,))
 
             yield dict(zip(_headers, row))
 
@@ -81,6 +79,6 @@ class CsvWriter(FileWriter, CsvHandler):
         if not lineno:
             headers.set(headers.value or row.keys())
             writer.writerow(headers.get())
-        writer.writerow(row[header] for header in headers.get())
+        writer.writerow(row.get(header, '') for header in headers.get())
         lineno += 1
         return NOT_MODIFIED

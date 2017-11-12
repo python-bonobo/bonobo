@@ -28,8 +28,8 @@ class WithStatistics:
         stats = tuple('{0}={1}'.format(name, cnt) for name, cnt in self.get_statistics(*args, **kwargs) if cnt > 0)
         return (kwargs.get('prefix', '') + ' '.join(stats)) if len(stats) else ''
 
-    def increment(self, name):
-        self.statistics[name] += 1
+    def increment(self, name, *, amount=1):
+        self.statistics[name] += amount
 
 
 class Timer:
