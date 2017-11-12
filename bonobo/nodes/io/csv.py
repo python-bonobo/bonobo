@@ -61,12 +61,9 @@ class CsvReader(FileReader, CsvHandler):
             for _ in range(0, self.skip):
                 next(reader)
 
-        for row in reader:
+        for lineno, row in enumerate(reader):
             if len(row) != field_count:
-                warnings.warn('Got a line with %d fields, expecting %d.' % (
-                    len(row),
-                    field_count,
-                ))
+                warnings.warn('Got %d fields on line #%d, expecting %d.' % (len(row), lineno, field_count,))
 
             yield dict(zip(_headers, row))
 
