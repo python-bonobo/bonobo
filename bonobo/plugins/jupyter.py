@@ -30,6 +30,4 @@ class JupyterOutputPlugin(Plugin):
         IPython.core.display.display(self.widget)
 
     def tick(self, event):
-        self.widget.value = [
-            event.context[i].as_dict() for i in event.context.graph.topologically_sorted_indexes
-        ]
+        self.widget.value = [event.context[i].as_dict() for i in event.context.graph.topologically_sorted_indexes]

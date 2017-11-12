@@ -159,7 +159,7 @@ def test_eq_operator_dict():
 
 def test_repr():
     bag = Bag('a', a=1)
-    assert repr(bag) == "<Bag ('a', a=1)>"
+    assert repr(bag) == "Bag('a', a=1)"
 
 
 def test_iterator():

@@ -1,3 +1,4 @@
+from operator import methodcaller
 from unittest.mock import MagicMock
 
 import pytest
@@ -5,6 +6,7 @@ import pytest
 import bonobo
 from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import NOT_MODIFIED
+from bonobo.util.testing import BufferingNodeExecutionContext
 
 
 def test_count():
@@ -72,3 +74,38 @@ def test_tee():
 
 def test_noop():
     assert bonobo.noop(1, 2, 3, 4, foo='bar') == NOT_MODIFIED
+
+
+def test_update():
+    with BufferingNodeExecutionContext(bonobo.Update('a', k=True)) as context:
+        context.write_sync('a', ('a', {'b': 1}), ('b', {'k': False}))
+    assert context.get_buffer() == [
+        bonobo.Bag('a', 'a', k=True),
+        bonobo.Bag('a', 'a', b=1, k=True),
+        bonobo.Bag('b', 'a', k=True),
+    ]
+    assert context.name == "Update('a', k=True)"
+
+
+def test_fixedwindow():
+    with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
+        context.write_sync(*range(10))
+    assert context.get_buffer() == [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+
+    with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
+        context.write_sync(*range(9))
+    assert context.get_buffer() == [[0, 1], [2, 3], [4, 5], [6, 7], [8]]
+
+    with BufferingNodeExecutionContext(bonobo.FixedWindow(1)) as context:
+        context.write_sync(*range(3))
+    assert context.get_buffer() == [[0], [1], [2]]
+
+
+def test_methodcaller():
+    with BufferingNodeExecutionContext(methodcaller('swapcase')) as context:
+        context.write_sync('aaa', 'bBb', 'CcC')
+    assert context.get_buffer() == ['AAA', 'BbB', 'cCc']
+
+    with BufferingNodeExecutionContext(methodcaller('zfill', 5)) as context:
+        context.write_sync('a', 'bb', 'ccc')
+    assert context.get_buffer() == ['0000a', '000bb', '00ccc']

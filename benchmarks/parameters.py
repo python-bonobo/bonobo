@@ -14,23 +14,30 @@ k3 1.353256585993222
 import json
 import timeit
 
+
 def j1(d):
     return {'prepend': 'foo', **d, 'append': 'bar'}
+
 
 def k1(**d):
     return {'prepend': 'foo', **d, 'append': 'bar'}
 
+
 def j2(d):
     return {**d}
+
 
 def k2(**d):
     return {**d}
 
+
 def j3(d):
     return None
 
+
 def k3(**d):
     return None
+
 
 if __name__ == '__main__':
     import timeit
@@ -38,7 +45,12 @@ if __name__ == '__main__':
     with open('person.json') as f:
         json_data = json.load(f)
 
-
-    for i in 1,2,3:
-        print('j{}'.format(i), timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i)))
-        print('k{}'.format(i), timeit.timeit("k{}(**{!r})".format(i, json_data), setup="from __main__ import k{}".format(i)))
+    for i in 1, 2, 3:
+        print(
+            'j{}'.format(i),
+            timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i))
+        )
+        print(
+            'k{}'.format(i),
+            timeit.timeit("k{}(**{!r})".format(i, json_data), setup="from __main__ import k{}".format(i))
+        )

@@ -10,6 +10,7 @@ from bonobo.util import get_name
 
 logger = logging.getLogger(__name__)
 
+
 class ExecutorStrategy(Strategy):
     """
     Strategy based on a concurrent.futures.Executor subclass (or similar interface).

@@ -22,9 +22,7 @@ class ETLCommand(BaseCommand):
     create_or_update = staticmethod(create_or_update)
 
     def create_parser(self, prog_name, subcommand):
-        return bonobo.get_argument_parser(
-            super().create_parser(prog_name, subcommand)
-        )
+        return bonobo.get_argument_parser(super().create_parser(prog_name, subcommand))
 
     def get_graph(self, *args, **options):
         def not_implemented():
