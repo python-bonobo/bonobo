@@ -242,8 +242,8 @@ The console output contains two things.
       a call, but the execution will move to the next row.
 
 
-Moving forward
-::::::::::::::
+Wrap up
+:::::::
 
 That's all for this first step.
 

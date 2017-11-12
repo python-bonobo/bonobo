@@ -1,7 +1,7 @@
 import itertools
 
-from bonobo.structs.tokens import Token
 from bonobo.constants import INHERIT_INPUT, LOOPBACK
+from bonobo.structs.tokens import Token
 
 __all__ = [
     'Bag',
@@ -35,6 +35,10 @@ class Bag:
     """
 
     default_flags = ()
+
+    @staticmethod
+    def format_args(*args, **kwargs):
+        return ', '.join(itertools.chain(map(repr, args), ('{}={!r}'.format(k, v) for k, v in kwargs.items())))
 
     def __new__(cls, *args, _flags=None, _parent=None, **kwargs):
         # Handle the special case where we call Bag's constructor with only one bag or token as argument.
@@ -85,6 +89,9 @@ class Bag:
             # Otherwise, lets get args/kwargs from the constructor.
             self._args = args
             self._kwargs = kwargs
+
+    def __repr__(self):
+        return 'Bag({})'.format(Bag.format_args(*self.args, **self.kwargs))
 
     @property
     def args(self):
@@ -141,7 +148,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
 
     def __eq__(self, other):
         # XXX there are overlapping cases, but this is very handy for now. Let's think about it later.
@@ -169,19 +176,9 @@ class Bag:
 
         return len(self.args) == 1 and not self.kwargs and self.args[0] == other
 
-    def __repr__(self):
-        return '<{} ({})>'.format(
-            type(self).__name__, ', '.join(
-                itertools.chain(
-                    map(repr, self.args),
-                    ('{}={}'.format(k, repr(v)) for k, v in self.kwargs.items()),
-                )
-            )
-        )
-
 
 class LoopbackBag(Bag):
-    default_flags = (LOOPBACK, )
+    default_flags = (LOOPBACK,)
 
 
 class ErrorBag(Bag):

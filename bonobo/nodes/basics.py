@@ -4,16 +4,17 @@ import itertools
 from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
 
-from bonobo.constants import NOT_MODIFIED
-
 __all__ = [
+    'FixedWindow',
     'Limit',
     'PrettyPrinter',
     'Tee',
+    'Update',
     'arg0_to_kwargs',
     'count',
     'identity',
@@ -128,3 +129,49 @@ def kwargs_to_arg0(**row):
     :return: bonobo.Bag
     """
     return Bag(row)
+
+
+def Update(*consts, **kwconsts):
+    """
+    Transformation factory to update a stream with constant values, by appending to args and updating kwargs.
+
+    :param consts: what to append to the input stream args
+    :param kwconsts: what to use to update input stream kwargs
+    :return: function
+
+    """
+
+    def update(*args, **kwargs):
+        nonlocal consts, kwconsts
+        return (*args, *consts, {**kwargs, **kwconsts})
+
+    update.__name__ = 'Update({})'.format(Bag.format_args(*consts, **kwconsts))
+
+    return update
+
+
+class FixedWindow(Configurable):
+    """
+    Transformation factory to create fixed windows of inputs, as lists.
+
+    For example, if the input is successively 1, 2, 3, 4, etc. and you pass it through a ``FixedWindow(2)``, you'll get
+    lists of elements 2 by 2: [1, 2], [3, 4], ...
+
+    """
+
+    length = Option(int, positional=True)  # type: int
+
+    @ContextProcessor
+    def buffer(self, context):
+        buffer = yield ValueHolder([])
+        if len(buffer):
+            context.send(Bag(buffer.get()))
+
+    def call(self, buffer, x):
+        buffer.append(x)
+        if len(buffer) >= self.length:
+            yield buffer.get()
+            buffer.set([])
+
+
+

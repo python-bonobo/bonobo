@@ -225,6 +225,9 @@ class ValueHolder:
     def __setitem__(self, key, value):
         self._value[key] = value
 
+    def __getattr__(self, item):
+        return getattr(self._value, item)
+
 
 def get_attribute_or_create(obj, attr, default):
     try:

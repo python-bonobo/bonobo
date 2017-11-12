@@ -1,4 +1,4 @@
-from .plugin import JupyterOutputPlugin
+from bonobo.plugins.jupyter import JupyterOutputPlugin
 
 
 def _jupyter_nbextension_paths():

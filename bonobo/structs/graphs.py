@@ -1,5 +1,8 @@
+import html
 import json
 from copy import copy
+
+from graphviz.dot import Digraph
 
 from bonobo.constants import BEGIN
 from bonobo.util import get_name
@@ -112,23 +115,31 @@ class Graph:
             self._topologcally_sorted_indexes_cache = tuple(filter(lambda i: type(i) is int, reversed(order)))
             return self._topologcally_sorted_indexes_cache
 
+    @property
+    def graphviz(self):
+        try:
+            return self._graphviz
+        except AttributeError:
+            g = Digraph()
+            g.attr(rankdir='LR')
+            g.node('BEGIN', shape='point')
+            for i in self.outputs_of(BEGIN):
+                g.edge('BEGIN', str(i))
+            for ix in self.topologically_sorted_indexes:
+                g.node(str(ix), label=get_name(self[ix]))
+                for iy in self.outputs_of(ix):
+                    g.edge(str(ix), str(iy))
+            self._graphviz = g
+            return self._graphviz
+
     def _repr_dot_(self):
-        src = [
-            'digraph {',
-            '  rankdir = LR;',
-            '  "BEGIN" [shape="point"];',
-        ]
+        return str(self.graphviz)
 
-        for i in self.outputs_of(BEGIN):
-            src.append('  "BEGIN" -> ' + _get_graphviz_node_id(self, i) + ';')
+    def _repr_svg_(self):
+        return self.graphviz._repr_svg_()
 
-        for ix in self.topologically_sorted_indexes:
-            for iy in self.outputs_of(ix):
-                src.append('  {} -> {};'.format(_get_graphviz_node_id(self, ix), _get_graphviz_node_id(self, iy)))
-
-        src.append('}')
-
-        return '\n'.join(src)
+    def _repr_html_(self):
+        return '<div>{}</div><pre>{}</pre>'.format(self.graphviz._repr_svg_(), html.escape(repr(self)))
 
     def _resolve_index(self, mixed):
         """ Find the index based on various strategies for a node, probably an input or output of chain. Supported inputs are indexes, node values or names.

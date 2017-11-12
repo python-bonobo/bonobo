@@ -193,5 +193,5 @@ rst_epilog = """
 .. |longversion| replace:: v.{version}
 
 """.format(
-    version = version,
+    version=version,
 )
