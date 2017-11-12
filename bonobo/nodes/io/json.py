@@ -35,13 +35,14 @@ class JsonWriter(FileWriter, JsonHandler):
         yield
         file.write(self.suffix)
 
-    def write(self, fs, file, lineno, **row):
+    def write(self, fs, file, lineno, arg0=None, **kwargs):
         """
         Write a json row on the next line of file pointed by ctx.file.
 
         :param ctx:
         :param row:
         """
+        row = _getrow(arg0, kwargs)
         self._write_line(file, (self.eol if lineno.value else '') + json.dumps(row))
         lineno += 1
         return NOT_MODIFIED
@@ -59,7 +60,19 @@ class LdjsonReader(FileReader):
 class LdjsonWriter(FileWriter):
     """Write a stream of JSON objects, one object per line."""
 
-    def write(self, fs, file, lineno, **row):
-        lineno += 1  # class-level variable
+    def write(self, fs, file, lineno, arg0=None, **kwargs):
+        row = _getrow(arg0, kwargs)
         file.write(json.dumps(row) + '\n')
+        lineno += 1  # class-level variable
         return NOT_MODIFIED
+
+
+def _getrow(arg0, kwargs):
+    if len(kwargs):
+        assert arg0 is None, 'Got both positional and keyword arguments, I recommend using keyword arguments.'
+        return kwargs
+
+    if arg0 is not None:
+        return arg0
+
+    return kwargs
