@@ -52,15 +52,8 @@ class ExecutorStrategy(Strategy):
         def starter(node):
             @functools.wraps(node)
             def _runner():
-                try:
-                    with node:
-                        node.loop()
-                except:
-                    logging.getLogger(__name__).critical(
-                        'Uncaught exception in node execution for {}.'.format(node), exc_info=True
-                    )
-                    node.shutdown()
-                    node.stop()
+                with node:
+                    node.loop()
 
             try:
                 futures.append(executor.submit(_runner))

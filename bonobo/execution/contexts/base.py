@@ -1,14 +1,10 @@
 import logging
 import sys
 from contextlib import contextmanager
-from logging import WARNING, ERROR
+from logging import ERROR
 
-import mondrian
-from bonobo.config import create_container
-from bonobo.config.processors import ContextCurrifier
-from bonobo.execution import logger
-from bonobo.util import isconfigurabletype
 from bonobo.util.objects import Wrapper, get_name
+from mondrian import term
 
 
 @contextmanager
@@ -28,8 +24,12 @@ def unrecoverable(error_handler):
         raise  # raise unrecoverableerror from x ?
 
 
-class LoopingExecutionContext(Wrapper):
-    PERIOD = 0.5
+class Lifecycle:
+    def __init__(self):
+        self._started = False
+        self._stopped = False
+        self._killed = False
+        self._defunct = False
 
     @property
     def started(self):
@@ -40,12 +40,21 @@ class LoopingExecutionContext(Wrapper):
         return self._stopped
 
     @property
+    def killed(self):
+        return self._killed
+
+    @property
     def defunct(self):
         return self._defunct
 
     @property
     def alive(self):
         return self._started and not self._stopped
+
+    @property
+    def should_loop(self):
+        # TODO XXX started/stopped?
+        return not any((self.defunct, self.killed))
 
     @property
     def status(self):
@@ -58,23 +67,6 @@ class LoopingExecutionContext(Wrapper):
             return '+'
         return '-'
 
-    def __init__(self, wrapped, parent, services=None):
-        super().__init__(wrapped)
-
-        self.parent = parent
-
-        if services:
-            if parent:
-                raise RuntimeError(
-                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.'
-                )
-            self.services = create_container(services)
-        else:
-            self.services = None
-
-        self._started, self._stopped, self._defunct = False, False, False
-        self._stack = None
-
     def __enter__(self):
         self.start()
         return self
@@ -82,57 +74,54 @@ class LoopingExecutionContext(Wrapper):
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.stop()
 
+    def get_flags_as_string(self):
+        if self._defunct:
+            return term.red('[defunct]')
+        if self.killed:
+            return term.lightred('[killed]')
+        if self.stopped:
+            return term.lightblack('[done]')
+        return ''
+
     def start(self):
         if self.started:
-            raise RuntimeError('Cannot start a node twice ({}).'.format(get_name(self)))
+            raise RuntimeError('This context is already started ({}).'.format(get_name(self)))
 
         self._started = True
 
-        try:
-            self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
-            if isconfigurabletype(self.wrapped):
-                # Not normal to have a partially configured object here, so let's warn the user instead of having get into
-                # the hard trouble of understanding that by himself.
-                raise TypeError(
-                    'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
-                )
-            self._stack.setup(self)
-        except Exception:
-            return self.fatal(sys.exc_info())
-
-    def loop(self):
-        """Generic loop. A bit boring. """
-        while self.alive:
-            self.step()
-
-    def step(self):
-        """Left as an exercise for the children."""
-        raise NotImplementedError('Abstract.')
-
     def stop(self):
         if not self.started:
-            raise RuntimeError('Cannot stop an unstarted node ({}).'.format(get_name(self)))
+            raise RuntimeError('This context cannot be stopped as it never started ({}).'.format(get_name(self)))
 
-        if self._stopped:
+        self._stopped = True
+
+        if self._stopped:  # Stopping twice has no effect
             return
 
-        try:
-            if self._stack:
-                self._stack.teardown()
-        finally:
-            self._stopped = True
+    def kill(self):
+        if not self.started:
+            raise RuntimeError('Cannot kill an unstarted context.')
 
-    def _get_initial_context(self):
-        if self.parent:
-            return self.parent.services.args_for(self.wrapped)
-        if self.services:
-            return self.services.args_for(self.wrapped)
-        return ()
+        if self.stopped:
+            raise RuntimeError('Cannot kill a stopped context.')
 
-    def handle_error(self, exctype, exc, tb, *, level=logging.ERROR):
-        logging.getLogger(__name__).log(level, repr(self), exc_info=(exctype, exc, tb))
+        self._killed = True
 
-    def fatal(self, exc_info):
+    def fatal(self, exc_info, *, level=logging.CRITICAL):
+        logging.getLogger(__name__).log(level, repr(self), exc_info=exc_info)
         self._defunct = True
-        self.input.shutdown()
-        self.handle_error(*exc_info, level=logging.CRITICAL)
+
+    def as_dict(self):
+        return {
+            'status': self.status,
+            'name': self.name,
+            'stats': self.get_statistics_as_string(),
+            'flags': self.get_flags_as_string(),
+        }
+
+
+class BaseContext(Lifecycle, Wrapper):
+    def __init__(self, wrapped, *, parent=None):
+        Lifecycle.__init__(self)
+        Wrapper.__init__(self, wrapped)
+        self.parent = parent

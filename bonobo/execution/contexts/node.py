@@ -1,38 +1,44 @@
 import logging
 import sys
-import warnings
 from queue import Empty
 from time import sleep
 from types import GeneratorType
 
-from bonobo.constants import NOT_MODIFIED, BEGIN, END
+from bonobo.config import create_container
+from bonobo.config.processors import ContextCurrifier
+from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError
-from bonobo.execution.contexts.base import LoopingExecutionContext
+from bonobo.execution.contexts.base import BaseContext
 from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
 from bonobo.structs.tokens import Token
-from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag, istuple
-from bonobo.util.compat import deprecated_alias
+from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag, istuple, isconfigurabletype
 from bonobo.util.statistics import WithStatistics
-from mondrian import term
+
+logger = logging.getLogger(__name__)
 
 
-class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
-    """
-    todo: make the counter dependant of parent context?
-    """
-
-    @property
-    def killed(self):
-        return self._killed
-
-    def __init__(self, wrapped, parent=None, services=None, _input=None, _outputs=None):
-        LoopingExecutionContext.__init__(self, wrapped, parent=parent, services=services)
+class NodeExecutionContext(BaseContext, WithStatistics):
+    def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
+        BaseContext.__init__(self, wrapped, parent=parent)
         WithStatistics.__init__(self, 'in', 'out', 'err', 'warn')
 
+        # Services: how we'll access external dependencies
+        if services:
+            if self.parent:
+                raise RuntimeError(
+                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.'
+                )
+            self.services = create_container(services)
+        else:
+            self.services = None
+
+        # Input / Output: how the wrapped node will communicate
         self.input = _input or Input()
         self.outputs = _outputs or []
-        self._killed = False
+
+        # Stack: context decorators for the execution
+        self._stack = None
 
     def __str__(self):
         return self.__name__ + self.get_statistics_as_string(prefix=' ')
@@ -41,14 +47,94 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         name, type_name = get_name(self), get_name(type(self))
         return '<{}({}{}){}>'.format(type_name, self.status, name, self.get_statistics_as_string(prefix=' '))
 
-    def get_flags_as_string(self):
-        if self._defunct:
-            return term.red('[defunct]')
-        if self.killed:
-            return term.lightred('[killed]')
-        if self.stopped:
-            return term.lightblack('[done]')
-        return ''
+    def start(self):
+        super().start()
+
+        try:
+            self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
+            if isconfigurabletype(self.wrapped):
+                # Not normal to have a partially configured object here, so let's warn the user instead of having get into
+                # the hard trouble of understanding that by himself.
+                raise TypeError(
+                    'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
+                )
+            self._stack.setup(self)
+        except Exception:
+            return self.fatal(sys.exc_info())
+
+    def loop(self):
+        logger.debug('Node loop starts for {!r}.'.format(self))
+        while self.should_loop:
+            try:
+                self.step()
+            except InactiveReadableError:
+                break
+            except Empty:
+                sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
+                continue
+            except UnrecoverableError:
+                self.handle_error(*sys.exc_info())
+                self.input.shutdown()
+                break
+            except Exception:  # pylint: disable=broad-except
+                self.handle_error(*sys.exc_info())
+            except BaseException:
+                self.handle_error(*sys.exc_info())
+                break
+        logger.debug('Node loop ends for {!r}.'.format(self))
+
+    def step(self):
+        """Runs a transformation callable with given args/kwargs and flush the result into the right
+        output channel."""
+
+        # Pull data
+        input_bag = self.get()
+
+        # Sent through the stack
+        try:
+            results = input_bag.apply(self._stack)
+        except Exception:
+            return self.handle_error(*sys.exc_info())
+
+        # self._exec_time += timer.duration
+        # Put data onto output channels
+
+        if isinstance(results, GeneratorType):
+            while True:
+                try:
+                    # if kill flag was step, stop iterating.
+                    if self._killed:
+                        break
+                    result = next(results)
+                except StopIteration:
+                    # That's not an error, we're just done.
+                    break
+                except Exception:
+                    # Let's kill this loop, won't be able to generate next.
+                    self.handle_error(*sys.exc_info())
+                    break
+                else:
+                    self.send(_resolve(input_bag, result))
+        elif results:
+            self.send(_resolve(input_bag, results))
+        else:
+            # case with no result, an execution went through anyway, use for stats.
+            # self._exec_count += 1
+            pass
+
+    def stop(self):
+        if self._stack:
+            self._stack.teardown()
+
+        super().stop()
+
+    def handle_error(self, exctype, exc, tb, *, level=logging.ERROR):
+        self.increment('err')
+        logging.getLogger(__name__).log(level, repr(self), exc_info=(exctype, exc, tb))
+
+    def fatal(self, exc_info, *, level=logging.CRITICAL):
+        super().fatal(exc_info, level=level)
+        self.input.shutdown()
 
     def write(self, *messages):
         """
@@ -63,9 +149,6 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
         self.write(BEGIN, *messages, END)
         for _ in messages:
             self.step()
-
-    # XXX deprecated alias
-    recv = deprecated_alias('recv', write)
 
     def send(self, value, _control=False):
         """
@@ -86,89 +169,25 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             for output in self.outputs:
                 output.put(value)
 
-    push = deprecated_alias('push', send)
-
-    def get(self):  # recv() ? input_data = self.receive()
+    def get(self):
         """
         Get from the queue first, then increment stats, so if Queue raise Timeout or Empty, stat won't be changed.
 
         """
-        row = self.input.get(timeout=self.PERIOD)
+        row = self.input.get()  # XXX TIMEOUT ???
         self.increment('in')
         return row
 
-    def should_loop(self):
-        return not any((self.defunct, self.killed))
-
-    def loop(self):
-        while self.should_loop():
-            try:
-                self.step()
-            except InactiveReadableError:
-                break
-            except Empty:
-                sleep(self.PERIOD)
-                continue
-            except UnrecoverableError:
-                self.handle_error(*sys.exc_info())
-                self.input.shutdown()
-                break
-            except Exception:  # pylint: disable=broad-except
-                self.handle_error(*sys.exc_info())
-            except BaseException:
-                self.handle_error(*sys.exc_info())
-                break
-
-    def step(self):
-        # Pull data from the first available input channel.
-        """Runs a transformation callable with given args/kwargs and flush the result into the right
-        output channel."""
-
-        input_bag = self.get()
-
-        results = input_bag.apply(self._stack)
-
-        # self._exec_time += timer.duration
-        # Put data onto output channels
-
-        if isinstance(results, GeneratorType):
-            while True:
-                try:
-                    # if kill flag was step, stop iterating.
-                    if self._killed:
-                        break
-                    result = next(results)
-                except StopIteration:
-                    break
-                else:
-                    self.send(_resolve(input_bag, result))
-        elif results:
-            self.send(_resolve(input_bag, results))
-        else:
-            # case with no result, an execution went through anyway, use for stats.
-            # self._exec_count += 1
-            pass
-
-    def kill(self):
-        if not self.started:
-            raise RuntimeError('Cannot kill a node context that has not started yet.')
-
-        if self.stopped:
-            raise RuntimeError('Cannot kill a node context that has already stopped.')
-
-        self._killed = True
-
-    def as_dict(self):
-        return {
-            'status': self.status,
-            'name': self.name,
-            'stats': self.get_statistics_as_string(),
-            'flags': self.get_flags_as_string(),
-        }
+    def _get_initial_context(self):
+        if self.parent:
+            return self.parent.services.args_for(self.wrapped)
+        if self.services:
+            return self.services.args_for(self.wrapped)
+        return ()
 
 
 def isflag(param):
-    return isinstance(param, Token) and param in (NOT_MODIFIED,)
+    return isinstance(param, Token) and param in (NOT_MODIFIED, )
 
 
 def split_tokens(output):
@@ -180,11 +199,11 @@ def split_tokens(output):
     """
     if isinstance(output, Token):
         # just a flag
-        return (output,), ()
+        return (output, ), ()
 
     if not istuple(output):
         # no flag
-        return (), (output,)
+        return (), (output, )
 
     i = 0
     while isflag(output[i]):

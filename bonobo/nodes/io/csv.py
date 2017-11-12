@@ -1,13 +1,13 @@
 import csv
 import warnings
 
-from bonobo.config import Option
-from bonobo.config.options import RemovedOption
-from bonobo.config.processors import ContextProcessor
-from bonobo.constants import NOT_MODIFIED
+from bonobo.config import Option, ContextProcessor
+from bonobo.config.options import RemovedOption, Method
+from bonobo.constants import NOT_MODIFIED, ARGNAMES
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.util.objects import ValueHolder
+from bonobo.structs.bags import Bag
+from bonobo.util import ensure_tuple
 
 
 class CsvHandler(FileHandler):
@@ -28,7 +28,7 @@ class CsvHandler(FileHandler):
     """
     delimiter = Option(str, default=';')
     quotechar = Option(str, default='"')
-    headers = Option(tuple, required=False)
+    headers = Option(ensure_tuple, required=False)
     ioformat = RemovedOption(positional=False, value='kwargs')
 
 
@@ -44,41 +44,66 @@ class CsvReader(FileReader, CsvHandler):
 
     skip = Option(int, default=0)
 
-    @ContextProcessor
-    def csv_headers(self, context, fs, file):
-        yield ValueHolder(self.headers)
+    @Method(
+        __doc__='''
+            Builds the CSV reader, a.k.a an object we can iterate, each iteration giving one line of fields, as an
+            iterable.
+            
+            Defaults to builtin csv.reader(...), but can be overriden to fit your special needs.
+        '''
+    )
+    def reader_factory(self, file):
+        return csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
 
-    def read(self, fs, file, headers):
-        reader = csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
-
-        if not headers.get():
-            headers.set(next(reader))
-        _headers = headers.get()
-
-        field_count = len(headers)
-
-        if self.skip and self.skip > 0:
-            for _ in range(0, self.skip):
-                next(reader)
-
-        for lineno, row in enumerate(reader):
-            if len(row) != field_count:
-                warnings.warn('Got %d fields on line #%d, expecting %d.' % (len(row), lineno, field_count,))
-
-            yield dict(zip(_headers, row))
+    def read(self, fs, file):
+        reader = self.reader_factory(file)
+        headers = self.headers or next(reader)
+        for row in reader:
+            yield Bag(*row, **{ARGNAMES: headers})
 
 
 class CsvWriter(FileWriter, CsvHandler):
     @ContextProcessor
-    def writer(self, context, fs, file, lineno):
-        writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol)
-        headers = ValueHolder(list(self.headers) if self.headers else None)
-        yield writer, headers
+    def context(self, context, *args):
+        yield context
 
-    def write(self, fs, file, lineno, writer, headers, **row):
-        if not lineno:
-            headers.set(headers.value or row.keys())
-            writer.writerow(headers.get())
-        writer.writerow(row.get(header, '') for header in headers.get())
+    @Method(
+        __doc__='''
+            Builds the CSV writer, a.k.a an object we can pass a field collection to be written as one line in the
+            target file.
+            
+            Defaults to builtin csv.writer(...).writerow, but can be overriden to fit your special needs.
+        '''
+    )
+    def writer_factory(self, file):
+        return csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol).writerow
+
+    def write(self, fs, file, lineno, context, *args, _argnames=None):
+        try:
+            writer = context.writer
+        except AttributeError:
+            context.writer = self.writer_factory(file)
+            writer = context.writer
+            context.headers = self.headers or _argnames
+
+        if context.headers and not lineno:
+            writer(context.headers)
+
         lineno += 1
+
+        if context.headers:
+            try:
+                row = [args[i] for i, header in enumerate(context.headers) if header]
+            except IndexError:
+                warnings.warn(
+                    'At line #{}, expected {} fields but only got {}. Padding with empty strings.'.format(
+                        lineno, len(context.headers), len(args)
+                    )
+                )
+                row = [(args[i] if i < len(args) else '') for i, header in enumerate(context.headers) if header]
+        else:
+            row = args
+
+        writer(row)
+
         return NOT_MODIFIED

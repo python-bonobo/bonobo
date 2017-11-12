@@ -16,6 +16,8 @@ def ensure_tuple(tuple_or_mixed):
     :return: tuple
 
     """
+    if tuple_or_mixed is None:
+        return ()
     if isinstance(tuple_or_mixed, tuple):
         return tuple_or_mixed
     return (tuple_or_mixed, )
