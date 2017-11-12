@@ -8,6 +8,7 @@ from bonobo.constants import BEGIN, END
 from bonobo.execution.strategies.base import Strategy
 from bonobo.util import get_name
 
+logger = logging.getLogger(__name__)
 
 class ExecutorStrategy(Strategy):
     """
@@ -30,8 +31,7 @@ class ExecutorStrategy(Strategy):
             try:
                 context.start(self.get_starter(executor, futures))
             except:
-                logging.getLogger(__name__
-                                  ).warning('KeyboardInterrupt received. Trying to terminate the nodes gracefully.')
+                logger.critical('Exception caught while starting execution context.', exc_info=sys.exc_info())
 
             while context.alive:
                 try:

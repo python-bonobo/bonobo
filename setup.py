@@ -43,6 +43,14 @@ else:
 setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
+    data_files=[
+        (
+            'share/jupyter/nbextensions/bonobo-jupyter', [
+                'bonobo/contrib/jupyter/static/extension.js', 'bonobo/contrib/jupyter/static/index.js',
+                'bonobo/contrib/jupyter/static/index.js.map'
+            ]
+        )
+    ],
     description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
@@ -53,14 +61,14 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'jinja2 (>= 2.9, < 2.10)', 'mondrian (>= 0.4, < 0.5)',
-        'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6.0)', 'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.27, < 1.28)',
-        'whistle (>= 1.0, < 1.1)'
+        'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'graphviz (>= 0.8, < 0.9)', 'jinja2 (>= 2.9, < 3)',
+        'mondrian (>= 0.4, < 0.5)', 'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6)', 'requests (>= 2, < 3)',
+        'stevedore (>= 1.27, < 1.28)', 'whistle (>= 1.0, < 1.1)'
     ],
     extras_require={
         'dev': [
             'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)', 'pytest-cov (>= 2.5, < 3.0)',
-            'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)', 'sphinx (>= 1.6, < 2.0)', 'yapf'
+            'pytest-sugar (>= 0.9, < 0.10)', 'pytest-timeout (>= 1, < 2)', 'sphinx (>= 1.6, < 2.0)', 'yapf'
         ],
         'docker': ['bonobo-docker (>= 0.5.0)'],
         'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)'],

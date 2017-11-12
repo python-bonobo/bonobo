@@ -159,6 +159,14 @@ class NodeExecutionContext(WithStatistics, LoopingExecutionContext):
             # self._exec_count += 1
             pass
 
+    def as_dict(self):
+        return {
+            'status': self.status,
+            'name': self.name,
+            'stats': self.get_statistics_as_string(),
+            'flags': self.get_flags_as_string(),
+        }
+
 
 def isflag(param):
     return isinstance(param, Token) and param in (NOT_MODIFIED, )

@@ -34,7 +34,7 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 /******/ 	__webpack_require__.c = installedModules;
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "https://unpkg.com/jupyter-widget-example@0.0.1/dist/";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -44,11 +44,14 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// Entry point for the unpkg bundle containing custom model definitions.
+	// Entry point for the notebook bundle containing custom model definitions.
 	//
-	// It differs from the notebook bundle in that it does not need to define a
-	// dynamic baseURL for the static assets and may load some css that would
-	// already be loaded by the notebook otherwise.
+	// Setup notebook base URL
+	//
+	// Some static assets may be required by the custom widget javascript. The base
+	// url for the notebook is not known at build time and is therefore computed
+	// dynamically.
+	__webpack_require__.p = document.querySelector('body').getAttribute('data-base-url') + 'nbextensions/bonobo/';
 	
 	// Export widget models and views, and the npm package version number.
 	module.exports = __webpack_require__(1);
@@ -69,7 +72,7 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 	// When serialiazing entire widget state for embedding, only values different from the
 	// defaults will be specified.
 	
-	var BonoboModel = widgets.DOMWidgetModel.extend({
+	const BonoboModel = widgets.DOMWidgetModel.extend({
 	    defaults: _.extend({}, widgets.DOMWidgetModel.prototype.defaults, {
 	        _model_name: 'BonoboModel',
 	        _view_name: 'BonoboView',
@@ -81,7 +84,7 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 	
 	
 	// Custom View. Renders the widget model.
-	var BonoboView = widgets.DOMWidgetView.extend({
+	const BonoboView = widgets.DOMWidgetView.extend({
 	    render: function () {
 	        this.value_changed();
 	        this.model.on('change:value', this.value_changed, this);
@@ -89,7 +92,9 @@ define(["jupyter-js-widgets"], function(__WEBPACK_EXTERNAL_MODULE_2__) { return 
 	
 	    value_changed: function () {
 	        this.$el.html(
-	            this.model.get('value').join('<br>')
+	            '<div class="rendered_html"><table style="margin: 0; border: 1px solid black;">' + this.model.get('value').map((key, i) => {
+	                return `<tr><td>${key.status}</td><td>${key.name}</td><td>${key.stats}</td><td>${key.flags}</td></tr>`
+	            }).join('\n') + '</table></div>'
 	        );
 	    },
 	});

@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from bonobo.ext.opendatasoft import OpenDataSoftAPI
+from bonobo.contrib.opendatasoft import OpenDataSoftAPI
 from bonobo.util.objects import ValueHolder
 
 

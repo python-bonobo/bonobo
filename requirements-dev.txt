@@ -1,18 +1,18 @@
 -e .[dev]
 alabaster==0.7.10
 babel==2.5.1
-certifi==2017.7.27.1
+certifi==2017.11.5
 chardet==3.0.4
-coverage==4.4.1
+coverage==4.4.2
 docutils==0.14
 idna==2.6
 imagesize==0.7.1
-jinja2==2.9.6
+jinja2==2.10
 markupsafe==1.0
 py==1.4.34
 pygments==2.2.0
 pytest-cov==2.5.1
-pytest-sugar==0.8.0
+pytest-sugar==0.9.0
 pytest-timeout==1.2.0
 pytest==3.2.3
 pytz==2017.3

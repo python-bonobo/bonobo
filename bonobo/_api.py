@@ -74,7 +74,7 @@ def run(graph, *, plugins=None, services=None, strategy=None):
 
         if _is_jupyter_notebook():
             try:
-                from bonobo.ext.jupyter import JupyterOutputPlugin
+                from bonobo.contrib.jupyter import JupyterOutputPlugin
             except ImportError:
                 import logging
                 logging.warning(

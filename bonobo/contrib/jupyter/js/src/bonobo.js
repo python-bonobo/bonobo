@@ -8,7 +8,7 @@ var _ = require('underscore');
 // When serialiazing entire widget state for embedding, only values different from the
 // defaults will be specified.
 
-var BonoboModel = widgets.DOMWidgetModel.extend({
+const BonoboModel = widgets.DOMWidgetModel.extend({
     defaults: _.extend({}, widgets.DOMWidgetModel.prototype.defaults, {
         _model_name: 'BonoboModel',
         _view_name: 'BonoboView',
@@ -20,7 +20,7 @@ var BonoboModel = widgets.DOMWidgetModel.extend({
 
 
 // Custom View. Renders the widget model.
-var BonoboView = widgets.DOMWidgetView.extend({
+const BonoboView = widgets.DOMWidgetView.extend({
     render: function () {
         this.value_changed();
         this.model.on('change:value', this.value_changed, this);
@@ -28,7 +28,9 @@ var BonoboView = widgets.DOMWidgetView.extend({
 
     value_changed: function () {
         this.$el.html(
-            this.model.get('value').join('<br>')
+            '<div class="rendered_html"><table style="margin: 0; border: 1px solid black;">' + this.model.get('value').map((key, i) => {
+                return `<tr><td>${key.status}</td><td>${key.name}</td><td>${key.stats}</td><td>${key.flags}</td></tr>`
+            }).join('\n') + '</table></div>'
         );
     },
 });
