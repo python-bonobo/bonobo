@@ -20,7 +20,7 @@ from colorama import Fore, Style
 
 import bonobo
 from bonobo.commands import get_default_services
-from bonobo.ext.opendatasoft import OpenDataSoftAPI
+from bonobo.contrib.opendatasoft import OpenDataSoftAPI
 
 try:
     import pycountry
