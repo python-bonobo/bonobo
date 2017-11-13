@@ -61,7 +61,7 @@ def register_api_group(*args):
 @register_graph_api
 def run(graph, *, plugins=None, services=None, strategy=None):
     """
-    Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
+    Main entry point of bonobo. It takes a graph and creates all the necessary plumbing around to execute it.
 
     The only necessary argument is a :class:`Graph` instance, containing the logic you actually want to execute.
 
