@@ -4,8 +4,8 @@ from bonobo.structs.bags import Bag
 
 
 class NaiveStrategy(Strategy):
-    def execute(self, graph, *args, plugins=None, **kwargs):
-        context = self.create_graph_execution_context(graph, plugins=plugins)
+    def execute(self, graph, *args, plugins=None, services=None, **kwargs):
+        context = self.create_graph_execution_context(graph, plugins=plugins, services=services)
         context.write(BEGIN, Bag(), END)
 
         # TODO: how to run plugins in "naive" mode ?
