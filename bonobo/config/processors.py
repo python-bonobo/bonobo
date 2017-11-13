@@ -15,10 +15,10 @@ class ContextProcessor(Option):
     It works like a yielding context manager, and is the recommended way to setup and teardown objects you'll need
     in the context of one execution. It's the way to overcome the stateless nature of transformations.
 
-    The yielded values will be passed as positional arguments to the next context processors (order do matter), and
+    The yielded values will be passed as positional arguments to the next context processors (order does matter), and
     finally to the __call__ method of the transformation.
 
-    Warning: this may change for a similar but simpler implementation, don't relly too much on it (yet).
+    Warning: this may change for a similar but simpler implementation, don't rely too much on it (yet).
 
     Example:
 
