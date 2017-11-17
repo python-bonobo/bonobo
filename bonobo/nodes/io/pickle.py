@@ -1,7 +1,6 @@
 import pickle
 
 from bonobo.config import Option
-from bonobo.config.options import RemovedOption
 from bonobo.config.processors import ContextProcessor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler

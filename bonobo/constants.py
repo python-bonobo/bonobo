@@ -7,3 +7,7 @@ LOOPBACK = Token('Loopback')
 NOT_MODIFIED = Token('NotModified')
 DEFAULT_SERVICES_FILENAME = '_services.py'
 DEFAULT_SERVICES_ATTR = 'get_services'
+
+TICK_PERIOD = 0.2
+
+ARGNAMES = '_argnames'

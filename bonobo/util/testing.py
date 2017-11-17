@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from bonobo import open_fs, Token, __main__, get_examples_path
+from bonobo import open_fs, Token, __main__, get_examples_path, Bag
 from bonobo.commands import entrypoint
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.contexts.node import NodeExecutionContext
@@ -56,6 +56,9 @@ class BufferingContext:
 
     def get_buffer(self):
         return self.buffer
+
+    def get_buffer_args_as_dicts(self):
+        return list(map(lambda x: x.args_as_dict() if isinstance(x, Bag) else dict(x), self.buffer))
 
 
 class BufferingNodeExecutionContext(BufferingContext, NodeExecutionContext):

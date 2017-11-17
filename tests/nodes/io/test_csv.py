@@ -17,17 +17,21 @@ def test_write_csv_ioformat_arg0(tmpdir):
         CsvReader(path=filename, delimiter=',', ioformat=settings.IOFORMAT_ARG0),
 
 
-@pytest.mark.parametrize('add_kwargs', (
-    {},
-    {
-        'ioformat': settings.IOFORMAT_KWARGS,
-    },
-))
-def test_write_csv_to_file_kwargs(tmpdir, add_kwargs):
+def test_write_csv_to_file_no_headers(tmpdir):
     fs, filename, services = csv_tester.get_services_for_writer(tmpdir)
 
-    with NodeExecutionContext(CsvWriter(filename, **add_kwargs), services=services) as context:
-        context.write_sync({'foo': 'bar'}, {'foo': 'baz', 'ignore': 'this'})
+    with NodeExecutionContext(CsvWriter(filename), services=services) as context:
+        context.write_sync(('bar', ), ('baz', 'boo'))
+
+    with fs.open(filename) as fp:
+        assert fp.read() == 'bar\nbaz;boo\n'
+
+
+def test_write_csv_to_file_with_headers(tmpdir):
+    fs, filename, services = csv_tester.get_services_for_writer(tmpdir)
+
+    with NodeExecutionContext(CsvWriter(filename, headers='foo'), services=services) as context:
+        context.write_sync(('bar', ), ('baz', 'boo'))
 
     with fs.open(filename) as fp:
         assert fp.read() == 'foo\nbar\nbaz\n'
@@ -45,7 +49,7 @@ def test_read_csv_from_file_kwargs(tmpdir):
     ) as context:
         context.write_sync(())
 
-    assert context.get_buffer() == [
+    assert context.get_buffer_args_as_dicts() == [
         {
             'a': 'a foo',
             'b': 'b foo',

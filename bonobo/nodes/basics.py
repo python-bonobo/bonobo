@@ -4,7 +4,7 @@ import itertools
 from bonobo import settings
 from bonobo.config import Configurable, Option
 from bonobo.config.processors import ContextProcessor
-from bonobo.constants import NOT_MODIFIED
+from bonobo.constants import NOT_MODIFIED, ARGNAMES
 from bonobo.structs.bags import Bag
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
@@ -88,18 +88,29 @@ class PrettyPrinter(Configurable):
 
     def call(self, *args, **kwargs):
         formater = self._format_quiet if settings.QUIET.get() else self._format_console
+        argnames = kwargs.get(ARGNAMES, None)
 
-        for i, (item, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
-            print(formater(i, item, value))
+        for i, (item, value) in enumerate(
+            itertools.chain(enumerate(args), filter(lambda x: not x[0].startswith('_'), kwargs.items()))
+        ):
+            print(formater(i, item, value, argnames=argnames))
 
-    def _format_quiet(self, i, item, value):
+    def _format_quiet(self, i, item, value, *, argnames=None):
+        # XXX should we implement argnames here ?
         return ' '.join(((' ' if i else '-'), str(item), ':', str(value).strip()))
 
-    def _format_console(self, i, item, value):
+    def _format_console(self, i, item, value, *, argnames=None):
+        argnames = argnames or []
+        if not isinstance(item, str):
+            if len(argnames) >= item:
+                item = '{} / {}'.format(item, argnames[item])
+            else:
+                item = str(i)
+
         return ' '.join(
             (
-                (' ' if i else '•'), str(item), '=', _shorten(str(value).strip(),
-                                                              self.max_width).replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL
+                (' ' if i else '•'), item, '=', _shorten(str(value).strip(),
+                                                         self.max_width).replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL
             )
         )
 
@@ -172,6 +183,3 @@ class FixedWindow(Configurable):
         if len(buffer) >= self.length:
             yield buffer.get()
             buffer.set([])
-
-
-

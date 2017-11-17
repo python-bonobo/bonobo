@@ -52,8 +52,9 @@ class Bag:
         # Otherwise, type will handle that for us.
         return super().__new__(cls)
 
-    def __init__(self, *args, _flags=None, _parent=None, **kwargs):
+    def __init__(self, *args, _flags=None, _parent=None, _argnames=None, **kwargs):
         self._flags = type(self).default_flags + (_flags or ())
+        self._argnames = _argnames
         self._parent = _parent
 
         if len(args) == 1 and len(kwargs) == 0:
@@ -115,9 +116,13 @@ class Bag:
     def flags(self):
         return self._flags
 
+    @property
+    def specials(self):
+        return {k: self.__dict__[k] for k in ('_argnames', ) if k in self.__dict__ and self.__dict__[k]}
+
     def apply(self, func_or_iter, *args, **kwargs):
         if callable(func_or_iter):
-            return func_or_iter(*args, *self.args, **kwargs, **self.kwargs)
+            return func_or_iter(*args, *self.args, **kwargs, **self.kwargs, **self.specials)
 
         if len(args) == 0 and len(kwargs) == 0:
             try:
@@ -148,7 +153,7 @@ class Bag:
 
     @classmethod
     def inherit(cls, *args, **kwargs):
-        return cls(*args, _flags=(INHERIT_INPUT,), **kwargs)
+        return cls(*args, _flags=(INHERIT_INPUT, ), **kwargs)
 
     def __eq__(self, other):
         # XXX there are overlapping cases, but this is very handy for now. Let's think about it later.
@@ -176,9 +181,12 @@ class Bag:
 
         return len(self.args) == 1 and not self.kwargs and self.args[0] == other
 
+    def args_as_dict(self):
+        return dict(zip(self._argnames, self.args))
+
 
 class LoopbackBag(Bag):
-    default_flags = (LOOPBACK,)
+    default_flags = (LOOPBACK, )
 
 
 class ErrorBag(Bag):

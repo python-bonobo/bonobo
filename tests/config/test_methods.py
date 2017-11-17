@@ -58,7 +58,7 @@ def test_define_with_decorator():
     Concrete = MethodBasedConfigurable(my_handler)
 
     assert callable(Concrete.handler)
-    assert Concrete.handler == my_handler
+    assert Concrete.handler.__func__ == my_handler
 
     with inspect_node(Concrete) as ci:
         assert ci.type == MethodBasedConfigurable

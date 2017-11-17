@@ -1,3 +1,5 @@
+import types
+
 from bonobo.util.inspect import istype
 
 
@@ -143,10 +145,23 @@ class Method(Option):
 
         >>> example3 = OtherChildMethodExample()
 
+    It's possible to pass a default implementation to a Method by calling it, making it suitable to use as a decorator.
+
+        >>> class MethodExampleWithDefault(Configurable):
+        ...     @Method()
+        ...     def handler(self):
+        ...         pass
+
     """
 
-    def __init__(self, *, required=True, positional=True):
-        super().__init__(None, required=required, positional=positional)
+    def __init__(self, *, required=True, positional=True, __doc__=None):
+        super().__init__(None, required=required, positional=positional, __doc__=__doc__)
+
+    def __get__(self, inst, type_):
+        x = super(Method, self).__get__(inst, type_)
+        if inst:
+            x = types.MethodType(x, inst)
+        return x
 
     def __set__(self, inst, value):
         if not hasattr(value, '__call__'):
@@ -157,6 +172,12 @@ class Method(Option):
             )
         inst._options_values[self.name] = self.type(value) if self.type else value
 
-    def __call__(self, *args, **kwargs):
-        # only here to trick IDEs into thinking this is callable.
-        raise NotImplementedError('You cannot call the descriptor')
+    def __call__(self, impl):
+        if self.default:
+            raise RuntimeError('Can only be used once as a decorator.')
+        self.default = impl
+        self.required = False
+        return self
+
+    def get_default(self):
+        return self.default
