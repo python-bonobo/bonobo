@@ -1,7 +1,7 @@
-from bonobo.execution.contexts.base import LoopingExecutionContext
+from bonobo.execution.contexts.base import BaseContext
 
 
-class PluginExecutionContext(LoopingExecutionContext):
+class PluginExecutionContext(BaseContext):
     @property
     def dispatcher(self):
         return self.parent.dispatcher

@@ -11,6 +11,7 @@
 *.so
 *.spec
 .*.sw?
+.DS_Store
 .Python
 .cache
 .coverage
