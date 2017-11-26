@@ -5,10 +5,11 @@ class FileHandler(Configurable):
     """Abstract component factory for file-related components.
 
     Args:
+        fs (str): service name to use for filesystem.
         path (str): which path to use within the provided filesystem.
         eol (str): which character to use to separate lines.
         mode (str): which mode to use when opening the file.
-        fs (str): service name to use for filesystem.
+        encoding (str): which encoding to use when opening the file.
     """
 
     path = Option(str, required=True, positional=True)  # type: str
@@ -19,7 +20,7 @@ class FileHandler(Configurable):
     fs = Service('fs')  # type: str
 
     @ContextProcessor
-    def file(self, context, fs):
+    def file(self, context, *, fs):
         with self.open(fs) as file:
             yield file
 
@@ -28,22 +29,8 @@ class FileHandler(Configurable):
 
 
 class Reader:
-    """Abstract component factory for readers.
-    """
-
-    def __call__(self, *args, **kwargs):
-        yield from self.read(*args, **kwargs)
-
-    def read(self, *args, **kwargs):
-        raise NotImplementedError('Abstract.')
+    pass
 
 
 class Writer:
-    """Abstract component factory for writers.
-    """
-
-    def __call__(self, *args, **kwargs):
-        return self.write(*args, **kwargs)
-
-    def write(self, *args, **kwargs):
-        raise NotImplementedError('Abstract.')
+    pass

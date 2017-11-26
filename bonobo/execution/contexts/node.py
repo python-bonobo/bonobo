@@ -1,25 +1,36 @@
 import logging
 import sys
+from collections import namedtuple
 from queue import Empty
 from time import sleep
 from types import GeneratorType
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
-from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD
-from bonobo.errors import InactiveReadableError, UnrecoverableError
+from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD, Token
+from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.bags import Bag
 from bonobo.structs.inputs import Input
-from bonobo.structs.tokens import Token
-from bonobo.util import get_name, iserrorbag, isloopbackbag, isbag, istuple, isconfigurabletype
+from bonobo.util import get_name, istuple, isconfigurabletype, ensure_tuple
+from bonobo.util.bags import BagType
 from bonobo.util.statistics import WithStatistics
 
 logger = logging.getLogger(__name__)
 
+UnboundArguments = namedtuple('UnboundArguments', ['args', 'kwargs'])
+
 
 class NodeExecutionContext(BaseContext, WithStatistics):
     def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
+        """
+        Node execution context has the responsibility fo storing the state of a transformation during its execution.
+
+        :param wrapped: wrapped transformation
+        :param parent: parent context, most probably a graph context
+        :param services: dict-like collection of services
+        :param _input: input queue (optional)
+        :param _outputs: output queues (optional)
+        """
         BaseContext.__init__(self, wrapped, parent=parent)
         WithStatistics.__init__(self, 'in', 'out', 'err', 'warn')
 
@@ -37,6 +48,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         self.input = _input or Input()
         self.outputs = _outputs or []
 
+        # Types
+        self._input_type, self._input_length = None, None
+        self._output_type = None
+
         # Stack: context decorators for the execution
         self._stack = None
 
@@ -48,22 +63,40 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         return '<{}({}{}){}>'.format(type_name, self.status, name, self.get_statistics_as_string(prefix=' '))
 
     def start(self):
+        """
+        Starts this context, a.k.a the phase where you setup everything which will be necessary during the whole
+        lifetime of a transformation.
+
+        The "ContextCurrifier" is in charge of setting up a decorating stack, that includes both services and context
+        processors, and will call the actual node callable with additional parameters.
+
+        """
         super().start()
 
         try:
-            self._stack = ContextCurrifier(self.wrapped, *self._get_initial_context())
+            initial = self._get_initial_context()
+            self._stack = ContextCurrifier(self.wrapped, *initial.args, **initial.kwargs)
             if isconfigurabletype(self.wrapped):
                 # Not normal to have a partially configured object here, so let's warn the user instead of having get into
                 # the hard trouble of understanding that by himself.
                 raise TypeError(
-                    'The Configurable should be fully instanciated by now, unfortunately I got a PartiallyConfigured object...'
+                    'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
                 )
             self._stack.setup(self)
         except Exception:
-            return self.fatal(sys.exc_info())
+            # Set the logging level to the lowest possible, to avoid double log.
+            self.fatal(sys.exc_info(), level=0)
+
+            # We raise again, so the error is not ignored out of execution loops.
+            raise
 
     def loop(self):
+        """
+        The actual infinite loop for this transformation.
+
+        """
         logger.debug('Node loop starts for {!r}.'.format(self))
+
         while self.should_loop:
             try:
                 self.step()
@@ -72,29 +105,31 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             except Empty:
                 sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
                 continue
-            except UnrecoverableError:
-                self.handle_error(*sys.exc_info())
-                self.input.shutdown()
-                break
+            except (
+                    NotImplementedError,
+                    UnrecoverableError,
+            ):
+                self.fatal(sys.exc_info())  # exit loop
             except Exception:  # pylint: disable=broad-except
-                self.handle_error(*sys.exc_info())
+                self.error(sys.exc_info())  # does not exit loop
             except BaseException:
-                self.handle_error(*sys.exc_info())
-                break
+                self.fatal(sys.exc_info())  # exit loop
+
         logger.debug('Node loop ends for {!r}.'.format(self))
 
     def step(self):
-        """Runs a transformation callable with given args/kwargs and flush the result into the right
-        output channel."""
+        """
+        A single step in the loop.
 
-        # Pull data
-        input_bag = self.get()
+        Basically gets an input bag, send it to the node, interpret the results.
+
+        """
+
+        # Pull and check data
+        input_bag = self._get()
 
         # Sent through the stack
-        try:
-            results = input_bag.apply(self._stack)
-        except Exception:
-            return self.handle_error(*sys.exc_info())
+        results = self._stack(input_bag)
 
         # self._exec_time += timer.duration
         # Put data onto output channels
@@ -109,32 +144,85 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 except StopIteration:
                     # That's not an error, we're just done.
                     break
-                except Exception:
-                    # Let's kill this loop, won't be able to generate next.
-                    self.handle_error(*sys.exc_info())
-                    break
                 else:
-                    self.send(_resolve(input_bag, result))
+                    # Push data (in case of an iterator)
+                    self._send(self._cast(input_bag, result))
         elif results:
-            self.send(_resolve(input_bag, results))
+            # Push data (returned value)
+            self._send(self._cast(input_bag, results))
         else:
             # case with no result, an execution went through anyway, use for stats.
             # self._exec_count += 1
             pass
 
     def stop(self):
+        """
+        Cleanup the context, after the loop ended.
+
+        """
         if self._stack:
-            self._stack.teardown()
+            try:
+                self._stack.teardown()
+            except:
+                self.fatal(sys.exc_info())
 
         super().stop()
 
-    def handle_error(self, exctype, exc, tb, *, level=logging.ERROR):
-        self.increment('err')
-        logging.getLogger(__name__).log(level, repr(self), exc_info=(exctype, exc, tb))
+    def send(self, *_output, _input=None):
+        return self._send(self._cast(_input, _output))
 
-    def fatal(self, exc_info, *, level=logging.CRITICAL):
-        super().fatal(exc_info, level=level)
-        self.input.shutdown()
+    ### Input type and fields
+    @property
+    def input_type(self):
+        return self._input_type
+
+    def set_input_type(self, input_type):
+        if self._input_type is not None:
+            raise RuntimeError('Cannot override input type, already have %r.', self._input_type)
+
+        if type(input_type) is not type:
+            raise UnrecoverableTypeError('Input types must be regular python types.')
+
+        if not issubclass(input_type, tuple):
+            raise UnrecoverableTypeError('Input types must be subclasses of tuple (and act as tuples).')
+
+        self._input_type = input_type
+
+    def get_input_fields(self):
+        return self._input_type._fields if self._input_type and hasattr(self._input_type, '_fields') else None
+
+    def set_input_fields(self, fields, typename='Bag'):
+        self.set_input_type(BagType(typename, fields))
+
+    ### Output type and fields
+    @property
+    def output_type(self):
+        return self._output_type
+
+    def set_output_type(self, output_type):
+        if self._output_type is not None:
+            raise RuntimeError('Cannot override output type, already have %r.', self._output_type)
+
+        if type(output_type) is not type:
+            raise UnrecoverableTypeError('Output types must be regular python types.')
+
+        if not issubclass(output_type, tuple):
+            raise UnrecoverableTypeError('Output types must be subclasses of tuple (and act as tuples).')
+
+        self._output_type = output_type
+
+    def get_output_fields(self):
+        return self._output_type._fields if self._output_type and hasattr(self._output_type, '_fields') else None
+
+    def set_output_fields(self, fields, typename='Bag'):
+        self.set_output_type(BagType(typename, fields))
+
+    ### Attributes
+    def setdefault(self, attr, value):
+        try:
+            getattr(self, attr)
+        except AttributeError:
+            setattr(self, attr, value)
 
     def write(self, *messages):
         """
@@ -143,14 +231,83 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param mixed value: message
         """
         for message in messages:
-            self.input.put(message if isinstance(message, (Bag, Token)) else Bag(message))
+            if isinstance(message, Token):
+                self.input.put(message)
+            elif self._input_type:
+                self.input.put(ensure_tuple(message, cls=self._input_type))
+            else:
+                self.input.put(ensure_tuple(message))
 
     def write_sync(self, *messages):
         self.write(BEGIN, *messages, END)
         for _ in messages:
             self.step()
 
-    def send(self, value, _control=False):
+    def error(self, exc_info, *, level=logging.ERROR):
+        self.increment('err')
+        super().error(exc_info, level=level)
+
+    def fatal(self, exc_info, *, level=logging.CRITICAL):
+        self.increment('err')
+        super().fatal(exc_info, level=level)
+        self.input.shutdown()
+
+    def get_service(self, name):
+        if self.parent:
+            return self.parent.services.get(name)
+        return self.services.get(name)
+
+    def _get(self):
+        """
+        Read from the input queue.
+
+        If Queue raises (like Timeout or Empty), stat won't be changed.
+
+        """
+        input_bag = self.input.get()
+
+        # Store or check input type
+        if self._input_type is None:
+            self._input_type = type(input_bag)
+        elif type(input_bag) is not self._input_type:
+            raise UnrecoverableTypeError(
+                'Input type changed between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
+                    self.wrapped, input_bag, self._input_type
+                )
+            )
+
+        # Store or check input length, which is a soft fallback in case we're just using tuples
+        if self._input_length is None:
+            self._input_length = len(input_bag)
+        elif len(input_bag) != self._input_length:
+            raise UnrecoverableTypeError(
+                'Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.'.format(
+                    self.wrapped, self._input_length, len(input_bag), input_bag
+                )
+            )
+
+        self.increment('in')  # XXX should that go before type check ?
+
+        return input_bag
+
+    def _cast(self, _input, _output):
+        """
+        Transforms a pair of input/output into what is the real output.
+
+        :param _input: Bag
+        :param _output: mixed
+        :return: Bag
+        """
+
+        if _output is NOT_MODIFIED:
+            if self._output_type is None:
+                return _input
+            else:
+                return self._output_type(*_input)
+
+        return ensure_tuple(_output, cls=(self.output_type or tuple))
+
+    def _send(self, value, _control=False):
         """
         Sends a message to all of this context's outputs.
 
@@ -161,29 +318,15 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if not _control:
             self.increment('out')
 
-        if iserrorbag(value):
-            value.apply(self.handle_error)
-        elif isloopbackbag(value):
-            self.input.put(value)
-        else:
-            for output in self.outputs:
-                output.put(value)
-
-    def get(self):
-        """
-        Get from the queue first, then increment stats, so if Queue raise Timeout or Empty, stat won't be changed.
-
-        """
-        row = self.input.get()  # XXX TIMEOUT ???
-        self.increment('in')
-        return row
+        for output in self.outputs:
+            output.put(value)
 
     def _get_initial_context(self):
         if self.parent:
-            return self.parent.services.args_for(self.wrapped)
+            return UnboundArguments((), self.parent.services.kwargs_for(self.wrapped))
         if self.services:
-            return self.services.args_for(self.wrapped)
-        return ()
+            return UnboundArguments((), self.services.kwargs_for(self.wrapped))
+        return UnboundArguments((), {})
 
 
 def isflag(param):
@@ -210,23 +353,3 @@ def split_tokens(output):
         i += 1
 
     return output[:i], output[i:]
-
-
-def _resolve(input_bag, output):
-    """
-    This function is key to how bonobo works (and internal, too). It transforms a pair of input/output into what is the
-    real output.
-
-    :param input_bag: Bag
-    :param output: mixed
-    :return: Bag
-    """
-    if isbag(output):
-        return output
-
-    tokens, output = split_tokens(output)
-
-    if len(tokens) == 1 and tokens[0] is NOT_MODIFIED:
-        return input_bag
-
-    return output if isbag(output) else Bag(output)

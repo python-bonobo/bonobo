@@ -41,8 +41,8 @@ class GraphExecutionContext:
             outputs = self.graph.outputs_of(i)
             if len(outputs):
                 node_context.outputs = [self[j].input for j in outputs]
-            node_context.input.on_begin = partial(node_context.send, BEGIN, _control=True)
-            node_context.input.on_end = partial(node_context.send, END, _control=True)
+            node_context.input.on_begin = partial(node_context._send, BEGIN, _control=True)
+            node_context.input.on_end = partial(node_context._send, END, _control=True)
             node_context.input.on_finalize = partial(node_context.stop)
 
     def __getitem__(self, item):

@@ -9,13 +9,7 @@ def useless(*args, **kwargs):
 def test_not_modified():
     input_messages = [
         ('foo', 'bar'),
-        {
-            'foo': 'bar'
-        },
-        ('foo', {
-            'bar': 'baz'
-        }),
-        (),
+        ('foo', 'baz'),
     ]
 
     with BufferingNodeExecutionContext(useless) as context:

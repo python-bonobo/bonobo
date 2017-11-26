@@ -1,13 +1,12 @@
 import csv
-import warnings
 
-from bonobo.config import Option, ContextProcessor
-from bonobo.config.options import RemovedOption, Method
-from bonobo.constants import NOT_MODIFIED, ARGNAMES
+from bonobo.config import Option, use_raw_input, use_context
+from bonobo.config.options import Method, RenamedOption
+from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.structs.bags import Bag
 from bonobo.util import ensure_tuple
+from bonobo.util.bags import BagType
 
 
 class CsvHandler(FileHandler):
@@ -21,17 +20,38 @@ class CsvHandler(FileHandler):
 
         The CSV quote character.
 
-    .. attribute:: headers
+    .. attribute:: fields
 
         The list of column names, if the CSV does not contain it as its first line.
 
     """
-    delimiter = Option(str, default=';')
-    quotechar = Option(str, default='"')
-    headers = Option(ensure_tuple, required=False)
-    ioformat = RemovedOption(positional=False, value='kwargs')
+
+    # Dialect related options
+    delimiter = Option(str, default=csv.excel.delimiter, required=False)
+    quotechar = Option(str, default=csv.excel.quotechar, required=False)
+    escapechar = Option(str, default=csv.excel.escapechar, required=False)
+    doublequote = Option(str, default=csv.excel.doublequote, required=False)
+    skipinitialspace = Option(str, default=csv.excel.skipinitialspace, required=False)
+    lineterminator = Option(str, default=csv.excel.lineterminator, required=False)
+    quoting = Option(str, default=csv.excel.quoting, required=False)
+
+    # Fields (renamed from headers)
+    headers = RenamedOption('fields')
+    fields = Option(ensure_tuple, required=False)
+
+    def get_dialect_kwargs(self):
+        return {
+            'delimiter': self.delimiter,
+            'quotechar': self.quotechar,
+            'escapechar': self.escapechar,
+            'doublequote': self.doublequote,
+            'skipinitialspace': self.skipinitialspace,
+            'lineterminator': self.lineterminator,
+            'quoting': self.quoting,
+        }
 
 
+@use_context
 class CsvReader(FileReader, CsvHandler):
     """
     Reads a CSV and yield the values as dicts.
@@ -45,6 +65,7 @@ class CsvReader(FileReader, CsvHandler):
     skip = Option(int, default=0)
 
     @Method(
+        positional=False,
         __doc__='''
             Builds the CSV reader, a.k.a an object we can iterate, each iteration giving one line of fields, as an
             iterable.
@@ -53,20 +74,37 @@ class CsvReader(FileReader, CsvHandler):
         '''
     )
     def reader_factory(self, file):
-        return csv.reader(file, delimiter=self.delimiter, quotechar=self.quotechar)
+        return csv.reader(file, **self.get_dialect_kwargs())
 
-    def read(self, fs, file):
+    def read(self, file, context, *, fs):
+        context.setdefault('skipped', 0)
         reader = self.reader_factory(file)
-        headers = self.headers or next(reader)
+        skip = self.skip
+
+        if not context.output_type:
+            context.set_output_fields(self.fields or next(reader))
+
         for row in reader:
-            yield Bag(*row, **{ARGNAMES: headers})
+            if context.skipped < skip:
+                context.skipped += 1
+                continue
+            yield tuple(row)
+
+    __call__ = read
 
 
+def get_values(args, *, fields):
+    print(fields, args)
+
+    return
+    if context.input_type and context.input_type is tuple:
+        context.writer(bag[0:len(context.fields)])
+    else:
+        context.writer([bag.get(field) if type(field) is str else bag[field] for field in context.fields])
+
+
+@use_context
 class CsvWriter(FileWriter, CsvHandler):
-    @ContextProcessor
-    def context(self, context, *args):
-        yield context
-
     @Method(
         __doc__='''
             Builds the CSV writer, a.k.a an object we can pass a field collection to be written as one line in the
@@ -76,34 +114,31 @@ class CsvWriter(FileWriter, CsvHandler):
         '''
     )
     def writer_factory(self, file):
-        return csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar, lineterminator=self.eol).writerow
+        return csv.writer(file, **self.get_dialect_kwargs()).writerow
 
-    def write(self, fs, file, lineno, context, *args, _argnames=None):
-        try:
-            writer = context.writer
-        except AttributeError:
+    def write(self, file, context, *values, fs):
+        context.setdefault('lineno', 0)
+        fields = context.get_input_fields()
+
+        if not context.lineno:
             context.writer = self.writer_factory(file)
-            writer = context.writer
-            context.headers = self.headers or _argnames
 
-        if context.headers and not lineno:
-            writer(context.headers)
+            if fields:
+                context.writer(fields)
+                context.lineno += 1
 
-        lineno += 1
-
-        if context.headers:
-            try:
-                row = [args[i] for i, header in enumerate(context.headers) if header]
-            except IndexError:
-                warnings.warn(
-                    'At line #{}, expected {} fields but only got {}. Padding with empty strings.'.format(
-                        lineno, len(context.headers), len(args)
+        if fields:
+            if len(values) != len(fields):
+                raise ValueError(
+                    'Values length differs from input fields length. Expected: {}. Got: {}. Values: {!r}.'.format(
+                        len(fields), len(values), values
                     )
                 )
-                row = [(args[i] if i < len(args) else '') for i, header in enumerate(context.headers) if header]
+            context.writer(values)
         else:
-            row = args
-
-        writer(row)
+            for arg in values:
+                context.writer(ensure_tuple(arg))
 
         return NOT_MODIFIED
+
+    __call__ = write

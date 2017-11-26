@@ -2,7 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from bonobo import Bag, Graph
+from bonobo import Graph
+from bonobo.constants import EMPTY
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.strategies import NaiveStrategy
 from bonobo.util.testing import BufferingNodeExecutionContext, BufferingGraphExecutionContext
@@ -13,23 +14,23 @@ def test_node_string():
         return 'foo'
 
     with BufferingNodeExecutionContext(f) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 1
-        assert output[0] == 'foo'
+        assert output[0] == ('foo', )
 
     def g():
         yield 'foo'
         yield 'bar'
 
     with BufferingNodeExecutionContext(g) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == 'foo'
-        assert output[1] == 'bar'
+        assert output[0] == ('foo', )
+        assert output[1] == ('bar', )
 
 
 def test_node_bytes():
@@ -37,23 +38,23 @@ def test_node_bytes():
         return b'foo'
 
     with BufferingNodeExecutionContext(f) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
 
         output = context.get_buffer()
         assert len(output) == 1
-        assert output[0] == b'foo'
+        assert output[0] == (b'foo', )
 
     def g():
         yield b'foo'
         yield b'bar'
 
     with BufferingNodeExecutionContext(g) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == b'foo'
-        assert output[1] == b'bar'
+        assert output[0] == (b'foo', )
+        assert output[1] == (b'bar', )
 
 
 def test_node_dict():
@@ -61,40 +62,38 @@ def test_node_dict():
         return {'id': 1, 'name': 'foo'}
 
     with BufferingNodeExecutionContext(f) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
-
         assert len(output) == 1
-        assert output[0] == {'id': 1, 'name': 'foo'}
+        assert output[0] == ({'id': 1, 'name': 'foo'}, )
 
     def g():
         yield {'id': 1, 'name': 'foo'}
         yield {'id': 2, 'name': 'bar'}
 
     with BufferingNodeExecutionContext(g) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
-
         assert len(output) == 2
-        assert output[0] == {'id': 1, 'name': 'foo'}
-        assert output[1] == {'id': 2, 'name': 'bar'}
+        assert output[0] == ({'id': 1, 'name': 'foo'}, )
+        assert output[1] == ({'id': 2, 'name': 'bar'}, )
 
 
 def test_node_dict_chained():
     strategy = NaiveStrategy(GraphExecutionContextType=BufferingGraphExecutionContext)
 
-    def uppercase_name(**kwargs):
-        return {**kwargs, 'name': kwargs['name'].upper()}
-
     def f():
         return {'id': 1, 'name': 'foo'}
+
+    def uppercase_name(values):
+        return {**values, 'name': values['name'].upper()}
 
     graph = Graph(f, uppercase_name)
     context = strategy.execute(graph)
     output = context.get_buffer()
 
     assert len(output) == 1
-    assert output[0] == {'id': 1, 'name': 'FOO'}
+    assert output[0] == ({'id': 1, 'name': 'FOO'}, )
 
     def g():
         yield {'id': 1, 'name': 'foo'}
@@ -105,8 +104,8 @@ def test_node_dict_chained():
     output = context.get_buffer()
 
     assert len(output) == 2
-    assert output[0] == {'id': 1, 'name': 'FOO'}
-    assert output[1] == {'id': 2, 'name': 'BAR'}
+    assert output[0] == ({'id': 1, 'name': 'FOO'}, )
+    assert output[1] == ({'id': 2, 'name': 'BAR'}, )
 
 
 def test_node_tuple():
@@ -114,7 +113,7 @@ def test_node_tuple():
         return 'foo', 'bar'
 
     with BufferingNodeExecutionContext(f) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 1
@@ -125,7 +124,7 @@ def test_node_tuple():
         yield 'foo', 'baz'
 
     with BufferingNodeExecutionContext(g) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 2
@@ -167,7 +166,7 @@ def test_node_tuple_dict():
         return 'foo', 'bar', {'id': 1}
 
     with BufferingNodeExecutionContext(f) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 1
@@ -178,7 +177,7 @@ def test_node_tuple_dict():
         yield 'foo', 'baz', {'id': 2}
 
     with BufferingNodeExecutionContext(g) as context:
-        context.write_sync(Bag())
+        context.write_sync(EMPTY)
         output = context.get_buffer()
 
         assert len(output) == 2

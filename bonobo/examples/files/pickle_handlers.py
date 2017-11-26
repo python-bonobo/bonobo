@@ -27,33 +27,51 @@ messages categorized as spam, and (3) prints the output.
 
 '''
 
-import bonobo
-from bonobo.commands import get_default_services
 from fs.tarfs import TarFS
 
+import bonobo
+from bonobo import examples
 
-def cleanse_sms(**row):
-    if row['category'] == 'spam':
-        row['sms_clean'] = '**MARKED AS SPAM** ' + row['sms'][0:50] + (
-            '...' if len(row['sms']) > 50 else ''
+
+def cleanse_sms(category, sms):
+    if category == 'spam':
+        sms_clean = '**MARKED AS SPAM** ' + sms[0:50] + (
+            '...' if len(sms) > 50 else ''
         )
+    elif category == 'ham':
+        sms_clean = sms
     else:
-        row['sms_clean'] = row['sms']
+        raise ValueError('Unknown category {!r}.'.format(category))
 
-    return row['sms_clean']
+    return category, sms, sms_clean
 
 
-graph = bonobo.Graph(
-    # spam.pkl is within the gzipped tarball
-    bonobo.PickleReader('spam.pkl'),
-    cleanse_sms,
-    bonobo.PrettyPrinter(),
-)
+def get_graph(*, _limit=(), _print=()):
+    graph = bonobo.Graph()
+
+    graph.add_chain(
+        # spam.pkl is within the gzipped tarball
+        bonobo.PickleReader('spam.pkl'),
+        *_limit,
+        cleanse_sms,
+        *_print,
+    )
+
+    return graph
 
 
 def get_services():
-    return {'fs': TarFS(bonobo.get_examples_path('datasets/spam.tgz'))}
+    from ._services import get_services
+    return {
+        **get_services(),
+        'fs': TarFS(bonobo.get_examples_path('datasets/spam.tgz'))
+    }
 
 
 if __name__ == '__main__':
-    bonobo.run(graph, services=get_default_services(__file__))
+    parser = examples.get_argument_parser()
+    with bonobo.parse_args(parser) as options:
+        bonobo.run(
+            get_graph(**examples.get_graph_options(options)),
+            services=get_services()
+        )

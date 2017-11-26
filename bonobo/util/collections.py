@@ -7,7 +7,7 @@ class sortedlist(list):
         bisect.insort(self, x)
 
 
-def ensure_tuple(tuple_or_mixed):
+def ensure_tuple(tuple_or_mixed, *, cls=tuple):
     """
     If it's not a tuple, let's make a tuple of one item.
     Otherwise, not changed.
@@ -16,11 +16,17 @@ def ensure_tuple(tuple_or_mixed):
     :return: tuple
 
     """
-    if tuple_or_mixed is None:
-        return ()
-    if isinstance(tuple_or_mixed, tuple):
+
+    if isinstance(tuple_or_mixed, cls):
         return tuple_or_mixed
-    return (tuple_or_mixed, )
+
+    if tuple_or_mixed is None:
+        return tuple.__new__(cls, ())
+
+    if isinstance(tuple_or_mixed, tuple):
+        return tuple.__new__(cls, tuple_or_mixed)
+
+    return tuple.__new__(cls, (tuple_or_mixed, ))
 
 
 def tuplize(generator):

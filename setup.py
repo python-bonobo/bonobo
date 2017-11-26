@@ -43,14 +43,12 @@ else:
 setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
-    data_files=[
-        (
-            'share/jupyter/nbextensions/bonobo-jupyter', [
-                'bonobo/contrib/jupyter/static/extension.js', 'bonobo/contrib/jupyter/static/index.js',
-                'bonobo/contrib/jupyter/static/index.js.map'
-            ]
-        )
-    ],
+    data_files=[(
+        'share/jupyter/nbextensions/bonobo-jupyter', [
+            'bonobo/contrib/jupyter/static/extension.js', 'bonobo/contrib/jupyter/static/index.js',
+            'bonobo/contrib/jupyter/static/index.js.map'
+        ]
+    )],
     description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
@@ -62,8 +60,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'graphviz (>= 0.8, < 0.9)', 'jinja2 (>= 2.9, < 3)',
-        'mondrian (>= 0.4, < 0.5)', 'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6)', 'requests (>= 2, < 3)',
-        'stevedore (>= 1.27, < 1.28)', 'whistle (>= 1.0, < 1.1)'
+        'mondrian (>= 0.5, < 0.6)', 'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6)', 'python-slugify (>= 1.2, < 1.3)',
+        'requests (>= 2, < 3)', 'stevedore (>= 1.27, < 1.28)', 'whistle (>= 1.0, < 1.1)'
     ],
     extras_require={
         'dev': [

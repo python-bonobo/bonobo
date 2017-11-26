@@ -2,7 +2,8 @@ import pickle
 
 import pytest
 
-from bonobo import Bag, PickleReader, PickleWriter
+from bonobo import PickleReader, PickleWriter
+from bonobo.constants import EMPTY
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.util.testing import BufferingNodeExecutionContext, FilesystemTester
 
@@ -14,7 +15,7 @@ def test_write_pickled_dict_to_file(tmpdir):
     fs, filename, services = pickle_tester.get_services_for_writer(tmpdir)
 
     with NodeExecutionContext(PickleWriter(filename), services=services) as context:
-        context.write_sync(Bag(({'foo': 'bar'}, {})), Bag(({'foo': 'baz', 'ignore': 'this'}, {})))
+        context.write_sync({'foo': 'bar'}, {'foo': 'baz', 'ignore': 'this'})
 
     with fs.open(filename, 'rb') as fp:
         assert pickle.loads(fp.read()) == {'foo': 'bar'}
@@ -27,17 +28,11 @@ def test_read_pickled_list_from_file(tmpdir):
     fs, filename, services = pickle_tester.get_services_for_reader(tmpdir)
 
     with BufferingNodeExecutionContext(PickleReader(filename), services=services) as context:
-        context.write_sync(())
-        output = context.get_buffer()
+        context.write_sync(EMPTY)
 
-    assert len(output) == 2
-    assert output[0] == {
-        'a': 'a foo',
-        'b': 'b foo',
-        'c': 'c foo',
-    }
-    assert output[1] == {
-        'a': 'a bar',
-        'b': 'b bar',
-        'c': 'c bar',
-    }
+    output = context.get_buffer()
+    assert context.get_output_fields() == ('a', 'b', 'c')
+    assert output == [
+        ('a foo', 'b foo', 'c foo'),
+        ('a bar', 'b bar', 'c bar'),
+    ]

@@ -1,6 +1,5 @@
 from bonobo.constants import BEGIN, END
 from bonobo.execution.strategies.base import Strategy
-from bonobo.structs.bags import Bag
 
 
 class NaiveStrategy(Strategy):
@@ -8,7 +7,7 @@ class NaiveStrategy(Strategy):
 
     def execute(self, graph, **kwargs):
         context = self.create_graph_execution_context(graph, **kwargs)
-        context.write(BEGIN, Bag(), END)
+        context.write(BEGIN, (), END)
 
         # start
         context.start()

@@ -1,4 +1,11 @@
 [style]
 based_on_style = pep8
 column_limit = 120
+allow_multiline_lambdas = false
+allow_multiline_dictionary_keys = false
+coalesce_brackets = true
 dedent_closing_brackets = true
+join_multiple_lines = true
+spaces_before_comment = 2
+split_before_first_argument = true
+split_complex_comprehension = true

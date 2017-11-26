@@ -6,7 +6,7 @@ chardet==3.0.4
 colorama==0.3.9
 docker-pycreds==0.2.1
 docker==2.3.0
-fs==2.0.16
+fs==2.0.17
 idna==2.6
 packaging==16.8
 pbr==3.1.1

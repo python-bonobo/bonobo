@@ -3,8 +3,10 @@ import sys
 from contextlib import contextmanager
 from logging import ERROR
 
-from bonobo.util.objects import Wrapper, get_name
 from mondrian import term
+
+from bonobo.util import deprecated
+from bonobo.util.objects import Wrapper, get_name
 
 
 @contextmanager
@@ -106,6 +108,13 @@ class Lifecycle:
             raise RuntimeError('Cannot kill a stopped context.')
 
         self._killed = True
+
+    @deprecated
+    def handle_error(self, exctype, exc, tb, *, level=logging.ERROR):
+        return self.error((exctype, exc, tb), level=level)
+
+    def error(self, exc_info, *, level=logging.ERROR):
+        logging.getLogger(__name__).log(level, repr(self), exc_info=exc_info)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
         logging.getLogger(__name__).log(level, repr(self), exc_info=exc_info)

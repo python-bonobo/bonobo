@@ -46,7 +46,7 @@ class Option:
                 title = Option(str, required=True, positional=True)
                 keyword = Option(str, default='foo')
 
-                def call(self, s):
+                def __call__(self, s):
                     return self.title + ': ' + s + ' (' + self.keyword + ')'
 
             example = Example('hello', keyword='bar')
@@ -116,6 +116,22 @@ class RemovedOption(Option):
         return self.value
 
 
+class RenamedOption(Option):
+    def __init__(self, target, *, positional=False):
+        super(RenamedOption, self).__init__(required=False, positional=False)
+        self.target = target
+
+    def __get__(self, instance, owner):
+        raise ValueError(
+            'Trying to get value from renamed option {}, try getting {} instead.'.format(self.name, self.target)
+        )
+
+    def clean(self, value):
+        raise ValueError(
+            'Trying to set value of renamed option {}, try setting {} instead.'.format(self.name, self.target)
+        )
+
+
 class Method(Option):
     """
     A Method is a special callable-valued option, that can be used in three different ways (but for same purpose).
@@ -154,8 +170,14 @@ class Method(Option):
 
     """
 
-    def __init__(self, *, required=True, positional=True, __doc__=None):
+    def __init__(self, *, default=None, required=True, positional=True, __doc__=None):
         super().__init__(None, required=required, positional=positional, __doc__=__doc__)
+
+        # If a callable is provided as default, then use self as if it was used as a decorator
+        if default is not None:
+            if not callable(default):
+                raise ValueError('Method defaults should be callable, if provided.')
+            self(default)
 
     def __get__(self, inst, type_):
         x = super(Method, self).__get__(inst, type_)
@@ -164,10 +186,12 @@ class Method(Option):
         return x
 
     def __set__(self, inst, value):
-        if not hasattr(value, '__call__'):
+        if not callable(value):
             raise TypeError(
-                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.format(
-                    type(self).__name__, type(value).__name__
+                'Option {!r} ({}) is expecting a callable value, got {!r} object: {!r}.'.format(
+                    self.name,
+                    type(self).__name__,
+                    type(value).__name__, value
                 )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value

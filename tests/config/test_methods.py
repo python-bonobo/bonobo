@@ -7,7 +7,7 @@ class MethodBasedConfigurable(Configurable):
     foo = Option(positional=True)
     bar = Option()
 
-    def call(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         self.handler(*args, **kwargs)
 
 

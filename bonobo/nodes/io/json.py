@@ -1,78 +1,86 @@
 import json
+from collections import OrderedDict
 
-from bonobo.config.options import RemovedOption
-from bonobo.config.processors import ContextProcessor
+from bonobo.config import Method
+from bonobo.config.processors import ContextProcessor, use_context
 from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.structs.bags import Bag
 
 
 class JsonHandler(FileHandler):
     eol = ',\n'
     prefix, suffix = '[', ']'
-    ioformat = RemovedOption(positional=False, value='kwargs')
 
 
-class JsonReader(FileReader, JsonHandler):
-    loader = staticmethod(json.load)
-
-    def read(self, fs, file):
-        for line in self.loader(file):
-            yield line
+class LdjsonHandler(FileHandler):
+    eol = '\n'
+    prefix, suffix = '', ''
 
 
-class JsonDictItemsReader(JsonReader):
-    def read(self, fs, file):
-        for line in self.loader(file).items():
-            yield Bag(*line)
+class JsonReader(JsonHandler, FileReader):
+    @Method(positional=False)
+    def loader(self, file):
+        return json.loads(file)
+
+    def read(self, file, *, fs):
+        yield from self.loader(file.read())
+
+    __call__ = read
 
 
-class JsonWriter(FileWriter, JsonHandler):
+class LdjsonReader(LdjsonHandler, JsonReader):
+    """
+    Read a stream of line-delimited JSON objects (one object per line).
+
+    Not to be mistaken with JSON-LD (where LD stands for linked data).
+
+    """
+
+    def read(self, file, *, fs):
+        yield from map(self.loader, file)
+
+    __call__ = read
+
+
+@use_context
+class JsonWriter(JsonHandler, FileWriter):
     @ContextProcessor
-    def envelope(self, context, fs, file, lineno):
+    def envelope(self, context, file, *, fs):
         file.write(self.prefix)
         yield
         file.write(self.suffix)
 
-    def write(self, fs, file, lineno, arg0=None, **kwargs):
+    def write(self, file, context, *args, fs):
         """
         Write a json row on the next line of file pointed by ctx.file.
 
         :param ctx:
         :param row:
         """
-        row = _getrow(arg0, kwargs)
-        self._write_line(file, (self.eol if lineno.value else '') + json.dumps(row))
-        lineno += 1
+        context.setdefault('lineno', 0)
+        fields = context.get_input_fields()
+
+        if fields:
+            prefix = self.eol if context.lineno else ''
+            self._write_line(file, prefix + json.dumps(OrderedDict(zip(fields, args))))
+            context.lineno += 1
+        else:
+            for arg in args:
+                prefix = self.eol if context.lineno else ''
+                self._write_line(file, prefix + json.dumps(arg))
+                context.lineno += 1
+
         return NOT_MODIFIED
 
-
-class LdjsonReader(FileReader):
-    """Read a stream of JSON objects, one object per line."""
-    loader = staticmethod(json.loads)
-
-    def read(self, fs, file):
-        for line in file:
-            yield self.loader(line)
+    __call__ = write
 
 
-class LdjsonWriter(FileWriter):
-    """Write a stream of JSON objects, one object per line."""
+@use_context
+class LdjsonWriter(LdjsonHandler, JsonWriter):
+    """
+    Write a stream of Line-delimited JSON objects (one object per line).
 
-    def write(self, fs, file, lineno, arg0=None, **kwargs):
-        row = _getrow(arg0, kwargs)
-        file.write(json.dumps(row) + '\n')
-        lineno += 1  # class-level variable
-        return NOT_MODIFIED
+    Not to be mistaken with JSON-LD (where LD stands for linked data).
 
-
-def _getrow(arg0, kwargs):
-    if len(kwargs):
-        assert arg0 is None, 'Got both positional and keyword arguments, I recommend using keyword arguments.'
-        return kwargs
-
-    if arg0 is not None:
-        return arg0
-
-    return kwargs
+    """

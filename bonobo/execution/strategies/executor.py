@@ -3,10 +3,8 @@ import logging
 import sys
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
-from bonobo.structs.bags import Bag
 from bonobo.constants import BEGIN, END
 from bonobo.execution.strategies.base import Strategy
-from bonobo.util import get_name
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,7 @@ class ExecutorStrategy(Strategy):
 
     def execute(self, graph, **kwargs):
         context = self.create_graph_execution_context(graph, **kwargs)
-        context.write(BEGIN, Bag(), END)
+        context.write(BEGIN, (), END)
 
         futures = []
 

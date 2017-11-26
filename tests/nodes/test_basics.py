@@ -1,64 +1,79 @@
 from operator import methodcaller
+from unittest import TestCase
 from unittest.mock import MagicMock
 
 import pytest
 
 import bonobo
-from bonobo.config.processors import ContextCurrifier
-from bonobo.constants import NOT_MODIFIED
-from bonobo.util.testing import BufferingNodeExecutionContext
+from bonobo.constants import NOT_MODIFIED, EMPTY
+from bonobo.util import ensure_tuple, ValueHolder
+from bonobo.util.testing import BufferingNodeExecutionContext, StaticNodeTest, ConfigurableNodeTest
 
 
-def test_count():
-    with pytest.raises(TypeError):
-        bonobo.count()
+class CountTest(StaticNodeTest, TestCase):
+    node = bonobo.count
 
-    context = MagicMock()
+    def test_counter_required(self):
+        with pytest.raises(TypeError):
+            self.call()
 
-    with ContextCurrifier(bonobo.count).as_contextmanager(context) as stack:
-        for i in range(42):
-            stack()
+    def test_manual_call(self):
+        counter = ValueHolder(0)
+        for i in range(3):
+            self.call(counter)
+        assert counter == 3
 
-    assert len(context.method_calls) == 1
-    bag = context.send.call_args[0][0]
-    assert isinstance(bag, bonobo.Bag)
-    assert 0 == len(bag.kwargs)
-    assert 1 == len(bag.args)
-    assert bag.args[0] == 42
-
-
-def test_identity():
-    assert bonobo.identity(42) == 42
+    def test_execution(self):
+        with self.execute() as context:
+            context.write_sync(*([EMPTY] * 42))
+        assert context.get_buffer() == [(42, )]
 
 
-def test_limit():
-    context, results = MagicMock(), []
+class IdentityTest(StaticNodeTest, TestCase):
+    node = bonobo.identity
 
-    with ContextCurrifier(bonobo.Limit(2)).as_contextmanager(context) as stack:
-        for i in range(42):
-            results += list(stack())
+    def test_basic_call(self):
+        assert self.call(42) == 42
 
-    assert results == [NOT_MODIFIED] * 2
-
-
-def test_limit_not_there():
-    context, results = MagicMock(), []
-
-    with ContextCurrifier(bonobo.Limit(42)).as_contextmanager(context) as stack:
-        for i in range(10):
-            results += list(stack())
-
-    assert results == [NOT_MODIFIED] * 10
+    def test_execution(self):
+        object_list = [object() for _ in range(42)]
+        with self.execute() as context:
+            context.write_sync(*object_list)
+        assert context.get_buffer() == list(map(ensure_tuple, object_list))
 
 
-def test_limit_default():
-    context, results = MagicMock(), []
+class LimitTest(ConfigurableNodeTest, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.NodeType = bonobo.Limit
 
-    with ContextCurrifier(bonobo.Limit()).as_contextmanager(context) as stack:
-        for i in range(20):
-            results += list(stack())
+    def test_execution_default(self):
+        object_list = [object() for _ in range(42)]
+        with self.execute() as context:
+            context.write_sync(*object_list)
 
-    assert results == [NOT_MODIFIED] * 10
+        assert context.get_buffer() == list(map(ensure_tuple, object_list[:10]))
+
+    def test_execution_custom(self):
+        object_list = [object() for _ in range(42)]
+        with self.execute(21) as context:
+            context.write_sync(*object_list)
+
+        assert context.get_buffer() == list(map(ensure_tuple, object_list[:21]))
+
+    def test_manual(self):
+        limit = self.NodeType(5)
+        buffer = []
+        for x in range(10):
+            buffer += list(limit(x))
+        assert len(buffer) == 5
+
+    def test_underflow(self):
+        limit = self.NodeType(10)
+        buffer = []
+        for x in range(5):
+            buffer += list(limit(x))
+        assert len(buffer) == 5
 
 
 def test_tee():
@@ -76,36 +91,28 @@ def test_noop():
     assert bonobo.noop(1, 2, 3, 4, foo='bar') == NOT_MODIFIED
 
 
-def test_update():
-    with BufferingNodeExecutionContext(bonobo.Update('a', k=True)) as context:
-        context.write_sync('a', ('a', {'b': 1}), ('b', {'k': False}))
-    assert context.get_buffer() == [
-        bonobo.Bag('a', 'a', k=True),
-        bonobo.Bag('a', 'a', b=1, k=True),
-        bonobo.Bag('b', 'a', k=True),
-    ]
-    assert context.name == "Update('a', k=True)"
-
-
 def test_fixedwindow():
     with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
         context.write_sync(*range(10))
-    assert context.get_buffer() == [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (8, 9)]
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
         context.write_sync(*range(9))
-    assert context.get_buffer() == [[0, 1], [2, 3], [4, 5], [6, 7], [8]]
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (
+        8,
+        None,
+    )]
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(1)) as context:
         context.write_sync(*range(3))
-    assert context.get_buffer() == [[0], [1], [2]]
+    assert context.get_buffer() == [(0, ), (1, ), (2, )]
 
 
 def test_methodcaller():
     with BufferingNodeExecutionContext(methodcaller('swapcase')) as context:
         context.write_sync('aaa', 'bBb', 'CcC')
-    assert context.get_buffer() == ['AAA', 'BbB', 'cCc']
+    assert context.get_buffer() == list(map(ensure_tuple, ['AAA', 'BbB', 'cCc']))
 
     with BufferingNodeExecutionContext(methodcaller('zfill', 5)) as context:
         context.write_sync('a', 'bb', 'ccc')
-    assert context.get_buffer() == ['0000a', '000bb', '00ccc']
+    assert context.get_buffer() == list(map(ensure_tuple, ['0000a', '000bb', '00ccc']))

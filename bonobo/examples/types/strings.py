@@ -23,11 +23,11 @@ def extract():
     yield 'baz'
 
 
-def transform(s: str):
+def transform(s):
     return '{} ({})'.format(s.title(), randint(10, 99))
 
 
-def load(s: str):
+def load(s):
     print(s)
 
 

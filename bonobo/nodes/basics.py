@@ -1,11 +1,17 @@
 import functools
 import itertools
+import operator
+import pprint
+from functools import reduce
+
+from bonobo.util import ensure_tuple
+from mondrian import term
 
 from bonobo import settings
-from bonobo.config import Configurable, Option
-from bonobo.config.processors import ContextProcessor
-from bonobo.constants import NOT_MODIFIED, ARGNAMES
-from bonobo.structs.bags import Bag
+from bonobo.config import Configurable, Option, Method, use_raw_input, use_context, use_no_input
+from bonobo.config.functools import transformation_factory
+from bonobo.config.processors import ContextProcessor, use_context_processor
+from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
 
@@ -14,11 +20,9 @@ __all__ = [
     'Limit',
     'PrettyPrinter',
     'Tee',
-    'Update',
-    'arg0_to_kwargs',
+    'SetFields',
     'count',
     'identity',
-    'kwargs_to_arg0',
     'noop',
 ]
 
@@ -35,6 +39,8 @@ class Limit(Configurable):
 
         Number of rows to let go through.
 
+    TODO: simplify into a closure building factory?
+
     """
     limit = Option(positional=True, default=10)
 
@@ -42,7 +48,7 @@ class Limit(Configurable):
     def counter(self, context):
         yield ValueHolder(0)
 
-    def call(self, counter, *args, **kwargs):
+    def __call__(self, counter, *args, **kwargs):
         counter += 1
         if counter <= self.limit:
             yield NOT_MODIFIED
@@ -60,17 +66,6 @@ def Tee(f):
     return wrapped
 
 
-def count(counter, *args, **kwargs):
-    counter += 1
-
-
-@ContextProcessor.decorate(count)
-def _count_counter(self, context):
-    counter = ValueHolder(0)
-    yield counter
-    context.send(Bag(counter._value))
-
-
 def _shorten(s, w):
     if w and len(s) > w:
         s = s[0:w - 3] + '...'
@@ -80,85 +75,71 @@ def _shorten(s, w):
 class PrettyPrinter(Configurable):
     max_width = Option(
         int,
+        default=term.get_size()[0],
         required=False,
         __doc__='''
         If set, truncates the output values longer than this to this width.
     '''
     )
 
-    def call(self, *args, **kwargs):
-        formater = self._format_quiet if settings.QUIET.get() else self._format_console
-        argnames = kwargs.get(ARGNAMES, None)
+    filter = Method(
+        default=
+        (lambda self, index, key, value: (value is not None) and (not isinstance(key, str) or not key.startswith('_'))),
+        __doc__='''
+            A filter that determine what to print.
+            
+            Default is to ignore any key starting with an underscore and none values.
+        '''
+    )
 
-        for i, (item, value) in enumerate(
-            itertools.chain(enumerate(args), filter(lambda x: not x[0].startswith('_'), kwargs.items()))
-        ):
-            print(formater(i, item, value, argnames=argnames))
+    @ContextProcessor
+    def context(self, context):
+        yield context
 
-    def _format_quiet(self, i, item, value, *, argnames=None):
+    def __call__(self, context, *args, **kwargs):
+        quiet = settings.QUIET.get()
+        formater = self._format_quiet if quiet else self._format_console
+
+        if not quiet:
+            print('\u250e' + '\u2500' * (self.max_width - 1))
+
+        for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
+            if self.filter(index, key, value):
+                print(formater(index, key, value, fields=context.get_input_fields()))
+
+        if not quiet:
+            print('\u2516' + '\u2500' * (self.max_width - 1))
+
+        return NOT_MODIFIED
+
+    def _format_quiet(self, index, key, value, *, fields=None):
         # XXX should we implement argnames here ?
-        return ' '.join(((' ' if i else '-'), str(item), ':', str(value).strip()))
+        return ' '.join(((' ' if index else '-'), str(key), ':', str(value).strip()))
 
-    def _format_console(self, i, item, value, *, argnames=None):
-        argnames = argnames or []
-        if not isinstance(item, str):
-            if len(argnames) >= item:
-                item = '{} / {}'.format(item, argnames[item])
+    def _format_console(self, index, key, value, *, fields=None):
+        fields = fields or []
+        if not isinstance(key, str):
+            if len(fields) >= key and str(key) != str(fields[key]):
+                key = '{}{}'.format(fields[key], term.lightblack('[{}]'.format(key)))
             else:
-                item = str(i)
+                key = str(index)
 
-        return ' '.join(
-            (
-                (' ' if i else '•'), item, '=', _shorten(str(value).strip(),
-                                                         self.max_width).replace('\n', '\n' + CLEAR_EOL), CLEAR_EOL
-            )
-        )
+        prefix = '\u2503 {} = '.format(key)
+        prefix_length = len(prefix)
+
+        def indent(text, prefix):
+            for i, line in enumerate(text.splitlines()):
+                yield (prefix if i else '') + line + CLEAR_EOL + '\n'
+
+        repr_of_value = ''.join(
+            indent(pprint.pformat(value, width=self.max_width - prefix_length), '\u2503' + ' ' * (len(prefix) - 1))
+        ).strip()
+        return '{}{}{}'.format(prefix, repr_of_value.replace('\n', CLEAR_EOL + '\n'), CLEAR_EOL)
 
 
-def noop(*args, **kwargs):  # pylint: disable=unused-argument
-    from bonobo.constants import NOT_MODIFIED
+@use_no_input
+def noop(*args, **kwargs):
     return NOT_MODIFIED
-
-
-def arg0_to_kwargs(row):
-    """
-    Transform items in a stream from "arg0" format (each call only has one positional argument, which is a dict-like
-    object) to "kwargs" format (each call only has keyword arguments that represent a row).
-
-    :param row:
-    :return: bonobo.Bag
-    """
-    return Bag(**row)
-
-
-def kwargs_to_arg0(**row):
-    """
-    Transform items in a stream from "kwargs" format (each call only has keyword arguments that represent a row) to
-    "arg0" format (each call only has one positional argument, which is a dict-like object) .
-
-    :param **row:
-    :return: bonobo.Bag
-    """
-    return Bag(row)
-
-
-def Update(*consts, **kwconsts):
-    """
-    Transformation factory to update a stream with constant values, by appending to args and updating kwargs.
-
-    :param consts: what to append to the input stream args
-    :param kwconsts: what to use to update input stream kwargs
-    :return: function
-
-    """
-
-    def update(*args, **kwargs):
-        nonlocal consts, kwconsts
-        return (*args, *consts, {**kwargs, **kwconsts})
-
-    update.__name__ = 'Update({})'.format(Bag.format_args(*consts, **kwconsts))
-
-    return update
 
 
 class FixedWindow(Configurable):
@@ -176,10 +157,112 @@ class FixedWindow(Configurable):
     def buffer(self, context):
         buffer = yield ValueHolder([])
         if len(buffer):
-            context.send(Bag(buffer.get()))
+            last_value = buffer.get()
+            last_value += [None] * (self.length - len(last_value))
+            context.send(*last_value)
 
-    def call(self, buffer, x):
-        buffer.append(x)
+    @use_raw_input
+    def __call__(self, buffer, bag):
+        buffer.append(bag)
         if len(buffer) >= self.length:
-            yield buffer.get()
+            yield tuple(buffer.get())
             buffer.set([])
+
+
+@transformation_factory
+def SetFields(fields):
+    @use_context
+    @use_no_input
+    def _SetFields(context):
+        nonlocal fields
+        if not context.output_type:
+            context.set_output_fields(fields)
+        return NOT_MODIFIED
+
+    return _SetFields
+
+
+@transformation_factory
+def UnpackItems(*items, fields=None, defaults=None):
+    """
+    >>> UnpackItems(0)
+
+    :param items:
+    :param fields:
+    :param defaults:
+    :return: callable
+    """
+    defaults = defaults or {}
+
+    @use_context
+    @use_raw_input
+    def _UnpackItems(context, bag):
+        nonlocal fields, items, defaults
+
+        if fields is None:
+            fields = ()
+            for item in items:
+                fields += tuple(bag[item].keys())
+            context.set_output_fields(fields)
+
+        values = ()
+        for item in items:
+            values += tuple(bag[item].get(field, defaults.get(field)) for field in fields)
+
+        return values
+
+    return _UnpackItems
+
+
+@transformation_factory
+def Rename(**translations):
+    # XXX todo handle duplicated
+
+    fields = None
+    translations = {v: k for k, v in translations.items()}
+
+    @use_context
+    @use_raw_input
+    def _Rename(context, bag):
+        nonlocal fields, translations
+
+        if not fields:
+            fields = tuple(translations.get(field, field) for field in context.get_input_fields())
+            context.set_output_fields(fields)
+
+        return NOT_MODIFIED
+
+    return _Rename
+
+
+@transformation_factory
+def Format(**formats):
+    fields, newfields = None, None
+
+    @use_context
+    @use_raw_input
+    def _Format(context, bag):
+        nonlocal fields, newfields, formats
+
+        if not context.output_type:
+            fields = context.input_type._fields
+            newfields = tuple(field for field in formats if not field in fields)
+            context.set_output_fields(fields + newfields)
+
+        return tuple(
+            formats[field].format(**bag._asdict()) if field in formats else bag.get(field)
+            for field in fields + newfields
+        )
+
+    return _Format
+
+
+def _count(self, context):
+    counter = yield ValueHolder(0)
+    context.send(counter.get())
+
+
+@use_no_input
+@use_context_processor(_count)
+def count(counter):
+    counter += 1

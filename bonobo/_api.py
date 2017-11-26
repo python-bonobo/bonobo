@@ -13,16 +13,14 @@ from bonobo.nodes import (
     PickleWriter,
     PrettyPrinter,
     RateLimited,
+    SetFields,
     Tee,
-    Update,
-    arg0_to_kwargs,
     count,
     identity,
-    kwargs_to_arg0,
     noop,
 )
 from bonobo.nodes import LdjsonReader, LdjsonWriter
-from bonobo.structs import Bag, ErrorBag, Graph, Token
+from bonobo.structs import Graph
 from bonobo.util import get_name
 from bonobo.util.environ import parse_args, get_argument_parser
 
@@ -133,7 +131,7 @@ def inspect(graph, *, plugins=None, services=None, strategy=None, format):
 
 
 # data structures
-register_api_group(Bag, ErrorBag, Graph, Token)
+register_api_group(Graph)
 
 # execution strategies
 register_api(create_strategy)
@@ -181,12 +179,10 @@ register_api_group(
     PickleWriter,
     PrettyPrinter,
     RateLimited,
+    SetFields,
     Tee,
-    Update,
-    arg0_to_kwargs,
     count,
     identity,
-    kwargs_to_arg0,
     noop,
 )
 

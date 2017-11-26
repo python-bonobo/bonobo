@@ -13,7 +13,8 @@ class MyJsonWriter(bonobo.JsonWriter):
 
     def write(self, fs, file, lineno, **row):
         return bonobo.FileWriter.write(
-            self, fs, file, lineno, json.dumps(row)[1:-1]
+            self, fs, file, lineno,
+            json.dumps(row)[1:-1]
         )
 
 

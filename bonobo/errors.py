@@ -63,6 +63,10 @@ class UnrecoverableError(Exception):
     because you know that your transformation has no point continuing runnning after a bad event."""
 
 
+class UnrecoverableTypeError(UnrecoverableError, TypeError):
+    pass
+
+
 class UnrecoverableValueError(UnrecoverableError, ValueError):
     pass
 

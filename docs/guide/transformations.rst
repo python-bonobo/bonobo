@@ -206,7 +206,7 @@ can be used as a graph node, then use camelcase names:
     # configurable
     class ChangeCase(Configurable):
         modifier = Option(default='upper')
-        def call(self, s: str) -> str:
+        def __call__(self, s: str) -> str:
             return getattr(s, self.modifier)()
 
     # transformation factory

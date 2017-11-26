@@ -32,7 +32,7 @@ pyzmq==17.0.0b3
 qtconsole==4.3.1
 simplegeneric==0.8.1
 six==1.11.0
-terminado==0.6
+terminado==0.7
 testpath==0.3.1
 tornado==4.5.2
 traitlets==4.3.2

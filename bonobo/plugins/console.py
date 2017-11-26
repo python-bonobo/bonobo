@@ -95,30 +95,26 @@ class ConsoleOutputPlugin(Plugin):
 
             liveliness_color = alive_color if node.alive else dead_color
             liveliness_prefix = ' {}{}{} '.format(liveliness_color, node.status, Style.RESET_ALL)
-            _line = ''.join(
-                (
-                    liveliness_prefix,
-                    node.name,
-                    name_suffix,
-                    ' ',
-                    node.get_statistics_as_string(),
-                    ' ',
-                    node.get_flags_as_string(),
-                    Style.RESET_ALL,
-                    ' ',
-                )
-            )
+            _line = ''.join((
+                liveliness_prefix,
+                node.name,
+                name_suffix,
+                ' ',
+                node.get_statistics_as_string(),
+                ' ',
+                node.get_flags_as_string(),
+                Style.RESET_ALL,
+                ' ',
+            ))
             print(prefix + _line + CLEAR_EOL, file=self._stderr)
 
         if append:
             # todo handle multiline
             print(
-                ''.join(
-                    (
-                        ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v) for k, v in append),
-                        CLEAR_EOL
-                    )
-                ),
+                ''.join((
+                    ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v) for k, v in append),
+                    CLEAR_EOL
+                )),
                 file=self._stderr
             )
             t_cnt += 1
@@ -132,10 +128,9 @@ class ConsoleOutputPlugin(Plugin):
             if self.counter % 10 and self._append_cache:
                 append = self._append_cache
             else:
-                self._append_cache = append = (
-                    ('Memory', '{0:.2f} Mb'.format(memory_usage())),
-                    # ('Total time', '{0} s'.format(execution_time(harness))),
-                )
+                self._append_cache = append = (('Memory', '{0:.2f} Mb'.format(memory_usage())),
+                                               # ('Total time', '{0} s'.format(execution_time(harness))),
+                                               )
         else:
             append = ()
         self.write(context, prefix=self.prefix, append=append, rewind=rewind)

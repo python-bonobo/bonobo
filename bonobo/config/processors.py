@@ -1,10 +1,17 @@
 from collections import Iterable
 from contextlib import contextmanager
+from functools import partial
+from inspect import signature
 
 from bonobo.config import Option
+from bonobo.errors import UnrecoverableTypeError
 from bonobo.util import deprecated_alias, ensure_tuple
 
-_CONTEXT_PROCESSORS_ATTR = '__processors__'
+_raw = object()
+_args = object()
+_none = object()
+
+INPUT_FORMATS = {_raw, _args, _none}
 
 
 class ContextProcessor(Option):
@@ -51,18 +58,11 @@ class ContextProcessor(Option):
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
-    @classmethod
-    def decorate(cls, cls_or_func):
-        try:
-            cls_or_func.__processors__
-        except AttributeError:
-            cls_or_func.__processors__ = []
 
-        def decorator(processor, cls_or_func=cls_or_func):
-            cls_or_func.__processors__.append(cls(processor))
-            return cls_or_func
-
-        return decorator
+class bound(partial):
+    @property
+    def kwargs(self):
+        return self.keywords
 
 
 class ContextCurrifier:
@@ -70,18 +70,47 @@ class ContextCurrifier:
     This is a helper to resolve processors.
     """
 
-    def __init__(self, wrapped, *initial_context):
+    def __init__(self, wrapped, *args, **kwargs):
         self.wrapped = wrapped
-        self.context = tuple(initial_context)
+        self.args = args
+        self.kwargs = kwargs
+        self.format = getattr(wrapped, '__input_format__', _args)
         self._stack, self._stack_values = None, None
 
     def __iter__(self):
         yield from self.wrapped
 
-    def __call__(self, *args, **kwargs):
-        if not callable(self.wrapped) and isinstance(self.wrapped, Iterable):
-            return self.__iter__()
-        return self.wrapped(*self.context, *args, **kwargs)
+    def _bind(self, _input):
+        try:
+            bind = signature(self.wrapped).bind
+        except ValueError:
+            bind = partial(bound, self.wrapped)
+        if self.format is _args:
+            return bind(*self.args, *_input, **self.kwargs)
+        if self.format is _raw:
+            return bind(*self.args, _input, **self.kwargs)
+        if self.format is _none:
+            return bind(*self.args, **self.kwargs)
+        raise NotImplementedError('Invalid format {!r}.'.format(self.format))
+
+    def __call__(self, _input):
+        if not callable(self.wrapped):
+            if isinstance(self.wrapped, Iterable):
+                return self.__iter__()
+            raise UnrecoverableTypeError('Uncallable node {}'.format(self.wrapped))
+        try:
+            bound = self._bind(_input)
+        except TypeError as exc:
+            raise UnrecoverableTypeError((
+                'Input of {wrapped!r} does not bind to the node signature.\n'
+                'Args: {args}\n'
+                'Input: {input}\n'
+                'Kwargs: {kwargs}\n'
+                'Signature: {sig}'
+            ).format(
+                wrapped=self.wrapped, args=self.args, input=_input, kwargs=self.kwargs, sig=signature(self.wrapped)
+            )) from exc
+        return self.wrapped(*bound.args, **bound.kwargs)
 
     def setup(self, *context):
         if self._stack is not None:
@@ -89,14 +118,11 @@ class ContextCurrifier:
 
         self._stack, self._stack_values = list(), list()
         for processor in resolve_processors(self.wrapped):
-            _processed = processor(self.wrapped, *context, *self.context)
-            try:
-                _append_to_context = next(_processed)
-            except TypeError as exc:
-                raise TypeError('Context processor should be generators (using yield).') from exc
+            _processed = processor(self.wrapped, *context, *self.args, **self.kwargs)
+            _append_to_context = next(_processed)
             self._stack_values.append(_append_to_context)
             if _append_to_context is not None:
-                self.context += ensure_tuple(_append_to_context)
+                self.args += ensure_tuple(_append_to_context)
             self._stack.append(_processed)
 
     def teardown(self):
@@ -139,3 +165,42 @@ def resolve_processors(mixed):
 
 
 get_context_processors = deprecated_alias('get_context_processors', resolve_processors)
+
+
+def use_context(f):
+    def context(self, context, *args, **kwargs):
+        yield context
+
+    return use_context_processor(context)(f)
+
+
+def use_context_processor(context_processor):
+    def using_context_processor(cls_or_func):
+        nonlocal context_processor
+
+        try:
+            cls_or_func.__processors__
+        except AttributeError:
+            cls_or_func.__processors__ = []
+
+        cls_or_func.__processors__.append(ContextProcessor(context_processor))
+        return cls_or_func
+
+    return using_context_processor
+
+
+def _use_input_format(input_format):
+    if input_format not in INPUT_FORMATS:
+        raise ValueError(
+            'Invalid input format {!r}. Choices: {}'.format(input_format, ', '.join(sorted(INPUT_FORMATS)))
+        )
+
+    def _set_input_format(f):
+        setattr(f, '__input_format__', input_format)
+        return f
+
+    return _set_input_format
+
+
+use_no_input = _use_input_format(_none)
+use_raw_input = _use_input_format(_raw)

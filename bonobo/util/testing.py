@@ -1,3 +1,4 @@
+import contextlib
 import functools
 import io
 import os
@@ -8,8 +9,9 @@ from unittest.mock import patch
 
 import pytest
 
-from bonobo import open_fs, Token, __main__, get_examples_path, Bag
+from bonobo import open_fs, __main__, get_examples_path
 from bonobo.commands import entrypoint
+from bonobo.constants import Token
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.contexts.node import NodeExecutionContext
 
@@ -24,9 +26,9 @@ def optional_contextmanager(cm, *, ignore=False):
 
 
 class FilesystemTester:
-    def __init__(self, extension='txt', mode='w'):
+    def __init__(self, extension='txt', mode='w', *, input_data=''):
         self.extension = extension
-        self.input_data = ''
+        self.input_data = input_data
         self.mode = mode
 
     def get_services_for_reader(self, tmpdir):
@@ -58,7 +60,7 @@ class BufferingContext:
         return self.buffer
 
     def get_buffer_args_as_dicts(self):
-        return list(map(lambda x: x.args_as_dict() if isinstance(x, Bag) else dict(x), self.buffer))
+        return [row._asdict() if hasattr(row, '_asdict') else dict(row) for row in self.buffer]
 
 
 class BufferingNodeExecutionContext(BufferingContext, NodeExecutionContext):
@@ -141,3 +143,121 @@ class EnvironmentTestCase():
 
         assert err == ''
         return dict(map(lambda line: line.split(' ', 1), filter(None, out.split('\n'))))
+
+
+class StaticNodeTest:
+    node = None
+    services = {}
+
+    NodeExecutionContextType = BufferingNodeExecutionContext
+
+    @contextlib.contextmanager
+    def execute(self, *args, **kwargs):
+        with self.NodeExecutionContextType(type(self).node, services=self.services) as context:
+            yield context
+
+    def call(self, *args, **kwargs):
+        return type(self).node(*args, **kwargs)
+
+
+class ConfigurableNodeTest:
+    NodeType = None
+    NodeExecutionContextType = BufferingNodeExecutionContext
+
+    services = {}
+
+    @staticmethod
+    def incontext(*create_args, **create_kwargs):
+        def decorator(method):
+            @functools.wraps(method)
+            def _incontext(self, *args, **kwargs):
+                nonlocal create_args, create_kwargs
+                with self.execute(*create_args, **create_kwargs) as context:
+                    return method(self, context, *args, **kwargs)
+
+            return _incontext
+
+        return decorator
+
+    def create(self, *args, **kwargs):
+        return self.NodeType(*self.get_create_args(*args), **self.get_create_kwargs(**kwargs))
+
+    @contextlib.contextmanager
+    def execute(self, *args, **kwargs):
+        with self.NodeExecutionContextType(self.create(*args, **kwargs), services=self.services) as context:
+            yield context
+
+    def get_create_args(self, *args):
+        return args
+
+    def get_create_kwargs(self, **kwargs):
+        return kwargs
+
+    def get_filesystem_tester(self):
+        return FilesystemTester(self.extension, input_data=self.input_data)
+
+
+class ReaderTest(ConfigurableNodeTest):
+    """ Helper class to test reader transformations. """
+
+    ReaderNodeType = None
+
+    extension = 'txt'
+    input_data = ''
+
+    @property
+    def NodeType(self):
+        return self.ReaderNodeType
+
+    @pytest.fixture(autouse=True)
+    def _reader_test_fixture(self, tmpdir):
+        fs_tester = self.get_filesystem_tester()
+        self.fs, self.filename, self.services = fs_tester.get_services_for_reader(tmpdir)
+        self.tmpdir = tmpdir
+
+    def get_create_args(self, *args):
+        return (self.filename, ) + args
+
+    def test_customizable_output_type_transform_not_a_type(self):
+        context = self.NodeExecutionContextType(
+            self.create(*self.get_create_args(), output_type=str.upper, **self.get_create_kwargs()),
+            services=self.services
+        )
+        with pytest.raises(TypeError):
+            context.start()
+
+    def test_customizable_output_type_transform_not_a_tuple(self):
+        context = self.NodeExecutionContextType(
+            self.create(
+                *self.get_create_args(), output_type=type('UpperString', (str, ), {}), **self.get_create_kwargs()
+            ),
+            services=self.services
+        )
+        with pytest.raises(TypeError):
+            context.start()
+
+
+class WriterTest(ConfigurableNodeTest):
+    """ Helper class to test writer transformations. """
+
+    WriterNodeType = None
+
+    extension = 'txt'
+    input_data = ''
+
+    @property
+    def NodeType(self):
+        return self.WriterNodeType
+
+    @pytest.fixture(autouse=True)
+    def _writer_test_fixture(self, tmpdir):
+        fs_tester = self.get_filesystem_tester()
+        self.fs, self.filename, self.services = fs_tester.get_services_for_writer(tmpdir)
+        self.tmpdir = tmpdir
+
+    def get_create_args(self, *args):
+        return (self.filename, ) + args
+
+    def readlines(self):
+        with self.fs.open(self.filename) as fp:
+            return tuple(map(str.strip, fp.readlines()))
