@@ -16,4 +16,50 @@ div.related {
 
 .brand {
     font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+    font-size: 0.9em;
+}
+
+div.sphinxsidebar h1,
+div.sphinxsidebar h2,
+div.sphinxsidebar h3,
+div.sphinxsidebar h4,
+div.sphinxsidebar h5,
+div.sphinxsidebar h6 {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+}
+
+div.sphinxsidebar h3 {
+    margin: 30px 0 10px 0;
+}
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+}
+
+div.admonition p.admonition-title {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+}
+
+div.sphinxsidebarwrapper {
+    padding: 0;
+}
+
+div.note {
+    border: 0;
+}
+
+div.admonition {
+    padding: 20px;
+}
+
+.last {
+    margin-bottom: 0 !important;
+}
+pre {
+    padding: 6px 20px;
 }

@@ -1,22 +1,46 @@
 Installation
 ============
 
-
 Create an ETL project
 :::::::::::::::::::::
 
-Let's create a job.
+First, install the framework:
 
 .. code-block:: shell-session
 
     $ pip install --upgrade bonobo
-    $ bonobo create my-etl.py
+
+Create a simple job:
+
+.. code-block:: shell-session
+
+    $ bonobo init my-etl.py
+
+And let's go for a test drive:
+
+.. code-block:: shell-session
+
     $ python my-etl.py
 
-This job only uses one python file, and you can run it using the python interpreter. For bigger jobs or jobs that
-relates to multiple files, you should create a python package.
+Congratulations, you ran your first Bonobo ETL job.
 
 Now, you can head to :doc:`tutorial/index`.
+
+.. note::
+
+    It's often best to start with a single file then move it into a project
+    (which, in python, needs to live in a package).
+
+    You can read more about this topic in the :doc:`guide/packaging` section,
+    along with pointers on how to move this first file into an existing fully
+    featured python package.
+
+    You can also avoid all the comments boilerplate by using `--bare` option
+    (which is a shorthand for `--template bare`):
+
+    .. code-block:: shell-session
+
+        $ bonobo init --bare my-bare-etl-job.py
 
 
 Other installation options
@@ -83,12 +107,12 @@ from the local clone.
     $ git clone git@github.com:python-bonobo/bonobo.git
     $ cd bonobo
     $ pip install --editable .
-    
+
 You can develop on this clone, but you probably want to add your own repository if you want to push code back and make pull requests.
 I usually name the git remote for the main bonobo repository "upstream", and my own repository "origin".
 
 .. code-block:: shell-session
-    
+
     $ git remote rename origin upstream
     $ git remote add origin git@github.com:hartym/bonobo.git
     $ git fetch --all
@@ -119,4 +143,3 @@ users.
 We're trying to look into that but energy available to provide serious support on windows is very limited.
 
 If you have experience in this domain and you're willing to help, you're more than welcome!
-
