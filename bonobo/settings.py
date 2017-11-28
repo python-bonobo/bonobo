@@ -46,6 +46,9 @@ class Setting:
     def __eq__(self, other):
         return self.get() == other
 
+    def __bool__(self):
+        return bool(self.get())
+
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):

@@ -1,11 +1,7 @@
 import functools
+import html
 import itertools
-import operator
 import pprint
-from functools import reduce
-
-from bonobo.util import ensure_tuple
-from mondrian import term
 
 from bonobo import settings
 from bonobo.config import Configurable, Option, Method, use_raw_input, use_context, use_no_input
@@ -14,6 +10,7 @@ from bonobo.config.processors import ContextProcessor, use_context_processor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
+from mondrian import term
 
 __all__ = [
     'FixedWindow',
@@ -94,29 +91,41 @@ class PrettyPrinter(Configurable):
 
     @ContextProcessor
     def context(self, context):
+        context.setdefault('_jupyter_html', None)
         yield context
+        if context._jupyter_html is not None:
+            from IPython.display import display, HTML
+            display(HTML('\n'.join(['<table>'] + context._jupyter_html + ['</table>'])))
 
     def __call__(self, context, *args, **kwargs):
-        quiet = settings.QUIET.get()
-        formater = self._format_quiet if quiet else self._format_console
+        if not settings.QUIET:
+            if term.isjupyter:
+                self.print_jupyter(context, *args, **kwargs)
+                return NOT_MODIFIED
+            if term.istty:
+                self.print_console(context, *args, **kwargs)
+                return NOT_MODIFIED
 
-        if not quiet:
-            print('\u250e' + '\u2500' * (self.max_width - 1))
-
-        for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
-            if self.filter(index, key, value):
-                print(formater(index, key, value, fields=context.get_input_fields()))
-
-        if not quiet:
-            print('\u2516' + '\u2500' * (self.max_width - 1))
-
+        self.print_quiet(context, *args, **kwargs)
         return NOT_MODIFIED
 
-    def _format_quiet(self, index, key, value, *, fields=None):
+    def print_quiet(self, context, *args, **kwargs):
+        for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
+            if self.filter(index, key, value):
+                print(self.format_quiet(index, key, value, fields=context.get_input_fields()))
+
+    def format_quiet(self, index, key, value, *, fields=None):
         # XXX should we implement argnames here ?
         return ' '.join(((' ' if index else '-'), str(key), ':', str(value).strip()))
 
-    def _format_console(self, index, key, value, *, fields=None):
+    def print_console(self, context, *args, **kwargs):
+        print('\u250e' + '\u2500' * (self.max_width - 1))
+        for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
+            if self.filter(index, key, value):
+                print(self.format_console(index, key, value, fields=context.get_input_fields()))
+        print('\u2516' + '\u2500' * (self.max_width - 1))
+
+    def format_console(self, index, key, value, *, fields=None):
         fields = fields or []
         if not isinstance(key, str):
             if len(fields) >= key and str(key) != str(fields[key]):
@@ -135,6 +144,21 @@ class PrettyPrinter(Configurable):
             indent(pprint.pformat(value, width=self.max_width - prefix_length), '\u2503' + ' ' * (len(prefix) - 1))
         ).strip()
         return '{}{}{}'.format(prefix, repr_of_value.replace('\n', CLEAR_EOL + '\n'), CLEAR_EOL)
+
+    def print_jupyter(self, context, *args):
+        if not context._jupyter_html:
+            context._jupyter_html = [
+                '<thead><tr>',
+                *map('<th>{}</th>'.format, map(html.escape, map(str,
+                                                                context.get_input_fields() or range(len(args))))),
+                '</tr></thead>',
+            ]
+
+        context._jupyter_html += [
+            '<tr>',
+            *map('<td>{}</td>'.format, map(html.escape, map(repr, args))),
+            '</tr>',
+        ]
 
 
 @use_no_input

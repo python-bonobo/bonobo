@@ -7,11 +7,11 @@ from types import GeneratorType
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
-from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD, Token
+from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD, Token, Flag, INHERIT
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.structs.inputs import Input
-from bonobo.util import get_name, istuple, isconfigurabletype, ensure_tuple
+from bonobo.util import get_name, isconfigurabletype, ensure_tuple
 from bonobo.util.bags import BagType
 from bonobo.util.statistics import WithStatistics
 
@@ -292,20 +292,24 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def _cast(self, _input, _output):
         """
-        Transforms a pair of input/output into what is the real output.
+        Transforms a pair of input/output into the real slim output.
 
         :param _input: Bag
         :param _output: mixed
         :return: Bag
         """
 
-        if _output is NOT_MODIFIED:
-            if self._output_type is None:
-                return _input
-            else:
-                return self._output_type(*_input)
+        tokens, _output = split_token(_output)
 
-        return ensure_tuple(_output, cls=(self.output_type or tuple))
+        if NOT_MODIFIED in tokens:
+            return ensure_tuple(_input, cls=(self.output_type or tuple))
+
+        if INHERIT in tokens:
+            if self._output_type is None:
+                self._output_type = concat_types(self._input_type, self._input_length, self._output_type, len(_output))
+            _output = _input + ensure_tuple(_output)
+
+        return ensure_tuple(_output, cls=(self._output_type or tuple))
 
     def _send(self, value, _control=False):
         """
@@ -330,26 +334,44 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
 
 def isflag(param):
-    return isinstance(param, Token) and param in (NOT_MODIFIED, )
+    return isinstance(param, Flag)
 
 
-def split_tokens(output):
+def split_token(output):
     """
     Split an output into token tuple, real output tuple.
 
     :param output:
     :return: tuple, tuple
     """
-    if isinstance(output, Token):
-        # just a flag
-        return (output, ), ()
 
-    if not istuple(output):
-        # no flag
-        return (), (output, )
+    output = ensure_tuple(output)
 
-    i = 0
-    while isflag(output[i]):
+    flags, i, len_output, data_allowed = set(), 0, len(output), True
+    while i < len_output and isflag(output[i]):
+        if output[i].must_be_first and i:
+            raise ValueError('{} flag must be first.'.format(output[i]))
+        if i and output[i - 1].must_be_last:
+            raise ValueError('{} flag must be last.'.format(output[i - 1]))
+        if output[i] in flags:
+            raise ValueError('Duplicate flag {}.'.format(output[i]))
+        flags.add(output[i])
+        data_allowed &= output[i].allows_data
         i += 1
 
-    return output[:i], output[i:]
+    output = output[i:]
+    if not data_allowed and len(output):
+        raise ValueError('Output data provided after a flag that does not allow data.')
+    return flags, output
+
+
+def concat_types(t1, l1, t2, l2):
+    t1, t2 = t1 or tuple, t2 or tuple
+
+    if t1 == t2 == tuple:
+        return tuple
+
+    f1 = t1._fields if hasattr(t1, '_fields') else tuple(range(l1))
+    f2 = t2._fields if hasattr(t2, '_fields') else tuple(range(l2))
+
+    return BagType('Inherited', f1 + f2)

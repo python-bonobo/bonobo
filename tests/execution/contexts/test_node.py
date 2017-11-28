@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from bonobo import Graph
-from bonobo.constants import EMPTY
-from bonobo.execution.contexts.node import NodeExecutionContext
+from bonobo.constants import EMPTY, NOT_MODIFIED, INHERIT
+from bonobo.execution.contexts.node import NodeExecutionContext, split_token
 from bonobo.execution.strategies import NaiveStrategy
 from bonobo.util.testing import BufferingNodeExecutionContext, BufferingGraphExecutionContext
 
@@ -224,3 +224,35 @@ def test_node_lifecycle_with_kill():
 
     ctx.stop()
     assert all((ctx.started, ctx.killed, ctx.stopped)) and not ctx.alive
+
+
+def test_split_token():
+    assert split_token(('foo', 'bar')) == (set(), ('foo', 'bar'))
+    assert split_token(()) == (set(), ())
+    assert split_token('') == (set(), ('', ))
+
+
+def test_split_token_duplicate():
+    with pytest.raises(ValueError):
+        split_token((NOT_MODIFIED, NOT_MODIFIED))
+    with pytest.raises(ValueError):
+        split_token((INHERIT, INHERIT))
+    with pytest.raises(ValueError):
+        split_token((INHERIT, NOT_MODIFIED, INHERIT))
+
+
+def test_split_token_not_modified():
+    with pytest.raises(ValueError):
+        split_token((NOT_MODIFIED, 'foo', 'bar'))
+    with pytest.raises(ValueError):
+        split_token((NOT_MODIFIED, INHERIT))
+    with pytest.raises(ValueError):
+        split_token((INHERIT, NOT_MODIFIED))
+    assert split_token(NOT_MODIFIED) == ({NOT_MODIFIED}, ())
+    assert split_token((NOT_MODIFIED, )) == ({NOT_MODIFIED}, ())
+
+
+def test_split_token_inherit():
+    assert split_token(INHERIT) == ({INHERIT}, ())
+    assert split_token((INHERIT, )) == ({INHERIT}, ())
+    assert split_token((INHERIT, 'foo', 'bar')) == ({INHERIT}, ('foo', 'bar'))

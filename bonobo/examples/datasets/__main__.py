@@ -66,11 +66,16 @@ def get_services():
 
 if __name__ == '__main__':
     parser = examples.get_argument_parser()
-    parser.add_argument('--target', '-t', choices=graphs.keys(), nargs='+')
+    parser.add_argument(
+        '--target', '-t', choices=graphs.keys(), nargs='+'
+    )
 
     with bonobo.parse_args(parser) as options:
         graph_options = examples.get_graph_options(options)
-        graph_names = list(options['target'] if options['target'] else sorted(graphs.keys()))
+        graph_names = list(
+            options['target']
+            if options['target'] else sorted(graphs.keys())
+        )
 
         graph = bonobo.Graph()
         for name in graph_names:

@@ -11,9 +11,18 @@ class Token:
 BEGIN = Token('Begin')
 END = Token('End')
 
-INHERIT_INPUT = Token('InheritInput')
-LOOPBACK = Token('Loopback')
-NOT_MODIFIED = Token('NotModified')
+
+class Flag(Token):
+    must_be_first = False
+    must_be_last = False
+    allows_data = True
+
+
+INHERIT = Flag('Inherit')
+NOT_MODIFIED = Flag('NotModified')
+NOT_MODIFIED.must_be_first = True
+NOT_MODIFIED.must_be_last = True
+NOT_MODIFIED.allows_data = False
 
 EMPTY = tuple()
 
