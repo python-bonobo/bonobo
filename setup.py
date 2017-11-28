@@ -74,9 +74,10 @@ setup(
     },
     entry_points={
         'bonobo.commands': [
-            'convert = bonobo.commands.convert:ConvertCommand', 'init = bonobo.commands.init:InitCommand',
+            'convert = bonobo.commands.convert:ConvertCommand', 'download = bonobo.commands.download:DownloadCommand',
+            'examples = bonobo.commands.examples:ExamplesCommand', 'init = bonobo.commands.init:InitCommand',
             'inspect = bonobo.commands.inspect:InspectCommand', 'run = bonobo.commands.run:RunCommand',
-            'version = bonobo.commands.version:VersionCommand', 'download = bonobo.commands.download:DownloadCommand'
+            'version = bonobo.commands.version:VersionCommand'
         ],
         'console_scripts': ['bonobo = bonobo.commands:entrypoint']
     },

@@ -27,6 +27,6 @@ def get_graph_options(options):
     _print = options.pop('print', False)
 
     return {
-        '_limit': (bonobo.Limit(_limit), ) if _limit else (),
-        '_print': (bonobo.PrettyPrinter(), ) if _print else (),
+        '_limit': (bonobo.Limit(_limit),) if _limit else (),
+        '_print': (bonobo.PrettyPrinter(),) if _print else (),
     }

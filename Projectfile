@@ -7,6 +7,8 @@ python = require('python')
 sphinx = require('sphinx')
 yapf = require('yapf')
 
+# python.set_versions('3.5', '3.6', '3.7')  --> not yet implemented
+
 python.setup(
     name='bonobo',
     description='Bonobo, a simple, modern and atomic extract-transform-load toolkit for python 3.5+.',
@@ -30,11 +32,12 @@ python.setup(
         ],
         'bonobo.commands': [
             'convert = bonobo.commands.convert:ConvertCommand',
+            'download = bonobo.commands.download:DownloadCommand',
+            'examples = bonobo.commands.examples:ExamplesCommand',
             'init = bonobo.commands.init:InitCommand',
             'inspect = bonobo.commands.inspect:InspectCommand',
             'run = bonobo.commands.run:RunCommand',
             'version = bonobo.commands.version:VersionCommand',
-            'download = bonobo.commands.download:DownloadCommand',
         ],
     }
 )
