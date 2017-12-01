@@ -12,4 +12,6 @@ def transformation_factory(f):
         )
         return retval
 
+    _transformation_factory._partial = True
+
     return _transformation_factory

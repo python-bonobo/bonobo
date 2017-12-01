@@ -50,8 +50,11 @@ class ExecutorStrategy(Strategy):
         def starter(node):
             @functools.wraps(node)
             def _runner():
-                with node:
-                    node.loop()
+                try:
+                    with node:
+                        node.loop()
+                except:
+                    logging.getLogger(__name__).critical('Critical error in threadpool node starter.', exc_info=sys.exc_info())
 
             try:
                 futures.append(executor.submit(_runner))

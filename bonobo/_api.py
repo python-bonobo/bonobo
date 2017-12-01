@@ -1,25 +1,6 @@
 from bonobo.execution.strategies import create_strategy
-from bonobo.nodes import (
-    CsvReader,
-    CsvWriter,
-    FileReader,
-    FileWriter,
-    Filter,
-    FixedWindow,
-    JsonReader,
-    JsonWriter,
-    Limit,
-    PickleReader,
-    PickleWriter,
-    PrettyPrinter,
-    RateLimited,
-    SetFields,
-    Tee,
-    count,
-    identity,
-    noop,
-)
-from bonobo.nodes import LdjsonReader, LdjsonWriter
+from bonobo.nodes import __all__ as _all_nodes
+from bonobo.nodes import *
 from bonobo.structs import Graph
 from bonobo.util import get_name
 from bonobo.util.environ import parse_args, get_argument_parser
@@ -51,9 +32,13 @@ def register_graph_api(x, __all__=__all__):
     return register_api(x, __all__=__all__)
 
 
-def register_api_group(*args):
+def register_api_group(*args, check=None):
+    check = set(check) if check else None
     for attr in args:
         register_api(attr)
+        if check:
+            check.remove(get_name(attr))
+    assert not (check and len(check))
 
 
 @register_graph_api
@@ -170,6 +155,7 @@ register_api_group(
     FileWriter,
     Filter,
     FixedWindow,
+    Format,
     JsonReader,
     JsonWriter,
     LdjsonReader,
@@ -179,11 +165,14 @@ register_api_group(
     PickleWriter,
     PrettyPrinter,
     RateLimited,
+    Rename,
     SetFields,
     Tee,
+    UnpackItems,
     count,
     identity,
     noop,
+    check=_all_nodes,
 )
 
 

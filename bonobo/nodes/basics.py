@@ -14,10 +14,13 @@ from mondrian import term
 
 __all__ = [
     'FixedWindow',
+    'Format',
     'Limit',
     'PrettyPrinter',
-    'Tee',
+    'Rename',
     'SetFields',
+    'Tee',
+    'UnpackItems',
     'count',
     'identity',
     'noop',
