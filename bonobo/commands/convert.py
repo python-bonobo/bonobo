@@ -20,6 +20,13 @@ class ConvertCommand(BaseCommand):
             'Choose the writer factory if it cannot be detected from extension, or if detection is wrong (use - for console pretty print).'
         )
         parser.add_argument(
+            '--limit',
+            '-l',
+            type=int,
+            help='Adds a Limit() after the reader instance.',
+            default=None,
+        )
+        parser.add_argument(
             '--transformation',
             '-t',
             dest='transformation',
@@ -57,24 +64,32 @@ class ConvertCommand(BaseCommand):
             writer=None,
             writer_option=None,
             option=None,
-            transformation=None
+            limit=None,
+            transformation=None,
     ):
         reader_factory = default_registry.get_reader_factory_for(input_filename, format=reader)
-        reader_options = _resolve_options((option or []) + (reader_option or []))
+        reader_kwargs = _resolve_options((option or []) + (reader_option or []))
 
         if output_filename == '-':
             writer_factory = bonobo.PrettyPrinter
+            writer_args = ()
         else:
             writer_factory = default_registry.get_writer_factory_for(output_filename, format=writer)
-        writer_options = _resolve_options((option or []) + (writer_option or []))
+            writer_args = (output_filename, )
+        writer_kwargs = _resolve_options((option or []) + (writer_option or []))
 
-        transformations = _resolve_transformations(transformation)
+        transformations = ()
+
+        if limit:
+            transformations += (bonobo.Limit(limit), )
+
+        transformations += _resolve_transformations(transformation)
 
         graph = bonobo.Graph()
         graph.add_chain(
-            reader_factory(input_filename, **reader_options),
+            reader_factory(input_filename, **reader_kwargs),
             *transformations,
-            writer_factory(output_filename, **writer_options),
+            writer_factory(*writer_args, **writer_kwargs),
         )
 
         return bonobo.run(

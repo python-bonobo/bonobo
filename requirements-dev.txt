@@ -1,5 +1,6 @@
 -e .[dev]
 alabaster==0.7.10
+attrs==17.3.0
 babel==2.5.1
 certifi==2017.11.5
 chardet==3.0.4
@@ -9,12 +10,13 @@ idna==2.6
 imagesize==0.7.1
 jinja2==2.10
 markupsafe==1.0
+pluggy==0.6.0
 py==1.5.2
 pygments==2.2.0
 pytest-cov==2.5.1
 pytest-sugar==0.9.0
-pytest-timeout==1.2.0
-pytest==3.2.5
+pytest-timeout==1.2.1
+pytest==3.3.0
 pytz==2017.3
 requests==2.18.4
 six==1.11.0

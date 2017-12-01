@@ -46,7 +46,7 @@ python.add_requirements(
     'fs >=2.0,<2.1',
     'graphviz >=0.8,<0.9',
     'jinja2 >=2.9,<3',
-    'mondrian >=0.5,<0.6',
+    'mondrian >=0.6,<0.7',
     'packaging >=16,<17',
     'psutil >=5.4,<6',
     'python-slugify >=1.2,<1.3',

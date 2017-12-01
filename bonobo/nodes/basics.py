@@ -119,21 +119,21 @@ class PrettyPrinter(Configurable):
         return ' '.join(((' ' if index else '-'), str(key), ':', str(value).strip()))
 
     def print_console(self, context, *args, **kwargs):
-        print('\u250e' + '\u2500' * (self.max_width - 1))
+        print('\u250c')
         for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
             if self.filter(index, key, value):
                 print(self.format_console(index, key, value, fields=context.get_input_fields()))
-        print('\u2516' + '\u2500' * (self.max_width - 1))
+        print('\u2514')
 
     def format_console(self, index, key, value, *, fields=None):
         fields = fields or []
         if not isinstance(key, str):
-            if len(fields) >= key and str(key) != str(fields[key]):
+            if len(fields) > key and str(key) != str(fields[key]):
                 key = '{}{}'.format(fields[key], term.lightblack('[{}]'.format(key)))
             else:
                 key = str(index)
 
-        prefix = '\u2503 {} = '.format(key)
+        prefix = '\u2502 {} = '.format(key)
         prefix_length = len(prefix)
 
         def indent(text, prefix):
@@ -141,7 +141,7 @@ class PrettyPrinter(Configurable):
                 yield (prefix if i else '') + line + CLEAR_EOL + '\n'
 
         repr_of_value = ''.join(
-            indent(pprint.pformat(value, width=self.max_width - prefix_length), '\u2503' + ' ' * (len(prefix) - 1))
+            indent(pprint.pformat(value, width=self.max_width - prefix_length), '\u2502' + ' ' * (len(prefix) - 1))
         ).strip()
         return '{}{}{}'.format(prefix, repr_of_value.replace('\n', CLEAR_EOL + '\n'), CLEAR_EOL)
 
