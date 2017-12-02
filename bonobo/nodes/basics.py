@@ -16,6 +16,7 @@ __all__ = [
     'FixedWindow',
     'Format',
     'Limit',
+    'OrderFields',
     'PrettyPrinter',
     'Rename',
     'SetFields',
@@ -197,7 +198,38 @@ class FixedWindow(Configurable):
 
 
 @transformation_factory
+def OrderFields(fields):
+    """
+    Transformation factory to reorder fields in a data stream.
+
+    :param fields:
+    :return: callable
+    """
+    fields = list(fields)
+
+    @use_context
+    @use_raw_input
+    def _OrderFields(context, row):
+        nonlocal fields
+        context.setdefault('remaining', None)
+        if not context.output_type:
+            context.remaining = list(sorted(set(context.get_input_fields()) - set(fields)))
+            context.set_output_fields(fields + context.remaining)
+
+        yield tuple(row.get(field) for field in context.get_output_fields())
+
+    return _OrderFields
+
+
+@transformation_factory
 def SetFields(fields):
+    """
+    Transformation factory that sets the field names on first iteration, without touching the values.
+
+    :param fields:
+    :return: callable
+    """
+
     @use_context
     @use_no_input
     def _SetFields(context):

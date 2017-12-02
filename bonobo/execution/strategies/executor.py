@@ -54,7 +54,9 @@ class ExecutorStrategy(Strategy):
                     with node:
                         node.loop()
                 except:
-                    logging.getLogger(__name__).critical('Critical error in threadpool node starter.', exc_info=sys.exc_info())
+                    logging.getLogger(__name__).critical(
+                        'Critical error in threadpool node starter.', exc_info=sys.exc_info()
+                    )
 
             try:
                 futures.append(executor.submit(_runner))

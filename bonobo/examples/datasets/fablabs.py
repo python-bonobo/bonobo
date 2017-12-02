@@ -16,11 +16,10 @@ and a flat txt file.
 
 import json
 
-from colorama import Fore, Style
-
 import bonobo
-from bonobo.commands import get_default_services
+from bonobo import examples
 from bonobo.contrib.opendatasoft import OpenDataSoftAPI
+from bonobo.examples.datasets.services import get_services
 
 try:
     import pycountry
@@ -29,8 +28,7 @@ except ImportError as exc:
         'You must install package "pycountry" to run this example.'
     ) from exc
 
-API_DATASET = 'fablabs-in-the-world'
-API_NETLOC = 'datanova.laposte.fr'
+API_DATASET = 'fablabs@public-us'
 ROWS = 100
 
 
@@ -40,65 +38,28 @@ def _getlink(x):
 
 def normalize(row):
     result = {
-        **
-        row,
+        **row,
         'links': list(filter(None, map(_getlink, json.loads(row.get('links'))))),
         'country': pycountry.countries.get(alpha_2=row.get('country_code', '').upper()).name,
     }
     return result
 
 
-def display(row):
-    print(Style.BRIGHT, row.get('name'), Style.RESET_ALL, sep='')
+def get_graph(graph=None, *, _limit=(), _print=()):
+    graph = graph or bonobo.Graph()
+    graph.add_chain(
+        OpenDataSoftAPI(dataset=API_DATASET),
+        *_limit,
+        normalize,
+        bonobo.UnpackItems(0),
+        *_print,
+        bonobo.JsonWriter(path='fablabs.json'),
+    )
+    return graph
 
-    address = list(
-        filter(
-            None, (
-                ' '.join(
-                    filter(
-                        None, (
-                            row.get('postal_code', None),
-                            row.get('city', None)
-                        )
-                    )
-                ),
-                row.get('county', None),
-                row.get('country'),
-            )
-        )
-    )
-
-    print(
-        '  - {}address{}: {address}'.format(
-            Fore.BLUE, Style.RESET_ALL, address=', '.join(address)
-        )
-    )
-    print(
-        '  - {}links{}: {links}'.format(
-            Fore.BLUE, Style.RESET_ALL, links=', '.join(row['links'])
-        )
-    )
-    print(
-        '  - {}geometry{}: {geometry}'.format(
-            Fore.BLUE, Style.RESET_ALL, **row
-        )
-    )
-    print(
-        '  - {}source{}: {source}'.format(
-            Fore.BLUE, Style.RESET_ALL, source='datanova/' + API_DATASET
-        )
-    )
-
-
-graph = bonobo.Graph(
-    OpenDataSoftAPI(
-        dataset=API_DATASET, netloc=API_NETLOC, timezone='Europe/Paris'
-    ),
-    normalize,
-    bonobo.Filter(filter=lambda row: row.get('country') == 'France'),
-    bonobo.JsonWriter(path='fablabs.txt', ioformat='arg0'),
-    bonobo.Tee(display),
-)
 
 if __name__ == '__main__':
-    bonobo.run(graph, services=get_default_services(__file__))
+    parser = examples.get_argument_parser()
+
+    with bonobo.parse_args(parser) as options:
+        bonobo.run(get_graph(**examples.get_graph_options(options)), services=get_services())
