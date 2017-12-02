@@ -4,7 +4,7 @@ import bonobo
 from bonobo import examples
 from bonobo.examples.datasets.coffeeshops import get_graph as get_coffeeshops_graph
 from bonobo.examples.datasets.fablabs import get_graph as get_fablabs_graph
-from bonobo.examples.datasets.services import get_services, get_datasets_dir
+from bonobo.examples.datasets.services import get_services, get_datasets_dir, get_minor_version
 
 graph_factories = {
     'coffeeshops': get_coffeeshops_graph,
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         bonobo.run(graph, services=get_services())
 
         if options['sync']:
-            # XXX/TODO: when parallel option for node will be implemented, need to be rewriten to use a graph.
+            # TODO: when parallel option for node will be implemented, need to be rewriten to use a graph.
             import boto3
 
             s3 = boto3.client('s3')
@@ -44,7 +44,7 @@ if __name__ == '__main__':
                     local_path = os.path.join(root, filename)
                     relative_path = os.path.relpath(local_path, local_dir)
                     s3_path = os.path.join(
-                        bonobo.__version__, relative_path
+                        get_minor_version(), relative_path
                     )
 
                     try:
