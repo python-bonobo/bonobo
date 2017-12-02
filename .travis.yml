@@ -4,8 +4,8 @@ python:
   - 3.5-dev
   - 3.6
   - 3.6-dev
-  - 3.7-dev
-  - nightly
+#  - 3.7-dev
+#  - nightly
 install:
   - make install-dev
   - pip install coveralls
