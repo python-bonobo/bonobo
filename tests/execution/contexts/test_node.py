@@ -186,7 +186,7 @@ def test_node_tuple_dict():
 
 
 def test_node_lifecycle_natural():
-    func = MagicMock()
+    func = MagicMock(spec=object())
 
     ctx = NodeExecutionContext(func)
     assert not any((ctx.started, ctx.stopped, ctx.killed, ctx.alive))
@@ -205,7 +205,7 @@ def test_node_lifecycle_natural():
 
 
 def test_node_lifecycle_with_kill():
-    func = MagicMock()
+    func = MagicMock(spec=object())
 
     ctx = NodeExecutionContext(func)
     assert not any((ctx.started, ctx.stopped, ctx.killed, ctx.alive))

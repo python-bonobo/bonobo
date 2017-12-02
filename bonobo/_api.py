@@ -161,6 +161,7 @@ register_api_group(
     LdjsonReader,
     LdjsonWriter,
     Limit,
+    OrderFields,
     PickleReader,
     PickleWriter,
     PrettyPrinter,
