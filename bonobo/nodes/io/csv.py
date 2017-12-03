@@ -93,16 +93,6 @@ class CsvReader(FileReader, CsvHandler):
     __call__ = read
 
 
-def get_values(args, *, fields):
-    print(fields, args)
-
-    return
-    if context.input_type and context.input_type is tuple:
-        context.writer(bag[0:len(context.fields)])
-    else:
-        context.writer([bag.get(field) if type(field) is str else bag[field] for field in context.fields])
-
-
 @use_context
 class CsvWriter(FileWriter, CsvHandler):
     @Method(
