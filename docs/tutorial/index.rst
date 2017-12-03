@@ -39,12 +39,16 @@ More
 What's next?
 ::::::::::::
 
-* :doc:`The Bonobo Guide <../guide/index>`
-* :doc:`Extensions <../extension/index>`
+
+Once you're familiar with all the base concepts, you can...
+
+* Read the :doc:`Guides </guide/index>` to have a deep dive in each concept.
+* Explore the :doc:`Extensions </extension/index>` to widen the possibilities.
+* Open the :doc:`References </reference/index>` and start hacking like crazy.
 
 
-We're there!
-::::::::::::
+You're not alone!
+:::::::::::::::::
 
 Good documentation is not easy to write.
 

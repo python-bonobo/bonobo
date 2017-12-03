@@ -35,13 +35,6 @@ Now, you can head to :doc:`tutorial/index`.
     along with pointers on how to move this first file into an existing fully
     featured python package.
 
-    You can also avoid all the comments boilerplate by using `--bare` option
-    (which is a shorthand for `--template bare`):
-
-    .. code-block:: shell-session
-
-        $ bonobo init --bare my-bare-etl-job.py
-
 
 Other installation options
 ::::::::::::::::::::::::::
@@ -54,6 +47,12 @@ You can install it directly from the `Python Package Index <https://pypi.python.
 .. code-block:: shell-session
 
     $ pip install bonobo
+
+To upgrade an existing installation, use `--upgrade`:
+
+.. code-block:: shell-session
+
+    $ pip install --upgrade bonobo
 
 
 Install from source
@@ -118,6 +117,17 @@ I usually name the git remote for the main bonobo repository "upstream", and my 
     $ git fetch --all
 
 Of course, replace my github username by the one you used to fork bonobo. You should be good to go!
+
+Preview versions
+----------------
+
+Sometimes, there are pre-versions available (before a major release, for example). By default, pip does not target
+pre-versions to avoid accidental upgrades to a potentially instable software, but you can easily opt-in:
+
+.. code-block:: shell-session
+
+    $ pip install --upgrade --pre bonobo
+
 
 Supported platforms
 :::::::::::::::::::
