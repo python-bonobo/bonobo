@@ -1,6 +1,16 @@
 Part 3: Working with Files
 ==========================
 
+* Filesystems
+
+* Reading files
+
+* Writing files
+
+* Writing files to S3
+
+* Atomic writes ???
+
 
 Moving forward
 ::::::::::::::

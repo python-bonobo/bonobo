@@ -150,8 +150,8 @@ Transformations that take input and yields nothing are also called **loaders**. 
 different types, to work with various external systems.
 
 Please note that as a convenience mean and because the cost is marginal, most builtin `loaders` will send their
-inputs to their output, so you can easily chain more than one loader, or apply more transformations after a given
-loader was applied.
+inputs to their output unmodified, so you can easily chain more than one loader, or apply more transformations after a
+given loader.
 
 
 Graph Factory
@@ -255,4 +255,4 @@ You now know:
 * How to execute a job file.
 * How to read the console output.
 
-**Next: :doc:`2-jobs`**
+**Jump to** :doc:`2-jobs`

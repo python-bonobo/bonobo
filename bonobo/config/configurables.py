@@ -3,7 +3,6 @@ from bonobo.util import isoption, iscontextprocessor, sortedlist
 
 __all__ = [
     'Configurable',
-    'Option',
 ]
 
 get_creation_counter = lambda v: v._creation_counter
@@ -192,11 +191,7 @@ class Configurable(metaclass=ConfigurableMeta):
             position += 1
 
     def __call__(self, *args, **kwargs):
-        raise AbstractError(
-            'You must implement the __call__ method in your configurable class {} to actually use it.'.format(
-                type(self).__name__
-            )
-        )
+        raise AbstractError(self.__call__)
 
     @property
     def __options__(self):
