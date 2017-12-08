@@ -2,6 +2,7 @@
 
 from medikit import require
 
+make = require('make')
 pytest = require('pytest')
 python = require('python')
 sphinx = require('sphinx')
@@ -49,6 +50,7 @@ python.add_requirements(
         'cookiecutter >=1.5,<1.6',
         'pytest-sugar >=0.8,<0.9',
         'pytest-timeout >=1,<2',
+        'sphinx-sitemap >=0.2,<0.3',
     ],
     docker=[
         'bonobo-docker',
@@ -58,5 +60,12 @@ python.add_requirements(
         'ipywidgets >=6.0.0,<7',
     ]
 )
+
+@listen(make.on_generate)
+def on_make_generate(event):
+    event.makefile['SPHINX_AUTOBUILD'] = '$(PYTHON_DIRNAME)/sphinx-autobuild'
+    event.makefile.add_target('watch-$(SPHINX_SOURCEDIR)', '''
+        $(SPHINX_AUTOBUILD) $(SPHINX_SOURCEDIR) $(shell mktemp -d)
+    ''', phony=True)
 
 # vim: ft=python:

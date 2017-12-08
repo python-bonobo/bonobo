@@ -43,6 +43,14 @@ else:
 setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
+    data_files=[
+        (
+            'share/jupyter/nbextensions/bonobo-jupyter', [
+                'bonobo/ext/jupyter/static/extension.js', 'bonobo/ext/jupyter/static/index.js',
+                'bonobo/ext/jupyter/static/index.js.map'
+            ]
+        )
+    ],
     description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
@@ -60,7 +68,7 @@ setup(
         'dev': [
             'cookiecutter (>= 1.5, < 1.6)', 'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)',
             'pytest-cov (>= 2.5, < 3.0)', 'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)',
-            'sphinx (>= 1.6, < 2.0)'
+            'sphinx (>= 1.6, < 2.0)', 'sphinx-sitemap (>= 0.2, < 0.3)', 'yapf'
         ],
         'docker': ['bonobo-docker'],
         'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)']

@@ -20,7 +20,10 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.graphviz',
+    'sphinx_sitemap',
 ]
+
+site_url = 'http://docs.bonobo-project.org/en/master/'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

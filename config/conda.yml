@@ -9,6 +9,7 @@ dependencies:
   - fs ==2.0.3
   - psutil ==5.2.2
   - requests ==2.13.0
+  - sphinx-sitemap==0.2
   - stevedore ==1.21.0
   # for examples
   - pycountry ==17.9.23
