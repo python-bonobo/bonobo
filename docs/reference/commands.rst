@@ -29,11 +29,13 @@ Requires `cookiecutter`.
 Bonobo Inspect
 ::::::::::::::
 
-Inspects a bonobo graph source files. For now, only support graphviz output.
+Inspects a bonobo file by rendering its transformation graph.
+For now, only graphviz output is supported.
 
-Syntax: `bonobo inspect [--graph|-g] filename`
+Syntax: `bonobo inspect [--graph|-g] [--open|-O] filename`
 
-Requires graphviz if you want to generate an actual graph picture, although the command itself depends on nothing.
+If the --open option is used, the transformation graph will be opened in the default web browser.
+Otherwise the graphviz source code will be printed for the user to use in other tools.
 
 
 Bonobo Run
