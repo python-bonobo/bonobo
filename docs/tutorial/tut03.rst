@@ -13,7 +13,7 @@ Class-based transformations and configurables
 Bonobo is a bit dumb. If something is callable, it considers it can be used as a transformation, and it's up to the
 user to provide callables that logically fits in a graph.
 
-You can use plain python objects with a `__call__()` method, and it ill just work.
+You can use plain python objects with a `__call__()` method, and it will just work.
 
 As a lot of transformations needs common machinery, there is a few tools to quickly build transformations, most of
 them requiring your class to subclass :class:`bonobo.config.Configurable`.
