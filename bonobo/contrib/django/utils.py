@@ -12,10 +12,11 @@ def create_or_update(model, *, defaults=None, save=True, **kwargs):
 
     updated = False
     if not created:
-        for k, v in defaults.items():
-            if getattr(obj, k) != v:
-                setattr(obj, k, v)
-                updated = True
+        if defaults:
+            for k, v in defaults.items():
+                if getattr(obj, k) != v:
+                    setattr(obj, k, v)
+                    updated = True
 
         if updated and save:
             obj.save()
