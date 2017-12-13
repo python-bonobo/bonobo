@@ -61,7 +61,7 @@ setup(
     install_requires=[
         'colorama (>= 0.3)', 'fs (>= 2.0, < 2.1)', 'graphviz (>= 0.8, < 0.9)', 'jinja2 (>= 2.9, < 3)',
         'mondrian (>= 0.6, < 0.7)', 'packaging (>= 16, < 17)', 'psutil (>= 5.4, < 6)', 'python-slugify (>= 1.2, < 1.3)',
-        'requests (>= 2, < 3)', 'stevedore (>= 1.27, < 1.28)', 'whistle (>= 1.0, < 1.1)'
+        'requests (>= 2, < 3)', 'stevedore (~= 1.27)', 'whistle (>= 1.0, < 1.1)'
     ],
     extras_require={
         'dev': [
