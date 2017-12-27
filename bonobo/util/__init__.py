@@ -1,4 +1,4 @@
-from bonobo.util.collections import ensure_tuple, sortedlist, tuplize
+from bonobo.util.collections import cast, ensure_tuple, sortedlist, tuplize
 from bonobo.util.compat import deprecated, deprecated_alias
 from bonobo.util.inspect import (
     inspect_node,
@@ -16,6 +16,7 @@ from bonobo.util.objects import (get_name, get_attribute_or_create, ValueHolder)
 # Bonobo's util API
 __all__ = [
     'ValueHolder',
+    'cast',
     'deprecated',
     'deprecated_alias',
     'ensure_tuple',

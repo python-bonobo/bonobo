@@ -1,5 +1,7 @@
+import pytest
+
 from bonobo.util import sortedlist, ensure_tuple
-from bonobo.util.collections import tuplize
+from bonobo.util.collections import tuplize, cast
 
 
 def test_sortedlist():
@@ -12,12 +14,13 @@ def test_sortedlist():
 
 
 def test_ensure_tuple():
-    assert ensure_tuple('a') == ('a', )
-    assert ensure_tuple(('a', )) == ('a', )
+    assert ensure_tuple('a') == ('a',)
+    assert ensure_tuple(('a',)) == ('a',)
     assert ensure_tuple(()) is ()
 
 
-def test_tuplize():
+@pytest.mark.parametrize('tuplize', [tuplize, cast(tuple)])
+def test_tuplize(tuplize):
     tuplized_lambda = tuplize(lambda: [1, 2, 3])
     assert tuplized_lambda() == (1, 2, 3)
 

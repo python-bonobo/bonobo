@@ -2,6 +2,7 @@ from bonobo.util import get_name
 
 
 class ApiHelper:
+    # TODO __all__ kwarg only
     def __init__(self, __all__):
         self.__all__ = __all__
 
@@ -13,7 +14,8 @@ class ApiHelper:
             from inspect import signature
             parameters = list(signature(x).parameters)
             required_parameters = {'plugins', 'services', 'strategy'}
-            assert parameters[0] == 'graph', 'First parameter of a graph api function must be "graph".'
+            assert len(parameters) > 0 and parameters[
+                0] == 'graph', 'First parameter of a graph api function must be "graph".'
             assert required_parameters.intersection(
                 parameters
             ) == required_parameters, 'Graph api functions must define the following parameters: ' + ', '.join(

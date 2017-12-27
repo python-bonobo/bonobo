@@ -8,7 +8,7 @@ import os
 import runpy
 
 import bonobo
-from bonobo.util.collections import tuplize
+from bonobo.util import cast
 
 
 class _RequiredModule:
@@ -61,7 +61,7 @@ def _resolve_options(options=None):
     return dict()
 
 
-@tuplize
+@cast(tuple)
 def _resolve_transformations(transformations):
     """
     Resolve a collection of strings into the matching python objects, defaulting to bonobo namespace if no package is provided.

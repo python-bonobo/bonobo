@@ -26,31 +26,36 @@ def ensure_tuple(tuple_or_mixed, *, cls=tuple):
     if isinstance(tuple_or_mixed, tuple):
         return tuple.__new__(cls, tuple_or_mixed)
 
-    return tuple.__new__(cls, (tuple_or_mixed, ))
+    return tuple.__new__(cls, (tuple_or_mixed,))
 
 
-def tuplize(generator):
-    """
-    Decorates a generator and make it a tuple-returning function. As a side effect, it can also decorate any
-    iterator-returning function to force return value to be a tuple.
+def cast(type_):
+    def _wrap_cast(f):
+        @functools.wraps(f)
+        def _wrapped_cast(*args, **kwargs):
+            nonlocal f, type_
+            return type_(f(*args, **kwargs))
 
-    >>> tuplized_lambda = tuplize(lambda: [1, 2, 3])
-    >>> tuplized_lambda()
-    (1, 2, 3)
+        return _wrapped_cast
 
-    >>> @tuplize
-    ... def my_generator():
-    ...     yield 1
-    ...     yield 2
-    ...     yield 3
-    ...
-    >>> my_generator()
-    (1, 2, 3)
+    return _wrap_cast
 
-    """
 
-    @functools.wraps(generator)
-    def tuplized(*args, **kwargs):
-        return tuple(generator(*args, **kwargs))
+tuplize = cast(tuple)
+tuplize.__doc__ = """
+Decorates a generator and make it a tuple-returning function. As a side effect, it can also decorate any
+iterator-returning function to force return value to be a tuple.
 
-    return tuplized
+>>> tuplized_lambda = tuplize(lambda: [1, 2, 3])
+>>> tuplized_lambda()
+(1, 2, 3)
+
+>>> @tuplize
+... def my_generator():
+...     yield 1
+...     yield 2
+...     yield 3
+...
+>>> my_generator()
+(1, 2, 3)
+"""
