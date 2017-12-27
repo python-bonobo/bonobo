@@ -31,9 +31,6 @@ We'll create a job to do the following
 * Display it (in the next step, we'll learn about writing the result to a file.
 
 
-
-
-
 Moving forward
 ::::::::::::::
 

@@ -1,9 +1,6 @@
 Part 4: Services and Configurables
 ==================================
 
-.. note::
-
-    This section lacks completeness, sorry for that (but you can still read it!).
 
 In the last section, we used a few new tools.
 

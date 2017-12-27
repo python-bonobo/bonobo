@@ -19,7 +19,7 @@ pytz==2017.3
 requests==2.18.4
 six==1.11.0
 sqlalchemy==1.1.15
-stevedore==1.27.1
+stevedore==1.28.0
 unidecode==0.4.21
 urllib3==1.22
 whistle==1.0.0

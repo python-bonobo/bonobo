@@ -3,45 +3,15 @@ from bonobo.nodes import __all__ as _all_nodes
 from bonobo.nodes import *
 from bonobo.structs import Graph
 from bonobo.util import get_name
+from bonobo.util.api import ApiHelper
 from bonobo.util.environ import parse_args, get_argument_parser
 
 __all__ = []
 
-
-def register_api(x, __all__=__all__):
-    """Register a function as being part of Bonobo's API, then returns the original function."""
-    __all__.append(get_name(x))
-    return x
+api = ApiHelper(__all__)
 
 
-def register_graph_api(x, __all__=__all__):
-    """
-    Register a function as being part of Bonobo's API, after checking that its signature contains the right parameters
-    to work correctly, then returns the original function.
-    """
-    from inspect import signature
-    parameters = list(signature(x).parameters)
-    required_parameters = {'plugins', 'services', 'strategy'}
-    assert parameters[0] == 'graph', 'First parameter of a graph api function must be "graph".'
-    assert required_parameters.intersection(
-        parameters
-    ) == required_parameters, 'Graph api functions must define the following parameters: ' + ', '.join(
-        sorted(required_parameters)
-    )
-
-    return register_api(x, __all__=__all__)
-
-
-def register_api_group(*args, check=None):
-    check = set(check) if check else None
-    for attr in args:
-        register_api(attr)
-        if check:
-            check.remove(get_name(attr))
-    assert not (check and len(check))
-
-
-@register_graph_api
+@api.register_graph
 def run(graph, *, plugins=None, services=None, strategy=None):
     """
     Main entry point of bonobo. It takes a graph and creates all the necessary plumbing around to execute it.
@@ -104,7 +74,7 @@ def _inspect_as_graph(graph):
 _inspect_formats = {'graph': _inspect_as_graph}
 
 
-@register_graph_api
+@api.register_graph
 def inspect(graph, *, plugins=None, services=None, strategy=None, format):
     if not format in _inspect_formats:
         raise NotImplementedError(
@@ -116,14 +86,14 @@ def inspect(graph, *, plugins=None, services=None, strategy=None, format):
 
 
 # data structures
-register_api_group(Graph)
+api.register_group(Graph)
 
 # execution strategies
-register_api(create_strategy)
+api.register_group(create_strategy)
 
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
-@register_api
+@api.register
 def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
@@ -148,7 +118,7 @@ def open_fs(fs_url=None, *args, **kwargs):
 
 
 # standard transformations
-register_api_group(
+api.register_group(
     CsvReader,
     CsvWriter,
     FileReader,
@@ -189,16 +159,16 @@ def _is_jupyter_notebook():
         return False
 
 
-@register_api
+@api.register
 def get_examples_path(*pathsegments):
     import os
     import pathlib
     return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
 
 
-@register_api
+@api.register
 def open_examples_fs(*pathsegments):
     return open_fs(get_examples_path(*pathsegments))
 
 
-register_api_group(get_argument_parser, parse_args)
+api.register_group(get_argument_parser, parse_args)
