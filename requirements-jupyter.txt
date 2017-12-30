@@ -1,6 +1,6 @@
 -e .[jupyter]
 appnope==0.1.0
-attrs==17.3.0
+attrs==17.4.0
 bleach==2.1.2
 decorator==4.1.2
 entrypoints==0.2.3
@@ -38,7 +38,7 @@ simplegeneric==0.8.1
 six==1.11.0
 terminado==0.8.1
 testpath==0.3.1
-tornado==4.5.2
+tornado==5.0a1
 traitlets==4.3.2
 wcwidth==0.1.7
 webencodings==0.5.1

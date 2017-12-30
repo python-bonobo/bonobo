@@ -58,14 +58,14 @@ python.add_requirements(
         'pytest-timeout ~=1.0',
     ],
     docker=[
-        'bonobo-docker',
+        'bonobo-docker ~=0.6.0a1',
     ],
     jupyter=[
         'ipywidgets ~=6.0',
         'jupyter ~=1.0',
     ],
     sqlalchemy=[
-        'bonobo-sqlalchemy',
+        'bonobo-sqlalchemy ~=0.6.0a1',
     ],
 )
 
