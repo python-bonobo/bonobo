@@ -1,9 +1,6 @@
 First steps
 ===========
 
-What is Bonobo?
-:::::::::::::::
-
 Bonobo is an ETL (Extract-Transform-Load) framework for python 3.5. The goal is to define data-transformations, with
 python code in charge of handling similar shaped independent lines of data.
 
@@ -14,8 +11,7 @@ Bonobo is a lean manufacturing assembly line for data that let you focus on the 
 
 Bonobo uses simple python and should be quick and easy to learn.
 
-Tutorial
-::::::::
+**Tutorials**
 
 .. toctree::
     :maxdepth: 1
@@ -26,8 +22,8 @@ Tutorial
     4-services
     5-packaging
 
-More
-::::
+
+**Integrations**
 
 .. toctree::
     :maxdepth: 1
@@ -36,9 +32,7 @@ More
     notebooks
     sqlalchemy
 
-What's next?
-::::::::::::
-
+**What's next?**
 
 Once you're familiar with all the base concepts, you can...
 
@@ -46,9 +40,7 @@ Once you're familiar with all the base concepts, you can...
 * Explore the :doc:`Extensions </extension/index>` to widen the possibilities.
 * Open the :doc:`References </reference/index>` and start hacking like crazy.
 
-
-You're not alone!
-:::::::::::::::::
+**You're not alone!**
 
 Good documentation is not easy to write.
 

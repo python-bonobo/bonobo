@@ -249,10 +249,10 @@ That's all for this first step.
 
 You now know:
 
-* How to create a new job file.
-* How to inspect the content of a job file.
+* How to create a new job (using a single file).
+* How to inspect the content of a job.
 * What should go in a job file.
 * How to execute a job file.
 * How to read the console output.
 
-**Jump to** :doc:`2-jobs`
+It's now time to jump to :doc:`2-jobs`.
