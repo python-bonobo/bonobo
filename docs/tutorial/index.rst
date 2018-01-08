@@ -53,3 +53,4 @@ out.
 If you're not stuck but had trouble understanding something, please consider contributing to the docs (using GitHub
 pull requests).
 
+.. include:: _wip_note.rst

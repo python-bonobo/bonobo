@@ -1,6 +1,8 @@
 Part 2: Writing ETL Jobs
 ========================
 
+.. include:: _wip_note.rst
+
 What's an ETL job ?
 :::::::::::::::::::
 

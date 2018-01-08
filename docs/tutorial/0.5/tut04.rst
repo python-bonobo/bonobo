@@ -1,6 +1,8 @@
 Working with databases
 ======================
 
+.. include:: _outdated_note.rst
+
 Databases (and especially SQL databases here) are not the focus of Bonobo, thus support for it is not (and will never
 be) included in the main package. Instead, working with databases is done using third party, well maintained and
 specialized packages, like SQLAlchemy, or other database access libraries from the python cheese shop.

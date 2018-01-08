@@ -1,6 +1,8 @@
 Configurables and Services
 ==========================
 
+.. include:: _outdated_note.rst
+
 .. note::
 
     This section lacks completeness, sorry for that (but you can still read it!).
@@ -30,7 +32,7 @@ Configurables allows to use the following features:
         class PrefixIt(Configurable):
             prefix = Option(str, positional=True, default='>>>')
 
-            def __call__(self, row):
+            def call(self, row):
                 return self.prefix + ' ' + row
 
         prefixer = PrefixIt('$')
@@ -48,7 +50,7 @@ Configurables allows to use the following features:
             url = Option(default='https://jsonplaceholder.typicode.com/users')
             http = Service('http.client')
 
-            def __call__(self, http):
+            def call(self, http):
                 resp = http.get(self.url)
 
                 for row in resp.json():
@@ -68,7 +70,7 @@ Configurables allows to use the following features:
         class Applier(Configurable):
             apply = Method()
 
-            def __call__(self, row):
+            def call(self, row):
                 return self.apply(row)
 
         @Applier
@@ -114,7 +116,7 @@ Let's see how to use it, starting from the previous service example:
         url = Option(default='https://jsonplaceholder.typicode.com/users')
         http = Service('http.client')
 
-        def __call__(self, http):
+        def call(self, http):
             resp = http.get(self.url)
 
             for row in resp.json():

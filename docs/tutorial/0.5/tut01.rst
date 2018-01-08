@@ -1,7 +1,10 @@
 Let's get started!
 ==================
 
-To get started with Bonobo, you need to install it in a working python 3.5+ environment:
+.. include:: _outdated_note.rst
+
+To begin with Bonobo, you need to install it in a working python 3.5+ environment, and you'll also need cookiecutter
+to bootstrap your project.
 
 .. code-block:: shell-session
 
@@ -13,24 +16,21 @@ See :doc:`/install` for more options.
 Create an empty project
 :::::::::::::::::::::::
 
-Your ETL code will live in standard python files and packages.
+Your ETL code will live in ETL projects, which are basically a bunch of files, including python code, that bonobo
+can run.
 
 .. code-block:: shell-session
 
-    $ bonobo create tutorial.py
+    $ bonobo init tutorial
 
-This will create a simple example job in a `tutorial.py` file.
+This will create a `tutorial` directory (`content description here <https://www.bonobo-project.org/with/cookiecutter>`_).
 
-Now, try to execute it:
+To run this project, use:
 
 .. code-block:: shell-session
 
-    $ python tutorial.py
+    $ bonobo run tutorial
 
-Congratulations, you just ran your first ETL job!
-
-
-.. todo:: XXX **CHANGES NEEDED BELOW THIS POINTS BEFORE 0.6** XXX
 
 Write a first transformation
 ::::::::::::::::::::::::::::
@@ -107,9 +107,6 @@ To do this, it needs to know what data-flow you want to achieve, and you'll use 
     The `if __name__ == '__main__':` section is not required, unless you want to run it directly using the python
     interpreter.
 
-    The name of the `graph` variable is arbitrary, but this variable must be global and available unconditionally.
-    Do not put it in its own function or in the `if __name__ == '__main__':` section.
-
 
 Execute the job
 :::::::::::::::
@@ -133,9 +130,9 @@ Rewrite it using builtins
 There is a much simpler way to describe an equivalent graph:
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut01e02.py
-:language: python
+    :language: python
 
-    The `extract()` generator has been replaced by a list, as Bonobo will interpret non-callable iterables as a no-input
+The `extract()` generator has been replaced by a list, as Bonobo will interpret non-callable iterables as a no-input
 generator.
 
 This example is also available in :mod:`bonobo.examples.tutorials.tut01e02`, and you can also run it as a module:

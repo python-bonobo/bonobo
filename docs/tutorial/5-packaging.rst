@@ -1,6 +1,8 @@
 Part 5: Projects and Packaging
 ==============================
 
+.. include:: _wip_note.rst
+
 Until then, we worked with one file managing a job.
 
 Real life often involves more complicated setups, with relations and imports between different files.

@@ -1,6 +1,7 @@
 Part 4: Services and Configurables
 ==================================
 
+.. include:: _wip_note.rst
 
 In the last section, we used a few new tools.
 

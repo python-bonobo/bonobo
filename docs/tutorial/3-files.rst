@@ -1,6 +1,8 @@
 Part 3: Working with Files
 ==========================
 
+.. include:: _wip_note.rst
+
 * Filesystems
 
 * Reading files
