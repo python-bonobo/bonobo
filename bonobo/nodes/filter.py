@@ -21,6 +21,6 @@ class Filter(Configurable):
 
     filter = Method()
 
-    def call(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         if self.filter(*args, **kwargs):
             return NOT_MODIFIED

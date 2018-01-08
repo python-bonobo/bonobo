@@ -1,33 +1,35 @@
-from bonobo.util.collections import sortedlist
+from bonobo.util.collections import cast, ensure_tuple, sortedlist, tuplize
+from bonobo.util.compat import deprecated, deprecated_alias
 from bonobo.util.inspect import (
     inspect_node,
-    isbag,
     isconfigurable,
     isconfigurabletype,
     iscontextprocessor,
-    iserrorbag,
-    isloopbackbag,
+    isdict,
     ismethod,
     isoption,
+    istuple,
     istype,
 )
 from bonobo.util.objects import (get_name, get_attribute_or_create, ValueHolder)
-from bonobo.util.python import require
 
 # Bonobo's util API
 __all__ = [
     'ValueHolder',
+    'cast',
+    'deprecated',
+    'deprecated_alias',
+    'ensure_tuple',
     'get_attribute_or_create',
     'get_name',
     'inspect_node',
-    'isbag',
     'isconfigurable',
     'isconfigurabletype',
     'iscontextprocessor',
-    'iserrorbag',
-    'isloopbackbag',
+    'isdict',
     'ismethod',
     'isoption',
     'istype',
-    'require',
+    'sortedlist',
+    'tuplize',
 ]

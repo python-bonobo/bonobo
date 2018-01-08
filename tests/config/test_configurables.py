@@ -1,3 +1,5 @@
+import pprint
+
 import pytest
 
 from bonobo.config.configurables import Configurable
@@ -67,7 +69,7 @@ def test_defaults():
 
     assert o.required_str == 'hello'
     assert o.default_str == 'foo'
-    assert o.integer == None
+    assert o.integer is None
 
 
 def test_str_type_factory():
@@ -78,7 +80,7 @@ def test_str_type_factory():
 
     assert o.required_str == '42'
     assert o.default_str == 'foo'
-    assert o.integer == None
+    assert o.integer is None
 
 
 def test_int_type_factory():
@@ -100,8 +102,8 @@ def test_bool_type_factory():
 
     assert o.required_str == 'yes'
     assert o.default_str == 'foo'
-    assert o.integer == None
-    assert o.also_required == True
+    assert o.integer is None
+    assert o.also_required is True
 
 
 def test_option_resolution_order():
@@ -112,7 +114,7 @@ def test_option_resolution_order():
 
     assert o.required_str == 'kaboom'
     assert o.default_str == 'foo'
-    assert o.integer == None
+    assert o.integer is None
 
 
 def test_option_positional():

@@ -14,7 +14,7 @@ Example on how to use symple python strings to communicate between transformatio
 """
 from random import randint
 
-from bonobo import Graph
+import bonobo
 
 
 def extract():
@@ -23,17 +23,19 @@ def extract():
     yield 'baz'
 
 
-def transform(s: str):
+def transform(s):
     return '{} ({})'.format(s.title(), randint(10, 99))
 
 
-def load(s: str):
+def load(s):
     print(s)
 
 
-graph = Graph(extract, transform, load)
+def get_graph():
+    return bonobo.Graph(extract, transform, load)
+
 
 if __name__ == '__main__':
-    from bonobo import run
-
-    run(graph)
+    parser = bonobo.get_argument_parser()
+    with bonobo.parse_args(parser):
+        bonobo.run(get_graph())

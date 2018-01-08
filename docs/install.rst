@@ -1,20 +1,39 @@
 Installation
 ============
 
-
 Create an ETL project
 :::::::::::::::::::::
 
-Creating a project and starting to write code should take less than a minute:
+First, install the framework:
 
 .. code-block:: shell-session
 
-    $ pip install --upgrade bonobo cookiecutter
-    $ bonobo init my-etl-project
-    $ bonobo run my-etl-project
+    $ pip install --upgrade bonobo
 
-Once you bootstrapped a project, you can start editing the default example transformation by editing
-`my-etl-project/main.py`. Now, you can head to :doc:`tutorial/index`.
+Create a simple job:
+
+.. code-block:: shell-session
+
+    $ bonobo init my-etl.py
+
+And let's go for a test drive:
+
+.. code-block:: shell-session
+
+    $ python my-etl.py
+
+Congratulations, you ran your first Bonobo ETL job.
+
+Now, you can head to :doc:`tutorial/index`.
+
+.. note::
+
+    It's often best to start with a single file then move it into a project
+    (which, in python, needs to live in a package).
+
+    You can read more about this topic in the :doc:`guide/packaging` section,
+    along with pointers on how to move this first file into an existing fully
+    featured python package.
 
 
 Other installation options
@@ -28,6 +47,12 @@ You can install it directly from the `Python Package Index <https://pypi.python.
 .. code-block:: shell-session
 
     $ pip install bonobo
+
+To upgrade an existing installation, use `--upgrade`:
+
+.. code-block:: shell-session
+
+    $ pip install --upgrade bonobo
 
 
 Install from source
@@ -81,17 +106,28 @@ from the local clone.
     $ git clone git@github.com:python-bonobo/bonobo.git
     $ cd bonobo
     $ pip install --editable .
-    
+
 You can develop on this clone, but you probably want to add your own repository if you want to push code back and make pull requests.
 I usually name the git remote for the main bonobo repository "upstream", and my own repository "origin".
 
 .. code-block:: shell-session
-    
+
     $ git remote rename origin upstream
     $ git remote add origin git@github.com:hartym/bonobo.git
     $ git fetch --all
 
 Of course, replace my github username by the one you used to fork bonobo. You should be good to go!
+
+Preview versions
+----------------
+
+Sometimes, there are pre-versions available (before a major release, for example). By default, pip does not target
+pre-versions to avoid accidental upgrades to a potentially instable software, but you can easily opt-in:
+
+.. code-block:: shell-session
+
+    $ pip install --upgrade --pre bonobo
+
 
 Supported platforms
 :::::::::::::::::::
@@ -117,4 +153,3 @@ users.
 We're trying to look into that but energy available to provide serious support on windows is very limited.
 
 If you have experience in this domain and you're willing to help, you're more than welcome!
-

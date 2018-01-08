@@ -1,19 +1,29 @@
 import bonobo
-from bonobo.commands.run import get_default_services
+from bonobo import examples
+from bonobo.examples.files._services import get_services
 
 
 def skip_comments(line):
+    line = line.strip()
     if not line.startswith('#'):
         yield line
 
 
-graph = bonobo.Graph(
-    bonobo.FileReader('datasets/passwd.txt'),
-    skip_comments,
-    lambda s: s.split(':'),
-    lambda l: l[0],
-    print,
-)
+def get_graph(*, _limit=(), _print=()):
+    return bonobo.Graph(
+        bonobo.FileReader('datasets/passwd.txt'),
+        skip_comments,
+        *_limit,
+        lambda s: s.split(':')[0],
+        *_print,
+        bonobo.FileWriter('usernames.txt', fs='fs.output'),
+    )
+
 
 if __name__ == '__main__':
-    bonobo.run(graph, services=get_default_services(__file__))
+    parser = examples.get_argument_parser()
+    with bonobo.parse_args(parser) as options:
+        bonobo.run(
+            get_graph(**examples.get_graph_options(options)),
+            services=get_services()
+        )

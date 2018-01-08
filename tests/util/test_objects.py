@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from bonobo.util.objects import Wrapper, get_name, ValueHolder
+from bonobo.util.objects import Wrapper, get_name, ValueHolder, get_attribute_or_create
 from bonobo.util.testing import optional_contextmanager
 
 
@@ -57,6 +57,73 @@ def test_valueholder():
     assert y == x
     assert y is not x
     assert repr(x) == repr(y) == repr(43)
+
+
+def test_valueholder_notequal():
+    x = ValueHolder(42)
+    assert x != 41
+    assert not (x != 42)
+
+
+@pytest.mark.parametrize('rlo,rhi', [
+    (1, 2),
+    ('a', 'b'),
+])
+def test_valueholder_ordering(rlo, rhi):
+    vlo, vhi = ValueHolder(rlo), ValueHolder(rhi)
+
+    for lo in (rlo, vlo):
+        for hi in (rhi, vhi):
+            assert lo < hi
+            assert hi > lo
+            assert lo <= lo
+            assert not (lo < lo)
+            assert lo >= lo
+
+
+def test_valueholder_negpos():
+    neg, zero, pos = ValueHolder(-1), ValueHolder(0), ValueHolder(1)
+
+    assert -neg == pos
+    assert -pos == neg
+    assert -zero == zero
+    assert +pos == pos
+    assert +neg == neg
+
+
+def test_valueholders_containers():
+    x = ValueHolder({1, 2, 3, 5, 8, 13})
+
+    assert 5 in x
+    assert 42 not in x
+
+    y = ValueHolder({'foo': 'bar', 'corp': 'acme'})
+
+    assert 'foo' in y
+    assert y['foo'] == 'bar'
+    with pytest.raises(KeyError):
+        y['no']
+    y['no'] = 'oh, wait'
+    assert 'no' in y
+    assert 'oh, wait' == y['no']
+
+
+def test_get_attribute_or_create():
+    class X:
+        pass
+
+    x = X()
+
+    with pytest.raises(AttributeError):
+        x.foo
+
+    foo = get_attribute_or_create(x, 'foo', 'bar')
+    assert foo == 'bar'
+    assert x.foo == 'bar'
+
+    foo = get_attribute_or_create(x, 'foo', 'baz')
+    assert foo == 'bar'
+    assert x.foo == 'bar'
 
 
 unsupported_operations = {

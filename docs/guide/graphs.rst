@@ -1,9 +1,8 @@
 Graphs
 ======
 
-Graphs are the glue that ties transformations together. It's the only data-structure bonobo can execute directly. Graphs
-must be acyclic, and can contain as much nodes as your system can handle. Although this number can be rather high in
-theory, extreme practical cases usually do not exceed hundreds of nodes (and this is already extreme, really).
+Graphs are the glue that ties transformations together. They are the only data-structure bonobo can execute directly. Graphs
+must be acyclic, and can contain as many nodes as your system can handle. However, although in theory the number of nodes can be rather high, practical use cases usually do not exceed more than a few hundred nodes and only then in extreme cases.
 
 
 Definitions
@@ -50,7 +49,7 @@ Non-linear graphs
 Divergences / forks
 -------------------
 
-To create two or more divergent data streams ("fork"), you should specify `_input` kwarg to `add_chain`.
+To create two or more divergent data streams ("forks"), you should specify the `_input` kwarg to `add_chain`.
 
 .. code-block:: python
 
@@ -74,12 +73,12 @@ Resulting graph:
         "b" -> "f" -> "g";
     }
 
-.. note:: Both branch will receive the same data, at the same time.
+.. note:: Both branches will receive the same data and at the same time.
 
-Convergences / merges
+Convergence / merges
 ---------------------
 
-To merge two data streams ("merge"), you can use the `_output` kwarg to `add_chain`, or use named nodes (see below).
+To merge two data streams, you can use the `_output` kwarg to `add_chain`, or use named nodes (see below).
 
 
 .. code-block:: python
@@ -88,7 +87,7 @@ To merge two data streams ("merge"), you can use the `_output` kwarg to `add_cha
 
     graph = bonobo.Graph()
 
-    # Here we mark _input to None, so normalize won't get the "begin" impulsion.
+    # Here we set _input to None, so normalize won't start on its own but only after it receives input from the other chains.
     graph.add_chain(normalize, store, _input=None)
 
     # Add two different chains
@@ -122,7 +121,7 @@ Resulting graph:
 Named nodes
 :::::::::::
 
-Using above code to create convergences can lead to hard to read code, because you have to define the "target" stream
+Using above code to create convergences often leads to code which is hard to read, because you have to define the "target" stream
 before the streams that logically goes to the beginning of the transformation graph. To overcome that, one can use
 "named" nodes:
 
@@ -194,7 +193,7 @@ You can also run a python module:
 
     $ bonobo run -m my.own.etlmod
 
-In each case, bonobo's CLI will look for an instance of :class:`bonobo.Graph` in your file/module, create the plumbery
+In each case, bonobo's CLI will look for an instance of :class:`bonobo.Graph` in your file/module, create the plumbing
 needed to execute it, and run it.
 
 If you're in an interactive terminal context, it will use :class:`bonobo.ext.console.ConsoleOutputPlugin` for display.

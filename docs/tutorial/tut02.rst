@@ -59,13 +59,7 @@ available in **Bonobo**'s repository:
 
 .. code-block:: shell-session
 
-    $ curl https://raw.githubusercontent.com/python-bonobo/bonobo/master/bonobo/examples/datasets/coffeeshops.txt > `python3 -c 'import bonobo; print(bonobo.get_examples_path("datasets/coffeeshops.txt"))'`
-
-.. note::
-
-    The "example dataset download" step will be easier in the future.
-
-    https://github.com/python-bonobo/bonobo/issues/134
+    $ bonobo download examples/datasets/coffeeshops.txt
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02e01_read.py
     :language: python

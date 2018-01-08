@@ -1,6 +1,15 @@
+import html
+import json
+from collections import namedtuple
 from copy import copy
 
+from graphviz import ExecutableNotFound
+from graphviz.dot import Digraph
+
 from bonobo.constants import BEGIN
+from bonobo.util import get_name
+
+GraphRange = namedtuple('GraphRange', ['graph', 'input', 'output'])
 
 
 class Graph:
@@ -46,15 +55,19 @@ class Graph:
         if len(nodes):
             _input = self._resolve_index(_input)
             _output = self._resolve_index(_output)
+            _first = None
+            _last = None
 
             for i, node in enumerate(nodes):
-                _next = self.add_node(node)
+                _last = self.add_node(node)
                 if not i and _name:
                     if _name in self.named:
                         raise KeyError('Duplicate name {!r} in graph.'.format(_name))
-                    self.named[_name] = _next
-                self.outputs_of(_input, create=True).add(_next)
-                _input = _next
+                    self.named[_name] = _last
+                if not _first:
+                    _first = _last
+                self.outputs_of(_input, create=True).add(_last)
+                _input = _last
 
             if _output is not None:
                 self.outputs_of(_input, create=True).add(_output)
@@ -62,7 +75,8 @@ class Graph:
             if hasattr(self, '_topologcally_sorted_indexes_cache'):
                 del self._topologcally_sorted_indexes_cache
 
-        return self
+            return GraphRange(self, _first, _last)
+        return GraphRange(self, None, None)
 
     def copy(self):
         g = Graph()
@@ -110,6 +124,32 @@ class Graph:
             self._topologcally_sorted_indexes_cache = tuple(filter(lambda i: type(i) is int, reversed(order)))
             return self._topologcally_sorted_indexes_cache
 
+    @property
+    def graphviz(self):
+        try:
+            return self._graphviz
+        except AttributeError:
+            g = Digraph()
+            g.attr(rankdir='LR')
+            g.node('BEGIN', shape='point')
+            for i in self.outputs_of(BEGIN):
+                g.edge('BEGIN', str(i))
+            for ix in self.topologically_sorted_indexes:
+                g.node(str(ix), label=get_name(self[ix]))
+                for iy in self.outputs_of(ix):
+                    g.edge(str(ix), str(iy))
+            self._graphviz = g
+            return self._graphviz
+
+    def _repr_dot_(self):
+        return str(self.graphviz)
+
+    def _repr_html_(self):
+        try:
+            return '<div>{}</div><pre>{}</pre>'.format(self.graphviz._repr_svg_(), html.escape(repr(self)))
+        except (ExecutableNotFound, FileNotFoundError) as exc:
+            return '<strong>{}</strong>: {}'.format(type(exc).__name__, str(exc))
+
     def _resolve_index(self, mixed):
         """ Find the index based on various strategies for a node, probably an input or output of chain. Supported inputs are indexes, node values or names.
         """
@@ -126,3 +166,9 @@ class Graph:
             return self.nodes.index(mixed)
 
         raise ValueError('Cannot find node matching {!r}.'.format(mixed))
+
+
+def _get_graphviz_node_id(graph, i):
+    escaped_index = str(i)
+    escaped_name = json.dumps(get_name(graph[i]))
+    return '{{{} [label={}]}}'.format(escaped_index, escaped_name)

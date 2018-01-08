@@ -3,7 +3,6 @@ from bonobo.util import isoption, iscontextprocessor, sortedlist, get_name
 
 __all__ = [
     'Configurable',
-    'Option',
 ]
 
 get_creation_counter = lambda v: v._creation_counter
@@ -18,6 +17,7 @@ class ConfigurableMeta(type):
         super().__init__(what, bases, dict)
 
         cls.__processors = sortedlist()
+        cls.__processors_cache = None
         cls.__methods = sortedlist()
         cls.__options = sortedlist()
         cls.__names = set()
@@ -67,7 +67,9 @@ class ConfigurableMeta(type):
 
     @property
     def __processors__(cls):
-        return (processor for _, processor in cls.__processors)
+        if cls.__processors_cache is None:
+            cls.__processors_cache = [processor for _, processor in cls.__processors]
+        return cls.__processors_cache
 
     def __repr__(self):
         return ' '.join((
@@ -85,7 +87,7 @@ except:
 else:
 
     class PartiallyConfigured(_functools.partial):
-        @property  # TODO XXX cache this shit
+        @property  # TODO XXX cache this
         def _options_values(self):
             """ Simulate option values for partially configured objects. """
             try:
@@ -162,8 +164,8 @@ class Configurable(metaclass=ConfigurableMeta):
         if len(extraneous):
             raise TypeError(
                 '{}() got {} unexpected option{}: {}.'.format(
-                    cls.__name__,
-                    len(extraneous), 's' if len(extraneous) > 1 else '', ', '.join(map(repr, sorted(extraneous)))
+                    cls.__name__, len(extraneous), 's'
+                    if len(extraneous) > 1 else '', ', '.join(map(repr, sorted(extraneous)))
                 )
             )
 
@@ -173,8 +175,8 @@ class Configurable(metaclass=ConfigurableMeta):
             if _final:
                 raise TypeError(
                     '{}() missing {} required option{}: {}.'.format(
-                        cls.__name__,
-                        len(missing), 's' if len(missing) > 1 else '', ', '.join(map(repr, sorted(missing)))
+                        cls.__name__, len(missing), 's'
+                        if len(missing) > 1 else '', ', '.join(map(repr, sorted(missing)))
                     )
                 )
             return PartiallyConfigured(cls, *args, **kwargs)
@@ -209,9 +211,7 @@ class Configurable(metaclass=ConfigurableMeta):
             position += 1
 
     def __call__(self, *args, **kwargs):
-        """ You can implement a configurable callable behaviour by implemenenting the call(...) method. Of course, it is also backward compatible with legacy __call__ override.
-        """
-        return self.call(*args, **kwargs)
+        raise AbstractError(self.__call__)
 
     @property
     def __options__(self):
@@ -220,6 +220,3 @@ class Configurable(metaclass=ConfigurableMeta):
     @property
     def __processors__(self):
         return type(self).__processors__
-
-    def call(self, *args, **kwargs):
-        raise AbstractError('Not implemented.')

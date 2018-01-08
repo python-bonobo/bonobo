@@ -43,6 +43,12 @@ else:
 setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
+    data_files=[(
+        'share/jupyter/nbextensions/bonobo-jupyter', [
+            'bonobo/contrib/jupyter/static/extension.js', 'bonobo/contrib/jupyter/static/index.js',
+            'bonobo/contrib/jupyter/static/index.js.map'
+        ]
+    )],
     description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
@@ -53,23 +59,24 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'colorama (>= 0.3, < 1.0)', 'fs (>= 2.0, < 3.0)', 'packaging (>= 16, < 17)', 'psutil (>= 5.2, < 6.0)',
-        'requests (>= 2.0, < 3.0)', 'stevedore (>= 1.21, < 2.0)'
+        'fs (~= 2.0)', 'graphviz (>= 0.8, < 0.9)', 'jinja2 (~= 2.9)', 'mondrian (~= 0.6)', 'packaging (~= 16.0)',
+        'psutil (~= 5.4)', 'python-slugify (~= 1.2.0)', 'requests (~= 2.0)', 'stevedore (~= 1.27)', 'whistle (~= 1.0)'
     ],
     extras_require={
         'dev': [
-            'cookiecutter (>= 1.5, < 1.6)', 'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)',
-            'pytest-cov (>= 2.5, < 3.0)', 'pytest-sugar (>= 0.8, < 0.9)', 'pytest-timeout (>= 1, < 2)',
-            'sphinx (>= 1.6, < 2.0)'
+            'coverage (>= 4.4, < 5.0)', 'pytest (>= 3.1, < 4.0)', 'pytest-cov (>= 2.5, < 3.0)',
+            'pytest-sugar (>= 0.9, < 0.10)', 'pytest-timeout (~= 1.0)', 'sphinx (>= 1.6, < 2.0)', 'yapf'
         ],
-        'docker': ['bonobo-docker'],
-        'jupyter': ['ipywidgets (>= 6.0.0, < 7)', 'jupyter (>= 1.0, < 1.1)']
+        'docker': ['bonobo-docker (~= 0.6.0a1)'],
+        'jupyter': ['ipywidgets (~= 6.0)', 'jupyter (~= 1.0)'],
+        'sqlalchemy': ['bonobo-sqlalchemy (~= 0.6.0a1)']
     },
     entry_points={
         'bonobo.commands': [
-            'convert = bonobo.commands.convert:register', 'init = bonobo.commands.init:register',
-            'inspect = bonobo.commands.inspect:register', 'run = bonobo.commands.run:register',
-            'version = bonobo.commands.version:register'
+            'convert = bonobo.commands.convert:ConvertCommand', 'download = bonobo.commands.download:DownloadCommand',
+            'examples = bonobo.commands.examples:ExamplesCommand', 'init = bonobo.commands.init:InitCommand',
+            'inspect = bonobo.commands.inspect:InspectCommand', 'run = bonobo.commands.run:RunCommand',
+            'version = bonobo.commands.version:VersionCommand'
         ],
         'console_scripts': ['bonobo = bonobo.commands:entrypoint']
     },

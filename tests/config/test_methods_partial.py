@@ -14,7 +14,7 @@ class Bobby(Configurable):
     def think(self, context):
         yield 'different'
 
-    def call(self, think, *args, **kwargs):
+    def __call__(self, think, *args, **kwargs):
         self.handler('1', *args, **kwargs)
         self.handler2('2', *args, **kwargs)
 

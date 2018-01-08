@@ -12,16 +12,30 @@ def isconfigurable(mixed):
     return isinstance(mixed, Configurable)
 
 
-def isconfigurabletype(mixed):
+def isconfigurabletype(mixed, *, strict=False):
     """
     Check if the given argument is an instance of :class:`bonobo.config.ConfigurableMeta`, meaning it has all the
     plumbery necessary to build :class:`bonobo.config.Configurable`-like instances.
 
     :param mixed:
+    :param strict: should we consider partially configured objects?
     :return: bool
     """
-    from bonobo.config.configurables import ConfigurableMeta
-    return isinstance(mixed, ConfigurableMeta)
+    from bonobo.config.configurables import ConfigurableMeta, PartiallyConfigured
+
+    if isinstance(mixed, ConfigurableMeta):
+        return True
+
+    if strict:
+        return False
+
+    if isinstance(mixed, PartiallyConfigured):
+        return True
+
+    if hasattr(mixed, '_partial') and mixed._partial:
+        return True
+
+    return False
 
 
 def isoption(mixed):
@@ -68,37 +82,24 @@ def istype(mixed):
     return isinstance(mixed, type)
 
 
-def isbag(mixed):
+def isdict(mixed):
     """
-    Check if the given argument is an instance of a :class:`bonobo.Bag`.
+    Check if the given argument is a dict.
 
     :param mixed:
     :return: bool
     """
-    from bonobo.structs.bags import Bag
-    return isinstance(mixed, Bag)
+    return isinstance(mixed, dict)
 
 
-def iserrorbag(mixed):
+def istuple(mixed):
     """
-    Check if the given argument is an instance of an :class:`bonobo.ErrorBag`.
+    Check if the given argument is a tuple.
 
     :param mixed:
     :return: bool
     """
-    from bonobo.structs.bags import ErrorBag
-    return isinstance(mixed, ErrorBag)
-
-
-def isloopbackbag(mixed):
-    """
-    Check if the given argument is an instance of a :class:`bonobo.Bag`, marked for loopback behaviour.
-
-    :param mixed:
-    :return: bool
-    """
-    from bonobo.constants import LOOPBACK
-    return isbag(mixed) and LOOPBACK in mixed.flags
+    return isinstance(mixed, tuple)
 
 
 ConfigurableInspection = namedtuple(
@@ -129,7 +130,7 @@ def inspect_node(mixed, *, _partial=None):
 
     :raise: TypeError
     """
-    if isconfigurabletype(mixed):
+    if isconfigurabletype(mixed, strict=True):
         inst, typ = None, mixed
     elif isconfigurable(mixed):
         inst, typ = mixed, type(mixed)

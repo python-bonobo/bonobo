@@ -1,1 +1,2 @@
 include *.txt
+recursive-include bonobo *.py-tpl

@@ -32,6 +32,100 @@ Iterable
     Something we can iterate on, in python, so basically anything you'd be able to use in a `for` loop.
 
 
+Concepts
+::::::::
+
+Whatever kind of transformation you want to use, there are a few common concepts you should know about.
+
+Input
+-----
+
+All input is retrieved via the call arguments. Each line of input means one call to the callable provided. Arguments
+will be, in order:
+
+* Injected dependencies (database, http, filesystem, ...)
+* Position based arguments
+* Keyword based arguments
+
+You'll see below how to pass each of those.
+
+Output
+------
+
+Each callable can return/yield different things (all examples will use yield, but if there is only one output per input
+line, you can also return your output row and expect the exact same behaviour).
+
+Let's see the rules (first to match wins).
+
+1. A flag, eventually followed by something else, marks a special behaviour. If it supports it, the remaining part of
+   the output line will be interpreted using the same rules, and some flags can be combined.
+
+   **NOT_MODIFIED**
+
+   **NOT_MODIFIED** tells bonobo to use the input row unmodified as the output.
+
+   *CANNOT be combined*
+
+   Example:
+
+   .. code-block:: python
+
+       from bonobo import NOT_MODIFIED
+
+       def output_will_be_same_as_input(*args, **kwargs):
+           yield NOT_MODIFIED
+
+   **APPEND**
+
+   **APPEND** tells bonobo to append this output to the input (positional arguments will equal `input_args + output_args`,
+   keyword arguments will equal `{**input_kwargs, **output_kwargs}`).
+
+   *CAN be combined, but not with itself*
+
+   .. code-block:: python
+
+       from bonobo import APPEND
+
+       def output_will_be_appended_to_input(*args, **kwargs):
+           yield APPEND, 'foo', 'bar', {'eat_at': 'joe'}
+
+   **LOOPBACK**
+
+   **LOOPBACK** tells bonobo that this output must be looped back into our own input queue, allowing to create the stream
+   processing version of recursive algorithms.
+
+   *CAN be combined, but not with itself*
+
+   .. code-block:: python
+
+       from bonobo import LOOPBACK
+
+       def output_will_be_sent_to_self(*args, **kwargs):
+           yield LOOPBACK, 'Hello, I am the future "you".'
+
+   **CHANNEL(...)**
+
+   **CHANNEL(...)** tells bonobo that this output does not use the default channel and is routed through another path.
+   This is something you should probably not use unless your data flow design is complex, and if you're not certain
+   about it, it probably means that it is not the feature you're looking for.
+
+   *CAN be combined, but not with itself*
+
+   .. code-block:: python
+
+      from bonobo import CHANNEL
+
+      def output_will_be_sent_to_self(*args, **kwargs):
+          yield CHANNEL("errors"), 'That is not cool.'
+
+2. Once all flags are "consumed", the remaining part is interpreted.
+
+   * If it is a :class:`bonobo.Bag` instance, then it's used directly.
+   * If it is a :class:`dict` then a kwargs-only :class:`bonobo.Bag` will be created.
+   * If it is a :class:`tuple` then an args-only :class:`bonobo.Bag` will be created, unless its last argument is a
+     :class:`dict` in which case a args+kwargs :class:`bonobo.Bag` will be created.
+   * If it's something else, it will be used to create a one-arg-only :class:`bonobo.Bag`.
+
 Function based transformations
 ::::::::::::::::::::::::::::::
 
@@ -112,7 +206,7 @@ can be used as a graph node, then use camelcase names:
     # configurable
     class ChangeCase(Configurable):
         modifier = Option(default='upper')
-        def call(self, s: str) -> str:
+        def __call__(self, s: str) -> str:
             return getattr(s, self.modifier)()
 
     # transformation factory

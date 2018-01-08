@@ -3,9 +3,9 @@ import time
 
 import pytest
 
-from bonobo.util import get_name
-from bonobo.config import Configurable, Container, Exclusive, Service, requires
+from bonobo.config import Configurable, Container, Exclusive, Service, use
 from bonobo.config.services import validate_service_name, create_container
+from bonobo.util import get_name
 
 
 class PrinterInterface():
@@ -30,7 +30,7 @@ SERVICES = Container(
 class MyServiceDependantConfigurable(Configurable):
     printer = Service(PrinterInterface, )
 
-    def __call__(self, printer: PrinterInterface, *args):
+    def __call__(self, *args, printer: PrinterInterface):
         return printer.print(*args)
 
 
@@ -51,15 +51,15 @@ def test_service_name_validator():
 def test_service_dependency():
     o = MyServiceDependantConfigurable(printer='printer0')
 
-    assert o(SERVICES.get('printer0'), 'foo', 'bar') == '0;foo;bar'
-    assert o(SERVICES.get('printer1'), 'bar', 'baz') == '1;bar;baz'
-    assert o(*SERVICES.args_for(o), 'foo', 'bar') == '0;foo;bar'
+    assert o('foo', 'bar', printer=SERVICES.get('printer0')) == '0;foo;bar'
+    assert o('bar', 'baz', printer=SERVICES.get('printer1')) == '1;bar;baz'
+    assert o('foo', 'bar', **SERVICES.kwargs_for(o)) == '0;foo;bar'
 
 
 def test_service_dependency_unavailable():
     o = MyServiceDependantConfigurable(printer='printer2')
     with pytest.raises(KeyError):
-        SERVICES.args_for(o)
+        SERVICES.kwargs_for(o)
 
 
 class VCR:
@@ -100,13 +100,13 @@ def test_requires():
 
     services = Container(output=vcr.append)
 
-    @requires('output')
+    @use('output')
     def append(out, x):
         out(x)
 
-    svcargs = services.args_for(append)
+    svcargs = services.kwargs_for(append)
     assert len(svcargs) == 1
-    assert svcargs[0] == vcr.append
+    assert svcargs['output'] == vcr.append
 
 
 @pytest.mark.parametrize('services', [None, {}])

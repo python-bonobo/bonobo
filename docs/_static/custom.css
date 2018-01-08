@@ -1,3 +1,47 @@
 svg {
     border: 2px solid green
 }
+
+div.related {
+    width: 940px;
+    margin: 30px auto 0 auto;
+}
+
+@media screen and (max-width: 875px) {
+    div.related {
+        visibility: hidden;
+        display: none;
+    }
+}
+
+.brand {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+    font-size: 0.9em;
+}
+
+div.sphinxsidebar h3 {
+    margin: 30px 0 10px 0;
+}
+
+div.admonition p.admonition-title {
+    font-family: 'Ubuntu', 'goudy old style', 'minion pro', 'bell mt', Georgia, 'Hiragino Mincho Pro', serif;
+}
+
+div.sphinxsidebarwrapper {
+    padding: 0;
+}
+
+div.note {
+    border: 0;
+}
+
+div.admonition {
+    padding: 20px;
+}
+
+.last {
+    margin-bottom: 0 !important;
+}
+pre {
+    padding: 6px 20px;
+}

@@ -1,3 +1,5 @@
+import inspect
+import pprint
 import re
 import threading
 import types
@@ -73,13 +75,13 @@ class Container(dict):
                 return cls
         return super().__new__(cls, *args, **kwargs)
 
-    def args_for(self, mixed):
+    def kwargs_for(self, mixed):
         try:
             options = dict(mixed.__options__)
         except AttributeError:
             options = {}
 
-        return tuple(option.resolve(mixed, self) for name, option in options.items() if isinstance(option, Service))
+        return {name: option.resolve(mixed, self) for name, option in options.items() if isinstance(option, Service)}
 
     def get(self, name, default=None):
         if not name in self:
@@ -156,7 +158,7 @@ class Exclusive(ContextDecorator):
         self.get_lock().release()
 
 
-def requires(*service_names):
+def use(*service_names):
     def decorate(mixed):
         try:
             options = mixed.__options__

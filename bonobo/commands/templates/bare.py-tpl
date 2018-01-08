@@ -1,0 +1,15 @@
+import bonobo
+
+
+def get_graph(**options):
+    graph = bonobo.Graph()
+    return graph
+
+
+def get_services(**options):
+    return {}
+
+
+if __name__ == '__main__':
+    with bonobo.parse_args() as options:
+        bonobo.run(get_graph(**options), services=get_services(**options))

@@ -11,6 +11,7 @@
 *.so
 *.spec
 .*.sw?
+.DS_Store
 .Python
 .cache
 .coverage
@@ -22,9 +23,10 @@
 .ipynb_checkpoints
 .python-version
 /.idea
+/.medikit-pipeline
 /.release
+/bonobo/contrib/jupyter/js/node_modules/
 /bonobo/examples/work_in_progress/
-/bonobo/ext/jupyter/js/node_modules/
 /build/
 /coverage.xml
 /dist/

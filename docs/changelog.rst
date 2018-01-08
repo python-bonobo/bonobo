@@ -1,6 +1,25 @@
 Changelog
 =========
 
+Unreleased
+::::::::::
+
+* Cookiecutter usage is removed. Linked to the fact that bonobo now use either a single file (up to you to get python
+  imports working as you want) or a regular fully fledged python package, we do not need it anymore.
+
+New features
+------------
+
+Command line
+............
+
+* `bonobo download /examples/datasets/coffeeshops.txt` now downloads the coffeeshops example
+
+Graphs and Nodes
+................
+
+* New `LdjsonReader` and `LdjsonWriter` nodes for handling `line-delimited JSON <https://en.wikipedia.org/wiki/JSON_Streaming>`_.
+
 v.0.5.0 - 5 october 2017
 ::::::::::::::::::::::::
 

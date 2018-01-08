@@ -1,11 +1,9 @@
 import pickle
 
-from bonobo.config import Option
-from bonobo.config.processors import ContextProcessor
+from bonobo.config import Option, use_context
 from bonobo.constants import NOT_MODIFIED
-from bonobo.nodes.io.base import FileHandler, IOFormatEnabled
+from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.util.objects import ValueHolder
 
 
 class PickleHandler(FileHandler):
@@ -17,21 +15,18 @@ class PickleHandler(FileHandler):
 
     """
 
-    item_names = Option(tuple, required=False)
+    fields = Option(tuple, required=False)
 
 
-class PickleReader(IOFormatEnabled, FileReader, PickleHandler):
+@use_context
+class PickleReader(FileReader, PickleHandler):
     """
     Reads a Python pickle object and yields the items in dicts.
     """
 
     mode = Option(str, default='rb')
 
-    @ContextProcessor
-    def pickle_headers(self, context, fs, file):
-        yield ValueHolder(self.item_names)
-
-    def read(self, fs, file, pickle_headers):
+    def read(self, file, context, *, fs):
         data = pickle.load(file)
 
         # if the data is not iterable, then wrap the object in a list so it may be iterated
@@ -45,28 +40,31 @@ class PickleReader(IOFormatEnabled, FileReader, PickleHandler):
             except TypeError:
                 iterator = iter([data])
 
-        if not pickle_headers.get():
-            pickle_headers.set(next(iterator))
+        if not context.output_type:
+            context.set_output_fields(self.fields or next(iterator))
+        fields = context.get_output_fields()
+        fields_length = len(fields)
 
-        item_count = len(pickle_headers.value)
+        for row in iterator:
+            if len(row) != fields_length:
+                raise ValueError('Received an object with {} items, expected {}.'.format(len(row), fields_length))
 
-        for i in iterator:
-            if len(i) != item_count:
-                raise ValueError('Received an object with %d items, expecting %d.' % (
-                    len(i),
-                    item_count,
-                ))
+            yield tuple(row.values() if is_dict else row)
 
-            yield self.get_output(dict(zip(i)) if is_dict else dict(zip(pickle_headers.value, i)))
+    __call__ = read
 
 
-class PickleWriter(IOFormatEnabled, FileWriter, PickleHandler):
+@use_context
+class PickleWriter(FileWriter, PickleHandler):
     mode = Option(str, default='wb')
 
-    def write(self, fs, file, lineno, item):
+    def write(self, file, context, item, *, fs):
         """
         Write a pickled item to the opened file.
         """
+        context.setdefault('lineno', 0)
         file.write(pickle.dumps(item))
-        lineno += 1
+        context.lineno += 1
         return NOT_MODIFIED
+
+    __call__ = write

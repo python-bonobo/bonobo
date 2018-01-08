@@ -41,7 +41,7 @@ instances.
     class JoinDatabaseCategories(Configurable):
         database = Service('orders_database')
 
-        def call(self, database, row):
+        def __call__(self, database, row):
             return {
                 **row,
                 'category': database.get_category_name_for_sku(row['sku'])

@@ -1,28 +1,20 @@
-import logging
-
-from bonobo.nodes import CsvReader, CsvWriter, FileReader, FileWriter, Filter, JsonReader, JsonWriter, Limit, \
-    PickleReader, PickleWriter, PrettyPrinter, RateLimited, Tee, arg0_to_kwargs, count, identity, kwargs_to_arg0, noop
-from bonobo.strategies import create_strategy
-from bonobo.structs import Bag, ErrorBag, Graph, Token
+from bonobo.execution.strategies import create_strategy
+from bonobo.nodes import __all__ as _all_nodes
+from bonobo.nodes import *
+from bonobo.structs import Graph
 from bonobo.util import get_name
+from bonobo.util.api import ApiHelper
+from bonobo.util.environ import parse_args, get_argument_parser
 
 __all__ = []
 
-
-def register_api(x, __all__=__all__):
-    __all__.append(get_name(x))
-    return x
+api = ApiHelper(__all__)
 
 
-def register_api_group(*args):
-    for attr in args:
-        register_api(attr)
-
-
-@register_api
-def run(graph, strategy=None, plugins=None, services=None):
+@api.register_graph
+def run(graph, *, plugins=None, services=None, strategy=None):
     """
-    Main entry point of bonobo. It takes a graph and creates all the necessary plumbery around to execute it.
+    Main entry point of bonobo. It takes a graph and creates all the necessary plumbing around to execute it.
 
     The only necessary argument is a :class:`Graph` instance, containing the logic you actually want to execute.
 
@@ -35,12 +27,11 @@ def run(graph, strategy=None, plugins=None, services=None):
     You'll probably want to provide a services dictionary mapping service names to service instances.
 
     :param Graph graph: The :class:`Graph` to execute.
-    :param str strategy: The :class:`bonobo.strategies.base.Strategy` to use.
+    :param str strategy: The :class:`bonobo.execution.strategies.base.Strategy` to use.
     :param list plugins: The list of plugins to enhance execution.
     :param dict services: The implementations of services this graph will use.
     :return bonobo.execution.graph.GraphExecutionContext:
     """
-    strategy = create_strategy(strategy)
 
     plugins = plugins or []
 
@@ -49,14 +40,18 @@ def run(graph, strategy=None, plugins=None, services=None):
 
     if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
-            from bonobo.ext.console import ConsoleOutputPlugin
+            import mondrian
+            mondrian.setup(excepthook=True)
+
+            from bonobo.plugins.console import ConsoleOutputPlugin
             if ConsoleOutputPlugin not in plugins:
                 plugins.append(ConsoleOutputPlugin)
 
         if _is_jupyter_notebook():
             try:
-                from bonobo.ext.jupyter import JupyterOutputPlugin
+                from bonobo.contrib.jupyter import JupyterOutputPlugin
             except ImportError:
+                import logging
                 logging.warning(
                     'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
                     'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '
@@ -66,18 +61,39 @@ def run(graph, strategy=None, plugins=None, services=None):
                 if JupyterOutputPlugin not in plugins:
                     plugins.append(JupyterOutputPlugin)
 
+    import logging
+    logging.getLogger().setLevel(settings.LOGGING_LEVEL.get())
+    strategy = create_strategy(strategy)
     return strategy.execute(graph, plugins=plugins, services=services)
 
 
-# bonobo.structs
-register_api_group(Bag, ErrorBag, Graph, Token)
+def _inspect_as_graph(graph):
+    return graph._repr_dot_()
 
-# bonobo.strategies
-register_api(create_strategy)
+
+_inspect_formats = {'graph': _inspect_as_graph}
+
+
+@api.register_graph
+def inspect(graph, *, plugins=None, services=None, strategy=None, format):
+    if not format in _inspect_formats:
+        raise NotImplementedError(
+            'Output format {} not implemented. Choices are: {}.'.format(
+                format, ', '.join(sorted(_inspect_formats.keys()))
+            )
+        )
+    print(_inspect_formats[format](graph))
+
+
+# data structures
+api.register_group(Graph)
+
+# execution strategies
+api.register_group(create_strategy)
 
 
 # Shortcut to filesystem2's open_fs, that we make available there for convenience.
-@register_api
+@api.register
 def open_fs(fs_url=None, *args, **kwargs):
     """
     Wraps :func:`fs.open_fs` function with a few candies.
@@ -101,26 +117,33 @@ def open_fs(fs_url=None, *args, **kwargs):
     return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
 
 
-# bonobo.nodes
-register_api_group(
+# standard transformations
+api.register_group(
     CsvReader,
     CsvWriter,
     FileReader,
     FileWriter,
     Filter,
+    FixedWindow,
+    Format,
     JsonReader,
     JsonWriter,
+    LdjsonReader,
+    LdjsonWriter,
     Limit,
+    OrderFields,
     PickleReader,
     PickleWriter,
     PrettyPrinter,
     RateLimited,
+    Rename,
+    SetFields,
     Tee,
-    arg0_to_kwargs,
+    UnpackItems,
     count,
     identity,
-    kwargs_to_arg0,
     noop,
+    check=_all_nodes,
 )
 
 
@@ -136,13 +159,16 @@ def _is_jupyter_notebook():
         return False
 
 
-@register_api
+@api.register
 def get_examples_path(*pathsegments):
     import os
     import pathlib
     return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
 
 
-@register_api
+@api.register
 def open_examples_fs(*pathsegments):
     return open_fs(get_examples_path(*pathsegments))
+
+
+api.register_group(get_argument_parser, parse_args)

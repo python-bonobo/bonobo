@@ -13,6 +13,7 @@
 # without warranties or conditions of any kind, either express or implied.
 # see the license for the specific language governing permissions and
 # limitations under the license.
+import time
 
 
 class WithStatistics:
@@ -27,5 +28,25 @@ class WithStatistics:
         stats = tuple('{0}={1}'.format(name, cnt) for name, cnt in self.get_statistics(*args, **kwargs) if cnt > 0)
         return (kwargs.get('prefix', '') + ' '.join(stats)) if len(stats) else ''
 
-    def increment(self, name):
-        self.statistics[name] += 1
+    def increment(self, name, *, amount=1):
+        self.statistics[name] += amount
+
+
+class Timer:
+    """
+    Context manager used to time execution of stuff.
+    """
+
+    def __enter__(self):
+        self.__start = time.time()
+
+    def __exit__(self, type=None, value=None, traceback=None):
+        # Error handling here
+        self.__finish = time.time()
+
+    @property
+    def duration(self):
+        return self.__finish - self.__start
+
+    def __str__(self):
+        return str(int(self.duration * 1000) / 1000.0) + 's'

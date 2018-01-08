@@ -1,4 +1,5 @@
-from textwrap import dedent
+import textwrap
+import types
 
 from bonobo.util.inspect import istype
 
@@ -46,7 +47,7 @@ class Option:
                 title = Option(str, required=True, positional=True)
                 keyword = Option(str, default='foo')
 
-                def call(self, s):
+                def __call__(self, s):
                     return self.title + ': ' + s + ' (' + self.keyword + ')'
 
             example = Example('hello', keyword='bar')
@@ -65,7 +66,7 @@ class Option:
         # Docstring formating
         self.__doc__ = __doc__ or None
         if self.__doc__:
-            self.__doc__ = dedent(self.__doc__.strip('\n')).strip()
+            self.__doc__ = textwrap.dedent(self.__doc__.strip('\n')).strip()
             if default:
                 self.__doc__ += '\nDefault: {!r}'.format(default)
 
@@ -103,6 +104,40 @@ class Option:
         return self.default() if callable(self.default) else self.default
 
 
+class RemovedOption(Option):
+    def __init__(self, *args, value, **kwargs):
+        kwargs['required'] = False
+        super(RemovedOption, self).__init__(*args, **kwargs)
+        self.value = value
+
+    def clean(self, value):
+        if value != self.value:
+            raise ValueError(
+                'Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.'.
+                format(self.name, self.value)
+            )
+        return self.value
+
+    def get_default(self):
+        return self.value
+
+
+class RenamedOption(Option):
+    def __init__(self, target, *, positional=False):
+        super(RenamedOption, self).__init__(required=False, positional=False)
+        self.target = target
+
+    def __get__(self, instance, owner):
+        raise ValueError(
+            'Trying to get value from renamed option {}, try getting {} instead.'.format(self.name, self.target)
+        )
+
+    def clean(self, value):
+        raise ValueError(
+            'Trying to set value of renamed option {}, try setting {} instead.'.format(self.name, self.target)
+        )
+
+
 class Method(Option):
     """
     A Method is a special callable-valued option, that can be used in three different ways (but for same purpose).
@@ -132,20 +167,47 @@ class Method(Option):
 
         >>> example3 = OtherChildMethodExample()
 
+    It's possible to pass a default implementation to a Method by calling it, making it suitable to use as a decorator.
+
+        >>> class MethodExampleWithDefault(Configurable):
+        ...     @Method()
+        ...     def handler(self):
+        ...         pass
+
     """
 
-    def __init__(self, *, required=True, positional=True):
-        super().__init__(None, required=required, positional=positional)
+    def __init__(self, *, default=None, required=True, positional=True, __doc__=None):
+        super().__init__(None, required=required, positional=positional, __doc__=__doc__)
+
+        # If a callable is provided as default, then use self as if it was used as a decorator
+        if default is not None:
+            if not callable(default):
+                raise ValueError('Method defaults should be callable, if provided.')
+            self(default)
+
+    def __get__(self, inst, type_):
+        x = super(Method, self).__get__(inst, type_)
+        if inst:
+            x = types.MethodType(x, inst)
+        return x
 
     def __set__(self, inst, value):
-        if not hasattr(value, '__call__'):
+        if not callable(value):
             raise TypeError(
-                'Option of type {!r} is expecting a callable value, got {!r} object (which is not).'.format(
-                    type(self).__name__, type(value).__name__
+                'Option {!r} ({}) is expecting a callable value, got {!r} object: {!r}.'.format(
+                    self.name,
+                    type(self).__name__,
+                    type(value).__name__, value
                 )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value
 
-    def __call__(self, *args, **kwargs):
-        # only here to trick IDEs into thinking this is callable.
-        raise NotImplementedError('You cannot call the descriptor')
+    def __call__(self, impl):
+        if self.default:
+            raise RuntimeError('Can only be used once as a decorator.')
+        self.default = impl
+        self.required = False
+        return self
+
+    def get_default(self):
+        return self.default

@@ -1,4 +1,5 @@
 import logging
+
 import os
 
 from bonobo.errors import ValidationError
@@ -42,11 +43,23 @@ class Setting:
     def __repr__(self):
         return '<Setting {}={!r}>'.format(self.name, self.get())
 
+    def __eq__(self, other):
+        return self.get() == other
+
+    def __bool__(self):
+        return bool(self.get())
+
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
             raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
         self.value = value
+
+    def set_if_true(self, value):
+        """Sets the value to true if it is actually true. May sound strange but the main usage is enforcing some
+        settings from command line."""
+        if value:
+            self.set(True)
 
     def get(self):
         try:

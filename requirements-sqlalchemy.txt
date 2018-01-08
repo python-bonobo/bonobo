@@ -1,0 +1,25 @@
+-e .[sqlalchemy]
+appdirs==1.4.3
+bonobo-sqlalchemy==0.6.0a1
+certifi==2017.11.5
+chardet==3.0.4
+colorama==0.3.9
+fs==2.0.17
+graphviz==0.8.2
+idna==2.6
+jinja2==2.10
+markupsafe==1.0
+mondrian==0.6.1
+packaging==16.8
+pbr==3.1.1
+psutil==5.4.3
+pyparsing==2.2.0
+python-slugify==1.2.4
+pytz==2017.3
+requests==2.18.4
+six==1.11.0
+sqlalchemy==1.2.0
+stevedore==1.28.0
+unidecode==0.4.21
+urllib3==1.22
+whistle==1.0.0

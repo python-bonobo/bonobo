@@ -42,9 +42,9 @@ def test_setting():
 def test_default_settings():
     settings.clear_all()
 
-    assert settings.DEBUG.get() == False
-    assert settings.PROFILE.get() == False
-    assert settings.QUIET.get() == False
+    assert settings.DEBUG.get() is False
+    assert settings.PROFILE.get() is False
+    assert settings.QUIET.get() is False
     assert settings.LOGGING_LEVEL.get() == logging._checkLevel('INFO')
 
     with patch.dict(environ, {'DEBUG': 't'}):

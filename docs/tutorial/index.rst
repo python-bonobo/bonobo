@@ -1,9 +1,6 @@
 First steps
 ===========
 
-What is Bonobo?
-:::::::::::::::
-
 Bonobo is an ETL (Extract-Transform-Load) framework for python 3.5. The goal is to define data-transformations, with
 python code in charge of handling similar shaped independent lines of data.
 
@@ -14,50 +11,45 @@ Bonobo is a lean manufacturing assembly line for data that let you focus on the 
 
 Bonobo uses simple python and should be quick and easy to learn.
 
-Tutorial
-::::::::
-
-.. note::
-
-    Good documentation is not easy to write. We do our best to make it better and better.
-
-    Although all content here should be accurate, you may feel a lack of completeness, for which we plead guilty and
-    apologize.
-
-    If you're stuck, please come and ask on our `slack channel <https://bonobo-slack.herokuapp.com/>`_, we'll figure
-    something out.
-
-    If you're not stuck but had trouble understanding something, please consider contributing to the docs (via GitHub
-    pull requests).
+**Tutorials**
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    tut01
-    tut02
-    tut03
-    tut04
+    1-init
+    2-jobs
+    3-files
+    4-services
+    5-packaging
 
 
-What's next?
-::::::::::::
+**Integrations**
 
-Read a few examples
--------------------
+.. toctree::
+    :maxdepth: 1
 
-* :doc:`../reference/examples`
+    django
+    notebooks
+    sqlalchemy
 
-Read about best development practices
--------------------------------------
+**What's next?**
 
-* :doc:`../guide/index`
-* :doc:`../guide/purity`
+Once you're familiar with all the base concepts, you can...
 
-Read about integrating external tools with bonobo
--------------------------------------------------
+* Read the :doc:`Guides </guide/index>` to have a deep dive in each concept.
+* Explore the :doc:`Extensions </extension/index>` to widen the possibilities.
+* Open the :doc:`References </reference/index>` and start hacking like crazy.
 
-* :doc:`../extension/docker`: run transformation graphs in isolated containers.
-* :doc:`../extension/jupyter`: run transformations within jupyter notebooks.
-* :doc:`../extension/selenium`: crawl the web using a real browser and work with the gathered data.
-* :doc:`../extension/sqlalchemy`: everything you need to interract with SQL databases.
+**You're not alone!**
+
+Good documentation is not easy to write.
+
+Although all content here should be accurate, you may feel a lack of completeness, for which we plead guilty and
+apologize.
+
+If you're stuck, please come to the `Bonobo Slack Channel <https://bonobo-slack.herokuapp.com/>`_ and we'll figure it
+out.
+
+If you're not stuck but had trouble understanding something, please consider contributing to the docs (using GitHub
+pull requests).
 

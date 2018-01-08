@@ -1,1 +1,5 @@
-from bonobo.execution.graph import GraphExecutionContext, NodeExecutionContext, PluginExecutionContext
+import logging
+
+logger = logging.getLogger(__name__)
+
+__all__ = []

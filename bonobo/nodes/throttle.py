@@ -47,6 +47,6 @@ class RateLimited(Configurable):
         bucket.stop()
         bucket.join()
 
-    def call(self, bucket, *args, **kwargs):
+    def __call__(self, bucket, *args, **kwargs):
         bucket.wait()
         return self.handler(*args, **kwargs)

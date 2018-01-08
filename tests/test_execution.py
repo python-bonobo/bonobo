@@ -1,27 +1,26 @@
-from bonobo.config.processors import ContextProcessor
+from bonobo.config.processors import use_context_processor
 from bonobo.constants import BEGIN, END
-from bonobo.execution.graph import GraphExecutionContext
-from bonobo.strategies import NaiveStrategy
-from bonobo.structs import Bag, Graph
+from bonobo.execution.contexts.graph import GraphExecutionContext
+from bonobo.execution.strategies import NaiveStrategy
+from bonobo.structs import Graph
 
 
 def generate_integers():
     yield from range(10)
 
 
-def square(i: int) -> int:
+def square(i):
     return i**2
 
 
-def push_result(results, i: int):
-    results.append(i)
-
-
-@ContextProcessor.decorate(push_result)
 def results(f, context):
-    results = []
-    yield results
+    results = yield list()
     context.parent.results = results
+
+
+@use_context_processor(results)
+def push_result(results, i):
+    results.append(i)
 
 
 chain = (generate_integers, square, push_result)
@@ -51,31 +50,31 @@ def test_simple_execution_context():
     graph = Graph()
     graph.add_chain(*chain)
 
-    ctx = GraphExecutionContext(graph)
-    assert len(ctx.nodes) == len(chain)
-    assert not len(ctx.plugins)
+    context = GraphExecutionContext(graph)
+    assert len(context.nodes) == len(chain)
+    assert not len(context.plugins)
 
     for i, node in enumerate(chain):
-        assert ctx[i].wrapped is node
+        assert context[i].wrapped is node
 
-    assert not ctx.alive
-    assert not ctx.started
-    assert not ctx.stopped
+    assert not context.alive
+    assert not context.started
+    assert not context.stopped
 
-    ctx.write(BEGIN, Bag(), END)
+    context.write(BEGIN, (), END)
 
-    assert not ctx.alive
-    assert not ctx.started
-    assert not ctx.stopped
+    assert not context.alive
+    assert not context.started
+    assert not context.stopped
 
-    ctx.start()
+    context.start()
 
-    assert ctx.alive
-    assert ctx.started
-    assert not ctx.stopped
+    assert context.alive
+    assert context.started
+    assert not context.stopped
 
-    ctx.stop()
+    context.stop()
 
-    assert not ctx.alive
-    assert ctx.started
-    assert ctx.stopped
+    assert not context.alive
+    assert context.started
+    assert context.stopped
