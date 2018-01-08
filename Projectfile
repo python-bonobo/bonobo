@@ -2,12 +2,11 @@
 
 from medikit import require
 
+make = require('make')
 pytest = require('pytest')
 python = require('python')
 sphinx = require('sphinx')
 yapf = require('yapf')
-
-# python.set_versions('3.5', '3.6', '3.7')  --> not yet implemented in medikit
 
 python.setup(
     name='bonobo',
@@ -54,8 +53,10 @@ python.add_requirements(
     'stevedore ~=1.27',
     'whistle ~=1.0',
     dev=[
-        'pytest-sugar >=0.9,<0.10',
-        'pytest-timeout ~=1.0',
+        'cookiecutter >=1.5,<1.6',
+        'pytest-sugar >=0.8,<0.9',
+        'pytest-timeout >=1,<2',
+        'sphinx-sitemap >=0.2,<0.3',
     ],
     docker=[
         'bonobo-docker ~=0.6.0a1',
@@ -68,5 +69,12 @@ python.add_requirements(
         'bonobo-sqlalchemy ~=0.6.0a1',
     ],
 )
+
+@listen(make.on_generate)
+def on_make_generate(event):
+    event.makefile['SPHINX_AUTOBUILD'] = '$(PYTHON_DIRNAME)/sphinx-autobuild'
+    event.makefile.add_target('watch-$(SPHINX_SOURCEDIR)', '''
+        $(SPHINX_AUTOBUILD) $(SPHINX_SOURCEDIR) $(shell mktemp -d)
+    ''', phony=True)
 
 # vim: ft=python:

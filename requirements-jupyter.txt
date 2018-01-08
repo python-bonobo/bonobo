@@ -1,6 +1,5 @@
 -e .[jupyter]
 appnope==0.1.0
-attrs==17.4.0
 bleach==2.1.2
 decorator==4.1.2
 entrypoints==0.2.3
@@ -12,7 +11,7 @@ ipywidgets==6.0.1
 jedi==0.11.1
 jinja2==2.10
 jsonschema==2.6.0
-jupyter-client==5.2.0
+jupyter-client==5.2.1
 jupyter-console==5.2.0
 jupyter-core==4.4.0
 jupyter==1.0.0
@@ -25,20 +24,17 @@ pandocfilters==1.4.2
 parso==0.1.1
 pexpect==4.3.1
 pickleshare==0.7.4
-pluggy==0.6.0
 prompt-toolkit==1.0.15
 ptyprocess==0.5.2
-py==1.5.2
 pygments==2.2.0
-pytest==3.3.1
 python-dateutil==2.6.1
-pyzmq==17.0.0b3
+pyzmq==16.0.3
 qtconsole==4.3.1
 simplegeneric==0.8.1
 six==1.11.0
 terminado==0.8.1
 testpath==0.3.1
-tornado==5.0a1
+tornado==4.5.3
 traitlets==4.3.2
 wcwidth==0.1.7
 webencodings==0.5.1

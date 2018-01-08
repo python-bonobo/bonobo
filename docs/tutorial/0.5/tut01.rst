@@ -174,8 +174,8 @@ strategy). Actual behavior of an execution will depend on the strategy chosen, b
 cases.
 
 ④ Before actually executing the `transformations`, the `ExecutorStrategy` instance will wrap each component in an
-`execution context`, whose responsibility is to hold the state of the transformation. It enables to keep the
-`transformations` stateless, while allowing to add an external state if required. We'll expand on this later.
+`execution context`, whose responsibility is to hold the state of the transformation. It enables you to keep the
+`transformations` stateless, while allowing you to add an external state if required. We'll expand on this later.
 
 Concepts and definitions
 ::::::::::::::::::::::::
