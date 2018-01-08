@@ -3,6 +3,11 @@ Working with Jupyter Notebooks
 
 .. warning::
 
-    This section does not exist yet, but it's in the plans to write it quite soon. Meanwhile, you can check the source
-    code and other links provided below.
+    This section does not exist yet, but it's in the plans to write it quite soon.
 
+    Meanwhile, you can check the source code and other links provided below.
+
+Source code
+:::::::::::
+
+https://github.com/python-bonobo/bonobo/tree/master/bonobo/contrib/jupyter
