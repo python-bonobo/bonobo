@@ -205,4 +205,4 @@ You now know:
 
 * How to ...
 
-**Next: :doc:`5-packaging`**
+It's now time to jump to :doc:`5-packaging`.
