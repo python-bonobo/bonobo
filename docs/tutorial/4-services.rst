@@ -1,6 +1,7 @@
 Part 4: Services and Configurables
 ==================================
 
+.. include:: _wip_note.rst
 
 In the last section, we used a few new tools.
 
@@ -204,4 +205,4 @@ You now know:
 
 * How to ...
 
-**Next: :doc:`5-packaging`**
+It's now time to jump to :doc:`5-packaging`.

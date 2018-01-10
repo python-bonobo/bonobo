@@ -1,6 +1,6 @@
 -e .[docker]
 appdirs==1.4.3
-bonobo-docker==0.6.0a1
+bonobo-docker==0.6.0
 certifi==2017.11.5
 chardet==3.0.4
 colorama==0.3.9
@@ -22,7 +22,7 @@ requests==2.18.4
 semantic-version==2.6.0
 six==1.11.0
 stevedore==1.28.0
-unidecode==0.4.21
+unidecode==1.0.22
 urllib3==1.22
 websocket-client==0.46.0
 whistle==1.0.0

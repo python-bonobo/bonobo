@@ -64,7 +64,7 @@ class Graph:
                     if _name in self.named:
                         raise KeyError('Duplicate name {!r} in graph.'.format(_name))
                     self.named[_name] = _last
-                if not _first:
+                if _first is None:
                     _first = _last
                 self.outputs_of(_input, create=True).add(_last)
                 _input = _last

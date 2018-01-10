@@ -1,6 +1,8 @@
 Working with files
 ==================
 
+.. include:: _outdated_note.rst
+
 Bonobo would be pointless if the aim was just to uppercase small lists of strings.
 
 In fact, Bonobo should not be used if you don't expect any gain from parallelization/distribution of tasks.
@@ -59,7 +61,13 @@ available in **Bonobo**'s repository:
 
 .. code-block:: shell-session
 
-    $ bonobo download examples/datasets/coffeeshops.txt
+    $ curl https://raw.githubusercontent.com/python-bonobo/bonobo/master/bonobo/examples/datasets/coffeeshops.txt > `python3 -c 'import bonobo; print(bonobo.get_examples_path("datasets/coffeeshops.txt"))'`
+
+.. note::
+
+    The "example dataset download" step will be easier in the future.
+
+    https://github.com/python-bonobo/bonobo/issues/134
 
 .. literalinclude:: ../../bonobo/examples/tutorials/tut02e01_read.py
     :language: python

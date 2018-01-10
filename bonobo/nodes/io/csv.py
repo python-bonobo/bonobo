@@ -55,14 +55,11 @@ class CsvHandler(FileHandler):
 class CsvReader(FileReader, CsvHandler):
     """
     Reads a CSV and yield the values as dicts.
-
-    .. attribute:: skip
-
-        The amount of lines to skip before it actually yield output.
-
     """
 
-    skip = Option(int, default=0)
+    skip = Option(int, default=0, __doc__='''
+        If set and greater than zero, the reader will skip this amount of lines.
+    ''')
 
     @Method(
         positional=False,
