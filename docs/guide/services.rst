@@ -4,7 +4,7 @@ Services and dependencies
 You'll want to use external systems within your transformations, including databases, HTTP APIs, other web services,
 filesystems, etc.
 
-Hardcoding those services is a good first step, but as your codebase grows, will show limits rather quickly.
+Hardcoding those services is a good first step, but as your codebase grows, this approach will show its limits rather quickly.
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
 * Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
