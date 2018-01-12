@@ -8,15 +8,15 @@ Hardcoding those services is a good first step, but as your codebase grows, this
 
 * Hardcoded and tightly linked dependencies make your transformations hard to test, and hard to reuse.
 * Processing data on your laptop is great, but being able to do it on different target systems (or stages), in different
-  environments, is more realistic. You'll want to configure a different database on a staging environment,
+  environments is more realistic. You'll want to configure a different database on a staging environment,
   pre-production environment, or production system. Maybe you have similar systems for different clients and want to select
-  the system at runtime. Etc.
+  the system at runtime, etc.
 
 Definition of service dependencies
 ::::::::::::::::::::::::::::::::::
 
-To solve this problem, we introduce a light dependency injection system. It allows to define **named dependencies** in
-your transformations, and provide an implementation at runtime.
+To solve this problem, we introduce a lightweight dependency injection system. It allows to define **named dependencies** in
+your transformations and provide an implementation at runtime.
 
 For function-based transformations, you can use the :func:`bonobo.config.use` decorator to mark the dependencies. You'll
 still be able to call it manually, providing the implementation yourself, but in a bonobo execution context, it will
@@ -47,13 +47,13 @@ instances.
                 'category': database.get_category_name_for_sku(row['sku'])
             }
 
-Both pieces of code tells bonobo that your transformation expect a service called "orders_database", that will be
+Both of the above code samples tell bonobo that your transformation expects a service called "orders_database", which will be
 injected to your calls under the parameter name "database".
 
 Providing implementations at run-time
 -------------------------------------
 
-Bonobo will expect you to provide a dictionary of all service implementations required by your graph.
+Bonobo expects you to provide a dictionary of all service implementations required by your graph.
 
 .. code-block:: python
 
@@ -74,11 +74,10 @@ Bonobo will expect you to provide a dictionary of all service implementations re
 
     A dictionary, or dictionary-like, "services" named argument can be passed to the :func:`bonobo.run` API method.
     The "dictionary-like" part is the real keyword here. Bonobo is not a DIC library, and won't become one. So the
-    implementation provided is pretty basic, and feature-less. But you can use much more evolved libraries instead of
-    the provided stub, and as long as it works the same (a.k.a implements a dictionary-like interface), the system will
-    use it.
+    implementation provided is pretty basic and feature-less. You can use much more involved libraries instead of
+    the provided stub and, as long as it implements a dictionary-like interface, the system will use it.
 
-Command line interface will look at services in two different places:
+The command line interface will look for services in two different places:
 
 * A `get_services()` function present at the same level of your graph definition.
 * A `get_services()` function in a `_services.py` file in the same directory as your graph's file, allowing to reuse the
@@ -107,7 +106,7 @@ use of a dependency for the time of the context manager (`with` statement)
 Future and proposals
 ::::::::::::::::::::
 
-This first implementation and it will evolve. Base concepts will stay, though.
+This is a first implementation and it will evolve. Base concepts will stay the same though.
 
 May or may not happen, depending on discussions.
 
@@ -115,13 +114,13 @@ May or may not happen, depending on discussions.
   https://www.tutorialspoint.com/spring/spring_bean_scopes.htm), allowing smart factory usage and efficient sharing of
   resources.
 * Lazily resolved parameters, eventually overriden by command line or environment, so you can for example override the
-  database DSN or target filesystem on command line (or with shell environment).
+  database DSN or target filesystem on command line (or with shell environment vars).
 * Pool based locks that ensure that only one (or n) transformations are using a given service at the same time.
 * Simple config implementation, using a python file for config (ex: bonobo run ... --services=services_prod.py).
 * Default configuration for services, using an optional callable (`def get_services(args): ...`). Maybe tie default
   configuration to graph, but not really a fan because this is unrelated to graph logic.
 * Default implementation for a service in a transformation or in the descriptor. Maybe not a good idea, because it
-  tends to push forward multiple instances of the same thing, but we maybe...
+  tends to push forward multiple instances of the same thing, but maybe...
   
   A few ideas on how it can be implemented, from the user perspective.
   
