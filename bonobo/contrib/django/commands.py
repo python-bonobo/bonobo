@@ -1,4 +1,5 @@
 from logging import getLogger
+from types import GeneratorType
 
 import bonobo
 from bonobo.plugins.console import ConsoleOutputPlugin
@@ -6,6 +7,7 @@ from bonobo.util.term import CLEAR_EOL
 from colorama import Fore, Back, Style
 from django.core.management import BaseCommand
 from django.core.management.base import OutputWrapper
+from mondrian import term
 
 from .utils import create_or_update
 
@@ -44,11 +46,17 @@ class ETLCommand(BaseCommand):
         self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
 
         with bonobo.parse_args(options) as options:
-            result = bonobo.run(
-                self.get_graph(*args, **options),
-                services=self.get_services(),
-            )
+            services = self.get_services()
+            graph_coll = self.get_graph(*args, **options)
+
+            if not isinstance(graph_coll, GeneratorType):
+                graph_coll = (graph_coll,)
+
+            for i, graph in enumerate(graph_coll):
+                assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'
+                print(term.lightwhite('{}. {}'.format(i + 1, graph.name)))
+                result = bonobo.run(graph, services=services)
+                print(term.lightblack(' ... return value: ' + str(result)))
+                print()
 
         self.stdout, self.stderr = _stdout_backup, _stderr_backup
-
-        return '\nReturn Value: ' + str(result)

@@ -5,6 +5,51 @@ Graphs are the glue that ties transformations together. They are the only data-s
 must be acyclic, and can contain as many nodes as your system can handle. However, although in theory the number of nodes can be rather high, practical use cases usually do not exceed more than a few hundred nodes and only then in extreme cases.
 
 
+Within a graph, each node are isolated and can only communicate using their
+input and output queues. For each input row, a given node will be called with
+the row passed as arguments. Each *return* or *yield* value will be put on the
+node's output queue, and the nodes connected in the graph will then be able to
+process it.
+
+|bonobo| is a line-by-line data stream processing solution.
+
+Handling the data-flow this way brings the following properties:
+
+- **First in, first out**: unless stated otherwise, each node will receeive the
+  rows from FIFO queues, and so, the order of rows will be preserved. That is
+  true for each single node, but please note that if you define "graph bubbles"
+  (where a graph diverge in different branches then converge again), the
+  convergence node will receive rows FIFO from each input queue, meaning that
+  the order existing at the divergence point wont stay true at the convergence
+  point.
+
+- **Parallelism**: each node run in parallel (by default, using independant
+  threads). This is useful as you don't have to worry about blocking calls.
+  If a thread waits for, let's say, a database, or a network service, the other
+  nodes will continue handling data, as long as they have input rows available.
+
+- **Independance**: the rows are independant from each other, making this way
+  of working with data flows good for line-by-line data processing, but
+  also not ideal for "grouped" computations (where an output depends on more
+  than one line of input data). You can overcome this with rolling windows if
+  the input required are adjacent rows, but if you need to work on the whole
+  dataset at once, you should consider other software.
+
+Graphs are defined using :class:`bonobo.Graph` instances, as seen in the
+previous tutorial step.
+
+What can be a node?
+:::::::::::::::::::
+
+**TL;DR**: … anything, as long as it’s callable().
+
+Functions
+---------
+
+.. code-block:: python
+
+    def get_item(id):
+        return id, items.get(id)
 
 
 
