@@ -1,201 +1,99 @@
-Part 4: Services and Configurables
-==================================
+Part 4: Services
+================
 
-.. include:: _wip_note.rst
+All external dependencies (like filesystems, network clients, database connections, etc.) should be provided to
+transformations as a service. It allows great flexibility, including the ability to test your transformations isolated
+from the external world, and being friendly to the infrastructure guys (and if you're one of them, it's also nice to
+treat yourself well).
 
-In the last section, we used a few new tools.
-
-Class-based transformations and configurables
-:::::::::::::::::::::::::::::::::::::::::::::
-
-Bonobo is a bit dumb. If something is callable, it considers it can be used as a transformation, and it's up to the
-user to provide callables that logically fits in a graph.
-
-You can use plain python objects with a `__call__()` method, and it ill just work.
-
-As a lot of transformations needs common machinery, there is a few tools to quickly build transformations, most of
-them requiring your class to subclass :class:`bonobo.config.Configurable`.
-
-Configurables allows to use the following features:
-
-* You can add **Options** (using the :class:`bonobo.config.Option` descriptor). Options can be positional, or keyword
-  based, can have a default value and will be consumed from the constructor arguments.
-
-    .. code-block:: python
-
-        from bonobo.config import Configurable, Option
-
-        class PrefixIt(Configurable):
-            prefix = Option(str, positional=True, default='>>>')
-
-            def __call__(self, row):
-                return self.prefix + ' ' + row
-
-        prefixer = PrefixIt('$')
-
-* You can add **Services** (using the :class:`bonobo.config.Service` descriptor). Services are a subclass of
-  :class:`bonobo.config.Option`, sharing the same basics, but specialized in the definition of "named services" that
-  will be resolved at runtime (a.k.a for which we will provide an implementation at runtime). We'll dive more into that
-  in the next section
-
-    .. code-block:: python
-
-        from bonobo.config import Configurable, Option, Service
-
-        class HttpGet(Configurable):
-            url = Option(default='https://jsonplaceholder.typicode.com/users')
-            http = Service('http.client')
-
-            def __call__(self, http):
-                resp = http.get(self.url)
-
-                for row in resp.json():
-                    yield row
-
-        http_get = HttpGet()
+In the last section, we used the `fs` service to access filesystems, we'll go even further by switching our `requests`
+call to use the `http` service, so we can switch the `requests` session at runtime. We'll use it to add an http cache,
+which is a great thing to avoid hammering a remote API.
 
 
-* You can add **Methods** (using the :class:`bonobo.config.Method` descriptor). :class:`bonobo.config.Method` is a
-  subclass of :class:`bonobo.config.Option` that allows to pass callable parameters, either to the class constructor,
-  or using the class as a decorator.
+Default services
+::::::::::::::::
 
-    .. code-block:: python
+As a default, |bonobo| provides only two services:
 
-        from bonobo.config import Configurable, Method
+* `fs`, a :obj:`fs.osfs.OSFS` object to access files.
+* `http`, a :obj:`requests.Session` object to access the Web.
 
-        class Applier(Configurable):
-            apply = Method()
 
-            def __call__(self, row):
-                return self.apply(row)
+Overriding services
+:::::::::::::::::::
 
-        @Applier
-        def Prefixer(self, row):
-            return 'Hello, ' + row
-
-        prefixer = Prefixer()
-
-* You can add **ContextProcessors**, which are an advanced feature we won't introduce here. If you're familiar with
-  pytest, you can think of them as pytest fixtures, execution wise.
-
-Services
-::::::::
-
-The motivation behind services is mostly separation of concerns, testability and deployability.
-
-Usually, your transformations will depend on services (like a filesystem, an http client, a database, a rest api, ...).
-Those services can very well be hardcoded in the transformations, but there is two main drawbacks:
-
-* You won't be able to change the implementation depending on the current environment (development laptop versus
-  production servers, bug-hunting session versus execution, etc.)
-* You won't be able to test your transformations without testing the associated services.
-
-To overcome those caveats of hardcoding things, we define Services in the configurable, which are basically
-string-options of the service names, and we provide an implementation at the last moment possible.
-
-There are two ways of providing implementations:
-
-* Either file-wide, by providing a `get_services()` function that returns a dict of named implementations (we did so
-  with filesystems in the previous step, :doc:`tut02`)
-* Either directory-wide, by providing a `get_services()` function in a specially named `_services.py` file.
-
-The first is simpler if you only have one transformation graph in one file, the second allows to group coherent
-transformations together in a directory and share the implementations.
-
-Let's see how to use it, starting from the previous service example:
+You can override the default services, or define your own services, by providing a dictionary to the `services=`
+argument of :obj:`bonobo.run`:
 
 .. code-block:: python
 
-    from bonobo.config import Configurable, Option, Service
-
-    class HttpGet(Configurable):
-        url = Option(default='https://jsonplaceholder.typicode.com/users')
-        http = Service('http.client')
-
-        def __call__(self, http):
-            resp = http.get(self.url)
-
-            for row in resp.json():
-                yield row
-
-We defined an "http.client" service, that obviously should have a `get()` method, returning responses that have a
-`json()` method.
-
-Let's provide two implementations for that. The first one will be using `requests <http://docs.python-requests.org/>`_,
-that coincidally satisfies the described interface:
-
-.. code-block:: python
-
-    import bonobo
     import requests
 
     def get_services():
+        http = requests.Session()
+        http.headers = {'User-Agent': 'Monkeys!'}
         return {
-            'http.client': requests
+            'http': http
         }
 
-    graph = bonobo.Graph(
-        HttpGet(),
-        print,
-    )
+Switching requests to use the service
+:::::::::::::::::::::::::::::::::::::
 
-If you run this code, you should see some mock data returned by the webservice we called (assuming it's up and you can
-reach it).
-
-Now, the second implementation will replace that with a mock, used for testing purposes:
+Let's replace the :obj:`requests.get` call we used in the first steps to use the `http` service:
 
 .. code-block:: python
 
-    class HttpResponseStub:
-        def json(self):
-            return [
-                {'id': 1, 'name': 'Leanne Graham', 'username': 'Bret', 'email': 'Sincere@april.biz', 'address': {'street': 'Kulas Light', 'suite': 'Apt. 556', 'city': 'Gwenborough', 'zipcode': '92998-3874', 'geo': {'lat': '-37.3159', 'lng': '81.1496'}}, 'phone': '1-770-736-8031 x56442', 'website': 'hildegard.org', 'company': {'name': 'Romaguera-Crona', 'catchPhrase': 'Multi-layered client-server neural-net', 'bs': 'harness real-time e-markets'}},
-                {'id': 2, 'name': 'Ervin Howell', 'username': 'Antonette', 'email': 'Shanna@melissa.tv', 'address': {'street': 'Victor Plains', 'suite': 'Suite 879', 'city': 'Wisokyburgh', 'zipcode': '90566-7771', 'geo': {'lat': '-43.9509', 'lng': '-34.4618'}}, 'phone': '010-692-6593 x09125', 'website': 'anastasia.net', 'company': {'name': 'Deckow-Crist', 'catchPhrase': 'Proactive didactic contingency', 'bs': 'synergize scalable supply-chains'}},
-            ]
+    from bonobo.config import use
 
-    class HttpStub:
-        def get(self, url):
-            return HttpResponseStub()
+    @use('http')
+    def extract_fablabs(http):
+        yield from http.get(FABLABS_API_URL).json().get('records')
 
-    def get_services():
-        return {
-            'http.client': HttpStub()
-        }
+Tadaa, done! You're not anymore tied to a specific implementation, but to whatever :obj:`requests` compatible object the
+user want to provide.
 
-    graph = bonobo.Graph(
-        HttpGet(),
-        print,
-    )
+Adding cache
+::::::::::::
 
-The `Graph` definition staying the exact same, you can easily substitute the `_services.py` file depending on your
-environment (the way you're doing this is out of bonobo scope and heavily depends on your usual way of managing
-configuration files on different platforms).
+Let's demonstrate the flexibility of this approach by adding some local cache for HTTP requests, to avoid hammering the
+API endpoint as we run our tests.
 
-Starting with bonobo 0.5 (not yet released), you will be able to use service injections with function-based
-transformations too, using the `bonobo.config.requires` decorator to mark a dependency.
+First, let's install `requests-cache`:
+
+.. code-block:: shell-session
+
+    $ pip install requests-cache
+
+Then, let's switch the implementation, conditionally.
 
 .. code-block:: python
 
-    from bonobo.config import requires
+    def get_services(use_cache=False):
+        if use_cache:
+            from requests_cache import CachedSession
+            http = CachedSession('http.cache')
+        else:
+            import requests
+            http = requests.Session()
 
-    @requires('http.client')
-    def http_get(http):
-        resp = http.get('https://jsonplaceholder.typicode.com/users')
+        return {
+            'http': http
+        }
 
-        for row in resp.json():
-            yield row
+Then in the main block, let's add support for a `--use-cache` argument:
 
+.. code-block:: python
 
-Read more
-:::::::::
+    if __name__ == '__main__':
+        parser = bonobo.get_argument_parser()
+        parser.add_argument('--use-cache', action='store_true', default=False)
 
-* :doc:`/guide/services`
-* :doc:`/reference/api_config`
+        with bonobo.parse_args(parser) as options:
+            bonobo.run(get_graph(**options), services=get_services(**options))
 
-Next
-::::
-
-:doc:`tut04`.
+And you're done! Now, you can switch from using or not the cache using the `--use-cache` argument in command line when
+running your job.
 
 
 Moving forward
@@ -203,6 +101,9 @@ Moving forward
 
 You now know:
 
-* How to ...
+* How to use builtin service implementations
+* How to override a service
+* How to define your own service
+* How to tune the default argument parser
 
 It's now time to jump to :doc:`5-packaging`.

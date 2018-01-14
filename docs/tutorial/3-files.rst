@@ -1,8 +1,6 @@
 Part 3: Working with Files
 ==========================
 
-.. include:: _wip_note.rst
-
 Writing to the console is nice, but let's be serious, real world will require us to use files or external services.
 
 Let's see how to use a few builtin writers and both local and remote filesystems.

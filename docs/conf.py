@@ -188,7 +188,11 @@ epub_copyright = copyright
 epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'fs': ('https://docs.pyfilesystem.org/en/latest/', None),
+    'requests': ('http://docs.python-requests.org/en/master/', None),
+}
 
 rst_epilog = """
 .. |bonobo| replace:: **Bonobo**
