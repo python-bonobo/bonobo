@@ -3,3 +3,5 @@ conda:
 python:
   extra_requirements:
     - dev
+    - docker
+    - sqlalchemy

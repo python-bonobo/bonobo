@@ -8,6 +8,7 @@ Most of them are available as optional extra dependencies, and the maturity stag
 .. toctree::
     :maxdepth: 2
 
+    django
     docker
     jupyter
     selenium

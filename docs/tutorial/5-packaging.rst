@@ -67,10 +67,10 @@ That's the end of the tutorial, you should now be familiar with all the basics.
 A few appendixes to the tutorial can explain how to integrate with other systems (we'll use the "fablabs" application
 created in this tutorial and extend it):
 
-* :doc:`notebooks`
-* :doc:`sqlalchemy`
-* :doc:`django`
-* :doc:`docker`
+* :doc:`/extension/django`
+* :doc:`/extension/docker`
+* :doc:`/extension/jupyter`
+* :doc:`/extension/sqlalchemy`
 
 Then, you can either to jump head-first into your code, or you can have a better grasp at all concepts by
 :doc:`reading the full bonobo guide </guide/index>`.

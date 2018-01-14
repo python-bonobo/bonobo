@@ -189,8 +189,9 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
+    'django': ('https://docs.djangoproject.com/en/2.0/', 'https://docs.djangoproject.com/en/2.0/_objects/'),
     'fs': ('https://docs.pyfilesystem.org/en/latest/', None),
+    'python': ('https://docs.python.org/3', None),
     'requests': ('http://docs.python-requests.org/en/master/', None),
 }
 

@@ -1,9 +1,7 @@
-Selenium Extension
-==================
+Working with Selenium
+=====================
 
-.. todo:: The `bonobo-selenium` package is at a very alpha stage, and things will change. This section is here to give a
-          brief overview but is neither complete nor definitive.
-
+.. include:: _alpha.rst
 
 Writing web crawlers with Bonobo and Selenium is easy.
 

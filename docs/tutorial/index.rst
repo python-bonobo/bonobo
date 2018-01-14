@@ -22,22 +22,18 @@ Bonobo uses simple python and should be quick and easy to learn.
     4-services
     5-packaging
 
-
-**Integrations**
-
-.. toctree::
-    :maxdepth: 1
-
-    django
-    notebooks
-    sqlalchemy
-
 **What's next?**
 
 Once you're familiar with all the base concepts, you can...
 
 * Read the :doc:`Guides </guide/index>` to have a deep dive in each concept.
-* Explore the :doc:`Extensions </extension/index>` to widen the possibilities.
+* Explore the :doc:`Extensions </extension/index>` to widen the possibilities:
+
+  * :doc:`/extension/django`
+  * :doc:`/extension/docker`
+  * :doc:`/extension/jupyter`
+  * :doc:`/extension/sqlalchemy`
+
 * Open the :doc:`References </reference/index>` and start hacking like crazy.
 
 **You're not alone!**
