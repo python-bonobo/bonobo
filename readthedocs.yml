@@ -1,7 +1,5 @@
 conda:
   file: readthedocs-conda.yml
 python:
-  extra_requirements:
-    - dev
-    - docker
-    - sqlalchemy
+  extra_requirements: [ dev, docker, sqlalchemy ]
+

@@ -19,7 +19,24 @@ To install the extension, use the `sqlalchemy` extra:
 Overview and examples
 :::::::::::::::::::::
 
-There are two main tools provided by this extension. One reader, one writer.
+First, you'll need a database connection (:obj:`sqlalchemy.engine.Engine` instance), that must be provided as a service.
+
+.. code-block:: python
+
+    import sqlalchemy
+
+    def get_services():
+        return {
+            'sqlalchemy.engine': sqlalchemy.create_engine(...)
+        }
+
+The `sqlalchemy.engine` name is the default name used by the provided transformations, but you can override it (for
+example if you need more than one connection) and specify the service name using `engine='myengine'` while building your
+transformations.
+
+There are two transformation classes provided by this extension.
+
+One reader, one writer.
 
 Let's select some data:
 
