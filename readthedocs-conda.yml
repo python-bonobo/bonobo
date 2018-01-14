@@ -29,6 +29,9 @@ dependencies:
   - whistle==1.0.0
   # for contribs
   - django>=2,<3
+  # for extensions
+  - bonobo-docker>=0.6,<0.7
+  - bonobo-sqlalchemy>=0.6,<0.7
   # for docs
   - alabaster==0.7.10
   - sphinx-sitemap==0.2
