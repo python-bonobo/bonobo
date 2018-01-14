@@ -127,7 +127,11 @@ See https://github.com/python-bonobo/bonobo/issues/24
 Who is behind this?
 -------------------
 
-Me (as an individual), and a few great people that helped me along the way. Not commercially endorsed, or supported.
+`Me (as an individual) <https://romain.dorgueil.net/>`_, and the `growing number of contributors
+<https://github.com/python-bonobo/bonobo/graphs/contributors>`_ that give of their time to move the project forward.
+
+|bonobo| is not commercially endorsed, or supported. If your company wants to sponsor parts of |bonobo| development
+effort, `let's talk <mailto:romain@bonobo-project.org>`_.
 
 The code, documentation, and surrounding material is created using spare time and may lack a bit velocity. Feel free
 to jump in so we can go faster!

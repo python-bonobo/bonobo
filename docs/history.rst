@@ -1,12 +1,12 @@
 History
 =======
 
-**Bonobo** is a full rewrite of **rdc.etl**.
+|bonobo| is a full rewrite of **rdc.etl**, aimed at modern python versions (3.5+).
 
-**rdc.etl** is a full python 2.7+ ETL library for which development started in 2012, and was opensourced in 2013 (see
-`first commit <https://github.com/rdcli/rdc.etl/commit/fdbc11c0ee7f6b97322693bd0051d63677b06a93>`_).
+**rdc.etl** is a now deprecated python 2.7+ ETL library for which development started in 2012, and was opensourced in
+2013 (see `first commit <https://github.com/rdcli/rdc.etl/commit/fdbc11c0ee7f6b97322693bd0051d63677b06a93>`_).
 
-Although the first commit in **Bonobo** happened late 2016, it's based on a lot of code, learnings and experience that
+Although the first commit in |bonobo| happened late 2016, it's based on a lot of code, learnings and experience that
 happened because of **rdc.etl**.
 
 It would have been counterproductive to migrate the same codebase:
@@ -17,6 +17,5 @@ It would have been counterproductive to migrate the same codebase:
   * we also wanted to develop something that took advantage of modern python versions, hence the choice of 3.5+.
 
 **rdc.etl** still runs data transformation jobs, in both python 2.7 and 3, and we reuse whatever is possible to
-build Bonobo.
+continue building |bonobo|.
 
-You can read

@@ -157,3 +157,5 @@ Read more
 :::::::::
 
 * See https://github.com/hartym/bonobo-sqlalchemy/blob/work-in-progress/bonobo_sqlalchemy/writers.py#L19 for example usage (work in progress).
+
+.. include:: _next.rst

@@ -127,3 +127,5 @@ function and used to get data from the database.
         bonobo.PrettyPrinter(),
     )
 
+
+.. include:: _next.rst

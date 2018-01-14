@@ -3,8 +3,14 @@ Guides
 
 This section will guide you through your journey with Bonobo ETL.
 
+.. toctree::
+    :maxdepth: 2
 
-.. include:: _toc.rst
-
-
-
+    introduction
+    transformations
+    graphs
+    services
+    environment
+    purity
+    debugging
+    plugins

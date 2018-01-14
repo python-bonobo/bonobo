@@ -233,22 +233,16 @@ bonobo send the data to your transformation.
 
 .. code-block:: python
 
-    from bonobo.constants import BEGIN, END
     from bonobo.execution import NodeExecutionContext
 
     with NodeExecutionContext(
         JsonWriter(filename), services={'fs': ...}
     ) as context:
-
         # Write a list of rows, including BEGIN/END control messages.
-        context.write(
-            BEGIN,
-            Bag({'foo': 'bar'}),
-            Bag({'foo': 'baz'}),
-            END
+        context.write_sync(
+            {'foo': 'bar'},
+            {'foo': 'baz'},
         )
 
-        # Out of the bonobo main loop, we need to call `step` explicitely.
-        context.step()
-        context.step()
 
+.. include:: _next.rst

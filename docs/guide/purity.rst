@@ -147,3 +147,5 @@ a new dict will of course create a new envelope, but the unchanged objects insid
 
 Last thing, copies made in the "pure" approach are explicit, and usually, explicit is better than implicit.
 
+
+.. include:: _next.rst
