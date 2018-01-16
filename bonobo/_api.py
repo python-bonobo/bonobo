@@ -1,8 +1,16 @@
+"""
+Contains all the tools you need to get started with the framework, including (but not limited to) generic
+transformations, readers, writers, and tools for writing and executing graphs and jobs.
+
+All objects in this module are considered very safe to use, and backward compatibility when moving up from one version
+to another is maximal.
+
+"""
+
 from bonobo.execution.strategies import create_strategy
 from bonobo.nodes import __all__ as _all_nodes
 from bonobo.nodes import *
 from bonobo.structs import Graph
-from bonobo.util import get_name
 from bonobo.util.api import ApiHelper
 from bonobo.util.environ import parse_args, get_argument_parser
 
@@ -96,7 +104,8 @@ api.register_group(create_strategy)
 @api.register
 def open_fs(fs_url=None, *args, **kwargs):
     """
-    Wraps :func:`fs.open_fs` function with a few candies.
+    Wraps :obj:`fs.opener.registry.Registry.open_fs`, with default to local current working directory and expanding ~ in
+    path.
 
     :param str fs_url: A filesystem URL
     :param parse_result: A parsed filesystem URL.
@@ -105,9 +114,9 @@ def open_fs(fs_url=None, *args, **kwargs):
     :param bool create: True if the filesystem should be created if it does not exist.
     :param str cwd: The current working directory (generally only relevant for OS filesystems).
     :param str default_protocol: The protocol to use if one is not supplied in the FS URL (defaults to ``"osfs"``).
-    :returns: :class:`~fs.base.FS` object
+    :returns: :class:`fs.base.FS` object
     """
-    from fs import open_fs as _open_fs
+    from fs.opener import open_fs as _open_fs
     from os.path import expanduser
     from os import getcwd
 

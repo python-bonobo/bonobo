@@ -1,3 +1,9 @@
+"""
+The Config API, located under the :mod:`bonobo.config` namespace, contains all the tools you need to create
+configurable transformations, either class-based or function-based.
+
+"""
+
 from bonobo.config.configurables import Configurable
 from bonobo.config.functools import transformation_factory
 from bonobo.config.options import Method, Option

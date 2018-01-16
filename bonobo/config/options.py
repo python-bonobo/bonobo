@@ -68,7 +68,7 @@ class Option:
         if self.__doc__:
             self.__doc__ = textwrap.dedent(self.__doc__.strip('\n')).strip()
             if default:
-                self.__doc__ += '\nDefault: {!r}'.format(default)
+                self.__doc__ += '\n\nDefault: {!r}'.format(default)
 
         # This hack is necessary for python3.5
         self._creation_counter = Option._creation_counter

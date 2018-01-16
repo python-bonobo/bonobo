@@ -1,3 +1,11 @@
+"""
+Execution strategies define how an actual job execution will happen. Default and recommended strategy is "threadpool",
+for now, which leverage a :obj:`concurrent.futures.ThreadPoolExecutor` to run each node in a separate thread.
+
+In the future, the two strategies that would really benefit bonobo are subprocess and dask/dask.distributed. Please be
+at home if you want to give it a shot.
+
+"""
 from bonobo.execution.strategies.executor import ProcessPoolExecutorStrategy, ThreadPoolExecutorStrategy
 from bonobo.execution.strategies.naive import NaiveStrategy
 

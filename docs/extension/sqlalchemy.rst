@@ -1,5 +1,7 @@
-Working with SQL Databases
-==========================
+.. currentmodule:: bonobo_sqlalchemy
+
+Working with SQLAlchemy
+=======================
 
 .. include:: _beta.rst
 
@@ -54,6 +56,7 @@ Let's select some data:
 
 And let's insert some data:
 
+
 .. code-block:: python
 
     import bonobo
@@ -69,21 +72,13 @@ And let's insert some data:
 
         return graph
 
-
 Reference
 :::::::::
 
-.. module:: bonobo_sqlalchemy
+:mod:`bonobo_sqlalchemy`
+------------------------
 
-Select
-------
-
-.. autoclass:: Select
-
-InsertOrUpdate
---------------
-
-.. autoclass:: InsertOrUpdate
+.. automodule:: bonobo_sqlalchemy
 
 Source code
 :::::::::::

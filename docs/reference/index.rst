@@ -1,15 +1,18 @@
-References
-==========
+Reference
+=========
 
 Reference documents of all stable APIs and modules. If something is not here, please be careful about using it as it
 means that the api is not yet 1.0-proof.
 
 .. toctree::
-    :maxdepth: 4
+    :maxdepth: 2
 
-    api
-    api_config
-    api_util
+    api/bonobo
+    api/bonobo/config
+    api/bonobo/constants
+    api/bonobo/execution
+    api/bonobo/util
     commands
     settings
     examples
+    private

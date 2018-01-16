@@ -1,3 +1,8 @@
+"""
+The Util API, located under the :mod:`bonobo.util` namespace, contains helpers functions and decorators to work with
+and inspect transformations, graphs, and nodes.
+
+"""
 from bonobo.util.collections import cast, ensure_tuple, sortedlist, tuplize
 from bonobo.util.compat import deprecated, deprecated_alias
 from bonobo.util.inspect import (

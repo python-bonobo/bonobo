@@ -35,13 +35,23 @@ div.note {
     border: 0;
 }
 
-div.admonition {
-    padding: 20px;
-}
-
 .last {
     margin-bottom: 0 !important;
 }
+
+div.admonition {
+    padding: 16px;
+}
+
 pre {
-    padding: 6px 20px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    background-color: #fafafa;
+}
+
+.section > dl {
+    border: 1px solid #ddd;
+    background-color: #fafafa;
+    margin: 16px 0;
+    padding: 16px;
 }

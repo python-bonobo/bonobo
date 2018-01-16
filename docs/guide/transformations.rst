@@ -1,44 +1,189 @@
 Transformations
 ===============
 
-Transformations are the smallest building blocks in Bonobo ETL.
+Transformations are the smallest building blocks in |bonobo|.
 
-They are written using standard python callables (or iterables, if you're writing transformations that have no input,
-a.k.a extractors).
+There is no special data-structure used to represent transformations, it's basically just a regular python callable, or
+even an iterable object (if it requires no input data).
 
-Definitions
-:::::::::::
-
-Transformation
-
-    The base building block of Bonobo, anything you would insert in a graph as a node. Mostly, a callable or an iterable.
-
-Extractor
-
-    Special case transformation that use no input. It will be only called once, and its purpose is to generate data,
-    either by itself or by requesting it from an external service.
-
-Loader
-
-    Special case transformation that feed an external service with data. For convenience, it can also yield the data but
-    a "pure" loader would have no output (although yielding things should have no bad side effect).
-
-Callable
-
-    Anything one can call, in python. Can be a function, a python builtin, or anything that implements `__call__`
-
-Iterable
-
-    Something we can iterate on, in python, so basically anything you'd be able to use in a `for` loop.
+Once in a graph, transformations become nodes and the data-flow between them is described using edges.
 
 
-Concepts
-::::::::
+.. note::
 
-Whatever kind of transformation you want to use, there are a few common concepts you should know about.
+    In this chapter, we'll consider that anytime we need a "database", it's something we can get from the global
+    namespace. This practice OK-ish for small jobs, but not at scale.
 
-Input
------
+    You'll learn in :doc:`services` how to manage external dependencies the right way.
+
+Transformation types
+::::::::::::::::::::
+
+General case
+------------
+
+The **general case** is a transformation that yields n outputs for each input.
+
+You can implement it using a generator:
+
+.. code-block:: python
+
+    db = ...
+
+    def get_orders(user_id):
+        for order in db.get_orders(user_id):
+            yield user_id, order
+
+.. graphviz::
+
+    digraph {
+        rankdir = LR;
+        stylesheet = "../_static/graphs.css";
+
+        BEFORE [shape=record label="0|1|<current>2|3|…" fontname="Courier New" fontsize=8 margin=0.03 width=0.3 style=filled fillcolor="#fafafa"];
+        AFTER [shape=record label="{0|order#98}|{<current>2|order#42}|{2|order#43}|{3|order#11}|{3|order#12}|{3|order#16}|{3|order#18}|…" fontname="Courier New" fontsize=8 margin=0.03 width=0.3 style=filled fillcolor="#fafafa"];
+        BEFORE:current -> "get_orders()" -> AFTER:current;
+
+        db [shape=cylinder label="" width=0.5 height=0.4];
+        db -> "get_orders()" [arrowhead=onormal];
+        { rank = same; "get_orders()" db }
+    }
+
+*Here, each row (containing a user id) will be transformed into a set of rows, each containing an user_id and an "order"
+object.*
+
+Extractor case
+--------------
+
+An **extractor** is a transformation that generates output without using any input. Usually, it does not generate this
+data out of nowhere, but instead connects to an external system (database, api, http, files ...) to read the data from
+there.
+
+It can be implemented in two different ways.
+
+* You can implement it using a generator, like in the general case:
+
+.. code-block:: python
+
+    db = ...
+
+    def extract_user_ids():
+        yield from db.select_all_user_ids()
+
+.. graphviz::
+
+    digraph {
+        rankdir = LR;
+        stylesheet = "../_static/graphs.css";
+
+        BEGIN [shape=point];
+        AFTER [shape=record label="<f0>0|1|2|3|…" fontname="Courier New" fontsize=8 margin=0.03 width=0.3 style=filled fillcolor="#fafafa"];
+        BEGIN -> "extract_user_ids()" -> AFTER:f0;
+
+
+        db [shape=cylinder label="" width=0.5 height=0.4];
+        db -> "extract_user_ids()" [arrowhead=onormal];
+        { rank = same; "extract_user_ids()" db }
+    }
+
+* You can also use an iterator directly:
+
+.. code-block:: python
+
+    import bonobo
+
+    db = ...
+
+    def get_graph():
+        graph = bonobo.Graph()
+        graph.add_chain(
+            db.select_all_user_ids(),
+            ...
+        )
+        return graph
+
+It is very convenient in many cases, when your existing system already have an interface that gives you iterators.
+
+.. note::
+
+   It's important to use a generative approach that yield data as it is provided and not generate everything
+   at once before returning, so |bonobo| can pass the data to the next nodes as soon as it starts streaming.
+
+Loader case
+-----------
+
+A **loader** is a transformation that sends its input into an external system. To have a perfect symmetry with
+extractors, we'd like not to have any output but as a convenience and because it has a negligible cost
+in |bonobo|, the convention is that all loaders return :obj:`bonobo.constants.NOT_MODIFIED`, meaning that all rows that
+streamed into this node's input will also stream into its outputs, not modified. It allows to chain transformations even
+after a loader happened, and avoid using shenanigans to achieve the same thing:
+
+.. code-block:: python
+
+   from bonobo.constants import NOT_MODIFIED
+
+   analytics_db = ...
+
+   def load_into_analytics_db(user_id, order):
+       analytics_db.insert_or_update_order(user_id, order['id'], order['amount'])
+       return NOT_MODIFIED
+
+
+.. graphviz::
+
+    digraph {
+        rankdir = LR;
+        stylesheet = "../_static/graphs.css";
+
+        BEFORE [shape=record label="{0|order#98}|{2|<current>order#42}|{2|order#43}|{3|order#11}|{3|order#12}|{3|order#16}|{3|order#18}|…" fontname="Courier New" fontsize=8 margin=0.03 width=0.3 style=filled fillcolor="#fafafa"];
+        AFTER [shape=record label="{0|order#98}|{<current>2|order#42}|{2|order#43}|{3|order#11}|{3|order#12}|{3|order#16}|{3|order#18}|…" fontname="Courier New" fontsize=8 margin=0.03 width=0.3 style=filled fillcolor="#fafafa"];
+        BEFORE:current -> "load_into_analytics_db()";
+        "load_into_analytics_db()" -> AFTER:current [label="NOT_MODIFIED" fontsize=8 fontname="Courier New"];
+
+        db [shape=cylinder label="" width=0.5 height=0.4];
+        db -> "load_into_analytics_db()" [arrowtail=onormal dir=back];
+        { rank = same; "load_into_analytics_db()" db }
+    }
+
+
+Execution Context
+:::::::::::::::::
+
+Transformations being regular functions, a bit of machinery is required to use them as nodes in a streaming flow.
+
+When a :class:`bonobo.Graph` is executed, each node is wrapped in a
+:class:`bonobo.execution.contexts.NodeExecutionContext` which is responsible for keeping the state of a node, within a
+given execution.
+
+
+Inputs and Outputs
+::::::::::::::::::
+
+When run in an execution context, transformations have inputs and outputs, which means that |bonobo| will pass data
+that comes in the input queue as calls, and push returned / yielded values into the output queue.
+
+
+.. graphviz::
+
+    digraph {
+        rankdir = LR;
+        stylesheet = "../_static/graphs.css";
+
+        "Input Queue" [shape=record label="{|||||}" margin=0.03 width=1 style=filled fillcolor="#fafafa" height=0.25];
+        "Output Queue" [shape=record label="{|||||}" margin=0.03 width=1 style=filled fillcolor="#fafafa" height=0.25];
+
+        "Input Queue" -> "transformation" [label="input"];
+         "transformation" -> "Output Queue" [label="output"];
+    }
+
+For thread-based strategies, the underlying implementation if the input and output queues is the standard
+:class:`queue.Queue`.
+
+
+Inputs
+------
+
+.. todo:: proofread, check consistency and correctness
 
 All input is retrieved via the call arguments. Each line of input means one call to the callable provided. Arguments
 will be, in order:
@@ -52,133 +197,39 @@ You'll see below how to pass each of those.
 Output
 ------
 
+.. todo:: proofread, check consistency and correctness
+
 Each callable can return/yield different things (all examples will use yield, but if there is only one output per input
 line, you can also return your output row and expect the exact same behaviour).
 
-Let's see the rules (first to match wins).
+.. todo:: add rules for output parsing
 
-1. A flag, eventually followed by something else, marks a special behaviour. If it supports it, the remaining part of
-   the output line will be interpreted using the same rules, and some flags can be combined.
+The logic is defined in this piece of code, documentation will be added soon:
 
-   **NOT_MODIFIED**
+.. literalinclude:: ../../bonobo/execution/contexts/node.py
+    :caption: NodeExecutionContext._cast(self, _input, _output)
+    :pyobject: NodeExecutionContext._cast
 
-   **NOT_MODIFIED** tells bonobo to use the input row unmodified as the output.
+Basically, after checking a few flags (`NOT_MODIFIED`, then `INHERIT`), it will "cast" the data into the "output type",
+which is either tuple or a kind of namedtuple.
 
-   *CANNOT be combined*
+.. todo:: document cast/input_type/output_type logic.
 
-   Example:
-
-   .. code-block:: python
-
-       from bonobo import NOT_MODIFIED
-
-       def output_will_be_same_as_input(*args, **kwargs):
-           yield NOT_MODIFIED
-
-   **APPEND**
-
-   **APPEND** tells bonobo to append this output to the input (positional arguments will equal `input_args + output_args`,
-   keyword arguments will equal `{**input_kwargs, **output_kwargs}`).
-
-   *CAN be combined, but not with itself*
-
-   .. code-block:: python
-
-       from bonobo import APPEND
-
-       def output_will_be_appended_to_input(*args, **kwargs):
-           yield APPEND, 'foo', 'bar', {'eat_at': 'joe'}
-
-   **LOOPBACK**
-
-   **LOOPBACK** tells bonobo that this output must be looped back into our own input queue, allowing to create the stream
-   processing version of recursive algorithms.
-
-   *CAN be combined, but not with itself*
-
-   .. code-block:: python
-
-       from bonobo import LOOPBACK
-
-       def output_will_be_sent_to_self(*args, **kwargs):
-           yield LOOPBACK, 'Hello, I am the future "you".'
-
-   **CHANNEL(...)**
-
-   **CHANNEL(...)** tells bonobo that this output does not use the default channel and is routed through another path.
-   This is something you should probably not use unless your data flow design is complex, and if you're not certain
-   about it, it probably means that it is not the feature you're looking for.
-
-   *CAN be combined, but not with itself*
-
-   .. code-block:: python
-
-      from bonobo import CHANNEL
-
-      def output_will_be_sent_to_self(*args, **kwargs):
-          yield CHANNEL("errors"), 'That is not cool.'
-
-2. Once all flags are "consumed", the remaining part is interpreted.
-
-   * If it is a :class:`bonobo.Bag` instance, then it's used directly.
-   * If it is a :class:`dict` then a kwargs-only :class:`bonobo.Bag` will be created.
-   * If it is a :class:`tuple` then an args-only :class:`bonobo.Bag` will be created, unless its last argument is a
-     :class:`dict` in which case a args+kwargs :class:`bonobo.Bag` will be created.
-   * If it's something else, it will be used to create a one-arg-only :class:`bonobo.Bag`.
-
-Function based transformations
-::::::::::::::::::::::::::::::
-
-The most basic transformations are function-based. Which means that you define a function, and it will be used directly
-in a graph.
-
-.. code-block:: python
-
-    def get_representation(row):
-        return repr(row)
-
-    graph = bonobo.Graph(
-        [...],
-        get_representation,
-        [...],
-    )
-
-
-It does not allow any configuration, but if it's an option, prefer it as it's simpler to write.
-
-
-Class based transformations
+Class-based Transformations
 :::::::::::::::::::::::::::
 
-For less basic use cases, you'll want to use classes to define some of your transformations. It's also a better choice
-to build reusable blocks, as you'll be able to create parametrizable transformations that the end user will be able to
-configure at the last minute.
+For use cases that are either less simple or that requires better reusability, you may want to use classes to define
+some of your transformations.
 
+.. todo:: narrative doc
 
-Configurable
-------------
+See:
 
-.. autoclass:: bonobo.config.Configurable
-
-Options
--------
-
-.. autoclass:: bonobo.config.Option
-
-Services
---------
-
-.. autoclass:: bonobo.config.Service
-
-Methods
--------
-
-.. autoclass:: bonobo.config.Method
-
-ContextProcessors
------------------
-
-.. autoclass:: bonobo.config.ContextProcessor
+* :class:`bonobo.config.Configurable`
+* :class:`bonobo.config.Option`
+* :class:`bonobo.config.Service`
+* :class:`bonobo.config.Method`
+* :class:`bonobo.config.ContextProcessor`
 
 
 Naming conventions

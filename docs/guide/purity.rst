@@ -1,6 +1,15 @@
 Best Practices
 ==============
 
+.. warning::
+
+    This document needs to be rewritten for 0.6.
+
+    Especially, `Bag()` was removed, and |bonobo| either ensure your i/o rows are tuples or some kind of namedtuples.
+
+    Please be aware of that while reading, and eventually check `the migration guide to 0.6
+    <https://news.bonobo-project.org/migration-guide-for-bonobo-0-6-alpha-c1d36b0a9d35>`_.
+
 The nature of components, and how the data flow from one to another, can be a bit tricky.
 Hopefully, they should be very easy to write with a few hints.
 

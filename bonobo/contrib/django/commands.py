@@ -26,6 +26,12 @@ class ETLCommand(BaseCommand):
     def create_parser(self, prog_name, subcommand):
         return bonobo.get_argument_parser(super().create_parser(prog_name, subcommand))
 
+    def add_arguments(self, parser):
+        """
+        Entry point for subclassed commands to add custom arguments.
+        """
+        pass
+
     def get_graph(self, *args, **options):
         def not_implemented():
             raise NotImplementedError('You must implement {}.get_graph() method.'.format(self))

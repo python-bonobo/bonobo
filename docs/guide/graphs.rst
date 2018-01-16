@@ -4,7 +4,6 @@ Graphs
 Graphs are the glue that ties transformations together. They are the only data-structure bonobo can execute directly. Graphs
 must be acyclic, and can contain as many nodes as your system can handle. However, although in theory the number of nodes can be rather high, practical use cases usually do not exceed more than a few hundred nodes and only then in extreme cases.
 
-
 Within a graph, each node are isolated and can only communicate using their
 input and output queues. For each input row, a given node will be called with
 the row passed as arguments. Each *return* or *yield* value will be put on the
@@ -37,6 +36,11 @@ Handling the data-flow this way brings the following properties:
 
 Graphs are defined using :class:`bonobo.Graph` instances, as seen in the
 previous tutorial step.
+
+.. warning::
+
+    This document is currently reviewed to check for correctness after the 0.6 release.
+
 
 What can be a node?
 :::::::::::::::::::
