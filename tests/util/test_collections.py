@@ -14,8 +14,8 @@ def test_sortedlist():
 
 
 def test_ensure_tuple():
-    assert ensure_tuple('a') == ('a',)
-    assert ensure_tuple(('a',)) == ('a',)
+    assert ensure_tuple('a') == ('a', )
+    assert ensure_tuple(('a', )) == ('a', )
     assert ensure_tuple(()) is ()
 
 

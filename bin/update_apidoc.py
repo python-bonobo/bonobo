@@ -40,13 +40,14 @@ modules = [
 ]
 
 
-
 def underlined_filter(txt, chr):
     return txt + '\n' + chr * len(txt)
 
 
-env = Environment(loader=DictLoader({
-    'module': '''
+env = Environment(
+    loader=DictLoader({
+        'module':
+        '''
 {{ (':mod:`'~title~' <'~name~'>`') | underlined('=') }}
 
 .. currentmodule:: {{ name }}
@@ -55,7 +56,9 @@ env = Environment(loader=DictLoader({
 
 .. automodule:: {{ name }}
 {% for opt in automodule_options %}   :{{ opt }}:{{ "\n" }}{% endfor %}
-    '''[1:-1] + '\n'}))
+    ''' [1:-1] + '\n'
+    })
+)
 env.filters['underlined'] = underlined_filter
 
 for module in modules:

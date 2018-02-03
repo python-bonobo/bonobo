@@ -151,7 +151,10 @@ class Graph:
             return '<strong>{}</strong>: {}'.format(type(exc).__name__, str(exc))
 
     def _resolve_index(self, mixed):
-        """ Find the index based on various strategies for a node, probably an input or output of chain. Supported inputs are indexes, node values or names.
+        """
+        Find the index based on various strategies for a node, probably an input or output of chain. Supported
+        inputs are indexes, node values or names.
+
         """
         if mixed is None:
             return None

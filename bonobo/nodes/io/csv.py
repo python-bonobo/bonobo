@@ -33,7 +33,7 @@ class CsvHandler(FileHandler):
     doublequote = Option(str, default=csv.excel.doublequote, required=False)
     skipinitialspace = Option(str, default=csv.excel.skipinitialspace, required=False)
     lineterminator = Option(str, default=csv.excel.lineterminator, required=False)
-    quoting = Option(str, default=csv.excel.quoting, required=False)
+    quoting = Option(int, default=csv.excel.quoting, required=False)
 
     # Fields (renamed from headers)
     headers = RenamedOption('fields')
@@ -57,9 +57,13 @@ class CsvReader(FileReader, CsvHandler):
     Reads a CSV and yield the values as dicts.
     """
 
-    skip = Option(int, default=0, __doc__='''
+    skip = Option(
+        int,
+        default=0,
+        __doc__='''
         If set and greater than zero, the reader will skip this amount of lines.
-    ''')
+    '''
+    )
 
     @Method(
         positional=False,
