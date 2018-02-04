@@ -1,5 +1,3 @@
-import pprint
-
 import pytest
 
 from bonobo.config.configurables import Configurable

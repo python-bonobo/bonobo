@@ -1,11 +1,13 @@
 from collections import namedtuple
+from csv import QUOTE_ALL
 from unittest import TestCase
 
 import pytest
 
 from bonobo import CsvReader, CsvWriter
 from bonobo.constants import EMPTY
-from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext, WriterTest, ConfigurableNodeTest, ReaderTest
+from bonobo.util.testing import FilesystemTester, BufferingNodeExecutionContext, WriterTest, ConfigurableNodeTest, \
+    ReaderTest
 
 csv_tester = FilesystemTester('csv')
 csv_tester.input_data = 'a,b,c\na foo,b foo,c foo\na bar,b bar,c bar'
@@ -89,6 +91,13 @@ class CsvReaderTest(Csv, ReaderTest, TestCase):
         context.stop()
         self.check_output(context)
         assert context.get_output_fields() == ('x', 'y')
+
+    @incontext(quoting=QUOTE_ALL)
+    def test_quoting(self, context):
+        context.write_sync(EMPTY)
+        context.stop()
+        self.check_output(context)
+        assert context.get_output_fields() == ('id', 'name')
 
 
 class CsvWriterTest(Csv, WriterTest, TestCase):

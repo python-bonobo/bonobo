@@ -47,15 +47,7 @@ class ConfigurableMeta(type):
             prefix = ':param {}: '.format(_param)
             for lineno, line in enumerate((_value.__doc__ or '').split('\n')):
                 _options_doc.append((' ' * len(prefix) if lineno else prefix) + line)
-        cls.__doc__ = '\n\n'.join(
-            map(
-                str.strip,
-                filter(None, (
-                    cls.__doc__,
-                    '\n'.join(_options_doc)
-                ))
-            )
-        )
+        cls.__doc__ = '\n\n'.join(map(str.strip, filter(None, (cls.__doc__, '\n'.join(_options_doc)))))
 
     @property
     def __options__(cls):

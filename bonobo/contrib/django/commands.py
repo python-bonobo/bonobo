@@ -56,7 +56,7 @@ class ETLCommand(BaseCommand):
             graph_coll = self.get_graph(*args, **options)
 
             if not isinstance(graph_coll, GeneratorType):
-                graph_coll = (graph_coll,)
+                graph_coll = (graph_coll, )
 
             for i, graph in enumerate(graph_coll):
                 assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'

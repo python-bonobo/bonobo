@@ -61,10 +61,13 @@ language = None
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 autoclass_content = 'both'
 autodoc_member_order = 'groupwise'
-autodoc_default_flags =['members', 'undoc-members', 'show-inheritance', ]
+autodoc_default_flags = [
+    'members',
+    'undoc-members',
+    'show-inheritance',
+]
 
 add_module_names = False
 pygments_style = 'sphinx'

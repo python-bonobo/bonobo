@@ -26,7 +26,7 @@ def ensure_tuple(tuple_or_mixed, *, cls=tuple):
     if isinstance(tuple_or_mixed, tuple):
         return tuple.__new__(cls, tuple_or_mixed)
 
-    return tuple.__new__(cls, (tuple_or_mixed,))
+    return tuple.__new__(cls, (tuple_or_mixed, ))
 
 
 def cast(type_):

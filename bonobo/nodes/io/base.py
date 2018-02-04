@@ -12,9 +12,11 @@ class FileHandler(Configurable):
         encoding (str): which encoding to use when opening the file.
     """
 
-    path = Option(str, required=True, positional=True, __doc__='''
+    path = Option(
+        str, required=True, positional=True, __doc__='''
         Path to use within the provided filesystem.
-    ''')  # type: str
+    '''
+    )  # type: str
     eol = Option(str, default='\n', __doc__='''
         Character to use as line separator.
     ''')  # type: str
