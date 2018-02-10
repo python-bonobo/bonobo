@@ -7,10 +7,10 @@ can understand if it could be a good fit for your use cases.
 How it works?
 :::::::::::::
 
-**Bonobo** is an **Extract Transform Load** framework aimed at coders, hackers, or any other person who's at ease with
+**Bonobo** is an **Extract Transform Load** framework aimed at coders, hackers, or any other people who are at ease with
 terminals and source code files.
 
-It is a **data streaming** solution, that treat datasets as ordered collections of independant rows, allowing to process
+It is a **data streaming** solution, that treat datasets as ordered collections of independent rows, allowing to process
 them "first in, first out" using a set of transformations organized together in a directed graph.
 
 Let's take a few examples.
@@ -101,16 +101,16 @@ What is it not?
 |bonobo| is not:
 
 * A data science, or statistical analysis tool, which need to treat the dataset as a whole and not as a collection of
-  independant rows. If this is your need, you probably want to look at `pandas <https://pandas.pydata.org/>`_.
+  independent rows. If this is your need, you probably want to look at `pandas <https://pandas.pydata.org/>`_.
 
-* A workflow or scheduling solution for independant data-engineering tasks. If you're looking to manage your sets of
-  data processing tasks as a whole, you probably want to look at `airflow <https://airflow.incubator.apache.org/>`_.
+* A workflow or scheduling solution for independent data-engineering tasks. If you're looking to manage your sets of
+  data processing tasks as a whole, you probably want to look at `Airflow <https://airflow.incubator.apache.org/>`_.
   Although there is no |bonobo| extension yet that handles that, it does make sense to integrate |bonobo| jobs in an
   airflow (or other similar tool) workflow.
 
-* A big data solution, `as defined by wikipedia <https://en.wikipedia.org/wiki/Big_data>`_. We're aiming at "small
+* A big data solution, `as defined by Wikipedia <https://en.wikipedia.org/wiki/Big_data>`_. We're aiming at "small
   scale" data processing, which can be still quite huge for humans, but not for computers. If you don't know whether or
-  not this is sufficient for your needs, it probably means you're not in the "big data" land.
+  not this is sufficient for your needs, it probably means you're not in "big data" land.
 
 
 .. include:: _next.rst
