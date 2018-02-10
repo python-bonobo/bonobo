@@ -22,12 +22,12 @@ Handling the data-flow this way brings the following properties:
   the order existing at the divergence point wont stay true at the convergence
   point.
 
-- **Parallelism**: each node run in parallel (by default, using independant
+- **Parallelism**: each node run in parallel (by default, using independent
   threads). This is useful as you don't have to worry about blocking calls.
   If a thread waits for, let's say, a database, or a network service, the other
   nodes will continue handling data, as long as they have input rows available.
 
-- **Independance**: the rows are independant from each other, making this way
+- **Independence**: the rows are independent from each other, making this way
   of working with data flows good for line-by-line data processing, but
   also not ideal for "grouped" computations (where an output depends on more
   than one line of input data). You can overcome this with rolling windows if
@@ -299,4 +299,3 @@ the CLI, and reading the source you should be able to figure out its usage quite
 
 
 .. include:: _next.rst
-

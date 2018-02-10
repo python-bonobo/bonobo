@@ -78,7 +78,7 @@ Create a transformation graph
 
 Amongst other features, Bonobo will mostly help you there with the following:
 
-* Execute the transformations in independant threads
+* Execute the transformations in independent threads
 * Pass the outputs of one thread to other(s) thread(s) inputs.
 
 To do this, it needs to know what data-flow you want to achieve, and you'll use a :class:`bonobo.Graph` to describe it.
@@ -200,4 +200,3 @@ Next
 ::::
 
 Time to jump to the second part: :doc:`tut02`.
-
