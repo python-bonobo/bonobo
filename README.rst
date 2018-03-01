@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpython-bonobo%2Fbonobo.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpython-bonobo%2Fbonobo?ref=badge_shield)
+
 ==========
 🐵  bonobo
 ==========
@@ -71,3 +73,6 @@ Made with ♥ by `Romain Dorgueil <https://twitter.com/rdorgueil>`_ and `contrib
     :alt: License
 
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpython-bonobo%2Fbonobo.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpython-bonobo%2Fbonobo?ref=badge_large)
