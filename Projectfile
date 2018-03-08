@@ -54,7 +54,6 @@ python.add_requirements(
     'whistle ~=1.0',
     dev=[
         'cookiecutter >=1.5,<1.6',
-        'pytest-sugar >=0.8,<0.9',
         'pytest-timeout >=1,<2',
         'sphinx-sitemap >=0.2,<0.3',
     ],
