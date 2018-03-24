@@ -44,13 +44,7 @@ class ETLCommand(BaseCommand):
     def info(self, *args, **kwargs):
         self.logger.info(*args, **kwargs)
 
-    def handle(self, *args, **options):
-        _stdout_backup, _stderr_backup = self.stdout, self.stderr
-
-        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + '\n')
-        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
-        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
-
+    def run(self, *args, **options):
         with bonobo.parse_args(options) as options:
             services = self.get_services()
             graph_coll = self.get_graph(*args, **options)
@@ -64,5 +58,14 @@ class ETLCommand(BaseCommand):
                 result = bonobo.run(graph, services=services)
                 print(term.lightblack(' ... return value: ' + str(result)))
                 print()
+
+    def handle(self, *args, **options):
+        _stdout_backup, _stderr_backup = self.stdout, self.stderr
+
+        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + '\n')
+        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
+        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
+
+        self.run(*args, **kwargs)
 
         self.stdout, self.stderr = _stdout_backup, _stderr_backup
