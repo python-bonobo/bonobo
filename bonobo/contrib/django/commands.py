@@ -45,6 +45,7 @@ class ETLCommand(BaseCommand):
         self.logger.info(*args, **kwargs)
 
     def run(self, *args, **options):
+        results = []
         with bonobo.parse_args(options) as options:
             services = self.get_services()
             graph_coll = self.get_graph(*args, **options)
@@ -56,8 +57,11 @@ class ETLCommand(BaseCommand):
                 assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'
                 print(term.lightwhite('{}. {}'.format(i + 1, graph.name)))
                 result = bonobo.run(graph, services=services)
+                results.append(result)
                 print(term.lightblack(' ... return value: ' + str(result)))
                 print()
+
+        return results
 
     def handle(self, *args, **options):
         _stdout_backup, _stderr_backup = self.stdout, self.stderr
