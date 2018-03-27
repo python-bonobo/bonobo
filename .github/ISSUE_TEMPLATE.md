@@ -14,7 +14,7 @@ Thanks for submitting an issue!
 
 * Python version:
 
-    `python -c "import platform,sys; print(platform.python_implementation() + ' ' + sys.version)")`
+    `python -c "import platform,sys; print(platform.python_implementation() + ' ' + sys.version)"`
 
 * Platform:
 
