@@ -23,7 +23,8 @@
 .ipynb_checkpoints
 .python-version
 /.idea
-/.medikit-pipeline
+/.medikit
+/.pytest_cache
 /.release
 /bonobo/contrib/jupyter/js/node_modules/
 /bonobo/examples/work_in_progress/
