@@ -46,7 +46,7 @@ python.add_requirements(
     'graphviz >=0.8,<0.9',
     'jinja2 ~=2.9',
     'mondrian ~=0.6',
-    'packaging ~=16.0',
+    'packaging ~=17.0',
     'psutil ~=5.4',
     'python-slugify ~=1.2.0',
     'requests ~=2.0',
