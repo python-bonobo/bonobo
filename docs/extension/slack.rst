@@ -1,12 +1,20 @@
-Plugins
-=======
+Working with Slack
+==================
 
+.. include:: _beta.rst
 
-Graph level plugins
-:::::::::::::::::::
 
 Slack
 -----
+
+
+Installation
+::::::::::::
+
+Install `bonobo` with the **slack** extra::
+
+    pip install bonobo[slack]
+
 
 .. code-block:: python
 
@@ -21,14 +29,7 @@ Slack
             )
         ])
 
-Node level plugins
-::::::::::::::::::
+Source code
+:::::::::::
 
-enhancers
-
-
-node
-    -
-
-
-.. include:: _next.rst
+https://github.com/python-bonobo/bonobo/tree/master/bonobo/contrib/slack
