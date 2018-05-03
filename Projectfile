@@ -67,6 +67,9 @@ python.add_requirements(
     sqlalchemy=[
         'bonobo-sqlalchemy ~=0.6.0a1',
     ],
+    slack=[
+        'slackclient >= 1.2'
+    ]
 )
 
 
