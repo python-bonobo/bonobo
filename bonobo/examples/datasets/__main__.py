@@ -56,7 +56,5 @@ if __name__ == '__main__':
                             local_path,
                             'bonobo-examples',
                             s3_path,
-                            ExtraArgs={
-                                'ACL': 'public-read'
-                            }
+                            ExtraArgs={'ACL': 'public-read'}
                         )

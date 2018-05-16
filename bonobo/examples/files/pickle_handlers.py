@@ -63,8 +63,8 @@ def get_graph(*, _limit=(), _print=()):
 def get_services():
     from ._services import get_services
     return {
-        **get_services(),
-        'fs': TarFS(bonobo.get_examples_path('datasets/spam.tgz'))
+        **get_services(), 'fs':
+        TarFS(bonobo.get_examples_path('datasets/spam.tgz'))
     }
 
 

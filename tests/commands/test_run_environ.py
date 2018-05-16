@@ -102,8 +102,6 @@ class TestEnvVars(EnvironmentTestCase):
         assert env.get('USER') == 'romain'
 
         env = self.run_environ(
-            runner, *target, '--env', 'USER=serious', '--default-env', 'USER=clown', environ={
-                'USER': 'romain'
-            }
+            runner, *target, '--env', 'USER=serious', '--default-env', 'USER=clown', environ={'USER': 'romain'}
         )
         assert env.get('USER') == 'serious'
