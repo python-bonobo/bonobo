@@ -54,6 +54,7 @@ setup(
                  'python 3.5+.'),
     license='Apache License, Version 2.0',
     name='bonobo',
+    python_requires='>=3.5',
     version=version,
     long_description=long_description,
     classifiers=classifiers,
