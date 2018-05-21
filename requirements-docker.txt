@@ -7,7 +7,7 @@ chardet==3.0.4
 colorama==0.3.9
 docker-pycreds==0.2.3
 docker==2.7.0
-fs==2.0.21
+fs==2.0.23
 graphviz==0.8.3
 idna==2.6
 jinja2==2.10
