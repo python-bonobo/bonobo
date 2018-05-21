@@ -2,7 +2,7 @@ import mimetypes
 
 import os
 
-from bonobo import JsonReader, CsvReader, PickleReader, FileReader, FileWriter, PickleWriter, CsvWriter, JsonWriter
+from bonobo.nodes import JsonReader, CsvReader, PickleReader, FileReader, FileWriter, PickleWriter, CsvWriter, JsonWriter
 
 FILETYPE_CSV = 'text/csv'
 FILETYPE_JSON = 'application/json'
@@ -88,3 +88,31 @@ class Registry:
 
 
 default_registry = Registry()
+
+def create_reader(name, *args, format=None, registry=default_registry, **kwargs):
+    """
+    Create a reader instance, guessing its factory using filename (and eventually format).
+
+    :param name:
+    :param args:
+    :param format:
+    :param registry:
+    :param kwargs:
+
+    :return: mixed
+    """
+    return registry.get_reader_factory_for(name, format=format)(name, *args, **kwargs)
+
+def create_writer(name, *args, format=None, registry=default_registry, **kwargs):
+    """
+    Create a writer instance, guessing its factory using filename (and eventually format).
+
+    :param name:
+    :param args:
+    :param format:
+    :param registry:
+    :param kwargs:
+
+    :return: mixed
+    """
+    return registry.get_writer_factory_for(name, format=format)(name, *args, **kwargs)

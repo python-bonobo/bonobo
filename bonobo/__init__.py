@@ -9,9 +9,12 @@ import sys
 
 assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
 
-from bonobo._api import *
-from bonobo._api import __all__
-from bonobo._api import __doc__
+from bonobo._api import (
+    run, inspect, Graph, create_strategy, open_fs, CsvReader, CsvWriter, FileReader, FileWriter, Filter, FixedWindow,
+    Format, JsonReader, JsonWriter, LdjsonReader, LdjsonWriter, Limit, OrderFields, PickleReader, PickleWriter,
+    PrettyPrinter, RateLimited, Rename, SetFields, Tee, UnpackItems, count, identity, noop, create_reader,
+    create_writer, get_examples_path, open_examples_fs, get_argument_parser, parse_args, __all__, __doc__
+)
 from bonobo._version import __version__
 
 __all__ = ['__version__'] + __all__
