@@ -23,8 +23,8 @@ nbconvert==5.3.1
 nbformat==4.4.0
 notebook==5.5.0
 pandocfilters==1.4.2
-parso==0.2.0
-pexpect==4.5.0
+parso==0.2.1
+pexpect==4.6.0
 pickleshare==0.7.4
 prompt-toolkit==1.0.15
 ptyprocess==0.5.2

@@ -12,14 +12,14 @@ jinja2==2.10
 markupsafe==1.0
 mondrian==0.7.0
 packaging==17.1
-pbr==4.0.3
-psutil==5.4.5
+pbr==4.0.4
+psutil==5.4.6
 pyparsing==2.2.0
 python-slugify==1.2.5
 pytz==2018.4
 requests==2.18.4
 six==1.11.0
-sqlalchemy==1.2.7
+sqlalchemy==1.2.8
 stevedore==1.28.0
 typing==3.6.4
 unidecode==1.0.22

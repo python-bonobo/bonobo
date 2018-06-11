@@ -2,8 +2,9 @@
 -r requirements.txt
 alabaster==0.7.10
 arrow==0.12.1
+atomicwrites==1.1.5
 attrs==18.1.0
-babel==2.5.3
+babel==2.6.0
 binaryornot==0.4.4
 certifi==2018.4.16
 chardet==3.0.4
@@ -17,7 +18,7 @@ imagesize==1.0.0
 jinja2-time==0.2.0
 jinja2==2.10
 markupsafe==1.0
-more-itertools==4.1.0
+more-itertools==4.2.0
 packaging==17.1
 pluggy==0.6.0
 poyo==0.4.1
@@ -26,15 +27,15 @@ pygments==2.2.0
 pyparsing==2.2.0
 pytest-cov==2.5.1
 pytest-timeout==1.2.1
-pytest==3.5.1
+pytest==3.6.1
 python-dateutil==2.7.3
 pytz==2018.4
 requests==2.18.4
 six==1.11.0
 snowballstemmer==1.2.1
 sphinx-sitemap==0.2
-sphinx==1.7.4
-sphinxcontrib-websupport==1.0.1
+sphinx==1.7.5
+sphinxcontrib-websupport==1.1.0
 urllib3==1.22
 whichcraft==0.4.1
 yapf==0.22.0
