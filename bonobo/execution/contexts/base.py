@@ -3,10 +3,9 @@ import sys
 from contextlib import contextmanager
 from logging import ERROR
 
-from mondrian import term
-
 from bonobo.util import deprecated
 from bonobo.util.objects import Wrapper, get_name
+from mondrian import term
 
 
 @contextmanager
@@ -23,7 +22,7 @@ def unrecoverable(error_handler):
         yield
     except Exception as exc:  # pylint: disable=broad-except
         error_handler(*sys.exc_info(), level=ERROR)
-        raise  # raise unrecoverableerror from x ?
+        raise  # raise unrecoverableerror from exc ?
 
 
 class Lifecycle:
@@ -60,7 +59,10 @@ class Lifecycle:
 
     @property
     def status(self):
-        """One character status for this node. """
+        """
+        One character status for this node.
+
+        """
         if self._defunct:
             return '!'
         if not self.started:

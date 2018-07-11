@@ -77,11 +77,18 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             initial = self._get_initial_context()
             self._stack = ContextCurrifier(self.wrapped, *initial.args, **initial.kwargs)
             if isconfigurabletype(self.wrapped):
-                # Not normal to have a partially configured object here, so let's warn the user instead of having get into
-                # the hard trouble of understanding that by himself.
-                raise TypeError(
-                    'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
-                )
+                try:
+                    self.wrapped = self.wrapped(_final=True)
+                except Exception as exc:
+                    # Not normal to have a partially configured object here, so let's warn the user instead of having get into
+                    # the hard trouble of understanding that by himself.
+                    raise TypeError(
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
+                    ) from exc
+                else:
+                    raise TypeError(
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
+                    )
             self._stack.setup(self)
         except Exception:
             # Set the logging level to the lowest possible, to avoid double log.
