@@ -21,6 +21,15 @@ UnboundArguments = namedtuple('UnboundArguments', ['args', 'kwargs'])
 
 
 class NodeExecutionContext(BaseContext, WithStatistics):
+    """
+    Stores the actual context of a node, within a given graph execution, accessed as `self.parent`.
+
+    A special case exist, mostly for testing purpose, where there is no parent context.
+
+    Can be used as a context manager, also very convenient for testing nodes that requires some external context (like
+    a service implementation, or a value holder).
+
+    """
     def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
@@ -170,7 +179,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self._stack:
             try:
                 self._stack.teardown()
-            except:
+            except Exception as exc:
                 self.fatal(sys.exc_info())
 
         super().stop()

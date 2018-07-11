@@ -99,9 +99,6 @@ class Lifecycle:
 
         self._stopped = True
 
-        if self._stopped:  # Stopping twice has no effect
-            return
-
     def kill(self):
         if not self.started:
             raise RuntimeError('Cannot kill an unstarted context.')
@@ -136,3 +133,12 @@ class BaseContext(Lifecycle, Wrapper):
         Lifecycle.__init__(self)
         Wrapper.__init__(self, wrapped)
         self.parent = parent
+
+    @property
+    def xstatus(self):
+        """
+        UNIX-like exit status, only coherent if the context has stopped.
+        """
+        if self._defunct:
+            return 70
+        return 0
