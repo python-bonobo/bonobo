@@ -140,15 +140,14 @@ class Configurable(metaclass=ConfigurableMeta):
                 break  # option orders make all positional options first, job done.
 
             if not isoption(getattr(cls, name)):
-                missing.remove(name)
+                missing.discard(name)
                 continue
 
             if len(args) <= position:
                 break  # no more positional arguments given.
 
             position += 1
-            if name in missing:
-                missing.remove(name)
+            missing.discard(name)
 
         # complain if there is more options than possible.
         extraneous = set(kwargs.keys()) - (set(next(zip(*options))) if len(options) else set())
