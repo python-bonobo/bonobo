@@ -286,11 +286,17 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self._input_type is None:
             self._input_type = type(input_bag)
         elif type(input_bag) is not self._input_type:
-            raise UnrecoverableTypeError(
-                'Input type changed between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
-                    self.wrapped, input_bag, self._input_type
-                )
-            )
+            try:
+                if type(self._input_type) == tuple:
+                    input_bag = self._input_type(tuple)
+                else:
+                    input_bag = self._input_type(*input_bag)
+            except Exception as exc:
+                raise UnrecoverableTypeError(
+                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
+                        self.wrapped, input_bag, self._input_type
+                    )
+                ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples
         if self._input_length is None:
