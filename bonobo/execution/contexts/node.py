@@ -285,10 +285,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         # Store or check input type
         if self._input_type is None:
             self._input_type = type(input_bag)
-        elif type(input_bag) is not self._input_type:
+        elif type(input_bag) != self._input_type:
             try:
-                if type(self._input_type) == tuple:
-                    input_bag = self._input_type(tuple)
+                if self._input_type == tuple:
+                    input_bag = self._input_type(input_bag)
                 else:
                     input_bag = self._input_type(*input_bag)
             except Exception as exc:
