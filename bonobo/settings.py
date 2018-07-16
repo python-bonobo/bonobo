@@ -52,7 +52,7 @@ class Setting:
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
-            raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
+            raise ValidationError(self, 'Invalid value {!r} for setting {!r}.'.format(value, self.name))
         self.value = value
 
     def set_if_true(self, value):

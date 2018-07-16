@@ -1,7 +1,6 @@
 import logging
 import sys
 from contextlib import contextmanager
-from logging import ERROR
 
 from bonobo.util import deprecated
 from bonobo.util.objects import Wrapper, get_name
@@ -13,7 +12,7 @@ def recoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(*sys.exc_info(), level=ERROR)
+        error_handler(*sys.exc_info(), level=logging.ERROR)
 
 
 @contextmanager
@@ -21,7 +20,7 @@ def unrecoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(*sys.exc_info(), level=ERROR)
+        error_handler(*sys.exc_info(), level=logging.ERROR)
         raise  # raise unrecoverableerror from exc ?
 
 

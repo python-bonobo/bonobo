@@ -57,7 +57,6 @@ def get_argument_parser(parser=None):
     :return:
     """
     if parser is None:
-        import argparse
         parser = argparse.ArgumentParser()
 
     # Store globally to be able to warn the user about the fact he's probably wrong not to pass a parser to
