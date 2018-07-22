@@ -30,6 +30,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
     a service implementation, or a value holder).
 
     """
+
     def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
@@ -92,11 +93,15 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                     # Not normal to have a partially configured object here, so let's warn the user instead of having get into
                     # the hard trouble of understanding that by himself.
                     raise TypeError(
-                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                            self.wrapped
+                        )
                     ) from exc
                 else:
                     raise TypeError(
-                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                            self.wrapped
+                        )
                     )
             self._stack.setup(self)
         except Exception:
@@ -128,7 +133,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self._step()
         except InactiveReadableError:
             raise
-        except (NotImplementedError, UnrecoverableError, ):
+        except (
+                NotImplementedError,
+                UnrecoverableError,
+        ):
             self.fatal(sys.exc_info())  # exit loop
         except Exception:  # pylint: disable=broad-except
             self.error(sys.exc_info())  # does not exit loop
