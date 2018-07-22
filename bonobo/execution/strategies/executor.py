@@ -29,7 +29,7 @@ class ExecutorStrategy(Strategy):
         with self.create_executor() as executor:
             try:
                 context.start(self.get_starter(executor, futures))
-            except:
+            except Exception:
                 logger.critical('Exception caught while starting execution context.', exc_info=sys.exc_info())
 
             while context.alive:
@@ -53,14 +53,14 @@ class ExecutorStrategy(Strategy):
                 try:
                     with node:
                         node.loop()
-                except:
+                except Exception:
                     logging.getLogger(__name__).critical(
                         'Critical error in threadpool node starter.', exc_info=sys.exc_info()
                     )
 
             try:
                 futures.append(executor.submit(_runner))
-            except:
+            except Exception:
                 logging.getLogger(__name__).critical('futures.append', exc_info=sys.exc_info())
 
         return starter

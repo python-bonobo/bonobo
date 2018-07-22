@@ -72,11 +72,12 @@ class ConfigurableMeta(type):
 
 try:
     import _functools
-except:
+except ImportError:
     import functools
 
     PartiallyConfigured = functools.partial
 else:
+
     class PartiallyConfigured(_functools.partial):
         @property  # TODO XXX cache this
         def _options_values(self):

@@ -1,13 +1,18 @@
+import logging
 from functools import partial
+from queue import Empty
 from time import sleep
 
 from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
+from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
 from whistle import EventDispatcher
+
+logger = logging.getLogger(__name__)
 
 
 class GraphExecutionContext(BaseContext):
@@ -104,11 +109,16 @@ class GraphExecutionContext(BaseContext):
             sleep(self.TICK_PERIOD)
 
     def loop(self):
-        while self.should_loop:
-            self.tick()
-            for node in self.nodes:
-                if node.should_loop:
+        nodes = set(node for node in self.nodes if node.should_loop)
+        while self.should_loop and len(nodes):
+            self.tick(pause=False)
+            for node in list(nodes):
+                try:
                     node.step()
+                except Empty:
+                    continue
+                except InactiveReadableError:
+                    nodes.discard(node)
 
     def stop(self, stopper=None):
         super(GraphExecutionContext, self).stop()
