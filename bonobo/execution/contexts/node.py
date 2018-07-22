@@ -123,8 +123,6 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 self.step()
             except InactiveReadableError:
                 break
-            except Empty:
-                sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
 
         logger.debug('Node loop ends for {!r}.'.format(self))
 
@@ -133,6 +131,8 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self._step()
         except InactiveReadableError:
             raise
+        except Empty:
+            sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
         except (
                 NotImplementedError,
                 UnrecoverableError,
