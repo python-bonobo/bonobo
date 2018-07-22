@@ -94,14 +94,16 @@ def test_simple_execution_context():
 
 def test_simple_error_context():
     graph = Graph()
-    graph.bad_chain(*chain)
+    graph.add_chain(*bad_chain)
 
     context = GraphExecutionContext(graph)
     context.write(BEGIN, (), END)
     context.start()
 
-    assert not context.alive
+    assert context.alive
     assert context.started
-    assert context.stopped
+
+    # How to run graph?
+
     assert context.killed
     assert context.defunct
