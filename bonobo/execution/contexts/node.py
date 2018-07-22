@@ -120,20 +120,22 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 break
             except Empty:
                 sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
-                continue
-            except (
-                    NotImplementedError,
-                    UnrecoverableError,
-            ):
-                self.fatal(sys.exc_info())  # exit loop
-            except Exception:  # pylint: disable=broad-except
-                self.error(sys.exc_info())  # does not exit loop
-            except BaseException:
-                self.fatal(sys.exc_info())  # exit loop
 
         logger.debug('Node loop ends for {!r}.'.format(self))
 
     def step(self):
+        try:
+            self._step()
+        except InactiveReadableError:
+            raise
+        except (NotImplementedError, UnrecoverableError, ):
+            self.fatal(sys.exc_info())  # exit loop
+        except Exception:  # pylint: disable=broad-except
+            self.error(sys.exc_info())  # does not exit loop
+        except BaseException:
+            self.fatal(sys.exc_info())  # exit loop
+
+    def _step(self):
         """
         A single step in the loop.
 
@@ -280,7 +282,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         If Queue raises (like Timeout or Empty), stat won't be changed.
 
         """
-        input_bag = self.input.get()
+        input_bag = self.input.get(timeout=0)
 
         # Store or check input type
         if self._input_type is None:

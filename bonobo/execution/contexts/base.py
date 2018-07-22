@@ -53,8 +53,7 @@ class Lifecycle:
 
     @property
     def should_loop(self):
-        # TODO XXX started/stopped?
-        return not any((self.defunct, self.killed))
+        return self.alive and not any((self.defunct, self.killed))
 
     @property
     def status(self):
