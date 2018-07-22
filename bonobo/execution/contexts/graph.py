@@ -4,12 +4,13 @@ from time import sleep
 from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
 from bonobo.execution import events
+from bonobo.execution.contexts.base import Lifecycle
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
 from whistle import EventDispatcher
 
 
-class GraphExecutionContext:
+class GraphExecutionContext(Lifecycle):
     NodeExecutionContextType = NodeExecutionContext
     PluginExecutionContextType = PluginExecutionContext
 
@@ -27,7 +28,16 @@ class GraphExecutionContext:
     def alive(self):
         return any(node.alive for node in self.nodes)
 
+    @property
+    def killed(self):
+        return any(node.killed for node in self.nodes)
+
+    @property
+    def defunct(self):
+        return any(node.defunct for node in self.nodes)
+
     def __init__(self, graph, plugins=None, services=None, dispatcher=None):
+        Lifecycle.__init__(self)
         self.dispatcher = dispatcher or EventDispatcher()
         self.graph = graph
         self.nodes = [self.create_node_execution_context_for(node) for node in self.graph]

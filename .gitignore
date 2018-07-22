@@ -22,6 +22,7 @@
 .installed.cfg
 .ipynb_checkpoints
 .python-version
+.pytest_cache/
 /.idea
 /.medikit-pipeline
 /.release

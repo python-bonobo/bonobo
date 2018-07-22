@@ -12,6 +12,9 @@ def generate_integers():
 def square(i):
     return i**2
 
+def bad_square(i):
+    raise RuntimeError('Boom!')
+
 
 def results(f, context):
     results = yield list()
@@ -24,6 +27,7 @@ def push_result(results, i):
 
 
 chain = (generate_integers, square, push_result)
+bad_chain = (generate_integers, bad_square, push_result)
 
 
 def test_empty_execution_context():
@@ -60,21 +64,44 @@ def test_simple_execution_context():
     assert not context.alive
     assert not context.started
     assert not context.stopped
+    assert not context.killed
+    assert not context.defunct
 
     context.write(BEGIN, (), END)
 
     assert not context.alive
     assert not context.started
     assert not context.stopped
+    assert not context.killed
+    assert not context.defunct
 
     context.start()
 
     assert context.alive
     assert context.started
     assert not context.stopped
+    assert not context.killed
+    assert not context.defunct
 
     context.stop()
 
     assert not context.alive
     assert context.started
     assert context.stopped
+    assert not context.killed
+    assert not context.defunct
+
+
+def test_simple_error_context():
+    graph = Graph()
+    graph.bad_chain(*chain)
+
+    context = GraphExecutionContext(graph)
+    context.write(BEGIN, (), END)
+    context.start()
+
+    assert not context.alive
+    assert context.started
+    assert context.stopped
+    assert context.killed
+    assert context.defunct
