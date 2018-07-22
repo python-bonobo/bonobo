@@ -41,18 +41,17 @@ class ETLCommand(BaseCommand):
     def get_services(self):
         return {}
 
+    def get_strategy(self):
+        return None
+
     def info(self, *args, **kwargs):
         self.logger.info(*args, **kwargs)
 
-    def handle(self, *args, **options):
-        _stdout_backup, _stderr_backup = self.stdout, self.stderr
-
-        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + '\n')
-        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
-        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
-
+    def run(self, *args, **options):
+        results = []
         with bonobo.parse_args(options) as options:
             services = self.get_services()
+            strategy = self.get_strategy()
             graph_coll = self.get_graph(*args, **options)
 
             if not isinstance(graph_coll, GeneratorType):
@@ -61,8 +60,20 @@ class ETLCommand(BaseCommand):
             for i, graph in enumerate(graph_coll):
                 assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'
                 print(term.lightwhite('{}. {}'.format(i + 1, graph.name)))
-                result = bonobo.run(graph, services=services)
+                result = bonobo.run(graph, services=services, strategy=strategy)
+                results.append(result)
                 print(term.lightblack(' ... return value: ' + str(result)))
                 print()
+
+        return results
+
+    def handle(self, *args, **options):
+        _stdout_backup, _stderr_backup = self.stdout, self.stderr
+
+        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + '\n')
+        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
+        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
+
+        self.run(*args, **kwargs)
 
         self.stdout, self.stderr = _stdout_backup, _stderr_backup
