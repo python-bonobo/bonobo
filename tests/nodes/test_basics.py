@@ -103,9 +103,13 @@ def test_fixedwindow():
         None,
     )]
 
-    with BufferingNodeExecutionContext(bonobo.FixedWindow(1)) as context:
-        context.write_sync(*range(3))
-    assert context.get_buffer() == [(0, ), (1, ), (2, )]
+    with BufferingNodeExecutionContext(bonobo.FixedWindow(2, pad=False)) as context:
+        context.write_sync(*range(9))
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (8, )]
+
+    with BufferingNodeExecutionContext(bonobo.FixedWindow(2, pad_value=-1)) as context:
+        context.write_sync(*range(9))
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (8, -1)]
 
 
 def test_methodcaller():
