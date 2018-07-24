@@ -180,13 +180,16 @@ class FixedWindow(Configurable):
     """
 
     length = Option(int, positional=True)  # type: int
+    pad = Option(bool, default=True, required=False)  # type; bool
+    pad_value = Option(None, required=False)
 
     @ContextProcessor
     def buffer(self, context):
         buffer = yield ValueHolder([])
         if len(buffer):
             last_value = buffer.get()
-            last_value += [None] * (self.length - len(last_value))
+            if self.pad:
+                last_value += [self.pad_value] * (self.length - len(last_value))
             context.send(*last_value)
 
     @use_raw_input
