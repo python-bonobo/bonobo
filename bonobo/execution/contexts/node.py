@@ -257,12 +257,11 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param mixed value: message
         """
         for message in messages:
-            if isinstance(message, Token):
-                self.input.put(message)
-            elif self._input_type:
-                self.input.put(ensure_tuple(message, cls=self._input_type))
-            else:
-                self.input.put(ensure_tuple(message))
+            if not isinstance(message, Token):
+                message = ensure_tuple(message, cls=self._input_type, length=self._input_length)
+                if self._input_length is None:
+                    self._input_length = len(message)
+            self.input.put(message)
 
     def write_sync(self, *messages):
         self.write(BEGIN, *messages, END)
