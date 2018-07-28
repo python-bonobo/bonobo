@@ -21,6 +21,16 @@ UnboundArguments = namedtuple('UnboundArguments', ['args', 'kwargs'])
 
 
 class NodeExecutionContext(BaseContext, WithStatistics):
+    """
+    Stores the actual context of a node, within a given graph execution, accessed as `self.parent`.
+
+    A special case exist, mostly for testing purpose, where there is no parent context.
+
+    Can be used as a context manager, also very convenient for testing nodes that requires some external context (like
+    a service implementation, or a value holder).
+
+    """
+
     def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
@@ -77,11 +87,22 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             initial = self._get_initial_context()
             self._stack = ContextCurrifier(self.wrapped, *initial.args, **initial.kwargs)
             if isconfigurabletype(self.wrapped):
-                # Not normal to have a partially configured object here, so let's warn the user instead of having get into
-                # the hard trouble of understanding that by himself.
-                raise TypeError(
-                    'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(self.wrapped)
-                )
+                try:
+                    self.wrapped = self.wrapped(_final=True)
+                except Exception as exc:
+                    # Not normal to have a partially configured object here, so let's warn the user instead of having get into
+                    # the hard trouble of understanding that by himself.
+                    raise TypeError(
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                            self.wrapped
+                        )
+                    ) from exc
+                else:
+                    raise TypeError(
+                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                            self.wrapped
+                        )
+                    )
             self._stack.setup(self)
         except Exception:
             # Set the logging level to the lowest possible, to avoid double log.
@@ -102,22 +123,27 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 self.step()
             except InactiveReadableError:
                 break
-            except Empty:
-                sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
-                continue
-            except (
-                    NotImplementedError,
-                    UnrecoverableError,
-            ):
-                self.fatal(sys.exc_info())  # exit loop
-            except Exception:  # pylint: disable=broad-except
-                self.error(sys.exc_info())  # does not exit loop
-            except BaseException:
-                self.fatal(sys.exc_info())  # exit loop
 
         logger.debug('Node loop ends for {!r}.'.format(self))
 
     def step(self):
+        try:
+            self._step()
+        except InactiveReadableError:
+            raise
+        except Empty:
+            sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
+        except (
+                NotImplementedError,
+                UnrecoverableError,
+        ):
+            self.fatal(sys.exc_info())  # exit loop
+        except Exception:  # pylint: disable=broad-except
+            self.error(sys.exc_info())  # does not exit loop
+        except BaseException:
+            self.fatal(sys.exc_info())  # exit loop
+
+    def _step(self):
         """
         A single step in the loop.
 
@@ -163,7 +189,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self._stack:
             try:
                 self._stack.teardown()
-            except:
+            except Exception as exc:
                 self.fatal(sys.exc_info())
 
         super().stop()
@@ -231,12 +257,11 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param mixed value: message
         """
         for message in messages:
-            if isinstance(message, Token):
-                self.input.put(message)
-            elif self._input_type:
-                self.input.put(ensure_tuple(message, cls=self._input_type))
-            else:
-                self.input.put(ensure_tuple(message))
+            if not isinstance(message, Token):
+                message = ensure_tuple(message, cls=self._input_type, length=self._input_length)
+                if self._input_length is None:
+                    self._input_length = len(message)
+            self.input.put(message)
 
     def write_sync(self, *messages):
         self.write(BEGIN, *messages, END)
@@ -264,17 +289,22 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         If Queue raises (like Timeout or Empty), stat won't be changed.
 
         """
-        input_bag = self.input.get()
+        input_bag = self.input.get(timeout=0)
 
         # Store or check input type
         if self._input_type is None:
             self._input_type = type(input_bag)
-        elif type(input_bag) is not self._input_type:
-            raise UnrecoverableTypeError(
-                'Input type changed between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
-                    self.wrapped, input_bag, self._input_type
-                )
-            )
+        elif type(input_bag) != self._input_type:
+            try:
+                if self._input_type == tuple:
+                    input_bag = self._input_type(input_bag)
+                else:
+                    input_bag = self._input_type(*input_bag)
+            except Exception as exc:
+                raise UnrecoverableTypeError(
+                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.
+                    format(self.wrapped, input_bag, self._input_type)
+                ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples
         if self._input_length is None:

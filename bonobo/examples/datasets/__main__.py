@@ -51,7 +51,7 @@ if __name__ == '__main__':
                         s3.head_object(
                             Bucket='bonobo-examples', Key=s3_path
                         )
-                    except:
+                    except Exception:
                         s3.upload_file(
                             local_path,
                             'bonobo-examples',

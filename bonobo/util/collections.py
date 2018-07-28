@@ -7,7 +7,23 @@ class sortedlist(list):
         bisect.insort(self, x)
 
 
-def ensure_tuple(tuple_or_mixed, *, cls=tuple):
+def _with_length_check(f):
+    @functools.wraps(f)
+    def _wrapped(*args, length=None, **kwargs):
+        nonlocal f
+        result = f(*args, **kwargs)
+        if length is not None:
+            if length != len(result):
+                raise TypeError(
+                    'Length check failed, expected {} fields but got {}: {!r}.'.format(length, len(result), result)
+                )
+        return result
+
+    return _wrapped
+
+
+@_with_length_check
+def ensure_tuple(tuple_or_mixed, *, cls=None):
     """
     If it's not a tuple, let's make a tuple of one item.
     Otherwise, not changed.
@@ -16,6 +32,8 @@ def ensure_tuple(tuple_or_mixed, *, cls=tuple):
     :return: tuple
 
     """
+    if cls is None:
+        cls = tuple
 
     if isinstance(tuple_or_mixed, cls):
         return tuple_or_mixed

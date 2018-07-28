@@ -1,12 +1,11 @@
 import csv
 
-from bonobo.config import Option, use_raw_input, use_context
+from bonobo.config import Option, use_context
 from bonobo.config.options import Method, RenamedOption
 from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.util import ensure_tuple
-from bonobo.util.bags import BagType
 
 
 class CsvHandler(FileHandler):

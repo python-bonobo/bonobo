@@ -1,12 +1,10 @@
 import logging
 import sys
 from contextlib import contextmanager
-from logging import ERROR
-
-from mondrian import term
 
 from bonobo.util import deprecated
 from bonobo.util.objects import Wrapper, get_name
+from mondrian import term
 
 
 @contextmanager
@@ -14,7 +12,7 @@ def recoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(*sys.exc_info(), level=ERROR)
+        error_handler(*sys.exc_info(), level=logging.ERROR)
 
 
 @contextmanager
@@ -22,8 +20,8 @@ def unrecoverable(error_handler):
     try:
         yield
     except Exception as exc:  # pylint: disable=broad-except
-        error_handler(*sys.exc_info(), level=ERROR)
-        raise  # raise unrecoverableerror from x ?
+        error_handler(*sys.exc_info(), level=logging.ERROR)
+        raise  # raise unrecoverableerror from exc ?
 
 
 class Lifecycle:
@@ -55,12 +53,14 @@ class Lifecycle:
 
     @property
     def should_loop(self):
-        # TODO XXX started/stopped?
-        return not any((self.defunct, self.killed))
+        return self.alive and not any((self.defunct, self.killed))
 
     @property
     def status(self):
-        """One character status for this node. """
+        """
+        One character status for this node.
+
+        """
         if self._defunct:
             return '!'
         if not self.started:
@@ -97,9 +97,6 @@ class Lifecycle:
 
         self._stopped = True
 
-        if self._stopped:  # Stopping twice has no effect
-            return
-
     def kill(self):
         if not self.started:
             raise RuntimeError('Cannot kill an unstarted context.')
@@ -134,3 +131,12 @@ class BaseContext(Lifecycle, Wrapper):
         Lifecycle.__init__(self)
         Wrapper.__init__(self, wrapped)
         self.parent = parent
+
+    @property
+    def xstatus(self):
+        """
+        UNIX-like exit status, only coherent if the context has stopped.
+        """
+        if self._defunct:
+            return 70
+        return 0
