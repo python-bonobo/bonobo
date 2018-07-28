@@ -41,7 +41,7 @@ Now, we need to write a `writer` transformation, and apply this context processo
 
     @use_context_processor(with_opened_file)
     def write_repr_to_file(f, *row):
-        f.write(repr(row))
+        f.write(repr(row) + "\n")
 
 The `f` parameter will contain the value yielded by the context processors, in order of appearance (you can chain
 multiple context processors).
@@ -50,6 +50,20 @@ Please note that the :func:`bonobo.config.use_context_processor` decorator will 
 modify its behaviour. If you want to call it out of the |bonobo| job context, it's your responsibility to provide
 the right parameters (and here, the opened file).
 
+To run this, change the last stage in the pipeline in get_graph to write_repr_to_file
+
+.. code-block:: python
+
+    def get_graph(**options):
+        graph = bonobo.Graph()
+        graph.add_chain(
+            extract_fablabs,
+            bonobo.Limit(10),
+            write_repr_to_file,
+        )
+        return graph
+
+Now run tutorial.py and check the output.txt file.
 
 Using the filesystem
 ::::::::::::::::::::
