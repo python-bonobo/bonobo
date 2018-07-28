@@ -40,7 +40,7 @@ This will create a simple job in a `tutorial.py` file. Let's run it:
      - transform in=2 out=2 [done]
      - load in=2 [done]
 
-If you have a similar result, then congratulations! You just ran your first |bonobo| ETL job.
+Congratulations! You just ran your first |bonobo| ETL job.
 
 
 Inspect your graph
