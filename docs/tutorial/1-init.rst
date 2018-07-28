@@ -53,7 +53,7 @@ The basic building blocks of |bonobo| are **transformations** and **graphs**.
 **Graphs** are a set of transformations, with directional links between them to define the data-flow that will happen
 at runtime.
 
-To inspect the graph of your first transformation (you must install graphviz first to do so), run:
+To inspect the graph of your first transformation (`you must install graphviz first to do so <https://www.graphviz.org/download/>`_), run:
 
 .. code-block:: shell-session
 
