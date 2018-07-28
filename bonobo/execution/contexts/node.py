@@ -123,8 +123,6 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 self.step()
             except InactiveReadableError:
                 break
-            except Empty:
-                sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
 
         logger.debug('Node loop ends for {!r}.'.format(self))
 
@@ -133,6 +131,8 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self._step()
         except InactiveReadableError:
             raise
+        except Empty:
+            sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
         except (
                 NotImplementedError,
                 UnrecoverableError,
@@ -294,12 +294,18 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         # Store or check input type
         if self._input_type is None:
             self._input_type = type(input_bag)
-        elif type(input_bag) is not self._input_type:
-            raise UnrecoverableTypeError(
-                'Input type changed between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
-                    self.wrapped, input_bag, self._input_type
-                )
-            )
+        elif type(input_bag) != self._input_type:
+            try:
+                if self._input_type == tuple:
+                    input_bag = self._input_type(input_bag)
+                else:
+                    input_bag = self._input_type(*input_bag)
+            except Exception as exc:
+                raise UnrecoverableTypeError(
+                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
+                        self.wrapped, input_bag, self._input_type
+                    )
+                ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples
         if self._input_length is None:
