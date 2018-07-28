@@ -44,7 +44,7 @@ Now, we need to write a `writer` transformation, and apply this context processo
         f.write(repr(row) + "\n")
 
 The `f` parameter will contain the value yielded by the context processors, in order of appearance. You can chain
-multiple context processors. To find about how to implement this, check the |bonobo| guides in the documentation.
+multiple context processors. To find out about how to implement this, check the |bonobo| guides in the documentation.
 
 Please note that the :func:`bonobo.config.use_context_processor` decorator will modify the function in place, but won't
 modify its behaviour. If you want to call it out of the |bonobo| job context, it's your responsibility to provide
@@ -144,7 +144,7 @@ Reading from files is done using the same logic as writing, except that you'll p
     def get_graph(**options):
         graph = bonobo.Graph()
         graph.add_chain(
-            bonobo.CsvReader('output.csv'),
+            bonobo.CsvReader('input.csv'),
             ...
         )
         return graph
