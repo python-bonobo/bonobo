@@ -36,6 +36,25 @@ The `sqlalchemy.engine` name is the default name used by the provided transforma
 example if you need more than one connection) and specify the service name using `engine='myengine'` while building your
 transformations.
 
+Lets create some tables and add some data. (You may need to edit the SQL if your database server uses a different
+version of SQL.)
+
+.. code-block:: sql
+
+    CREATE TABLE test_in (
+      id INTEGER PRIMARY KEY NOT NULL,
+      text TEXT
+    );
+
+    CREATE TABLE test_out (
+      id INTEGER PRIMARY KEY NOT NULL,
+      text TEXT
+    );
+
+    INSERT INTO test_in (id, text) VALUES (1, 'Cat');
+    INSERT INTO test_in (id, text) VALUES (2, 'Dog');
+
+
 There are two transformation classes provided by this extension.
 
 One reader, one writer.
@@ -50,12 +69,29 @@ Let's select some data:
     def get_graph():
         graph = bonobo.Graph()
         graph.add_chain(
-            bonobo_sqlalchemy.Select('SELECT * FROM example', limit=100),
+            bonobo_sqlalchemy.Select('SELECT * FROM test_in', limit=100),
             bonobo.PrettyPrinter(),
         )
+        return graph
 
-And let's insert some data:
+You should see:
 
+.. code-block:: shell-session
+
+    $ python tutorial.py
+    ┌
+    │ id[0] = 1
+    │ text[1] = 'Cat'
+    └
+    ┌
+    │ id[0] = 2
+    │ text[1] = 'Dog'
+    └
+     - Select in=1 out=2 [done]
+     - PrettyPrinter in=2 out=2 [done]
+
+
+Now let's insert some data:
 
 .. code-block:: python
 
@@ -66,11 +102,13 @@ And let's insert some data:
     def get_graph(**options):
         graph = bonobo.Graph()
         graph.add_chain(
-            ...,
-            bonobo_sqlalchemy.InsertOrUpdate('example')
+            bonobo_sqlalchemy.Select('SELECT * FROM test_in', limit=100),
+            bonobo_sqlalchemy.InsertOrUpdate('test_out')
         )
 
         return graph
+
+If you check the `test_out` table, it should now have the data.
 
 Reference
 :::::::::

@@ -40,7 +40,7 @@ This will create a simple job in a `tutorial.py` file. Let's run it:
      - transform in=2 out=2 [done]
      - load in=2 [done]
 
-If you have a similar result, then congratulations! You just ran your first |bonobo| ETL job.
+Congratulations! You just ran your first |bonobo| ETL job.
 
 
 Inspect your graph
@@ -53,7 +53,12 @@ The basic building blocks of |bonobo| are **transformations** and **graphs**.
 **Graphs** are a set of transformations, with directional links between them to define the data-flow that will happen
 at runtime.
 
-To inspect the graph of your first transformation (you must install graphviz first to do so), run:
+To inspect the graph of your first transformation:
+
+.. note::
+
+    You must `install the graphviz software first <https://www.graphviz.org/download/>`_. It is _not_ the python's graphviz
+    package, you must install it using your system's package manager (apt, brew, ...).
 
 .. code-block:: shell-session
 
@@ -241,6 +246,37 @@ The console output contains two things.
     * “`err=...`” shows the count of exceptions that happened while running the transformation. Note that exception will abort
       a call, but the execution will move to the next row.
 
+
+However, if you run the tutorial.py it happens too fast and you can't see the status change. Let's add some delays to your code.
+
+At the top of tutorial.py add a new import and add some delays to the 3 stages:
+
+.. code-block:: python
+
+    import time
+
+    def extract():
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        yield 'hello'
+        time.sleep(5)
+        yield 'world'
+
+
+    def transform(*args):
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        yield tuple(
+            map(str.title, args)
+        )
+
+
+    def load(*args):
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        print(*args)
+
+Now run tutorial.py again, and you can see the status change during the process.
 
 Wrap up
 :::::::

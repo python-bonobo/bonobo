@@ -41,14 +41,29 @@ Now, we need to write a `writer` transformation, and apply this context processo
 
     @use_context_processor(with_opened_file)
     def write_repr_to_file(f, *row):
-        f.write(repr(row))
+        f.write(repr(row) + "\n")
 
-The `f` parameter will contain the value yielded by the context processors, in order of appearance (you can chain
-multiple context processors).
+The `f` parameter will contain the value yielded by the context processors, in order of appearance. You can chain
+multiple context processors. To find about how to implement this, check the |bonobo| guides in the documentation.
 
 Please note that the :func:`bonobo.config.use_context_processor` decorator will modify the function in place, but won't
 modify its behaviour. If you want to call it out of the |bonobo| job context, it's your responsibility to provide
 the right parameters (and here, the opened file).
+
+To run this, change the last stage in the pipeline in get_graph to write_repr_to_file
+
+.. code-block:: python
+
+    def get_graph(**options):
+        graph = bonobo.Graph()
+        graph.add_chain(
+            extract_fablabs,
+            bonobo.Limit(10),
+            write_repr_to_file,
+        )
+        return graph
+
+Now run tutorial.py and check the output.txt file.
 
 
 Using the filesystem
@@ -65,10 +80,10 @@ Let's rewrite our context processor to use it.
         with context.get_service('fs').open('output.txt', 'w+') as f:
             yield f
 
-Interface does not change much, but this small change allows the end-user to change the filesystem implementation at
-runtime, which is great to handle different environments (local development, staging servers, production, ...).
+The interface does not change much, but this small change allows the end-user to change the filesystem implementation at
+runtime, which is great for handling different environments (local development, staging servers, production, ...).
 
-Note that |bonobo| only provide very few services with default implementation (actually, only `fs` and `http`), but
+Note that |bonobo| only provides very few services with default implementation (actually, only `fs` and `http`), but
 you can define all the services you want, depending on your system. You'll learn more about this in the next tutorial
 chapter.
 
@@ -122,16 +137,17 @@ function:
 Reading from files
 ::::::::::::::::::
 
-Reading from files is done using the same logic as writing, except that you'll probably have only one call to a reader.
+Reading from files is done using the same logic as writing, except that you'll probably have only one call to a reader. You can read the file we just wrote by using a :obj:`bonobo.CsvReader` instance:
 
-Our example application does not include reading from files, but you can read the file we just wrote by using a
-:obj:`bonobo.CsvReader` instance.
+.. code-block:: python
 
-
-Atomic writes
-:::::::::::::
-
-.. include:: _todo.rst
+    def get_graph(**options):
+        graph = bonobo.Graph()
+        graph.add_chain(
+            bonobo.CsvReader('output.csv'),
+            ...
+        )
+        return graph
 
 
 Moving forward
