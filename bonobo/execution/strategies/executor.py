@@ -17,7 +17,7 @@ class ExecutorStrategy(Strategy):
 
     executor_factory = Executor
 
-    def create_executor(self):
+    def create_executor(self, graph):
         return self.executor_factory()
 
     def execute(self, graph, **kwargs):
@@ -26,7 +26,7 @@ class ExecutorStrategy(Strategy):
 
         futures = []
 
-        with self.create_executor() as executor:
+        with self.create_executor(graph) as executor:
             try:
                 context.start(self.get_starter(executor, futures))
             except:
@@ -69,6 +69,12 @@ class ExecutorStrategy(Strategy):
 class ThreadPoolExecutorStrategy(ExecutorStrategy):
     executor_factory = ThreadPoolExecutor
 
+    def create_executor(self, graph):
+        return self.executor_factory(max_workers=len(graph))
+
 
 class ProcessPoolExecutorStrategy(ExecutorStrategy):
     executor_factory = ProcessPoolExecutor
+
+    def create_executor(self, graph):
+        return self.executor_factory(max_workers=len(graph))
