@@ -150,12 +150,6 @@ Reading from files is done using the same logic as writing, except that you'll p
         return graph
 
 
-Atomic writes
-:::::::::::::
-
-.. include:: _todo.rst
-
-
 Moving forward
 ::::::::::::::
 
