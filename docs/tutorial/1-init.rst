@@ -247,6 +247,37 @@ The console output contains two things.
       a call, but the execution will move to the next row.
 
 
+However, if you run the tutorial.py it happens too fast and you can't see the status change. Let's add some delays to your code.
+
+At the top of tutorial.py add a new import and add some delays to the 3 stages:
+
+.. code-block:: python
+
+    import time
+
+    def extract():
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        yield 'hello'
+        time.sleep(5)
+        yield 'world'
+
+
+    def transform(*args):
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        yield tuple(
+            map(str.title, args)
+        )
+
+
+    def load(*args):
+        """Placeholder, change, rename, remove... """
+        time.sleep(5)
+        print(*args)
+
+Now run tutorial.py again, and you can see the status change during the process.
+
 Wrap up
 :::::::
 
