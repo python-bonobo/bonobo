@@ -302,9 +302,8 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                     input_bag = self._input_type(*input_bag)
             except Exception as exc:
                 raise UnrecoverableTypeError(
-                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.format(
-                        self.wrapped, input_bag, self._input_type
-                    )
+                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.
+                    format(self.wrapped, input_bag, self._input_type)
                 ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples

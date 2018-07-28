@@ -149,10 +149,10 @@ class GraphExecutionContext(BaseContext):
         for plugin_context in self.plugins:
             plugin_context.unregister()
 
-
     @property
     def xstatus(self):
         """
         UNIX-like exit status, only coherent if the context has stopped.
+
         """
-        return max(node.xstatus for node in self.nodes)
+        return max(node.xstatus for node in self.nodes) if len(self.nodes) else 0
