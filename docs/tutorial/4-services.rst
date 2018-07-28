@@ -3,7 +3,7 @@ Part 4: Services
 
 All external dependencies (like filesystems, network clients, database connections, etc.) should be provided to
 transformations as a service. It allows great flexibility, including the ability to test your transformations isolated
-from the external world, and being friendly to the infrastructure guys (and if you're one of them, it's also nice to
+from the external world, and being friendly to the infrastructure people (and if you're one of them, it's also nice to
 treat yourself well).
 
 In the last section, we used the `fs` service to access filesystems, we'll go even further by switching our `requests`
