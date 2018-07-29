@@ -1,10 +1,12 @@
 """
 
 """
+import sys
+
 import bonobo
 from bonobo import examples
 from bonobo.contrib.opendatasoft import OpenDataSoftAPI as ODSReader
-from bonobo.examples.datasets.services import get_services
+from bonobo.examples import get_services
 
 
 def get_graph(graph=None, *, _limit=(), _print=()):
@@ -58,10 +60,4 @@ def get_graph(graph=None, *, _limit=(), _print=()):
 
 
 if __name__ == '__main__':
-    parser = examples.get_argument_parser()
-
-    with bonobo.parse_args(parser) as options:
-        bonobo.run(
-            get_graph(**examples.get_graph_options(options)),
-            services=get_services()
-        )
+    sys.exit(examples.run(get_graph, get_services))

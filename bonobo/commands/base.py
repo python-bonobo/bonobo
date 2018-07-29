@@ -41,6 +41,7 @@ class BaseGraphCommand(BaseCommand):
     Base class for CLI commands that depends on a graph definition, either from a file or from a module.
 
     """
+
     required = True
     handler = None
 

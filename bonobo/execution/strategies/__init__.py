@@ -40,7 +40,7 @@ def create_strategy(name=None):
     if name is None:
         name = DEFAULT_STRATEGY
 
-    logging.debug('Creating strategy {}...'.format(name))
+    logging.debug('Creating execution strategy {!r}...'.format(name))
 
     try:
         factory = STRATEGIES[name]

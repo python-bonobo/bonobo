@@ -27,6 +27,8 @@ messages categorized as spam, and (3) prints the output.
 
 '''
 
+import sys
+
 from fs.tarfs import TarFS
 
 import bonobo
@@ -61,17 +63,11 @@ def get_graph(*, _limit=(), _print=()):
 
 
 def get_services():
-    from ._services import get_services
     return {
-        **get_services(), 'fs':
-        TarFS(bonobo.get_examples_path('datasets/spam.tgz'))
+        **examples.get_services(), 'fs':
+        TarFS(bonobo.get_examples_path('datasets', 'static', 'spam.tgz'))
     }
 
 
 if __name__ == '__main__':
-    parser = examples.get_argument_parser()
-    with bonobo.parse_args(parser) as options:
-        bonobo.run(
-            get_graph(**examples.get_graph_options(options)),
-            services=get_services()
-        )
+    sys.exit(examples.run(get_graph, get_services))

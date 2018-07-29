@@ -10,10 +10,10 @@ to another is maximal.
 from bonobo.execution.strategies import create_strategy
 from bonobo.nodes import *
 from bonobo.nodes import __all__ as _all_nodes
+from bonobo.registry import create_reader, create_writer
 from bonobo.structs.graphs import Graph
 from bonobo.util.api import ApiHelper
 from bonobo.util.environ import parse_args, get_argument_parser
-from bonobo.registry import create_reader, create_writer
 
 __all__ = []
 
@@ -73,7 +73,10 @@ def run(graph, *, plugins=None, services=None, strategy=None):
     import logging
     logging.getLogger().setLevel(settings.LOGGING_LEVEL.get())
     strategy = create_strategy(strategy)
-    return strategy.execute(graph, plugins=plugins, services=services)
+
+    from bonobo.util.errors import sweeten_errors
+    with sweeten_errors():
+        return strategy.execute(graph, plugins=plugins, services=services)
 
 
 def _inspect_as_graph(graph):

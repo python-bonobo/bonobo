@@ -20,8 +20,7 @@ import sys
 import bonobo
 from bonobo import examples
 from bonobo.contrib.opendatasoft import OpenDataSoftAPI
-from bonobo.examples.datasets.services import get_services
-from bonobo.util.statistics import Timer
+from bonobo.examples import get_services
 
 try:
     import pycountry
@@ -65,23 +64,4 @@ def get_graph(graph=None, *, _limit=(), _print=()):
 
 
 if __name__ == '__main__':
-    parser = examples.get_argument_parser()
-
-    with bonobo.parse_args(parser) as options:
-        with Timer() as timer:
-            print(
-                'Options:', ' '.join(
-                    '{}={}'.format(k, v)
-                    for k, v in sorted(options.items())
-                )
-            )
-            retval = bonobo.run(
-                get_graph(**examples.get_graph_options(options)),
-                services=get_services(),
-                strategy=options['strategy'],
-            )
-        print('Execution time:', timer)
-        print('Return value:', retval)
-        print('XStatus:', retval.xstatus)
-        if retval.xstatus:
-            sys.exit(retval.xstatus)
+    sys.exit(examples.run(get_graph, get_services))
