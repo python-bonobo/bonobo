@@ -4,7 +4,7 @@ from queue import Empty
 from time import sleep
 
 from bonobo.config import create_container
-from bonobo.constants import BEGIN, END
+from bonobo.constants import BEGIN, END, EMPTY
 from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
@@ -119,6 +119,10 @@ class GraphExecutionContext(BaseContext):
                     continue
                 except InactiveReadableError:
                     nodes.discard(node)
+
+    def run_until_complete(self):
+        self.write(BEGIN, EMPTY, END)
+        self.loop()
 
     def stop(self, stopper=None):
         super(GraphExecutionContext, self).stop()

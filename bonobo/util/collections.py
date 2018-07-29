@@ -3,7 +3,17 @@ import functools
 
 
 class sortedlist(list):
+    """
+    A list with an insort() method that wan be used to maintain sorted lists. The list by itself is not sorted, it's
+    up to the user to not insert unsorted elements.
+    """
+
     def insort(self, x):
+        """
+        If the list is sorted, insert the element in the right place. Otherwise, unpredictable behaviour.
+
+        :param x:
+        """
         bisect.insort(self, x)
 
 

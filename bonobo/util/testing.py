@@ -11,7 +11,7 @@ import pytest
 
 from bonobo import open_fs, __main__, get_examples_path
 from bonobo.commands import entrypoint
-from bonobo.constants import Token
+from bonobo.structs.tokens import Token
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.contexts.node import NodeExecutionContext
 

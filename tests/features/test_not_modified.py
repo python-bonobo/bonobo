@@ -15,4 +15,6 @@ def test_not_modified():
     with BufferingNodeExecutionContext(useless) as context:
         context.write_sync(*input_messages)
 
-    assert context.get_buffer() == input_messages
+    result = context.get_buffer()
+    print(result)
+    assert result == input_messages

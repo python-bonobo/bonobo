@@ -1,4 +1,4 @@
-from bonobo.constants import INHERIT
+from bonobo.util.envelopes import AppendingEnvelope
 from bonobo.util.testing import BufferingNodeExecutionContext
 
 messages = [
@@ -8,7 +8,7 @@ messages = [
 
 
 def append(*args):
-    return INHERIT, '!'
+    return AppendingEnvelope('!')
 
 
 def test_inherit():

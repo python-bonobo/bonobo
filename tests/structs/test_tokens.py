@@ -1,4 +1,4 @@
-from bonobo.constants import Token
+from bonobo.structs.tokens import Token
 
 
 def test_token_repr():

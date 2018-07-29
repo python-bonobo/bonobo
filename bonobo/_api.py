@@ -10,7 +10,7 @@ to another is maximal.
 from bonobo.execution.strategies import create_strategy
 from bonobo.nodes import *
 from bonobo.nodes import __all__ as _all_nodes
-from bonobo.structs import Graph
+from bonobo.structs.graphs import Graph
 from bonobo.util.api import ApiHelper
 from bonobo.util.environ import parse_args, get_argument_parser
 from bonobo.registry import create_reader, create_writer

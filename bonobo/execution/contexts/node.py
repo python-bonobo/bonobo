@@ -7,12 +7,14 @@ from types import GeneratorType
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
-from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD, Token, Flag, INHERIT
+from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.structs.inputs import Input
-from bonobo.util import get_name, isconfigurabletype, ensure_tuple
+from bonobo.structs.tokens import Token, Flag
+from bonobo.util import get_name, isconfigurabletype, ensure_tuple, deprecated
 from bonobo.util.bags import BagType
+from bonobo.util.envelopes import isenvelope, F_NOT_MODIFIED, F_INHERIT
 from bonobo.util.statistics import WithStatistics
 
 logger = logging.getLogger(__name__)
@@ -329,17 +331,29 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :return: Bag
         """
 
-        tokens, _output = split_token(_output)
+        if isenvelope(_output):
+            _output, _flags, _options = _output.unfold()
+        else:
+            _flags, _options = [], {}
 
-        if NOT_MODIFIED in tokens:
-            return ensure_tuple(_input, cls=(self.output_type or tuple))
+        if len(_flags):
+            # TODO: parse flags to check constraints are respected (like not modified alone, etc.)
 
-        if INHERIT in tokens:
-            if self._output_type is None:
-                self._output_type = concat_types(self._input_type, self._input_length, self._output_type, len(_output))
-            _output = _input + ensure_tuple(_output)
+            if F_NOT_MODIFIED in _flags:
+                return _input
 
-        return ensure_tuple(_output, cls=(self._output_type or tuple))
+            if F_INHERIT in _flags:
+                if self._output_type is None:
+                    self._output_type = concat_types(
+                        self._input_type, self._input_length, self._output_type, len(_output)
+                    )
+                _output = _input + ensure_tuple(_output)
+
+        if not self._output_type:
+            if issubclass(type(_output), tuple):
+                self._output_type = type(_output)
+
+        return ensure_tuple(_output, cls=self._output_type)
 
     def _send(self, value, _control=False):
         """
@@ -367,6 +381,7 @@ def isflag(param):
     return isinstance(param, Flag)
 
 
+@deprecated
 def split_token(output):
     """
     Split an output into token tuple, real output tuple.
@@ -392,6 +407,7 @@ def split_token(output):
     output = output[i:]
     if not data_allowed and len(output):
         raise ValueError('Output data provided after a flag that does not allow data.')
+
     return flags, output
 
 

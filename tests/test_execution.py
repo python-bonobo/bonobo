@@ -2,7 +2,7 @@ from bonobo.config.processors import use_context_processor
 from bonobo.constants import BEGIN, END
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.strategies import NaiveStrategy
-from bonobo.structs import Graph
+from bonobo.structs.graphs import Graph
 
 
 def generate_integers():

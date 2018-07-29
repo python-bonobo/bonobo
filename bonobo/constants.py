@@ -20,30 +20,13 @@
 
 
 """
-
-
-class Token:
-    def __init__(self, name):
-        self.__name__ = name
-
-    def __repr__(self):
-        return '<{}>'.format(self.__name__)
-
-
-class Flag(Token):
-    must_be_first = False
-    must_be_last = False
-    allows_data = True
-
+from bonobo.structs.tokens import Token
+from bonobo.util.envelopes import UnchangedEnvelope
 
 BEGIN = Token('Begin')
 END = Token('End')
 
-INHERIT = Flag('Inherit')
-NOT_MODIFIED = Flag('NotModified')
-NOT_MODIFIED.must_be_first = True
-NOT_MODIFIED.must_be_last = True
-NOT_MODIFIED.allows_data = False
+NOT_MODIFIED = UnchangedEnvelope()
 
 EMPTY = tuple()
 

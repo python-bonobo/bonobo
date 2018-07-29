@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import sentinel
 
 from bonobo.constants import BEGIN
-from bonobo.structs import Graph
+from bonobo.structs.graphs import Graph
 
 identity = lambda x: x
 
