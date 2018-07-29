@@ -11,6 +11,16 @@ from bonobo.util import get_name
 
 GraphRange = namedtuple('GraphRange', ['graph', 'input', 'output'])
 
+class GraphCursor:
+    def __init__(self, graph, node):
+        self.graph = graph
+        self.node = node
+
+    def __rshift__(self, other):
+        """ Self >> Other """
+        chain = self.graph.add_chain(other, _input=self.node)
+        return GraphCursor(chain.graph, chain.output)
+
 
 class Graph:
     """
@@ -34,6 +44,9 @@ class Graph:
 
     def __getitem__(self, key):
         return self.nodes[key]
+
+    def get_cursor(self, ref=BEGIN):
+        return GraphCursor(self, self._resolve_index(ref))
 
     def outputs_of(self, idx, create=False):
         """ Get a set of the outputs for a given node index.
