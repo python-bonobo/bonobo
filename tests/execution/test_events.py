@@ -6,9 +6,9 @@ from bonobo.execution import events
 def test_names():
     # This test looks useless, but as it's becoming the pliugin API, I want to make sure that nothing changes here, or
     # notice it otherwise.
-    for name in 'start', 'started', 'tick', 'stop', 'stopped', 'kill':
+    for name in "start", "started", "tick", "stop", "stopped", "kill":
         event_name = getattr(events, name.upper())
-        assert event_name == '.'.join(('execution', name))
+        assert event_name == ".".join(("execution", name))
 
 
 def test_event_object():

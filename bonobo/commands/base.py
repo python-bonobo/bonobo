@@ -33,7 +33,7 @@ class BaseCommand:
         """
         The actual logic of the command. Subclasses must implement this method.
         """
-        raise NotImplementedError('Subclasses of BaseCommand must provide a handle() method')
+        raise NotImplementedError("Subclasses of BaseCommand must provide a handle() method")
 
 
 class BaseGraphCommand(BaseCommand):
@@ -48,8 +48,8 @@ class BaseGraphCommand(BaseCommand):
     def add_arguments(self, parser):
         # target arguments (cannot provide both).
         source_group = parser.add_mutually_exclusive_group(required=self.required)
-        source_group.add_argument('file', nargs='?', type=str)
-        source_group.add_argument('-m', dest='mod', type=str)
+        source_group.add_argument("file", nargs="?", type=str)
+        source_group.add_argument("-m", dest="mod", type=str)
 
         # add arguments to enforce system environment.
         parser = get_argument_parser(parser)
@@ -66,7 +66,7 @@ class BaseGraphCommand(BaseCommand):
 
     def do_handle(self, graph, **options):
         if not self.handler:
-            raise RuntimeError('{} has no handler defined.'.format(get_name(self)))
+            raise RuntimeError("{} has no handler defined.".format(get_name(self)))
         return self.handler(graph, **options)
 
     @contextmanager
@@ -87,20 +87,20 @@ class BaseGraphCommand(BaseCommand):
                     sys.argv = [mod]
                     self._run_module(mod)
                 else:
-                    raise RuntimeError('No target provided.')
+                    raise RuntimeError("No target provided.")
             finally:
                 sys.argv = _argv
 
             if _graph is None:
-                raise RuntimeError('Could not find graph.')
+                raise RuntimeError("Could not find graph.")
 
             yield _graph, _graph_execution_options, options
 
     def _run_path(self, file):
-        return runpy.run_path(file, run_name='__main__')
+        return runpy.run_path(file, run_name="__main__")
 
     def _run_module(self, mod):
-        return runpy.run_module(mod, run_name='__main__')
+        return runpy.run_module(mod, run_name="__main__")
 
 
 @contextmanager

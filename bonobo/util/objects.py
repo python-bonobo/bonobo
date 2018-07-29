@@ -11,7 +11,7 @@ class Wrapper:
 
     @property
     def __name__(self):
-        return getattr(self.wrapped, '__name__', getattr(type(self.wrapped), '__name__', repr(self.wrapped)))
+        return getattr(self.wrapped, "__name__", getattr(type(self.wrapped), "__name__", repr(self.wrapped)))
 
     name = __name__
 
@@ -142,10 +142,10 @@ class ValueHolder:
         return divmod(other, self._value)
 
     def __pow__(self, other):
-        return self._value**other
+        return self._value ** other
 
     def __rpow__(self, other):
-        return other**self._value
+        return other ** self._value
 
     def __ipow__(self, other):
         self._value **= other

@@ -3,7 +3,7 @@ class Token:
         self.__name__ = name
 
     def __repr__(self):
-        return '<{}>'.format(self.__name__)
+        return "<{}>".format(self.__name__)
 
 
 class Flag(Token):

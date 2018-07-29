@@ -35,7 +35,7 @@ class ETLCommand(BaseCommand):
 
     def get_graph(self, *args, **options):
         def not_implemented():
-            raise NotImplementedError('You must implement {}.get_graph() method.'.format(self))
+            raise NotImplementedError("You must implement {}.get_graph() method.".format(self))
 
         return bonobo.Graph(not_implemented)
 
@@ -56,14 +56,14 @@ class ETLCommand(BaseCommand):
             graph_coll = self.get_graph(*args, **options)
 
             if not isinstance(graph_coll, GeneratorType):
-                graph_coll = (graph_coll, )
+                graph_coll = (graph_coll,)
 
             for i, graph in enumerate(graph_coll):
-                assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'
-                print(term.lightwhite('{}. {}'.format(i + 1, graph.name)))
+                assert isinstance(graph, bonobo.Graph), "Invalid graph provided."
+                print(term.lightwhite("{}. {}".format(i + 1, graph.name)))
                 result = bonobo.run(graph, services=services, strategy=strategy)
                 results.append(result)
-                print(term.lightblack(' ... return value: ' + str(result)))
+                print(term.lightblack(" ... return value: " + str(result)))
                 print()
 
         return results
@@ -71,9 +71,9 @@ class ETLCommand(BaseCommand):
     def handle(self, *args, **options):
         _stdout_backup, _stderr_backup = self.stdout, self.stderr
 
-        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + '\n')
-        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
-        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
+        self.stdout = OutputWrapper(ConsoleOutputPlugin._stdout, ending=CLEAR_EOL + "\n")
+        self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + "\n")
+        self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + "!" + Style.RESET_ALL + " " + x
 
         self.run(*args, **kwargs)
 

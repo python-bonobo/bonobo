@@ -53,7 +53,7 @@ class ContextProcessor(Option):
         self.name = self.__name__
 
     def __repr__(self):
-        return repr(self.func).replace('<function', '<{}'.format(type(self).__name__))
+        return repr(self.func).replace("<function", "<{}".format(type(self).__name__))
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
@@ -74,7 +74,7 @@ class ContextCurrifier:
         self.wrapped = wrapped
         self.args = args
         self.kwargs = kwargs
-        self.format = getattr(wrapped, '__input_format__', _args)
+        self.format = getattr(wrapped, "__input_format__", _args)
         self._stack, self._stack_values = None, None
 
     def __iter__(self):
@@ -91,30 +91,32 @@ class ContextCurrifier:
             return bind(*self.args, _input, **self.kwargs)
         if self.format is _none:
             return bind(*self.args, **self.kwargs)
-        raise NotImplementedError('Invalid format {!r}.'.format(self.format))
+        raise NotImplementedError("Invalid format {!r}.".format(self.format))
 
     def __call__(self, _input):
         if not callable(self.wrapped):
             if isinstance(self.wrapped, Iterable):
                 return self.__iter__()
-            raise UnrecoverableTypeError('Uncallable node {}'.format(self.wrapped))
+            raise UnrecoverableTypeError("Uncallable node {}".format(self.wrapped))
         try:
             bound = self._bind(_input)
         except TypeError as exc:
-            raise UnrecoverableTypeError((
-                'Input of {wrapped!r} does not bind to the node signature.\n'
-                'Args: {args}\n'
-                'Input: {input}\n'
-                'Kwargs: {kwargs}\n'
-                'Signature: {sig}'
-            ).format(
-                wrapped=self.wrapped, args=self.args, input=_input, kwargs=self.kwargs, sig=signature(self.wrapped)
-            )) from exc
+            raise UnrecoverableTypeError(
+                (
+                    "Input of {wrapped!r} does not bind to the node signature.\n"
+                    "Args: {args}\n"
+                    "Input: {input}\n"
+                    "Kwargs: {kwargs}\n"
+                    "Signature: {sig}"
+                ).format(
+                    wrapped=self.wrapped, args=self.args, input=_input, kwargs=self.kwargs, sig=signature(self.wrapped)
+                )
+            ) from exc
         return self.wrapped(*bound.args, **bound.kwargs)
 
     def setup(self, *context):
         if self._stack is not None:
-            raise RuntimeError('Cannot setup context currification twice.')
+            raise RuntimeError("Cannot setup context currification twice.")
 
         self._stack, self._stack_values = list(), list()
         for processor in resolve_processors(self.wrapped):
@@ -136,7 +138,7 @@ class ContextCurrifier:
                 pass
             else:
                 # No error ? We should have had StopIteration ...
-                raise RuntimeError('Context processors should not yield more than once.')
+                raise RuntimeError("Context processors should not yield more than once.")
         self._stack, self._stack_values = None, None
 
     @contextmanager
@@ -164,7 +166,7 @@ def resolve_processors(mixed):
         yield from ()
 
 
-get_context_processors = deprecated_alias('get_context_processors', resolve_processors)
+get_context_processors = deprecated_alias("get_context_processors", resolve_processors)
 
 
 def use_context(f):
@@ -192,11 +194,11 @@ def use_context_processor(context_processor):
 def _use_input_format(input_format):
     if input_format not in INPUT_FORMATS:
         raise ValueError(
-            'Invalid input format {!r}. Choices: {}'.format(input_format, ', '.join(sorted(INPUT_FORMATS)))
+            "Invalid input format {!r}. Choices: {}".format(input_format, ", ".join(sorted(INPUT_FORMATS)))
         )
 
     def _set_input_format(f):
-        setattr(f, '__input_format__', input_format)
+        setattr(f, "__input_format__", input_format)
         return f
 
     return _set_input_format

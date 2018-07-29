@@ -1,4 +1,4 @@
-'''
+"""
 This example shows how a different file system service can be injected
 into a transformation (as compressing pickled objects often makes sense
 anyways).  The pickle itself contains a list of lists as follows:
@@ -25,7 +25,7 @@ https://www.kaggle.com/uciml/sms-spam-collection-dataset/downloads/sms-spam-coll
 The transformation (1) reads the pickled data, (2) marks and shortens
 messages categorized as spam, and (3) prints the output.
 
-'''
+"""
 
 import sys
 
@@ -36,14 +36,12 @@ from bonobo import examples
 
 
 def cleanse_sms(category, sms):
-    if category == 'spam':
-        sms_clean = '**MARKED AS SPAM** ' + sms[0:50] + (
-            '...' if len(sms) > 50 else ''
-        )
-    elif category == 'ham':
+    if category == "spam":
+        sms_clean = "**MARKED AS SPAM** " + sms[0:50] + ("..." if len(sms) > 50 else "")
+    elif category == "ham":
         sms_clean = sms
     else:
-        raise ValueError('Unknown category {!r}.'.format(category))
+        raise ValueError("Unknown category {!r}.".format(category))
 
     return category, sms, sms_clean
 
@@ -53,7 +51,7 @@ def get_graph(*, _limit=(), _print=()):
 
     graph.add_chain(
         # spam.pkl is within the gzipped tarball
-        bonobo.PickleReader('spam.pkl'),
+        bonobo.PickleReader("spam.pkl"),
         *_limit,
         cleanse_sms,
         *_print,
@@ -63,11 +61,8 @@ def get_graph(*, _limit=(), _print=()):
 
 
 def get_services():
-    return {
-        **examples.get_services(), 'fs':
-        TarFS(bonobo.get_examples_path('datasets', 'static', 'spam.tgz'))
-    }
+    return {**examples.get_services(), "fs": TarFS(bonobo.get_examples_path("datasets", "static", "spam.tgz"))}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(examples.run(get_graph, get_services))

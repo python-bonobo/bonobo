@@ -5,12 +5,12 @@ import re
 import warnings
 from contextlib import contextmanager
 
-__escape_decoder = codecs.getdecoder('unicode_escape')
-__posix_variable = re.compile('\$\{[^\}]*\}')
+__escape_decoder = codecs.getdecoder("unicode_escape")
+__posix_variable = re.compile("\$\{[^\}]*\}")
 
 
 def parse_var(var):
-    name, value = var.split('=', 1)
+    name, value = var.split("=", 1)
 
     def decode_escaped(escaped):
         return __escape_decoder(escaped)[0]
@@ -29,15 +29,15 @@ def load_env_from_file(filename):
     Read an env file into a collection of (name, value) tuples.
     """
     if not os.path.exists(filename):
-        raise FileNotFoundError('Environment file {} does not exist.'.format(filename))
+        raise FileNotFoundError("Environment file {} does not exist.".format(filename))
 
     with open(filename) as f:
         for lineno, line in enumerate(f):
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
-            if '=' not in line:
-                raise SyntaxError('Invalid environment file syntax in {} at line {}.'.format(filename, lineno + 1))
+            if "=" not in line:
+                raise SyntaxError("Invalid environment file syntax in {} at line {}.".format(filename, lineno + 1))
 
             name, value = parse_var(line)
 
@@ -64,10 +64,10 @@ def get_argument_parser(parser=None):
     global _parser
     _parser = parser
 
-    _parser.add_argument('--default-env-file', '-E', action='append')
-    _parser.add_argument('--default-env', action='append')
-    _parser.add_argument('--env-file', action='append')
-    _parser.add_argument('--env', '-e', action='append')
+    _parser.add_argument("--default-env-file", "-E", action="append")
+    _parser.add_argument("--default-env", action="append")
+    _parser.add_argument("--env-file", action="append")
+    _parser.add_argument("--env", "-e", action="append")
 
     return _parser
 
@@ -89,10 +89,11 @@ def parse_args(mixed=None):
         global _parser
         if _parser is not None:
             warnings.warn(
-                'You are calling bonobo.parse_args() without a parser argument, but it looks like you created a parser before. You probably want to pass your parser to this call, or if creating a new parser here is really what you want to do, please create a new one explicitely to silence this warning.'
+                "You are calling bonobo.parse_args() without a parser argument, but it looks like you created a parser before. You probably want to pass your parser to this call, or if creating a new parser here is really what you want to do, please create a new one explicitely to silence this warning."
             )
         # use the api from bonobo namespace, in case a command patched it.
         import bonobo
+
         mixed = bonobo.get_argument_parser()
 
     if isinstance(mixed, argparse.ArgumentParser):
@@ -117,14 +118,14 @@ def parse_args(mixed=None):
     #   env-file sets something.)
     try:
         # Set default environment
-        for name, value in map(parse_var, options.pop('default_env', []) or []):
+        for name, value in map(parse_var, options.pop("default_env", []) or []):
             if not name in os.environ:
                 if not name in _backup:
                     _backup[name] = os.environ.get(name, None)
                 os.environ[name] = value
 
         # Read and set default environment from file(s)
-        for filename in options.pop('default_env_file', []) or []:
+        for filename in options.pop("default_env_file", []) or []:
             for name, value in load_env_from_file(filename):
                 if not name in os.environ:
                     if not name in _backup:
@@ -132,14 +133,14 @@ def parse_args(mixed=None):
                     os.environ[name] = value
 
         # Read and set environment from file(s)
-        for filename in options.pop('env_file', []) or []:
+        for filename in options.pop("env_file", []) or []:
             for name, value in load_env_from_file(filename):
                 if not name in _backup:
                     _backup[name] = os.environ.get(name, None)
                 os.environ[name] = value
 
         # Set environment
-        for name, value in map(parse_var, options.pop('env', []) or []):
+        for name, value in map(parse_var, options.pop("env", []) or []):
             if not name in _backup:
                 _backup[name] = os.environ.get(name, None)
             os.environ[name] = value

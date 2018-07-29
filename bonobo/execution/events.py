@@ -27,12 +27,12 @@
 
 from whistle import Event
 
-START = 'execution.start'
-STARTED = 'execution.started'
-TICK = 'execution.tick'
-STOP = 'execution.stop'
-STOPPED = 'execution.stopped'
-KILL = 'execution.kill'
+START = "execution.start"
+STARTED = "execution.started"
+TICK = "execution.tick"
+STOP = "execution.stop"
+STOPPED = "execution.stopped"
+KILL = "execution.kill"
 
 
 class ExecutionEvent(Event):

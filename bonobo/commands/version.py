@@ -9,15 +9,15 @@ def get_versions(*, all=False, quiet=None):
 
     if all:
         for name in sorted(bonobo_packages):
-            if name != 'bonobo':
+            if name != "bonobo":
                 try:
-                    mod = __import__(name.replace('-', '_'))
+                    mod = __import__(name.replace("-", "_"))
                     try:
                         yield _format_version(mod, name=name, quiet=quiet)
                     except Exception as exc:
-                        yield '{} ({})'.format(name, exc)
+                        yield "{} ({})".format(name, exc)
                 except ImportError as exc:
-                    yield '{} is not importable ({}).'.format(name, exc)
+                    yield "{} is not importable ({}).".format(name, exc)
 
 
 class VersionCommand(BaseCommand):
@@ -26,23 +26,24 @@ class VersionCommand(BaseCommand):
             print(line)
 
     def add_arguments(self, parser):
-        parser.add_argument('--all', '-a', action='store_true')
-        parser.add_argument('--quiet', '-q', action='count')
+        parser.add_argument("--all", "-a", action="store_true")
+        parser.add_argument("--quiet", "-q", action="count")
 
 
 def _format_version(mod, *, name=None, quiet=False):
     from bonobo.util.pkgs import bonobo_packages
+
     args = {
-        'name': name or mod.__name__,
-        'version': mod.__version__,
-        'location': bonobo_packages[name or mod.__name__].location
+        "name": name or mod.__name__,
+        "version": mod.__version__,
+        "location": bonobo_packages[name or mod.__name__].location,
     }
 
     if not quiet:
-        return '{name} v.{version} (in {location})'.format(**args)
+        return "{name} v.{version} (in {location})".format(**args)
     if quiet < 2:
-        return '{name} {version}'.format(**args)
+        return "{name} {version}".format(**args)
     if quiet < 3:
-        return '{version}'.format(**args)
+        return "{version}".format(**args)
 
-    raise RuntimeError('Hard to be so quiet...')
+    raise RuntimeError("Hard to be so quiet...")

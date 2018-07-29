@@ -17,7 +17,7 @@ def test_deprecated_alias():
     def foo():
         pass
 
-    foo = deprecated_alias('bar', foo)
+    foo = deprecated_alias("bar", foo)
 
     with pytest.warns(DeprecationWarning):
         foo()

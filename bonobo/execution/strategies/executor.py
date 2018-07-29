@@ -36,14 +36,14 @@ class ExecutorStrategy(Strategy):
             try:
                 context.start(self.get_starter(executor, futures))
             except Exception:
-                logger.critical('Exception caught while starting execution context.', exc_info=sys.exc_info())
+                logger.critical("Exception caught while starting execution context.", exc_info=sys.exc_info())
 
             while context.alive:
                 try:
                     context.tick()
                 except KeyboardInterrupt:
                     logging.getLogger(__name__).warning(
-                        'KeyboardInterrupt received. Trying to terminate the nodes gracefully.'
+                        "KeyboardInterrupt received. Trying to terminate the nodes gracefully."
                     )
                     context.kill()
                     break
@@ -61,13 +61,13 @@ class ExecutorStrategy(Strategy):
                         node.loop()
                 except Exception:
                     logging.getLogger(__name__).critical(
-                        'Critical error in threadpool node starter.', exc_info=sys.exc_info()
+                        "Critical error in threadpool node starter.", exc_info=sys.exc_info()
                     )
 
             try:
                 futures.append(executor.submit(_runner))
             except Exception:
-                logging.getLogger(__name__).critical('futures.append', exc_info=sys.exc_info())
+                logging.getLogger(__name__).critical("futures.append", exc_info=sys.exc_info())
 
         return starter
 
@@ -85,7 +85,7 @@ class AsyncThreadPoolExecutorStrategy(ThreadPoolExecutorStrategy):
     def __init__(self, GraphExecutionContextType=None):
         if not settings.ALPHA.get():
             raise NotImplementedError(
-                '{} is experimental, you need to explicitely activate it using ALPHA=True in system env.'.format(
+                "{} is experimental, you need to explicitely activate it using ALPHA=True in system env.".format(
                     get_name(self)
                 )
             )

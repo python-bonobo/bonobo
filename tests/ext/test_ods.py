@@ -14,16 +14,11 @@ class ResponseMock:
             return {}
         else:
             self.count += 1
-            return {
-                'records': self.json_value,
-            }
+            return {"records": self.json_value}
 
 
 def test_read_from_opendatasoft_api():
-    extract = OpenDataSoftAPI(dataset='test-a-set')
-    with patch('requests.get', return_value=ResponseMock([
-        {'fields': {'foo': 'bar'}},
-        {'fields': {'foo': 'zab'}},
-    ])):
-        for line in extract('http://example.com/', ValueHolder(0)):
-            assert 'foo' in line
+    extract = OpenDataSoftAPI(dataset="test-a-set")
+    with patch("requests.get", return_value=ResponseMock([{"fields": {"foo": "bar"}}, {"fields": {"foo": "zab"}}])):
+        for line in extract("http://example.com/", ValueHolder(0)):
+            assert "foo" in line

@@ -62,12 +62,12 @@ class Lifecycle:
 
         """
         if self._defunct:
-            return '!'
+            return "!"
         if not self.started:
-            return ' '
+            return " "
         if not self.stopped:
-            return '+'
-        return '-'
+            return "+"
+        return "-"
 
     def __enter__(self):
         self.start()
@@ -78,31 +78,31 @@ class Lifecycle:
 
     def get_flags_as_string(self):
         if self._defunct:
-            return term.red('[defunct]')
+            return term.red("[defunct]")
         if self.killed:
-            return term.lightred('[killed]')
+            return term.lightred("[killed]")
         if self.stopped:
-            return term.lightblack('[done]')
-        return ''
+            return term.lightblack("[done]")
+        return ""
 
     def start(self):
         if self.started:
-            raise RuntimeError('This context is already started ({}).'.format(get_name(self)))
+            raise RuntimeError("This context is already started ({}).".format(get_name(self)))
 
         self._started = True
 
     def stop(self):
         if not self.started:
-            raise RuntimeError('This context cannot be stopped as it never started ({}).'.format(get_name(self)))
+            raise RuntimeError("This context cannot be stopped as it never started ({}).".format(get_name(self)))
 
         self._stopped = True
 
     def kill(self):
         if not self.started:
-            raise RuntimeError('Cannot kill an unstarted context.')
+            raise RuntimeError("Cannot kill an unstarted context.")
 
         if self.stopped:
-            raise RuntimeError('Cannot kill a stopped context.')
+            raise RuntimeError("Cannot kill a stopped context.")
 
         self._killed = True
 
@@ -119,10 +119,10 @@ class Lifecycle:
 
     def as_dict(self):
         return {
-            'status': self.status,
-            'name': self.name,
-            'stats': self.get_statistics_as_string(),
-            'flags': self.get_flags_as_string(),
+            "status": self.status,
+            "name": self.name,
+            "stats": self.get_statistics_as_string(),
+            "flags": self.get_flags_as_string(),
         }
 
 

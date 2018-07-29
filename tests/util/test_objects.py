@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from bonobo.util.objects import Wrapper, get_name, ValueHolder, get_attribute_or_create
+from bonobo.util.objects import ValueHolder, Wrapper, get_attribute_or_create, get_name
 from bonobo.util.testing import optional_contextmanager
 
 
@@ -11,31 +11,31 @@ class foo:
 
 
 class bar:
-    __name__ = 'baz'
+    __name__ = "baz"
 
 
 def test_get_name():
-    assert get_name(42) == 'int'
-    assert get_name('eat at joe.') == 'str'
-    assert get_name(str) == 'str'
-    assert get_name(object) == 'object'
-    assert get_name(get_name) == 'get_name'
-    assert get_name(foo) == 'foo'
-    assert get_name(foo()) == 'foo'
-    assert get_name(bar) == 'bar'
-    assert get_name(bar()) == 'baz'
+    assert get_name(42) == "int"
+    assert get_name("eat at joe.") == "str"
+    assert get_name(str) == "str"
+    assert get_name(object) == "object"
+    assert get_name(get_name) == "get_name"
+    assert get_name(foo) == "foo"
+    assert get_name(foo()) == "foo"
+    assert get_name(bar) == "bar"
+    assert get_name(bar()) == "baz"
 
 
 def test_wrapper_name():
-    assert get_name(Wrapper(42)) == 'int'
-    assert get_name(Wrapper('eat at joe.')) == 'str'
-    assert get_name(Wrapper(str)) == 'str'
-    assert get_name(Wrapper(object)) == 'object'
-    assert get_name(Wrapper(foo)) == 'foo'
-    assert get_name(Wrapper(foo())) == 'foo'
-    assert get_name(Wrapper(bar)) == 'bar'
-    assert get_name(Wrapper(bar())) == 'baz'
-    assert get_name(Wrapper(get_name)) == 'get_name'
+    assert get_name(Wrapper(42)) == "int"
+    assert get_name(Wrapper("eat at joe.")) == "str"
+    assert get_name(Wrapper(str)) == "str"
+    assert get_name(Wrapper(object)) == "object"
+    assert get_name(Wrapper(foo)) == "foo"
+    assert get_name(Wrapper(foo())) == "foo"
+    assert get_name(Wrapper(bar)) == "bar"
+    assert get_name(Wrapper(bar())) == "baz"
+    assert get_name(Wrapper(get_name)) == "get_name"
 
 
 def test_valueholder():
@@ -65,10 +65,7 @@ def test_valueholder_notequal():
     assert not (x != 42)
 
 
-@pytest.mark.parametrize('rlo,rhi', [
-    (1, 2),
-    ('a', 'b'),
-])
+@pytest.mark.parametrize("rlo,rhi", [(1, 2), ("a", "b")])
 def test_valueholder_ordering(rlo, rhi):
     vlo, vhi = ValueHolder(rlo), ValueHolder(rhi)
 
@@ -97,15 +94,15 @@ def test_valueholders_containers():
     assert 5 in x
     assert 42 not in x
 
-    y = ValueHolder({'foo': 'bar', 'corp': 'acme'})
+    y = ValueHolder({"foo": "bar", "corp": "acme"})
 
-    assert 'foo' in y
-    assert y['foo'] == 'bar'
+    assert "foo" in y
+    assert y["foo"] == "bar"
     with pytest.raises(KeyError):
-        y['no']
-    y['no'] = 'oh, wait'
-    assert 'no' in y
-    assert 'oh, wait' == y['no']
+        y["no"]
+    y["no"] = "oh, wait"
+    assert "no" in y
+    assert "oh, wait" == y["no"]
 
 
 def test_get_attribute_or_create():
@@ -117,27 +114,39 @@ def test_get_attribute_or_create():
     with pytest.raises(AttributeError):
         x.foo
 
-    foo = get_attribute_or_create(x, 'foo', 'bar')
-    assert foo == 'bar'
-    assert x.foo == 'bar'
+    foo = get_attribute_or_create(x, "foo", "bar")
+    assert foo == "bar"
+    assert x.foo == "bar"
 
-    foo = get_attribute_or_create(x, 'foo', 'baz')
-    assert foo == 'bar'
-    assert x.foo == 'bar'
+    foo = get_attribute_or_create(x, "foo", "baz")
+    assert foo == "bar"
+    assert x.foo == "bar"
 
 
 unsupported_operations = {
     int: {operator.matmul},
     str: {
-        operator.sub, operator.mul, operator.matmul, operator.floordiv, operator.truediv, operator.mod, divmod,
-        operator.pow, operator.lshift, operator.rshift, operator.and_, operator.xor, operator.or_
+        operator.sub,
+        operator.mul,
+        operator.matmul,
+        operator.floordiv,
+        operator.truediv,
+        operator.mod,
+        divmod,
+        operator.pow,
+        operator.lshift,
+        operator.rshift,
+        operator.and_,
+        operator.xor,
+        operator.or_,
     },
 }
 
 
-@pytest.mark.parametrize('x,y', [(5, 3), (0, 10), (0, 0), (1, 1), ('foo', 'bar'), ('', 'baz!')])
+@pytest.mark.parametrize("x,y", [(5, 3), (0, 10), (0, 0), (1, 1), ("foo", "bar"), ("", "baz!")])
 @pytest.mark.parametrize(
-    'operation,inplace_operation', [
+    "operation,inplace_operation",
+    [
         (operator.add, operator.iadd),
         (operator.sub, operator.isub),
         (operator.mul, operator.imul),
@@ -152,14 +161,14 @@ unsupported_operations = {
         (operator.and_, operator.iand),
         (operator.xor, operator.ixor),
         (operator.or_, operator.ior),
-    ]
+    ],
 )
 def test_valueholder_integer_operations(x, y, operation, inplace_operation):
     v = ValueHolder(x)
 
     is_supported = operation not in unsupported_operations.get(type(x), set())
 
-    isdiv = ('div' in operation.__name__) or ('mod' in operation.__name__)
+    isdiv = ("div" in operation.__name__) or ("mod" in operation.__name__)
 
     # forward...
     with optional_contextmanager(pytest.raises(TypeError), ignore=is_supported):

@@ -16,25 +16,25 @@ from bonobo.util.inspect import (
     istuple,
     istype,
 )
-from bonobo.util.objects import (get_name, get_attribute_or_create, ValueHolder)
+from bonobo.util.objects import get_name, get_attribute_or_create, ValueHolder
 
 # Bonobo's util API
 __all__ = [
-    'ValueHolder',
-    'cast',
-    'deprecated',
-    'deprecated_alias',
-    'ensure_tuple',
-    'get_attribute_or_create',
-    'get_name',
-    'inspect_node',
-    'isconfigurable',
-    'isconfigurabletype',
-    'iscontextprocessor',
-    'isdict',
-    'ismethod',
-    'isoption',
-    'istype',
-    'sortedlist',
-    'tuplize',
+    "ValueHolder",
+    "cast",
+    "deprecated",
+    "deprecated_alias",
+    "ensure_tuple",
+    "get_attribute_or_create",
+    "get_name",
+    "inspect_node",
+    "isconfigurable",
+    "isconfigurabletype",
+    "iscontextprocessor",
+    "isdict",
+    "ismethod",
+    "isoption",
+    "istype",
+    "sortedlist",
+    "tuplize",
 ]

@@ -25,27 +25,21 @@ from bonobo.examples import get_services
 try:
     import pycountry
 except ImportError as exc:
-    raise ImportError(
-        'You must install package "pycountry" to run this example.'
-    ) from exc
+    raise ImportError('You must install package "pycountry" to run this example.') from exc
 
-API_DATASET = 'fablabs@public-us'
+API_DATASET = "fablabs@public-us"
 ROWS = 100
 
 
 def _getlink(x):
-    return x.get('url', None)
+    return x.get("url", None)
 
 
 def normalize(row):
     result = {
         **row,
-        'links':
-        list(filter(None, map(_getlink, json.loads(row.get('links'))))),
-        'country':
-        pycountry.countries.get(
-            alpha_2=row.get('country_code', '').upper()
-        ).name,
+        "links": list(filter(None, map(_getlink, json.loads(row.get("links"))))),
+        "country": pycountry.countries.get(alpha_2=row.get("country_code", "").upper()).name,
     }
     return result
 
@@ -58,10 +52,10 @@ def get_graph(graph=None, *, _limit=(), _print=()):
         normalize,
         bonobo.UnpackItems(0),
         *_print,
-        bonobo.JsonWriter(path='fablabs.json'),
+        bonobo.JsonWriter(path="fablabs.json"),
     )
     return graph
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(examples.run(get_graph, get_services))

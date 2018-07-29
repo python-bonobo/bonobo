@@ -1,8 +1,8 @@
 from bonobo.structs.tokens import Flag
 
-F_INHERIT = Flag('Inherit')
+F_INHERIT = Flag("Inherit")
 
-F_NOT_MODIFIED = Flag('NotModified')
+F_NOT_MODIFIED = Flag("NotModified")
 F_NOT_MODIFIED.must_be_first = True
 F_NOT_MODIFIED.must_be_last = True
 F_NOT_MODIFIED.allows_data = False

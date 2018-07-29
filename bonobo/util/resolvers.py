@@ -23,8 +23,8 @@ class _ModulesRegistry(dict):
 
     def require(self, name):
         if name not in self:
-            bits = name.split('.')
-            filename = os.path.join(self.pathname, *bits[:-1], bits[-1] + '.py')
+            bits = name.split(".")
+            filename = os.path.join(self.pathname, *bits[:-1], bits[-1] + ".py")
             self[name] = _RequiredModule(runpy.run_path(filename, run_name=name))
         return self[name]
 
@@ -37,7 +37,7 @@ def _parse_option(option):
     :return: tuple
     """
     try:
-        key, val = option.split('=', 1)
+        key, val = option.split("=", 1)
     except ValueError:
         return option, True
 
@@ -75,7 +75,7 @@ def _resolve_transformations(transformations):
     transformations = transformations or []
     for t in transformations:
         try:
-            mod, attr = t.split(':', 1)
+            mod, attr = t.split(":", 1)
             yield getattr(registry.require(mod), attr)
         except ValueError:
             yield getattr(bonobo, t)

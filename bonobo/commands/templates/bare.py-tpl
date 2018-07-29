@@ -3,6 +3,7 @@ import bonobo
 
 def get_graph(**options):
     graph = bonobo.Graph()
+    graph.get_cursor() >> ...
     return graph
 
 

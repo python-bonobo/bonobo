@@ -1,6 +1,6 @@
-import pytest
-
 from unittest.mock import sentinel
+
+import pytest
 
 from bonobo.constants import BEGIN
 from bonobo.structs.graphs import Graph
@@ -48,24 +48,14 @@ def test_graph_add_chain():
 def test_graph_topological_sort():
     g = Graph()
 
-    g.add_chain(
-        sentinel.a1,
-        sentinel.a2,
-        sentinel.a3,
-        _input=None,
-        _output=None,
-    )
+    g.add_chain(sentinel.a1, sentinel.a2, sentinel.a3, _input=None, _output=None)
 
     assert g.topologically_sorted_indexes == (0, 1, 2)
     assert g[0] == sentinel.a1
     assert g[1] == sentinel.a2
     assert g[2] == sentinel.a3
 
-    g.add_chain(
-        sentinel.b1,
-        sentinel.b2,
-        _output=sentinel.a2,
-    )
+    g.add_chain(sentinel.b1, sentinel.b2, _output=sentinel.a2)
 
     assert g.topologically_sorted_indexes[-2:] == (1, 2)
     assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)

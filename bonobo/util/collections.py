@@ -25,7 +25,7 @@ def _with_length_check(f):
         if length is not None:
             if length != len(result):
                 raise TypeError(
-                    'Length check failed, expected {} fields but got {}: {!r}.'.format(length, len(result), result)
+                    "Length check failed, expected {} fields but got {}: {!r}.".format(length, len(result), result)
                 )
         return result
 
@@ -54,7 +54,7 @@ def ensure_tuple(tuple_or_mixed, *, cls=None):
     if isinstance(tuple_or_mixed, tuple):
         return tuple.__new__(cls, tuple_or_mixed)
 
-    return tuple.__new__(cls, (tuple_or_mixed, ))
+    return tuple.__new__(cls, (tuple_or_mixed,))
 
 
 def cast(type_):

@@ -63,7 +63,7 @@ class BaseGraphExecutionContext(BaseContext):
         self.services = create_container(services)
 
         # Probably not a good idea to use it unless you really know what you're doing. But you can access the context.
-        self.services['__graph_context'] = self
+        self.services["__graph_context"] = self
 
         for i, node_context in enumerate(self):
             outputs = self.graph.outputs_of(i)

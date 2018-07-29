@@ -13,18 +13,18 @@ from bonobo.util.term import CLEAR_EOL
 from mondrian import term
 
 __all__ = [
-    'FixedWindow',
-    'Format',
-    'Limit',
-    'OrderFields',
-    'PrettyPrinter',
-    'Rename',
-    'SetFields',
-    'Tee',
-    'UnpackItems',
-    'count',
-    'identity',
-    'noop',
+    "FixedWindow",
+    "Format",
+    "Limit",
+    "OrderFields",
+    "PrettyPrinter",
+    "Rename",
+    "SetFields",
+    "Tee",
+    "UnpackItems",
+    "count",
+    "identity",
+    "noop",
 ]
 
 
@@ -43,6 +43,7 @@ class Limit(Configurable):
     TODO: simplify into a closure building factory?
 
     """
+
     limit = Option(positional=True, default=10)
 
     @ContextProcessor
@@ -69,7 +70,7 @@ def Tee(f):
 
 def _shorten(s, w):
     if w and len(s) > w:
-        s = s[0:w - 3] + '...'
+        s = s[0 : w - 3] + "..."
     return s
 
 
@@ -78,28 +79,31 @@ class PrettyPrinter(Configurable):
         int,
         default=term.get_size()[0],
         required=False,
-        __doc__='''
+        __doc__="""
         If set, truncates the output values longer than this to this width.
-    '''
+    """,
     )
 
     filter = Method(
-        default=
-        (lambda self, index, key, value: (value is not None) and (not isinstance(key, str) or not key.startswith('_'))),
-        __doc__='''
+        default=(
+            lambda self, index, key, value: (value is not None)
+            and (not isinstance(key, str) or not key.startswith("_"))
+        ),
+        __doc__="""
             A filter that determine what to print.
             
             Default is to ignore any key starting with an underscore and none values.
-        '''
+        """,
     )
 
     @ContextProcessor
     def context(self, context):
-        context.setdefault('_jupyter_html', None)
+        context.setdefault("_jupyter_html", None)
         yield context
         if context._jupyter_html is not None:
             from IPython.display import display, HTML
-            display(HTML('\n'.join(['<table>'] + context._jupyter_html + ['</table>'])))
+
+            display(HTML("\n".join(["<table>"] + context._jupyter_html + ["</table>"])))
 
     def __call__(self, context, *args, **kwargs):
         if not settings.QUIET:
@@ -120,49 +124,44 @@ class PrettyPrinter(Configurable):
 
     def format_quiet(self, index, key, value, *, fields=None):
         # XXX should we implement argnames here ?
-        return ' '.join(((' ' if index else '-'), str(key), ':', str(value).strip()))
+        return " ".join(((" " if index else "-"), str(key), ":", str(value).strip()))
 
     def print_console(self, context, *args, **kwargs):
-        print('\u250c')
+        print("\u250c")
         for index, (key, value) in enumerate(itertools.chain(enumerate(args), kwargs.items())):
             if self.filter(index, key, value):
                 print(self.format_console(index, key, value, fields=context.get_input_fields()))
-        print('\u2514')
+        print("\u2514")
 
     def format_console(self, index, key, value, *, fields=None):
         fields = fields or []
         if not isinstance(key, str):
             if len(fields) > key and str(key) != str(fields[key]):
-                key = '{}{}'.format(fields[key], term.lightblack('[{}]'.format(key)))
+                key = "{}{}".format(fields[key], term.lightblack("[{}]".format(key)))
             else:
                 key = str(index)
 
-        prefix = '\u2502 {} = '.format(key)
+        prefix = "\u2502 {} = ".format(key)
         prefix_length = len(prefix)
 
         def indent(text, prefix):
             for i, line in enumerate(text.splitlines()):
-                yield (prefix if i else '') + line + CLEAR_EOL + '\n'
+                yield (prefix if i else "") + line + CLEAR_EOL + "\n"
 
-        repr_of_value = ''.join(
-            indent(pprint.pformat(value, width=self.max_width - prefix_length), '\u2502' + ' ' * (len(prefix) - 1))
+        repr_of_value = "".join(
+            indent(pprint.pformat(value, width=self.max_width - prefix_length), "\u2502" + " " * (len(prefix) - 1))
         ).strip()
-        return '{}{}{}'.format(prefix, repr_of_value.replace('\n', CLEAR_EOL + '\n'), CLEAR_EOL)
+        return "{}{}{}".format(prefix, repr_of_value.replace("\n", CLEAR_EOL + "\n"), CLEAR_EOL)
 
     def print_jupyter(self, context, *args):
         if not context._jupyter_html:
             context._jupyter_html = [
-                '<thead><tr>',
-                *map('<th>{}</th>'.format, map(html.escape, map(str,
-                                                                context.get_input_fields() or range(len(args))))),
-                '</tr></thead>',
+                "<thead><tr>",
+                *map("<th>{}</th>".format, map(html.escape, map(str, context.get_input_fields() or range(len(args))))),
+                "</tr></thead>",
             ]
 
-        context._jupyter_html += [
-            '<tr>',
-            *map('<td>{}</td>'.format, map(html.escape, map(repr, args))),
-            '</tr>',
-        ]
+        context._jupyter_html += ["<tr>", *map("<td>{}</td>".format, map(html.escape, map(repr, args))), "</tr>"]
 
 
 @use_no_input
@@ -211,7 +210,7 @@ def OrderFields(fields):
     @use_raw_input
     def _OrderFields(context, row):
         nonlocal fields
-        context.setdefault('remaining', None)
+        context.setdefault("remaining", None)
         if not context.output_type:
             context.remaining = list(sorted(set(context.get_input_fields()) - set(fields)))
             context.set_output_fields(fields + context.remaining)

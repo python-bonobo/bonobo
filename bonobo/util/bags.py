@@ -71,16 +71,18 @@ class {typename}(tuple):
 {field_defs}
 '''
 
-_field_template = '''\
+_field_template = """\
     {name} = _property(_itemgetter({index:d}), doc={doc!r})
-'''.strip('\n')
-
-_reserved = frozenset(
-    ['_', '_cls', '_attrs', '_fields', 'get', '_asdict', '_replace', '_make', 'self', '_self', 'tuple'] + dir(tuple)
+""".strip(
+    "\n"
 )
 
-_multiple_underscores_pattern = re.compile('__+')
-_slugify_allowed_chars_pattern = re.compile(r'[^a-z0-9_]+', flags=re.IGNORECASE)
+_reserved = frozenset(
+    ["_", "_cls", "_attrs", "_fields", "get", "_asdict", "_replace", "_make", "self", "_self", "tuple"] + dir(tuple)
+)
+
+_multiple_underscores_pattern = re.compile("__+")
+_slugify_allowed_chars_pattern = re.compile(r"[^a-z0-9_]+", flags=re.IGNORECASE)
 
 
 def _uniquify(f):
@@ -90,13 +92,13 @@ def _uniquify(f):
     def _uniquified(x):
         nonlocal f, seen
         x = str(x)
-        v = v0 = _multiple_underscores_pattern.sub('_', f(x))
+        v = v0 = _multiple_underscores_pattern.sub("_", f(x))
         i = 0
         # if last character is not "allowed", let's start appending indexes right from the first iteration
         if len(x) and _slugify_allowed_chars_pattern.match(x[-1]):
-            v = '{}{}'.format(v0, i)
+            v = "{}{}".format(v0, i)
         while v in seen:
-            v = '{}{}'.format(v0, i)
+            v = "{}{}".format(v0, i)
             i += 1
         seen.add(v)
         return v
@@ -106,13 +108,13 @@ def _uniquify(f):
 
 def _make_valid_attr_name(x):
     if iskeyword(x):
-        x = '_' + x
+        x = "_" + x
     if x.isidentifier():
         return x
-    x = slugify(x, separator='_', regex_pattern=_slugify_allowed_chars_pattern)
+    x = slugify(x, separator="_", regex_pattern=_slugify_allowed_chars_pattern)
     if x.isidentifier():
         return x
-    x = '_' + x
+    x = "_" + x
     if x.isidentifier():
         return x
     raise ValueError(x)
@@ -124,23 +126,23 @@ def BagType(typename, fields, *, verbose=False, module=None):
 
     attrs = tuple(map(_uniquify(_make_valid_attr_name), fields))
     if type(fields) is str:
-        raise TypeError('BagType does not support providing fields as a string.')
+        raise TypeError("BagType does not support providing fields as a string.")
     fields = list(map(str, fields))
     typename = str(typename)
 
     for i, name in enumerate([typename] + fields):
         if type(name) is not str:
-            raise TypeError('Type names and field names must be strings, got {name!r}'.format(name=name))
+            raise TypeError("Type names and field names must be strings, got {name!r}".format(name=name))
         if not i:
             if not name.isidentifier():
-                raise ValueError('Type names must be valid identifiers: {name!r}'.format(name=name))
+                raise ValueError("Type names must be valid identifiers: {name!r}".format(name=name))
             if iskeyword(name):
-                raise ValueError('Type names cannot be a keyword: {name!r}'.format(name=name))
+                raise ValueError("Type names cannot be a keyword: {name!r}".format(name=name))
 
     seen = set()
     for name in fields:
         if name in seen:
-            raise ValueError('Encountered duplicate field name: {name!r}'.format(name=name))
+            raise ValueError("Encountered duplicate field name: {name!r}".format(name=name))
         seen.add(name)
 
     # Fill-in the class template
@@ -150,21 +152,24 @@ def BagType(typename, fields, *, verbose=False, module=None):
         attrs=attrs,
         num_fields=len(fields),
         arg_list=repr(attrs).replace("'", "")[1:-1],
-        repr_fmt=', '.join(('%r' if isinstance(fields[index], int) else '{name}=%r').format(name=name)
-                           for index, name in enumerate(attrs)),
-        field_defs='\n'.join(
+        repr_fmt=", ".join(
+            ("%r" if isinstance(fields[index], int) else "{name}=%r").format(name=name)
+            for index, name in enumerate(attrs)
+        ),
+        field_defs="\n".join(
             _field_template.format(
                 index=index,
                 name=name,
-                doc='Alias for ' +
-                ('field #{}'.format(index) if isinstance(fields[index], int) else repr(fields[index]))
-            ) for index, name in enumerate(attrs)
-        )
+                doc="Alias for "
+                + ("field #{}".format(index) if isinstance(fields[index], int) else repr(fields[index])),
+            )
+            for index, name in enumerate(attrs)
+        ),
     )
 
     # Execute the template string in a temporary namespace and support
     # tracing utilities by setting a value for frame.f_globals['__name__']
-    namespace = dict(__name__='namedtuple_%s' % typename)
+    namespace = dict(__name__="namedtuple_%s" % typename)
     exec(class_definition, namespace)
     result = namespace[typename]
     result._source = class_definition
@@ -178,7 +183,7 @@ def BagType(typename, fields, *, verbose=False, module=None):
     # specified a particular module.
     if module is None:
         try:
-            module = sys._getframe(1).f_globals.get('__name__', '__main__')
+            module = sys._getframe(1).f_globals.get("__name__", "__main__")
         except (AttributeError, ValueError):
             pass
     if module is not None:

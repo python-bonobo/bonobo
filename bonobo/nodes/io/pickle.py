@@ -24,7 +24,7 @@ class PickleReader(FileReader, PickleHandler):
     Reads a Python pickle object and yields the items in dicts.
     """
 
-    mode = Option(str, default='rb')
+    mode = Option(str, default="rb")
 
     def read(self, file, context, *, fs):
         data = pickle.load(file)
@@ -47,7 +47,7 @@ class PickleReader(FileReader, PickleHandler):
 
         for row in iterator:
             if len(row) != fields_length:
-                raise ValueError('Received an object with {} items, expected {}.'.format(len(row), fields_length))
+                raise ValueError("Received an object with {} items, expected {}.".format(len(row), fields_length))
 
             yield tuple(row.values() if is_dict else row)
 
@@ -56,13 +56,13 @@ class PickleReader(FileReader, PickleHandler):
 
 @use_context
 class PickleWriter(FileWriter, PickleHandler):
-    mode = Option(str, default='wb')
+    mode = Option(str, default="wb")
 
     def write(self, file, context, item, *, fs):
         """
         Write a pickled item to the opened file.
         """
-        context.setdefault('lineno', 0)
+        context.setdefault("lineno", 0)
         file.write(pickle.dumps(item))
         context.lineno += 1
         return NOT_MODIFIED

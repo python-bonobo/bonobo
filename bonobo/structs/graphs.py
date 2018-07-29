@@ -9,24 +9,51 @@ from graphviz.dot import Digraph
 from bonobo.constants import BEGIN
 from bonobo.util import get_name
 
-GraphRange = namedtuple('GraphRange', ['graph', 'input', 'output'])
+GraphRange = namedtuple("GraphRange", ["graph", "input", "output"])
+
 
 class GraphCursor:
-    def __init__(self, graph, node):
+    @property
+    def input(self):
+        return self.first
+
+    @property
+    def output(self):
+        return self.last
+
+    def __init__(self, graph, *, first=None, last=None):
         self.graph = graph
-        self.node = node
+        self.first = first or last
+        self.last = last
 
     def __rshift__(self, other):
         """ Self >> Other """
-        chain = self.graph.add_chain(other, _input=self.node)
-        return GraphCursor(chain.graph, chain.output)
+
+        if other == ...:
+            raise NotImplementedError(
+                "Expected something looking like a node, but got an Ellipsis (...). Did you forget to complete the graph?"
+            )
+
+        nodes = other.nodes if hasattr(other, "nodes") else [other]
+
+        if len(nodes):
+            chain = self.graph.add_chain(*nodes, _input=self.last)
+            return GraphCursor(chain.graph, first=self.first, last=chain.output)
+
+        return self
+
+
+class PartialGraph:
+    def __init__(self, *nodes):
+        self.nodes = list(nodes)
 
 
 class Graph:
     """
     Represents a directed graph of nodes.
     """
-    name = ''
+
+    name = ""
 
     def __init__(self, *chain):
         self.edges = {BEGIN: set()}
@@ -46,7 +73,7 @@ class Graph:
         return self.nodes[key]
 
     def get_cursor(self, ref=BEGIN):
-        return GraphCursor(self, self._resolve_index(ref))
+        return GraphCursor(self, last=self._resolve_index(ref))
 
     def outputs_of(self, idx, create=False):
         """ Get a set of the outputs for a given node index.
@@ -76,7 +103,7 @@ class Graph:
                 _last = self.add_node(node)
                 if not i and _name:
                     if _name in self.named:
-                        raise KeyError('Duplicate name {!r} in graph.'.format(_name))
+                        raise KeyError("Duplicate name {!r} in graph.".format(_name))
                     self.named[_name] = _last
                 if _first is None:
                     _first = _last
@@ -86,7 +113,7 @@ class Graph:
             if _output is not None:
                 self.outputs_of(_input, create=True).add(_output)
 
-            if hasattr(self, '_topologcally_sorted_indexes_cache'):
+            if hasattr(self, "_topologcally_sorted_indexes_cache"):
                 del self._topologcally_sorted_indexes_cache
 
             return GraphRange(self, _first, _last)
@@ -144,10 +171,10 @@ class Graph:
             return self._graphviz
         except AttributeError:
             g = Digraph()
-            g.attr(rankdir='LR')
-            g.node('BEGIN', shape='point')
+            g.attr(rankdir="LR")
+            g.node("BEGIN", shape="point")
             for i in self.outputs_of(BEGIN):
-                g.edge('BEGIN', str(i))
+                g.edge("BEGIN", str(i))
             for ix in self.topologically_sorted_indexes:
                 g.node(str(ix), label=get_name(self[ix]))
                 for iy in self.outputs_of(ix):
@@ -160,9 +187,9 @@ class Graph:
 
     def _repr_html_(self):
         try:
-            return '<div>{}</div><pre>{}</pre>'.format(self.graphviz._repr_svg_(), html.escape(repr(self)))
+            return "<div>{}</div><pre>{}</pre>".format(self.graphviz._repr_svg_(), html.escape(repr(self)))
         except (ExecutableNotFound, FileNotFoundError) as exc:
-            return '<strong>{}</strong>: {}'.format(type(exc).__name__, str(exc))
+            return "<strong>{}</strong>: {}".format(type(exc).__name__, str(exc))
 
     def _resolve_index(self, mixed):
         """
@@ -182,10 +209,10 @@ class Graph:
         if mixed in self.nodes:
             return self.nodes.index(mixed)
 
-        raise ValueError('Cannot find node matching {!r}.'.format(mixed))
+        raise ValueError("Cannot find node matching {!r}.".format(mixed))
 
 
 def _get_graphviz_node_id(graph, i):
     escaped_index = str(i)
     escaped_name = json.dumps(get_name(graph[i]))
-    return '{{{} [label={}]}}'.format(escaped_index, escaped_name)
+    return "{{{} [label={}]}}".format(escaped_index, escaped_name)

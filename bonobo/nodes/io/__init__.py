@@ -6,14 +6,14 @@ from .json import JsonReader, JsonWriter, LdjsonReader, LdjsonWriter
 from .pickle import PickleReader, PickleWriter
 
 __all__ = [
-    'CsvReader',
-    'CsvWriter',
-    'FileReader',
-    'FileWriter',
-    'JsonReader',
-    'JsonWriter',
-    'LdjsonReader',
-    'LdjsonWriter',
-    'PickleReader',
-    'PickleWriter',
+    "CsvReader",
+    "CsvWriter",
+    "FileReader",
+    "FileWriter",
+    "JsonReader",
+    "JsonWriter",
+    "LdjsonReader",
+    "LdjsonWriter",
+    "PickleReader",
+    "PickleWriter",
 ]

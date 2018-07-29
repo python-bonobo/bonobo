@@ -9,7 +9,7 @@ from bonobo.util.testing import all_runners
 
 @all_runners
 def test_download_works_for_examples(runner):
-    expected_bytes = b'hello world'
+    expected_bytes = b"hello world"
 
     class MockResponse(object):
         def __init__(self):
@@ -27,12 +27,13 @@ def test_download_works_for_examples(runner):
     fout = io.BytesIO()
     fout.close = lambda: None
 
-    with patch('bonobo.commands.download._open_url') as mock_open_url, \
-            patch('bonobo.commands.download.open') as mock_open:
+    with patch("bonobo.commands.download._open_url") as mock_open_url, patch(
+        "bonobo.commands.download.open"
+    ) as mock_open:
         mock_open_url.return_value = MockResponse()
         mock_open.return_value = fout
-        runner('download', 'examples/datasets/coffeeshops.txt')
-    expected_url = EXAMPLES_BASE_URL + 'datasets/coffeeshops.txt'
+        runner("download", "examples/datasets/coffeeshops.txt")
+    expected_url = EXAMPLES_BASE_URL + "datasets/coffeeshops.txt"
     mock_open_url.assert_called_once_with(expected_url)
 
     assert fout.getvalue() == expected_bytes
@@ -41,4 +42,4 @@ def test_download_works_for_examples(runner):
 @all_runners
 def test_download_fails_non_example(runner):
     with pytest.raises(ValueError):
-        runner('download', 'something/entirely/different.txt')
+        runner("download", "something/entirely/different.txt")

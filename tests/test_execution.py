@@ -10,7 +10,7 @@ def generate_integers():
 
 
 def square(i):
-    return i**2
+    return i ** 2
 
 
 def results(f, context):

@@ -66,9 +66,9 @@ class Option:
         # Docstring formating
         self.__doc__ = __doc__ or None
         if self.__doc__:
-            self.__doc__ = textwrap.dedent(self.__doc__.strip('\n')).strip()
+            self.__doc__ = textwrap.dedent(self.__doc__.strip("\n")).strip()
             if default:
-                self.__doc__ += '\n\nDefault: {!r}'.format(default)
+                self.__doc__ += "\n\nDefault: {!r}".format(default)
 
         # This hack is necessary for python3.5
         self._creation_counter = Option._creation_counter
@@ -88,13 +88,13 @@ class Option:
         inst._options_values[self.name] = self.clean(value)
 
     def __repr__(self):
-        return '<{positional}{typename} {type}{name} default={default!r}{required}>'.format(
+        return "<{positional}{typename} {type}{name} default={default!r}{required}>".format(
             typename=type(self).__name__,
-            type='({})'.format(self.type) if istype(self.type) else '',
+            type="({})".format(self.type) if istype(self.type) else "",
             name=self.name,
-            positional='*' if self.positional else '**',
+            positional="*" if self.positional else "**",
             default=self.default,
-            required=' (required)' if self.required else '',
+            required=" (required)" if self.required else "",
         )
 
     def clean(self, value):
@@ -106,15 +106,16 @@ class Option:
 
 class RemovedOption(Option):
     def __init__(self, *args, value, **kwargs):
-        kwargs['required'] = False
+        kwargs["required"] = False
         super(RemovedOption, self).__init__(*args, **kwargs)
         self.value = value
 
     def clean(self, value):
         if value != self.value:
             raise ValueError(
-                'Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.'.
-                format(self.name, self.value)
+                "Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.".format(
+                    self.name, self.value
+                )
             )
         return self.value
 
@@ -129,12 +130,12 @@ class RenamedOption(Option):
 
     def __get__(self, instance, owner):
         raise ValueError(
-            'Trying to get value from renamed option {}, try getting {} instead.'.format(self.name, self.target)
+            "Trying to get value from renamed option {}, try getting {} instead.".format(self.name, self.target)
         )
 
     def clean(self, value):
         raise ValueError(
-            'Trying to set value of renamed option {}, try setting {} instead.'.format(self.name, self.target)
+            "Trying to set value of renamed option {}, try setting {} instead.".format(self.name, self.target)
         )
 
 
@@ -182,7 +183,7 @@ class Method(Option):
         # If a callable is provided as default, then use self as if it was used as a decorator
         if default is not None:
             if not callable(default):
-                raise ValueError('Method defaults should be callable, if provided.')
+                raise ValueError("Method defaults should be callable, if provided.")
             self(default)
 
     def __get__(self, inst, type_):
@@ -194,17 +195,15 @@ class Method(Option):
     def __set__(self, inst, value):
         if not callable(value):
             raise TypeError(
-                'Option {!r} ({}) is expecting a callable value, got {!r} object: {!r}.'.format(
-                    self.name,
-                    type(self).__name__,
-                    type(value).__name__, value
+                "Option {!r} ({}) is expecting a callable value, got {!r} object: {!r}.".format(
+                    self.name, type(self).__name__, type(value).__name__, value
                 )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value
 
     def __call__(self, impl):
         if self.default:
-            raise RuntimeError('Can only be used once as a decorator.')
+            raise RuntimeError("Can only be used once as a decorator.")
         self.default = impl
         self.required = False
         return self

@@ -19,7 +19,7 @@ from queue import Empty
 import pytest
 
 from bonobo.constants import BEGIN, END
-from bonobo.errors import InactiveWritableError, InactiveReadableError
+from bonobo.errors import InactiveReadableError, InactiveWritableError
 from bonobo.structs.inputs import Input
 
 
@@ -29,22 +29,22 @@ def test_input_runlevels():
     # Before BEGIN, noone should be able to write in an Input queue.
     assert not q.alive
     with pytest.raises(InactiveWritableError):
-        q.put('hello, unborn queue.')
+        q.put("hello, unborn queue.")
 
     # Begin
     q.put(BEGIN)
     assert q.alive and q._runlevel == 1
-    q.put('foo')
+    q.put("foo")
 
     # Second Begin
     q.put(BEGIN)
     assert q.alive and q._runlevel == 2
-    q.put('bar')
+    q.put("bar")
     q.put(END)
 
     # FIFO
-    assert q.get() == 'foo'
-    assert q.get() == 'bar'
+    assert q.get() == "foo"
+    assert q.get() == "bar"
 
     # self.assertEqual(q.alive, False) XXX queue don't know it's dead yet, but it is ...
     # Async get raises Empty (End is not returned)
@@ -53,14 +53,14 @@ def test_input_runlevels():
     assert q.alive
 
     # Before killing, let's slide some data in.
-    q.put('baz')
+    q.put("baz")
 
     # Now kill the queue...
     q.put(END)
     with pytest.raises(InactiveWritableError):
-        q.put('foo')
+        q.put("foo")
 
     # Still can get remaining data
-    assert q.get() == 'baz'
+    assert q.get() == "baz"
     with pytest.raises(InactiveReadableError):
         q.get()

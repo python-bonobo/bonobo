@@ -50,10 +50,7 @@ def test_define_with_decorator():
     calls = []
 
     def my_handler(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     Concrete = MethodBasedConfigurable(my_handler)
 
@@ -64,7 +61,7 @@ def test_define_with_decorator():
         assert ci.type == MethodBasedConfigurable
         assert ci.partial
 
-    t = Concrete('foo', bar='baz')
+    t = Concrete("foo", bar="baz")
 
     assert callable(t.handler)
     assert len(calls) == 0
@@ -75,15 +72,12 @@ def test_define_with_decorator():
 def test_late_binding_method_decoration():
     calls = []
 
-    @MethodBasedConfigurable(foo='foo')
+    @MethodBasedConfigurable(foo="foo")
     def Concrete(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     assert callable(Concrete.handler)
-    t = Concrete(bar='baz')
+    t = Concrete(bar="baz")
 
     assert callable(t.handler)
     assert len(calls) == 0
@@ -95,12 +89,9 @@ def test_define_with_argument():
     calls = []
 
     def concrete_handler(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
-    t = MethodBasedConfigurable(concrete_handler, 'foo', bar='baz')
+    t = MethodBasedConfigurable(concrete_handler, "foo", bar="baz")
     assert callable(t.handler)
     assert len(calls) == 0
     t()
@@ -112,12 +103,9 @@ def test_define_with_inheritance():
 
     class Inheriting(MethodBasedConfigurable):
         def handler(self, *args, **kwargs):
-            calls.append((
-                args,
-                kwargs,
-            ))
+            calls.append((args, kwargs))
 
-    t = Inheriting('foo', bar='baz')
+    t = Inheriting("foo", bar="baz")
     assert callable(t.handler)
     assert len(calls) == 0
     t()
@@ -132,13 +120,10 @@ def test_inheritance_then_decorate():
 
     @Inheriting
     def Concrete(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     assert callable(Concrete.handler)
-    t = Concrete('foo', bar='baz')
+    t = Concrete("foo", bar="baz")
     assert callable(t.handler)
     assert len(calls) == 0
     t()

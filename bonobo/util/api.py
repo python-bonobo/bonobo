@@ -12,14 +12,14 @@ class ApiHelper:
         if graph:
             # This function must comply to the "graph" API interface, meaning it can bahave like bonobo.run.
             from inspect import signature
+
             parameters = list(signature(x).parameters)
-            required_parameters = {'plugins', 'services', 'strategy'}
-            assert len(parameters
-                       ) > 0 and parameters[0] == 'graph', 'First parameter of a graph api function must be "graph".'
-            assert required_parameters.intersection(
-                parameters
-            ) == required_parameters, 'Graph api functions must define the following parameters: ' + ', '.join(
-                sorted(required_parameters)
+            required_parameters = {"plugins", "services", "strategy"}
+            assert (
+                len(parameters) > 0 and parameters[0] == "graph"
+            ), 'First parameter of a graph api function must be "graph".'
+            assert required_parameters.intersection(parameters) == required_parameters, (
+                "Graph api functions must define the following parameters: " + ", ".join(sorted(required_parameters))
             )
 
         self.__all__.append(get_name(x))

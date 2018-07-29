@@ -19,7 +19,7 @@ from bonobo.util.statistics import WithStatistics
 
 logger = logging.getLogger(__name__)
 
-UnboundArguments = namedtuple('UnboundArguments', ['args', 'kwargs'])
+UnboundArguments = namedtuple("UnboundArguments", ["args", "kwargs"])
 
 
 class NodeExecutionContext(BaseContext, WithStatistics):
@@ -46,13 +46,13 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param _outputs: output queues (optional)
         """
         BaseContext.__init__(self, wrapped, parent=parent)
-        WithStatistics.__init__(self, 'in', 'out', 'err', 'warn')
+        WithStatistics.__init__(self, "in", "out", "err", "warn")
 
         # Services: how we'll access external dependencies
         if services:
             if self.parent:
                 raise RuntimeError(
-                    'Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now.'
+                    "Having services defined both in GraphExecutionContext and child NodeExecutionContext is not supported, for now."
                 )
             self.services = create_container(services)
         else:
@@ -70,11 +70,11 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         self._stack = None
 
     def __str__(self):
-        return self.__name__ + self.get_statistics_as_string(prefix=' ')
+        return self.__name__ + self.get_statistics_as_string(prefix=" ")
 
     def __repr__(self):
         name, type_name = get_name(self), get_name(type(self))
-        return '<{}({}{}){}>'.format(type_name, self.status, name, self.get_statistics_as_string(prefix=' '))
+        return "<{}({}{}){}>".format(type_name, self.status, name, self.get_statistics_as_string(prefix=" "))
 
     def start(self):
         """
@@ -97,13 +97,13 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                     # Not normal to have a partially configured object here, so let's warn the user instead of having get into
                     # the hard trouble of understanding that by himself.
                     raise TypeError(
-                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                        "Configurables should be instanciated before execution starts.\nGot {!r}.\n".format(
                             self.wrapped
                         )
                     ) from exc
                 else:
                     raise TypeError(
-                        'Configurables should be instanciated before execution starts.\nGot {!r}.\n'.format(
+                        "Configurables should be instanciated before execution starts.\nGot {!r}.\n".format(
                             self.wrapped
                         )
                     )
@@ -120,7 +120,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         The actual infinite loop for this transformation.
 
         """
-        logger.debug('Node loop starts for {!r}.'.format(self))
+        logger.debug("Node loop starts for {!r}.".format(self))
 
         while self.should_loop:
             try:
@@ -128,7 +128,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             except InactiveReadableError:
                 break
 
-        logger.debug('Node loop ends for {!r}.'.format(self))
+        logger.debug("Node loop ends for {!r}.".format(self))
 
     def step(self):
         try:
@@ -137,10 +137,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             raise
         except Empty:
             sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
-        except (
-                NotImplementedError,
-                UnrecoverableError,
-        ):
+        except (NotImplementedError, UnrecoverableError):
             self.fatal(sys.exc_info())  # exit loop
         except Exception:  # pylint: disable=broad-except
             self.error(sys.exc_info())  # does not exit loop
@@ -208,20 +205,20 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def set_input_type(self, input_type):
         if self._input_type is not None:
-            raise RuntimeError('Cannot override input type, already have %r.', self._input_type)
+            raise RuntimeError("Cannot override input type, already have %r.", self._input_type)
 
         if type(input_type) is not type:
-            raise UnrecoverableTypeError('Input types must be regular python types.')
+            raise UnrecoverableTypeError("Input types must be regular python types.")
 
         if not issubclass(input_type, tuple):
-            raise UnrecoverableTypeError('Input types must be subclasses of tuple (and act as tuples).')
+            raise UnrecoverableTypeError("Input types must be subclasses of tuple (and act as tuples).")
 
         self._input_type = input_type
 
     def get_input_fields(self):
-        return self._input_type._fields if self._input_type and hasattr(self._input_type, '_fields') else None
+        return self._input_type._fields if self._input_type and hasattr(self._input_type, "_fields") else None
 
-    def set_input_fields(self, fields, typename='Bag'):
+    def set_input_fields(self, fields, typename="Bag"):
         self.set_input_type(BagType(typename, fields))
 
     ### Output type and fields
@@ -231,20 +228,20 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def set_output_type(self, output_type):
         if self._output_type is not None:
-            raise RuntimeError('Cannot override output type, already have %r.', self._output_type)
+            raise RuntimeError("Cannot override output type, already have %r.", self._output_type)
 
         if type(output_type) is not type:
-            raise UnrecoverableTypeError('Output types must be regular python types.')
+            raise UnrecoverableTypeError("Output types must be regular python types.")
 
         if not issubclass(output_type, tuple):
-            raise UnrecoverableTypeError('Output types must be subclasses of tuple (and act as tuples).')
+            raise UnrecoverableTypeError("Output types must be subclasses of tuple (and act as tuples).")
 
         self._output_type = output_type
 
     def get_output_fields(self):
-        return self._output_type._fields if self._output_type and hasattr(self._output_type, '_fields') else None
+        return self._output_type._fields if self._output_type and hasattr(self._output_type, "_fields") else None
 
-    def set_output_fields(self, fields, typename='Bag'):
+    def set_output_fields(self, fields, typename="Bag"):
         self.set_output_type(BagType(typename, fields))
 
     ### Attributes
@@ -273,11 +270,11 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self.step()
 
     def error(self, exc_info, *, level=logging.ERROR):
-        self.increment('err')
+        self.increment("err")
         super().error(exc_info, level=level)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
-        self.increment('err')
+        self.increment("err")
         super().fatal(exc_info, level=level)
         self.input.shutdown()
 
@@ -306,8 +303,9 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                     input_bag = self._input_type(*input_bag)
             except Exception as exc:
                 raise UnrecoverableTypeError(
-                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.
-                    format(self.wrapped, input_bag, self._input_type)
+                    "Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.".format(
+                        self.wrapped, input_bag, self._input_type
+                    )
                 ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples
@@ -315,12 +313,12 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self._input_length = len(input_bag)
         elif len(input_bag) != self._input_length:
             raise UnrecoverableTypeError(
-                'Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.'.format(
+                "Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.".format(
                     self.wrapped, self._input_length, len(input_bag), input_bag
                 )
             )
 
-        self.increment('in')  # XXX should that go before type check ?
+        self.increment("in")  # XXX should that go before type check ?
 
         return input_bag
 
@@ -366,7 +364,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         """
 
         if not _control:
-            self.increment('out')
+            self.increment("out")
 
         for output in self.outputs:
             output.put(value)
@@ -406,8 +404,9 @@ class AsyncNodeExecutionContext(NodeExecutionContext):
                     input_bag = self._input_type(*input_bag)
             except Exception as exc:
                 raise UnrecoverableTypeError(
-                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.
-                    format(self.wrapped, input_bag, self._input_type)
+                    "Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.".format(
+                        self.wrapped, input_bag, self._input_type
+                    )
                 ) from exc
 
         # Store or check input length, which is a soft fallback in case we're just using tuples
@@ -415,12 +414,12 @@ class AsyncNodeExecutionContext(NodeExecutionContext):
             self._input_length = len(input_bag)
         elif len(input_bag) != self._input_length:
             raise UnrecoverableTypeError(
-                'Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.'.format(
+                "Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.".format(
                     self.wrapped, self._input_length, len(input_bag), input_bag
                 )
             )
 
-        self.increment('in')  # XXX should that go before type check ?
+        self.increment("in")  # XXX should that go before type check ?
 
         return input_bag
 
@@ -443,18 +442,18 @@ def split_token(output):
     flags, i, len_output, data_allowed = set(), 0, len(output), True
     while i < len_output and isflag(output[i]):
         if output[i].must_be_first and i:
-            raise ValueError('{} flag must be first.'.format(output[i]))
+            raise ValueError("{} flag must be first.".format(output[i]))
         if i and output[i - 1].must_be_last:
-            raise ValueError('{} flag must be last.'.format(output[i - 1]))
+            raise ValueError("{} flag must be last.".format(output[i - 1]))
         if output[i] in flags:
-            raise ValueError('Duplicate flag {}.'.format(output[i]))
+            raise ValueError("Duplicate flag {}.".format(output[i]))
         flags.add(output[i])
         data_allowed &= output[i].allows_data
         i += 1
 
     output = output[i:]
     if not data_allowed and len(output):
-        raise ValueError('Output data provided after a flag that does not allow data.')
+        raise ValueError("Output data provided after a flag that does not allow data.")
 
     return flags, output
 
@@ -465,7 +464,7 @@ def concat_types(t1, l1, t2, l2):
     if t1 == t2 == tuple:
         return tuple
 
-    f1 = t1._fields if hasattr(t1, '_fields') else tuple(range(l1))
-    f2 = t2._fields if hasattr(t2, '_fields') else tuple(range(l2))
+    f1 = t1._fields if hasattr(t1, "_fields") else tuple(range(l1))
+    f2 = t2._fields if hasattr(t2, "_fields") else tuple(range(l2))
 
-    return BagType('Inherited', f1 + f2)
+    return BagType("Inherited", f1 + f2)

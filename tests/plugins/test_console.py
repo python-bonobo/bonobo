@@ -1,10 +1,11 @@
 from unittest.mock import MagicMock
 
+from whistle import EventDispatcher
+
 import bonobo
 from bonobo.execution import events
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.plugins.console import ConsoleOutputPlugin
-from whistle import EventDispatcher
 
 
 def test_register_unregister():

@@ -27,7 +27,7 @@ def get_graph(**options):
 
     """
     graph = bonobo.Graph()
-    graph.add_chain(extract, transform, load)
+    graph.get_cursor() >> extract >> transform >> load
 
     return graph
 

@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 
 import bonobo
-from bonobo.constants import NOT_MODIFIED, EMPTY
-from bonobo.util import ensure_tuple, ValueHolder
-from bonobo.util.testing import BufferingNodeExecutionContext, StaticNodeTest, ConfigurableNodeTest
+from bonobo.constants import EMPTY, NOT_MODIFIED
+from bonobo.util import ValueHolder, ensure_tuple
+from bonobo.util.testing import BufferingNodeExecutionContext, ConfigurableNodeTest, StaticNodeTest
 
 
 class CountTest(StaticNodeTest, TestCase):
@@ -26,7 +26,7 @@ class CountTest(StaticNodeTest, TestCase):
     def test_execution(self):
         with self.execute() as context:
             context.write_sync(*([EMPTY] * 42))
-        assert context.get_buffer() == [(42, )]
+        assert context.get_buffer() == [(42,)]
 
 
 class IdentityTest(StaticNodeTest, TestCase):
@@ -81,14 +81,14 @@ def test_tee():
     tee = bonobo.Tee(inner)
     results = []
     for i in range(10):
-        results.append(tee('foo'))
+        results.append(tee("foo"))
 
     assert results == [NOT_MODIFIED] * 10
     assert len(inner.mock_calls) == 10
 
 
 def test_noop():
-    assert bonobo.noop(1, 2, 3, 4, foo='bar') == NOT_MODIFIED
+    assert bonobo.noop(1, 2, 3, 4, foo="bar") == NOT_MODIFIED
 
 
 def test_fixedwindow():
@@ -98,21 +98,18 @@ def test_fixedwindow():
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
         context.write_sync(*range(9))
-    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (
-        8,
-        None,
-    )]
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (8, None)]
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(1)) as context:
         context.write_sync(*range(3))
-    assert context.get_buffer() == [(0, ), (1, ), (2, )]
+    assert context.get_buffer() == [(0,), (1,), (2,)]
 
 
 def test_methodcaller():
-    with BufferingNodeExecutionContext(methodcaller('swapcase')) as context:
-        context.write_sync('aaa', 'bBb', 'CcC')
-    assert context.get_buffer() == list(map(ensure_tuple, ['AAA', 'BbB', 'cCc']))
+    with BufferingNodeExecutionContext(methodcaller("swapcase")) as context:
+        context.write_sync("aaa", "bBb", "CcC")
+    assert context.get_buffer() == list(map(ensure_tuple, ["AAA", "BbB", "cCc"]))
 
-    with BufferingNodeExecutionContext(methodcaller('zfill', 5)) as context:
-        context.write_sync('a', 'bb', 'ccc')
-    assert context.get_buffer() == list(map(ensure_tuple, ['0000a', '000bb', '00ccc']))
+    with BufferingNodeExecutionContext(methodcaller("zfill", 5)) as context:
+        context.write_sync("a", "bb", "ccc")
+    assert context.get_buffer() == list(map(ensure_tuple, ["0000a", "000bb", "00ccc"]))

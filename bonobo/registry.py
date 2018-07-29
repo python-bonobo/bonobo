@@ -5,23 +5,23 @@ from bonobo.nodes import (
     CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter, PickleReader, PickleWriter
 )
 
-FILETYPE_CSV = 'text/csv'
-FILETYPE_JSON = 'application/json'
-FILETYPE_PICKLE = 'pickle'
-FILETYPE_PLAIN = 'text/plain'
+FILETYPE_CSV = "text/csv"
+FILETYPE_JSON = "application/json"
+FILETYPE_PICKLE = "pickle"
+FILETYPE_PLAIN = "text/plain"
 
-READER = 'reader'
-WRITER = 'writer'
+READER = "reader"
+WRITER = "writer"
 
 
 class Registry:
     ALIASES = {
-        'csv': FILETYPE_CSV,
-        'json': FILETYPE_JSON,
-        'pickle': FILETYPE_PICKLE,
-        'plain': FILETYPE_PLAIN,
-        'text': FILETYPE_PLAIN,
-        'txt': FILETYPE_PLAIN,
+        "csv": FILETYPE_CSV,
+        "json": FILETYPE_JSON,
+        "pickle": FILETYPE_PICKLE,
+        "plain": FILETYPE_PLAIN,
+        "text": FILETYPE_PLAIN,
+        "txt": FILETYPE_PLAIN,
     }
 
     FACTORIES = {
@@ -41,10 +41,10 @@ class Registry:
 
     def get_factory_for(self, kind, name, *, format=None):
         if not kind in self.FACTORIES:
-            raise KeyError('Unknown factory kind {!r}.'.format(kind))
+            raise KeyError("Unknown factory kind {!r}.".format(kind))
 
         if format is None and name is None:
-            raise RuntimeError('Cannot guess factory without at least a filename or a format.')
+            raise RuntimeError("Cannot guess factory without at least a filename or a format.")
 
         # Guess mimetype if possible
         if format is None:
@@ -62,7 +62,7 @@ class Registry:
 
         if format is None or not format in self.FACTORIES[kind]:
             raise RuntimeError(
-                'Could not resolve {kind} factory for {name} ({format}).'.format(kind=kind, name=name, format=format)
+                "Could not resolve {kind} factory for {name} ({format}).".format(kind=kind, name=name, format=format)
             )
 
         return self.FACTORIES[kind][format]

@@ -12,13 +12,14 @@ class RunCommand(BaseGraphCommand):
         super(RunCommand, self).add_arguments(parser)
 
         verbosity_group = parser.add_mutually_exclusive_group()
-        verbosity_group.add_argument('--quiet', '-q', action='store_true')
-        verbosity_group.add_argument('--verbose', '-v', action='store_true')
+        verbosity_group.add_argument("--quiet", "-q", action="store_true")
+        verbosity_group.add_argument("--verbose", "-v", action="store_true")
 
-        parser.add_argument('--install', '-I', action='store_true')
+        parser.add_argument("--install", "-I", action="store_true")
 
     def parse_options(self, *, quiet=False, verbose=False, install=False, **options):
         from bonobo import settings
+
         settings.QUIET.set_if_true(quiet)
         settings.DEBUG.set_if_true(verbose)
         self.install = install
@@ -28,9 +29,9 @@ class RunCommand(BaseGraphCommand):
         # add install logic
         if self.install:
             if os.path.isdir(file):
-                requirements = os.path.join(file, 'requirements.txt')
+                requirements = os.path.join(file, "requirements.txt")
             else:
-                requirements = os.path.join(os.path.dirname(file), 'requirements.txt')
+                requirements = os.path.join(os.path.dirname(file), "requirements.txt")
             _install_requirements(requirements)
 
         return super()._run_path(file)
@@ -38,7 +39,7 @@ class RunCommand(BaseGraphCommand):
     def _run_module(self, mod):
         # install not implemented for a module, not sure it even make sense.
         if self.install:
-            raise RuntimeError('--install behaviour when running a module is not defined.')
+            raise RuntimeError("--install behaviour when running a module is not defined.")
 
         return super()._run_module(mod)
 
@@ -59,10 +60,11 @@ def _install_requirements(requirements):
     import importlib
     import pip
 
-    pip.main(['install', '-r', requirements])
+    pip.main(["install", "-r", requirements])
     # Some shenanigans to be sure everything is importable after this, especially .egg-link files which
     # are referenced in *.pth files and apparently loaded by site.py at some magic bootstrap moment of the
     # python interpreter.
     pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
     import site
+
     importlib.reload(site)

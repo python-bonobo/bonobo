@@ -9,13 +9,13 @@ from bonobo.nodes.io.file import FileReader, FileWriter
 
 
 class JsonHandler(FileHandler):
-    eol = ',\n'
-    prefix, suffix = '[', ']'
+    eol = ",\n"
+    prefix, suffix = "[", "]"
 
 
 class LdjsonHandler(FileHandler):
-    eol = '\n'
-    prefix, suffix = '', ''
+    eol = "\n"
+    prefix, suffix = "", ""
 
 
 class JsonReader(JsonHandler, FileReader):
@@ -58,16 +58,16 @@ class JsonWriter(JsonHandler, FileWriter):
         :param ctx:
         :param row:
         """
-        context.setdefault('lineno', 0)
+        context.setdefault("lineno", 0)
         fields = context.get_input_fields()
 
         if fields:
-            prefix = self.eol if context.lineno else ''
+            prefix = self.eol if context.lineno else ""
             self._write_line(file, prefix + json.dumps(OrderedDict(zip(fields, args))))
             context.lineno += 1
         else:
             for arg in args:
-                prefix = self.eol if context.lineno else ''
+                prefix = self.eol if context.lineno else ""
                 self._write_line(file, prefix + json.dumps(arg))
                 context.lineno += 1
 

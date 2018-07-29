@@ -45,14 +45,17 @@ def run(graph, *, plugins=None, services=None, strategy=None):
     plugins = plugins or []
 
     from bonobo import settings
+
     settings.check()
 
     if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
             import mondrian
+
             mondrian.setup(excepthook=True)
 
             from bonobo.plugins.console import ConsoleOutputPlugin
+
             if ConsoleOutputPlugin not in plugins:
                 plugins.append(ConsoleOutputPlugin)
 
@@ -61,20 +64,23 @@ def run(graph, *, plugins=None, services=None, strategy=None):
                 from bonobo.contrib.jupyter import JupyterOutputPlugin
             except ImportError:
                 import logging
+
                 logging.warning(
                     'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
-                    'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '
-                    'version by yourself.'
+                    "dependencies with «pip install bonobo[jupyter]», but you can also install a specific "
+                    "version by yourself."
                 )
             else:
                 if JupyterOutputPlugin not in plugins:
                     plugins.append(JupyterOutputPlugin)
 
     import logging
+
     logging.getLogger().setLevel(settings.LOGGING_LEVEL.get())
     strategy = create_strategy(strategy)
 
     from bonobo.util.errors import sweeten_errors
+
     with sweeten_errors():
         return strategy.execute(graph, plugins=plugins, services=services)
 
@@ -83,15 +89,15 @@ def _inspect_as_graph(graph):
     return graph._repr_dot_()
 
 
-_inspect_formats = {'graph': _inspect_as_graph}
+_inspect_formats = {"graph": _inspect_as_graph}
 
 
 @api.register_graph
 def inspect(graph, *, plugins=None, services=None, strategy=None, format):
     if not format in _inspect_formats:
         raise NotImplementedError(
-            'Output format {} not implemented. Choices are: {}.'.format(
-                format, ', '.join(sorted(_inspect_formats.keys()))
+            "Output format {} not implemented. Choices are: {}.".format(
+                format, ", ".join(sorted(_inspect_formats.keys()))
             )
         )
     print(_inspect_formats[format](graph))
@@ -160,20 +166,18 @@ api.register_group(
 )
 
 # registry
-api.register_group(
-    create_reader,
-    create_writer,
-)
+api.register_group(create_reader, create_writer)
 
 
 def _is_interactive_console():
     import sys
+
     return sys.stdout.isatty()
 
 
 def _is_jupyter_notebook():
     try:
-        return get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"
     except NameError:
         return False
 
@@ -182,7 +186,8 @@ def _is_jupyter_notebook():
 def get_examples_path(*pathsegments):
     import os
     import pathlib
-    return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
+
+    return str(pathlib.Path(os.path.dirname(__file__), "examples", *pathsegments))
 
 
 @api.register

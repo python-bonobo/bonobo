@@ -10,7 +10,7 @@ def to_bool(s):
     if type(s) is bool:
         return s
     if len(s):
-        if s.lower() in ('f', 'false', 'n', 'no', '0'):
+        if s.lower() in ("f", "false", "n", "no", "0"):
             return False
         return True
     return False
@@ -40,7 +40,7 @@ class Setting:
         self.formatter = formatter
 
     def __repr__(self):
-        return '<Setting {}={!r}>'.format(self.name, self.get())
+        return "<Setting {}={!r}>".format(self.name, self.get())
 
     def __eq__(self, other):
         return self.get() == other
@@ -51,7 +51,7 @@ class Setting:
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
-            raise ValidationError(self, 'Invalid value {!r} for setting {!r}.'.format(value, self.name))
+            raise ValidationError(self, "Invalid value {!r} for setting {!r}.".format(value, self.name))
         self.value = value
 
     def set_if_true(self, value):
@@ -78,40 +78,37 @@ class Setting:
 
 
 # Debug/verbose mode.
-DEBUG = Setting('DEBUG', formatter=to_bool, default=False)
+DEBUG = Setting("DEBUG", formatter=to_bool, default=False)
 
 # Profile mode.
-PROFILE = Setting('PROFILE', formatter=to_bool, default=False)
+PROFILE = Setting("PROFILE", formatter=to_bool, default=False)
 
 # Alpha mode.
-ALPHA = Setting('ALPHA', formatter=to_bool, default=False)
+ALPHA = Setting("ALPHA", formatter=to_bool, default=False)
 
 # Quiet mode.
-QUIET = Setting('QUIET', formatter=to_bool, default=False)
+QUIET = Setting("QUIET", formatter=to_bool, default=False)
 
 # Logging level.
 LOGGING_LEVEL = Setting(
-    'LOGGING_LEVEL',
+    "LOGGING_LEVEL",
     formatter=logging._checkLevel,
     validator=logging._checkLevel,
-    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO
+    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO,
 )
 
 # Input/Output format for transformations
-IOFORMAT_ARG0 = 'arg0'
-IOFORMAT_KWARGS = 'kwargs'
+IOFORMAT_ARG0 = "arg0"
+IOFORMAT_KWARGS = "kwargs"
 
-IOFORMATS = {
-    IOFORMAT_ARG0,
-    IOFORMAT_KWARGS,
-}
+IOFORMATS = {IOFORMAT_ARG0, IOFORMAT_KWARGS}
 
-IOFORMAT = Setting('IOFORMAT', default=IOFORMAT_KWARGS, validator=IOFORMATS.__contains__)
+IOFORMAT = Setting("IOFORMAT", default=IOFORMAT_KWARGS, validator=IOFORMATS.__contains__)
 
 
 def check():
     if DEBUG.get() and QUIET.get():
-        raise RuntimeError('I cannot be verbose and quiet at the same time.')
+        raise RuntimeError("I cannot be verbose and quiet at the same time.")
 
 
 clear_all = Setting.clear_all

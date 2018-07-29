@@ -1,14 +1,14 @@
 from bonobo import Graph
-from bonobo.constants import EMPTY, BEGIN, END
+from bonobo.constants import BEGIN, EMPTY, END
 from bonobo.execution.contexts import GraphExecutionContext
 
 
 def raise_an_error(*args, **kwargs):
-    raise Exception('Careful, man, there\'s a beverage here!')
+    raise Exception("Careful, man, there's a beverage here!")
 
 
 def raise_an_unrecoverrable_error(*args, **kwargs):
-    raise Exception('You are entering a world of pain!')
+    raise Exception("You are entering a world of pain!")
 
 
 def test_lifecycle_of_empty_graph():

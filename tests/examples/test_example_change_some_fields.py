@@ -5,22 +5,22 @@ from bonobo.config import use_raw_input
 from bonobo.execution.contexts import GraphExecutionContext
 from bonobo.util.bags import BagType
 
-Extracted = namedtuple('Extracted', ['id', 'name', 'value'])
-ExtractedBT = BagType('ExtractedBT', ['id', 'name', 'value'])
+Extracted = namedtuple("Extracted", ["id", "name", "value"])
+ExtractedBT = BagType("ExtractedBT", ["id", "name", "value"])
 
 
 def extract_nt():
-    yield Extracted(id=1, name='Guido', value='.py')
-    yield Extracted(id=2, name='Larry', value='.pl')
-    yield Extracted(id=3, name='Dennis', value='.c')
-    yield Extracted(id=4, name='Yukihiro', value='.rb')
+    yield Extracted(id=1, name="Guido", value=".py")
+    yield Extracted(id=2, name="Larry", value=".pl")
+    yield Extracted(id=3, name="Dennis", value=".c")
+    yield Extracted(id=4, name="Yukihiro", value=".rb")
 
 
 def extract_bt():
-    yield ExtractedBT(id=1, name='Guido', value='.py')
-    yield ExtractedBT(id=2, name='Larry', value='.pl')
-    yield ExtractedBT(id=3, name='Dennis', value='.c')
-    yield ExtractedBT(id=4, name='Yukihiro', value='.rb')
+    yield ExtractedBT(id=1, name="Guido", value=".py")
+    yield ExtractedBT(id=2, name="Larry", value=".pl")
+    yield ExtractedBT(id=3, name="Dennis", value=".c")
+    yield ExtractedBT(id=4, name="Yukihiro", value=".rb")
 
 
 def transform_using_args(id, name, value):
@@ -53,10 +53,18 @@ def test_execution():
     with GraphExecutionContext(graph) as context:
         context.run_until_complete()
 
-    assert result_args == [(2, 'Guido', 'guido.py'), (4, 'Larry', 'larry.pl'), (6, 'Dennis', 'dennis.c'),
-                           (8, 'Yukihiro', 'yukihiro.rb')]
+    assert result_args == [
+        (2, "Guido", "guido.py"),
+        (4, "Larry", "larry.pl"),
+        (6, "Dennis", "dennis.c"),
+        (8, "Yukihiro", "yukihiro.rb"),
+    ]
 
-    assert result_nt == [(1, 'GUIDO', '.py'), (2, 'LARRY', '.pl'), (3, 'DENNIS', '.c'), (4, 'YUKIHIRO', '.rb')]
+    assert result_nt == [(1, "GUIDO", ".py"), (2, "LARRY", ".pl"), (3, "DENNIS", ".c"), (4, "YUKIHIRO", ".rb")]
 
-    assert result_bt == [(2, 'Guido', 'guido.py'), (4, 'Larry', 'larry.pl'), (6, 'Dennis', 'dennis.c'),
-                         (8, 'Yukihiro', 'yukihiro.rb')]
+    assert result_bt == [
+        (2, "Guido", "guido.py"),
+        (4, "Larry", "larry.pl"),
+        (6, "Dennis", "dennis.c"),
+        (8, "Yukihiro", "yukihiro.rb"),
+    ]

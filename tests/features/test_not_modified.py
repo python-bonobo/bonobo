@@ -7,10 +7,7 @@ def useless(*args, **kwargs):
 
 
 def test_not_modified():
-    input_messages = [
-        ('foo', 'bar'),
-        ('foo', 'baz'),
-    ]
+    input_messages = [("foo", "bar"), ("foo", "baz")]
 
     with BufferingNodeExecutionContext(useless) as context:
         context.write_sync(*input_messages)

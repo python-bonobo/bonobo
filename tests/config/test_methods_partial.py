@@ -12,11 +12,11 @@ class Bobby(Configurable):
 
     @ContextProcessor
     def think(self, context):
-        yield 'different'
+        yield "different"
 
     def __call__(self, think, *args, **kwargs):
-        self.handler('1', *args, **kwargs)
-        self.handler2('2', *args, **kwargs)
+        self.handler("1", *args, **kwargs)
+        self.handler2("2", *args, **kwargs)
 
 
 def test_partial():
@@ -40,7 +40,7 @@ def test_partial():
         assert len(ci.options) == 4
         assert len(ci.processors) == 1
         assert ci.partial
-        assert ci.partial[0] == (f1, )
+        assert ci.partial[0] == (f1,)
         assert not len(ci.partial[1])
 
     # instanciate a more complete partial instance ...
@@ -53,13 +53,10 @@ def test_partial():
         assert len(ci.options) == 4
         assert len(ci.processors) == 1
         assert ci.partial
-        assert ci.partial[0] == (
-            f1,
-            f2,
-        )
+        assert ci.partial[0] == (f1, f2)
         assert not len(ci.partial[1])
 
-    c = C('foo')
+    c = C("foo")
 
     with inspect_node(c) as ci:
         assert ci.type == Bobby

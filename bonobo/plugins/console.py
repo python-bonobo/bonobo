@@ -35,7 +35,7 @@ class ConsoleOutputPlugin(Plugin):
     isatty = False
 
     # Whether we're on windows, or a real operating system.
-    iswindows = (sys.platform == 'win32')
+    iswindows = sys.platform == "win32"
 
     def __init__(self):
         self.isatty = self._stdout.isatty()
@@ -55,9 +55,9 @@ class ConsoleOutputPlugin(Plugin):
         # Two options:
         # - move state to context
         # - forbid registering more than once
-        self.prefix = ''
+        self.prefix = ""
         self.counter = 0
-        self._append_cache = ''
+        self._append_cache = ""
 
         self.stdout = IOBuffer()
         self.redirect_stdout = redirect_stdout(self._stdout if self.iswindows else self.stdout)
@@ -78,13 +78,13 @@ class ConsoleOutputPlugin(Plugin):
         self.redirect_stderr.__exit__(None, None, None)
         self.redirect_stdout.__exit__(None, None, None)
 
-    def write(self, context, prefix='', rewind=True, append=None):
+    def write(self, context, prefix="", rewind=True, append=None):
         t_cnt = len(context)
 
         if not self.iswindows:
-            for line in self.stdout.switch().split('\n')[:-1]:
+            for line in self.stdout.switch().split("\n")[:-1]:
                 print(line + CLEAR_EOL, file=self._stdout)
-            for line in self.stderr.switch().split('\n')[:-1]:
+            for line in self.stderr.switch().split("\n")[:-1]:
                 print(line + CLEAR_EOL, file=self._stderr)
 
         alive_color = Style.BRIGHT
@@ -92,31 +92,36 @@ class ConsoleOutputPlugin(Plugin):
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
-            name_suffix = '({})'.format(i) if settings.DEBUG.get() else ''
+            name_suffix = "({})".format(i) if settings.DEBUG.get() else ""
 
             liveliness_color = alive_color if node.alive else dead_color
-            liveliness_prefix = ' {}{}{} '.format(liveliness_color, node.status, Style.RESET_ALL)
-            _line = ''.join((
-                liveliness_prefix,
-                node.name,
-                name_suffix,
-                ' ',
-                node.get_statistics_as_string(),
-                ' ',
-                node.get_flags_as_string(),
-                Style.RESET_ALL,
-                ' ',
-            ))
+            liveliness_prefix = " {}{}{} ".format(liveliness_color, node.status, Style.RESET_ALL)
+            _line = "".join(
+                (
+                    liveliness_prefix,
+                    node.name,
+                    name_suffix,
+                    " ",
+                    node.get_statistics_as_string(),
+                    " ",
+                    node.get_flags_as_string(),
+                    Style.RESET_ALL,
+                    " ",
+                )
+            )
             print(prefix + _line + CLEAR_EOL, file=self._stderr)
 
         if append:
             # todo handle multiline
             print(
-                ''.join((
-                    ' `-> ', ' '.join('{}{}{}: {}'.format(Style.BRIGHT, k, Style.RESET_ALL, v) for k, v in append),
-                    CLEAR_EOL
-                )),
-                file=self._stderr
+                "".join(
+                    (
+                        " `-> ",
+                        " ".join("{}{}{}: {}".format(Style.BRIGHT, k, Style.RESET_ALL, v) for k, v in append),
+                        CLEAR_EOL,
+                    )
+                ),
+                file=self._stderr,
             )
             t_cnt += 1
 
@@ -129,16 +134,17 @@ class ConsoleOutputPlugin(Plugin):
             if self.counter % 10 and self._append_cache:
                 append = self._append_cache
             else:
-                self._append_cache = append = (('Memory', '{0:.2f} Mb'.format(memory_usage())),
-                                               # ('Total time', '{0} s'.format(execution_time(harness))),
-                                               )
+                self._append_cache = append = (
+                    ("Memory", "{0:.2f} Mb".format(memory_usage())),
+                    # ('Total time', '{0} s'.format(execution_time(harness))),
+                )
         else:
             append = ()
         self.write(context, prefix=self.prefix, append=append, rewind=rewind)
         self.counter += 1
 
 
-class IOBuffer():
+class IOBuffer:
     """
     The role of IOBuffer is to overcome the problem of multiple threads wanting to write to stdout at the same time. It
     works a bit like a videogame: there are two buffers, one that is used to write, and one which is used to read from.
@@ -165,5 +171,6 @@ class IOBuffer():
 
 def memory_usage():
     import os, psutil
+
     process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2**20)
+    return process.memory_info()[0] / float(2 ** 20)

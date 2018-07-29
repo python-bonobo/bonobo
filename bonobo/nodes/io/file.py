@@ -12,24 +12,28 @@ class FileReader(Reader, FileHandler):
     present. Extending it is usually the right way to create more specific file readers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='r', __doc__='''
+    mode = Option(
+        str,
+        default="r",
+        __doc__="""
         What mode to use for open() call.
-    ''')  # type: str
+    """,
+    )  # type: str
 
     output_fields = Option(
         ensure_tuple,
         required=False,
-        __doc__='''
+        __doc__="""
         Specify the field names of output lines.
         Mutually exclusive with "output_type".
-    '''
+    """,
     )
     output_type = Option(
         required=False,
-        __doc__='''
+        __doc__="""
         Specify the type of output lines.
         Mutually exclusive with "output_fields".
-    '''
+    """,
     )
 
     @ContextProcessor
@@ -43,7 +47,7 @@ class FileReader(Reader, FileHandler):
         output_type = self.output_type
 
         if output_fields and output_type:
-            raise UnrecoverableError('Cannot specify both output_fields and output_type option.')
+            raise UnrecoverableError("Cannot specify both output_fields and output_type option.")
 
         if self.output_type:
             context.set_output_type(self.output_type)
@@ -72,16 +76,20 @@ class FileWriter(Writer, FileHandler):
     usually the right way to create more specific file writers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='w+', __doc__='''
+    mode = Option(
+        str,
+        default="w+",
+        __doc__="""
         What mode to use for open() call.
-    ''')  # type: str
+    """,
+    )  # type: str
 
     def write(self, file, context, line, *, fs):
         """
         Write a row on the next line of opened file in context.
         """
-        context.setdefault('lineno', 0)
-        self._write_line(file, (self.eol if context.lineno else '') + line)
+        context.setdefault("lineno", 0)
+        self._write_line(file, (self.eol if context.lineno else "") + line)
         context.lineno += 1
         return NOT_MODIFIED
 

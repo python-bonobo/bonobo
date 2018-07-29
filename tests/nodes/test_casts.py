@@ -8,11 +8,11 @@ from bonobo.util.bags import BagType
 from bonobo.util.envelopes import Envelope
 from bonobo.util.testing import BufferingNodeExecutionContext
 
-MyTuple = namedtuple('MyTuple', ['a', 'b', 'c'])
-MyBag = BagType('MyBag', ['a', 'b', 'c'])
+MyTuple = namedtuple("MyTuple", ["a", "b", "c"])
+MyBag = BagType("MyBag", ["a", "b", "c"])
 
 
-class MyCustomType():
+class MyCustomType:
     def __init__(self, *args):
         self.args = args
 
@@ -20,16 +20,19 @@ class MyCustomType():
         return MyBag(*self.args)
 
 
-@pytest.mark.parametrize(['factory', 'expected', 'expected_item0'], [
-    [lambda: (1, 2, 3), tuple, int],
-    [lambda: Envelope((1, 2, 3)), tuple, int],
-    [lambda: MyTuple(1, 2, 3), MyTuple, int],
-    [lambda: Envelope(MyTuple(1, 2, 3)), MyTuple, int],
-    [lambda: MyBag(1, 2, 3), MyBag, int],
-    [lambda: Envelope(MyBag(1, 2, 3)), MyBag, int],
-    [lambda: MyCustomType(1, 2, 3), tuple, MyCustomType],
-    [lambda: Envelope(MyCustomType(1, 2, 3)), tuple, MyCustomType],
-])
+@pytest.mark.parametrize(
+    ["factory", "expected", "expected_item0"],
+    [
+        [lambda: (1, 2, 3), tuple, int],
+        [lambda: Envelope((1, 2, 3)), tuple, int],
+        [lambda: MyTuple(1, 2, 3), MyTuple, int],
+        [lambda: Envelope(MyTuple(1, 2, 3)), MyTuple, int],
+        [lambda: MyBag(1, 2, 3), MyBag, int],
+        [lambda: Envelope(MyBag(1, 2, 3)), MyBag, int],
+        [lambda: MyCustomType(1, 2, 3), tuple, MyCustomType],
+        [lambda: Envelope(MyCustomType(1, 2, 3)), tuple, MyCustomType],
+    ],
+)
 def test_casts_after_output(factory: Callable, expected, expected_item0):
     def transform():
         yield factory()

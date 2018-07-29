@@ -11,7 +11,7 @@ _service_name_re = re.compile(r"^[^\d\W]\w*(:?\.[^\d\W]\w*)*$", re.UNICODE)
 
 def validate_service_name(name):
     if not _service_name_re.match(name):
-        raise ValueError('Invalid service name {!r}.'.format(name))
+        raise ValueError("Invalid service name {!r}.".format(name))
     return name
 
 
@@ -66,7 +66,7 @@ class Service(Option):
 class Container(dict):
     def __new__(cls, *args, **kwargs):
         if len(args) == 1:
-            assert not len(kwargs), 'only one usage at a time, my dear.'
+            assert not len(kwargs), "only one usage at a time, my dear."
             if not (args[0]):
                 return super().__new__(cls)
             if isinstance(args[0], cls):
@@ -86,7 +86,7 @@ class Container(dict):
             if default:
                 return default
             raise MissingServiceImplementationError(
-                'Cannot resolve service {!r} using provided service collection.'.format(name)
+                "Cannot resolve service {!r} using provided service collection.".format(name)
             )
         value = super().get(name)
         # XXX this is not documented and can lead to errors.
@@ -108,13 +108,15 @@ def create_container(services=None, factory=Container):
     """
     container = factory(services) if services else factory()
 
-    if not 'fs' in container:
+    if not "fs" in container:
         import bonobo
-        container.setdefault('fs', bonobo.open_fs())
 
-    if not 'http' in container:
+        container.setdefault("fs", bonobo.open_fs())
+
+    if not "http" in container:
         import requests
-        container.setdefault('http', requests)
+
+        container.setdefault("http", requests)
 
     return container
 
@@ -137,6 +139,7 @@ class Exclusive(ContextDecorator):
     ensure that.
 
     """
+
     _locks = {}
 
     def __init__(self, wrapped):

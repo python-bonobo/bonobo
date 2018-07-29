@@ -18,13 +18,13 @@ import bonobo
 
 
 def extract():
-    yield 'foo'
-    yield 'bar'
-    yield 'baz'
+    yield "foo"
+    yield "bar"
+    yield "baz"
 
 
 def transform(s):
-    return '{} ({})'.format(s.title(), randint(10, 99))
+    return "{} ({})".format(s.title(), randint(10, 99))
 
 
 def load(s):
@@ -35,7 +35,7 @@ def get_graph():
     return bonobo.Graph(extract, transform, load)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = bonobo.get_argument_parser()
     with bonobo.parse_args(parser):
         bonobo.run(get_graph())

@@ -1,9 +1,7 @@
 from bonobo.errors import AbstractError
 from bonobo.util import get_name, iscontextprocessor, isoption, sortedlist
 
-__all__ = [
-    'Configurable',
-]
+__all__ = ["Configurable"]
 
 get_creation_counter = lambda v: v._creation_counter
 
@@ -42,12 +40,12 @@ class ConfigurableMeta(type):
         for _positional, _counter, _name, _value in cls.__options:
             _param = _name
             if _value.type:
-                _param = get_name(_value.type) + ' ' + _param
+                _param = get_name(_value.type) + " " + _param
 
-            prefix = ':param {}: '.format(_param)
-            for lineno, line in enumerate((_value.__doc__ or '').split('\n')):
-                _options_doc.append((' ' * len(prefix) if lineno else prefix) + line)
-        cls.__doc__ = '\n\n'.join(map(str.strip, filter(None, (cls.__doc__, '\n'.join(_options_doc)))))
+            prefix = ":param {}: ".format(_param)
+            for lineno, line in enumerate((_value.__doc__ or "").split("\n")):
+                _options_doc.append((" " * len(prefix) if lineno else prefix) + line)
+        cls.__doc__ = "\n\n".join(map(str.strip, filter(None, (cls.__doc__, "\n".join(_options_doc)))))
 
     @property
     def __options__(cls):
@@ -64,10 +62,7 @@ class ConfigurableMeta(type):
         return cls.__processors_cache
 
     def __repr__(self):
-        return ' '.join((
-            '<Configurable',
-            super(ConfigurableMeta, self).__repr__().split(' ', 1)[1],
-        ))
+        return " ".join(("<Configurable", super(ConfigurableMeta, self).__repr__().split(" ", 1)[1]))
 
 
 try:
@@ -154,9 +149,11 @@ class Configurable(metaclass=ConfigurableMeta):
         extraneous = set(kwargs.keys()) - (set(next(zip(*options))) if len(options) else set())
         if len(extraneous):
             raise TypeError(
-                '{}() got {} unexpected option{}: {}.'.format(
-                    cls.__name__, len(extraneous), 's'
-                    if len(extraneous) > 1 else '', ', '.join(map(repr, sorted(extraneous)))
+                "{}() got {} unexpected option{}: {}.".format(
+                    cls.__name__,
+                    len(extraneous),
+                    "s" if len(extraneous) > 1 else "",
+                    ", ".join(map(repr, sorted(extraneous))),
                 )
             )
 
@@ -165,9 +162,11 @@ class Configurable(metaclass=ConfigurableMeta):
         if len(missing):
             if _final:
                 raise TypeError(
-                    '{}() missing {} required option{}: {}.'.format(
-                        cls.__name__, len(missing), 's'
-                        if len(missing) > 1 else '', ', '.join(map(repr, sorted(missing)))
+                    "{}() missing {} required option{}: {}.".format(
+                        cls.__name__,
+                        len(missing),
+                        "s" if len(missing) > 1 else "",
+                        ", ".join(map(repr, sorted(missing))),
                     )
                 )
             return PartiallyConfigured(cls, *args, **kwargs)
@@ -196,7 +195,7 @@ class Configurable(metaclass=ConfigurableMeta):
                 break
 
             if name in self._options_values:
-                raise ValueError('Already got a value for option {}'.format(name))
+                raise ValueError("Already got a value for option {}".format(name))
 
             setattr(self, name, args[position])
             position += 1
