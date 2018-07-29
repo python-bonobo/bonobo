@@ -4,7 +4,7 @@ import itertools
 import pprint
 
 from bonobo import settings
-from bonobo.config import Configurable, Option, Method, use_raw_input, use_context, use_no_input
+from bonobo.config import Configurable, Method, Option, use_context, use_no_input, use_raw_input
 from bonobo.config.functools import transformation_factory
 from bonobo.config.processors import ContextProcessor, use_context_processor
 from bonobo.constants import NOT_MODIFIED

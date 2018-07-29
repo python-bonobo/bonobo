@@ -1,4 +1,4 @@
-from bonobo.config import Configurable, Method, Option, ContextProcessor, use_raw_input
+from bonobo.config import Configurable, ContextProcessor, Method, Option, use_raw_input
 from bonobo.util import ValueHolder
 
 

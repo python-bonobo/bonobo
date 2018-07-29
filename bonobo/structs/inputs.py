@@ -15,8 +15,8 @@
 # limitations under the License.
 
 from abc import ABCMeta, abstractmethod
-from queue import Queue
 from asyncio.queues import Queue as AioQueue
+from queue import Queue
 
 from bonobo.constants import BEGIN, END
 from bonobo.errors import AbstractError, InactiveReadableError, InactiveWritableError

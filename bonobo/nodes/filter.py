@@ -1,6 +1,5 @@
-from bonobo.constants import NOT_MODIFIED
-
 from bonobo.config import Configurable, Method
+from bonobo.constants import NOT_MODIFIED
 
 
 class Filter(Configurable):

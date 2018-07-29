@@ -4,16 +4,16 @@ import io
 import os
 import runpy
 import sys
-from contextlib import contextmanager, redirect_stdout, redirect_stderr
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 import pytest
 
-from bonobo import open_fs, __main__, get_examples_path
+from bonobo import __main__, get_examples_path, open_fs
 from bonobo.commands import entrypoint
-from bonobo.structs.tokens import Token
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.contexts.node import NodeExecutionContext
+from bonobo.structs.tokens import Token
 
 
 @contextmanager

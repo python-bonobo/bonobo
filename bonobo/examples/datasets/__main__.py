@@ -2,9 +2,9 @@ import os
 
 import bonobo
 from bonobo import examples
+from bonobo.examples import get_datasets_dir, get_minor_version, get_services
 from bonobo.examples.datasets.coffeeshops import get_graph as get_coffeeshops_graph
 from bonobo.examples.datasets.fablabs import get_graph as get_fablabs_graph
-from bonobo.examples import get_minor_version, get_datasets_dir, get_services
 
 graph_factories = {
     'coffeeshops': get_coffeeshops_graph,

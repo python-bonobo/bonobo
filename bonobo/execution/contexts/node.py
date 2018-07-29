@@ -10,11 +10,11 @@ from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.inputs import Input, AioInput
-from bonobo.structs.tokens import Token, Flag
-from bonobo.util import get_name, isconfigurabletype, ensure_tuple, deprecated
+from bonobo.structs.inputs import AioInput, Input
+from bonobo.structs.tokens import Flag, Token
+from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype
 from bonobo.util.bags import BagType
-from bonobo.util.envelopes import isenvelope, F_NOT_MODIFIED, F_INHERIT
+from bonobo.util.envelopes import F_INHERIT, F_NOT_MODIFIED, isenvelope
 from bonobo.util.statistics import WithStatistics
 
 logger = logging.getLogger(__name__)

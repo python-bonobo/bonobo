@@ -1,5 +1,4 @@
 import logging
-
 import os
 
 from bonobo.errors import ValidationError

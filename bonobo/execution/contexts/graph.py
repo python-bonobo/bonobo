@@ -3,14 +3,15 @@ from functools import partial
 from queue import Empty
 from time import sleep
 
+from whistle import EventDispatcher
+
 from bonobo.config import create_container
-from bonobo.constants import BEGIN, END, EMPTY
+from bonobo.constants import BEGIN, EMPTY, END
 from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.execution.contexts.node import NodeExecutionContext, AsyncNodeExecutionContext
+from bonobo.execution.contexts.node import AsyncNodeExecutionContext, NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
-from whistle import EventDispatcher
 
 logger = logging.getLogger(__name__)
 

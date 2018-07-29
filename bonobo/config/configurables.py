@@ -1,5 +1,5 @@
 from bonobo.errors import AbstractError
-from bonobo.util import isoption, iscontextprocessor, sortedlist, get_name
+from bonobo.util import get_name, iscontextprocessor, isoption, sortedlist
 
 __all__ = [
     'Configurable',

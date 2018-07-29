@@ -1,4 +1,4 @@
-from bonobo.config import Option, ContextProcessor, use_context
+from bonobo.config import ContextProcessor, Option, use_context
 from bonobo.constants import NOT_MODIFIED
 from bonobo.errors import UnrecoverableError
 from bonobo.nodes.io.base import FileHandler, Reader, Writer

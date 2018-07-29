@@ -1,4 +1,4 @@
-from bonobo import open_fs, examples
+from bonobo import examples, open_fs
 
 
 def get_services():

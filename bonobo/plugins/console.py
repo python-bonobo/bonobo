@@ -1,8 +1,9 @@
 import io
 import sys
-from contextlib import redirect_stdout, redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 
-from colorama import Style, Fore, init as initialize_colorama_output_wrappers
+from colorama import Fore, Style
+from colorama import init as initialize_colorama_output_wrappers
 
 from bonobo import settings
 from bonobo.execution import events

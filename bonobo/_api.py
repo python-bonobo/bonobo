@@ -13,7 +13,7 @@ from bonobo.nodes import __all__ as _all_nodes
 from bonobo.registry import create_reader, create_writer
 from bonobo.structs.graphs import Graph
 from bonobo.util.api import ApiHelper
-from bonobo.util.environ import parse_args, get_argument_parser
+from bonobo.util.environ import get_argument_parser, parse_args
 
 __all__ = []
 

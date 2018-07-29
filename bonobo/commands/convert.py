@@ -1,7 +1,7 @@
 import bonobo
 from bonobo.commands import BaseCommand
 from bonobo.registry import READER, WRITER, default_registry
-from bonobo.util.resolvers import _resolve_transformations, _resolve_options
+from bonobo.util.resolvers import _resolve_options, _resolve_transformations
 
 
 class ConvertCommand(BaseCommand):

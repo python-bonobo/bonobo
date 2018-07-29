@@ -1,6 +1,7 @@
-import bonobo
 import datetime
 import time
+
+import bonobo
 
 
 def extract():
