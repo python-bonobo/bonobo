@@ -10,7 +10,7 @@ from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.inputs import Input
+from bonobo.structs.inputs import Input, AioInput
 from bonobo.structs.tokens import Token, Flag
 from bonobo.util import get_name, isconfigurabletype, ensure_tuple, deprecated
 from bonobo.util.bags import BagType
@@ -32,6 +32,8 @@ class NodeExecutionContext(BaseContext, WithStatistics):
     a service implementation, or a value holder).
 
     """
+
+    QueueType = Input
 
     def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
         """
@@ -57,7 +59,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self.services = None
 
         # Input / Output: how the wrapped node will communicate
-        self.input = _input or Input()
+        self.input = _input or self.QueueType()
         self.outputs = _outputs or []
 
         # Types
@@ -174,10 +176,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                     break
                 else:
                     # Push data (in case of an iterator)
-                    self._send(self._cast(input_bag, result))
+                    self._put(self._cast(input_bag, result))
         elif results:
             # Push data (returned value)
-            self._send(self._cast(input_bag, results))
+            self._put(self._cast(input_bag, results))
         else:
             # case with no result, an execution went through anyway, use for stats.
             # self._exec_count += 1
@@ -197,7 +199,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         super().stop()
 
     def send(self, *_output, _input=None):
-        return self._send(self._cast(_input, _output))
+        return self._put(self._cast(_input, _output))
 
     ### Input type and fields
     @property
@@ -324,7 +326,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def _cast(self, _input, _output):
         """
-        Transforms a pair of input/output into the real slim output.
+        Transforms a pair of input/output into the real slim shoutput.
 
         :param _input: Bag
         :param _output: mixed
@@ -355,7 +357,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
         return ensure_tuple(_output, cls=self._output_type)
 
-    def _send(self, value, _control=False):
+    def _put(self, value, _control=False):
         """
         Sends a message to all of this context's outputs.
 
@@ -375,6 +377,52 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self.services:
             return UnboundArguments((), self.services.kwargs_for(self.wrapped))
         return UnboundArguments((), {})
+
+
+class AsyncNodeExecutionContext(NodeExecutionContext):
+    QueueType = AioInput
+
+    def __init__(self, *args, loop, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._event_loop = loop
+
+    async def _get(self):
+        """
+        Read from the input queue.
+
+        If Queue raises (like Timeout or Empty), stat won't be changed.
+
+        """
+        input_bag = await self.input.get()
+
+        # Store or check input type
+        if self._input_type is None:
+            self._input_type = type(input_bag)
+        elif type(input_bag) != self._input_type:
+            try:
+                if self._input_type == tuple:
+                    input_bag = self._input_type(input_bag)
+                else:
+                    input_bag = self._input_type(*input_bag)
+            except Exception as exc:
+                raise UnrecoverableTypeError(
+                    'Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.'.
+                    format(self.wrapped, input_bag, self._input_type)
+                ) from exc
+
+        # Store or check input length, which is a soft fallback in case we're just using tuples
+        if self._input_length is None:
+            self._input_length = len(input_bag)
+        elif len(input_bag) != self._input_length:
+            raise UnrecoverableTypeError(
+                'Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.'.format(
+                    self.wrapped, self._input_length, len(input_bag), input_bag
+                )
+            )
+
+        self.increment('in')  # XXX should that go before type check ?
+
+        return input_bag
 
 
 def isflag(param):

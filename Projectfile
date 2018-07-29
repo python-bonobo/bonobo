@@ -43,6 +43,7 @@ python.setup(
 )
 
 python.add_requirements(
+    'cached-property ~=1.4',
     'fs ~=2.0',
     'graphviz >=0.8,<0.9',
     'jinja2 ~=2.9',

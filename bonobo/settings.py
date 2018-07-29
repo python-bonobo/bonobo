@@ -84,6 +84,9 @@ DEBUG = Setting('DEBUG', formatter=to_bool, default=False)
 # Profile mode.
 PROFILE = Setting('PROFILE', formatter=to_bool, default=False)
 
+# Alpha mode.
+ALPHA = Setting('ALPHA', formatter=to_bool, default=False)
+
 # Quiet mode.
 QUIET = Setting('QUIET', formatter=to_bool, default=False)
 

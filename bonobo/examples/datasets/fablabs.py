@@ -15,11 +15,13 @@ and a flat txt file.
 """
 
 import json
+import sys
 
 import bonobo
 from bonobo import examples
 from bonobo.contrib.opendatasoft import OpenDataSoftAPI
 from bonobo.examples.datasets.services import get_services
+from bonobo.util.statistics import Timer
 
 try:
     import pycountry
@@ -66,7 +68,20 @@ if __name__ == '__main__':
     parser = examples.get_argument_parser()
 
     with bonobo.parse_args(parser) as options:
-        bonobo.run(
-            get_graph(**examples.get_graph_options(options)),
-            services=get_services()
-        )
+        with Timer() as timer:
+            print(
+                'Options:', ' '.join(
+                    '{}={}'.format(k, v)
+                    for k, v in sorted(options.items())
+                )
+            )
+            retval = bonobo.run(
+                get_graph(**examples.get_graph_options(options)),
+                services=get_services(),
+                strategy=options['strategy'],
+            )
+        print('Execution time:', timer)
+        print('Return value:', retval)
+        print('XStatus:', retval.xstatus)
+        if retval.xstatus:
+            sys.exit(retval.xstatus)

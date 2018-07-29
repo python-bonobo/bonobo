@@ -1,5 +1,6 @@
 -e .
 appdirs==1.4.3
+cached-property==1.4.3
 certifi==2018.4.16
 chardet==3.0.4
 colorama==0.3.9

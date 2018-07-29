@@ -6,7 +6,8 @@ In the future, the two strategies that would really benefit bonobo are subproces
 at home if you want to give it a shot.
 
 """
-from bonobo.execution.strategies.executor import ProcessPoolExecutorStrategy, ThreadPoolExecutorStrategy
+from bonobo.execution.strategies.executor import ProcessPoolExecutorStrategy, ThreadPoolExecutorStrategy, \
+    AsyncThreadPoolExecutorStrategy
 from bonobo.execution.strategies.naive import NaiveStrategy
 
 __all__ = [
@@ -17,6 +18,7 @@ STRATEGIES = {
     'naive': NaiveStrategy,
     'processpool': ProcessPoolExecutorStrategy,
     'threadpool': ThreadPoolExecutorStrategy,
+    'aio_threadpool': AsyncThreadPoolExecutorStrategy,
 }
 
 DEFAULT_STRATEGY = 'threadpool'

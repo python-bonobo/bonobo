@@ -8,18 +8,20 @@ from bonobo.constants import BEGIN, END, EMPTY
 from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.execution.contexts.node import NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext, AsyncNodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
 from whistle import EventDispatcher
 
 logger = logging.getLogger(__name__)
 
 
-class GraphExecutionContext(BaseContext):
+class BaseGraphExecutionContext(BaseContext):
     """
-    Stores the actual state of a graph execution, and manages its lifecycle.
+    Stores the actual state of a graph execution, and manages its lifecycle. This is an abstract base class for all
+    graph execution contexts, and a few methods should actually be implemented for the child classes to be useable.
 
     """
+
     NodeExecutionContextType = NodeExecutionContext
     PluginExecutionContextType = PluginExecutionContext
 
@@ -28,23 +30,31 @@ class GraphExecutionContext(BaseContext):
     @property
     def started(self):
         if not len(self.nodes):
-            return super(GraphExecutionContext, self).started
+            return super(BaseGraphExecutionContext, self).started
         return any(node.started for node in self.nodes)
 
     @property
     def stopped(self):
         if not len(self.nodes):
-            return super(GraphExecutionContext, self).stopped
+            return super(BaseGraphExecutionContext, self).stopped
         return all(node.started and node.stopped for node in self.nodes)
 
     @property
     def alive(self):
         if not len(self.nodes):
-            return super(GraphExecutionContext, self).alive
+            return super(BaseGraphExecutionContext, self).alive
         return any(node.alive for node in self.nodes)
 
+    @property
+    def xstatus(self):
+        """
+        UNIX-like exit status, only coherent if the context has stopped.
+
+        """
+        return max(node.xstatus for node in self.nodes) if len(self.nodes) else 0
+
     def __init__(self, graph, *, plugins=None, services=None, dispatcher=None):
-        super(GraphExecutionContext, self).__init__(graph)
+        super(BaseGraphExecutionContext, self).__init__(graph)
         self.dispatcher = dispatcher or EventDispatcher()
         self.graph = graph
         self.nodes = [self.create_node_execution_context_for(node) for node in self.graph]
@@ -58,8 +68,8 @@ class GraphExecutionContext(BaseContext):
             outputs = self.graph.outputs_of(i)
             if len(outputs):
                 node_context.outputs = [self[j].input for j in outputs]
-            node_context.input.on_begin = partial(node_context._send, BEGIN, _control=True)
-            node_context.input.on_end = partial(node_context._send, END, _control=True)
+            node_context.input.on_begin = partial(node_context._put, BEGIN, _control=True)
+            node_context.input.on_end = partial(node_context._put, END, _control=True)
             node_context.input.on_finalize = partial(node_context.stop)
 
     def __getitem__(self, item):
@@ -79,50 +89,38 @@ class GraphExecutionContext(BaseContext):
             plugin = plugin()
         return self.PluginExecutionContextType(plugin, parent=self)
 
-    def write(self, *messages):
-        """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
-        our graph."""
-
-        for i in self.graph.outputs_of(BEGIN):
-            for message in messages:
-                self[i].write(message)
-
     def dispatch(self, name):
         self.dispatcher.dispatch(name, events.ExecutionEvent(self))
 
+    def register_plugins(self):
+        for plugin_context in self.plugins:
+            plugin_context.register()
+
+    def unregister_plugins(self):
+        for plugin_context in self.plugins:
+            plugin_context.unregister()
+
+
+class GraphExecutionContext(BaseGraphExecutionContext):
     def start(self, starter=None):
         super(GraphExecutionContext, self).start()
 
         self.register_plugins()
         self.dispatch(events.START)
         self.tick(pause=False)
+
         for node in self.nodes:
             if starter is None:
                 node.start()
             else:
                 starter(node)
+
         self.dispatch(events.STARTED)
 
     def tick(self, pause=True):
         self.dispatch(events.TICK)
         if pause:
             sleep(self.TICK_PERIOD)
-
-    def loop(self):
-        nodes = set(node for node in self.nodes if node.should_loop)
-        while self.should_loop and len(nodes):
-            self.tick(pause=False)
-            for node in list(nodes):
-                try:
-                    node.step()
-                except Empty:
-                    continue
-                except InactiveReadableError:
-                    nodes.discard(node)
-
-    def run_until_complete(self):
-        self.write(BEGIN, EMPTY, END)
-        self.loop()
 
     def stop(self, stopper=None):
         super(GraphExecutionContext, self).stop()
@@ -145,18 +143,37 @@ class GraphExecutionContext(BaseContext):
             node_context.kill()
         self.tick()
 
-    def register_plugins(self):
-        for plugin_context in self.plugins:
-            plugin_context.register()
+    def write(self, *messages):
+        """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
+        our graph."""
 
-    def unregister_plugins(self):
-        for plugin_context in self.plugins:
-            plugin_context.unregister()
+        for i in self.graph.outputs_of(BEGIN):
+            for message in messages:
+                self[i].write(message)
 
-    @property
-    def xstatus(self):
-        """
-        UNIX-like exit status, only coherent if the context has stopped.
+    def loop(self):
+        nodes = set(node for node in self.nodes if node.should_loop)
+        while self.should_loop and len(nodes):
+            self.tick(pause=False)
+            for node in list(nodes):
+                try:
+                    node.step()
+                except Empty:
+                    continue
+                except InactiveReadableError:
+                    nodes.discard(node)
 
-        """
-        return max(node.xstatus for node in self.nodes) if len(self.nodes) else 0
+    def run_until_complete(self):
+        self.write(BEGIN, EMPTY, END)
+        self.loop()
+
+
+class AsyncGraphExecutionContext(GraphExecutionContext):
+    NodeExecutionContextType = AsyncNodeExecutionContext
+
+    def __init__(self, *args, loop, **kwargs):
+        self._event_loop = loop
+        super().__init__(*args, **kwargs)
+
+    def create_node_execution_context_for(self, node):
+        return self.NodeExecutionContextType(node, parent=self, loop=self._event_loop)

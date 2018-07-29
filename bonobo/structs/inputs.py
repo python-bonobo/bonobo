@@ -16,6 +16,7 @@
 
 from abc import ABCMeta, abstractmethod
 from queue import Queue
+from asyncio.queues import Queue as AioQueue
 
 from bonobo.constants import BEGIN, END
 from bonobo.errors import AbstractError, InactiveReadableError, InactiveWritableError
@@ -115,3 +116,7 @@ class Input(Queue, Readable, Writable):
     @property
     def alive(self):
         return self._runlevel > 0
+
+
+class AioInput(AioQueue):
+    pass

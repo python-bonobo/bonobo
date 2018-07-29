@@ -1,10 +1,16 @@
+import asyncio
 import functools
 import logging
 import sys
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
+from cached_property import cached_property
+
+from bonobo import settings
 from bonobo.constants import BEGIN, END
+from bonobo.execution.contexts.graph import AsyncGraphExecutionContext
 from bonobo.execution.strategies.base import Strategy
+from bonobo.util import get_name
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +77,35 @@ class ThreadPoolExecutorStrategy(ExecutorStrategy):
 
     def create_executor(self, graph):
         return self.executor_factory(max_workers=len(graph))
+
+
+class AsyncThreadPoolExecutorStrategy(ThreadPoolExecutorStrategy):
+    GraphExecutionContextType = AsyncGraphExecutionContext
+
+    def __init__(self, GraphExecutionContextType=None):
+        if not settings.ALPHA.get():
+            raise NotImplementedError(
+                '{} is experimental, you need to explicitely activate it using ALPHA=True in system env.'.format(
+                    get_name(self)
+                )
+            )
+        super().__init__(GraphExecutionContextType)
+
+    @cached_property
+    def loop(self):
+        return asyncio.get_event_loop()
+
+    def create_graph_execution_context(self, *args, **kwargs):
+        return super(AsyncThreadPoolExecutorStrategy, self).create_graph_execution_context(
+            *args, **kwargs, loop=self.loop
+        )
+
+    def get_starter(self, executor, futures):
+        return functools.partial(
+            self.loop.run_in_executor,
+            executor,
+            super(AsyncThreadPoolExecutorStrategy, self).get_starter(executor, futures),
+        )
 
 
 class ProcessPoolExecutorStrategy(ExecutorStrategy):

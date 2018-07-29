@@ -1,4 +1,5 @@
 import bonobo
+from bonobo.execution.strategies import STRATEGIES, DEFAULT_STRATEGY
 
 
 def get_argument_parser(parser=None):
@@ -17,6 +18,14 @@ def get_argument_parser(parser=None):
         action='store_true',
         default=False,
         help='If set, pretty prints before writing to output file.'
+    )
+
+    parser.add_argument(
+        '--strategy',
+        '-s',
+        type=str,
+        choices=STRATEGIES.keys(),
+        default=DEFAULT_STRATEGY,
     )
 
     return parser
