@@ -29,12 +29,13 @@ class GraphCursor:
     def __rshift__(self, other):
         """ Self >> Other """
 
-        if other == ...:
+        nodes = other.nodes if hasattr(other, "nodes") else [other]
+
+        if ... in nodes:
             raise NotImplementedError(
                 "Expected something looking like a node, but got an Ellipsis (...). Did you forget to complete the graph?"
             )
 
-        nodes = other.nodes if hasattr(other, "nodes") else [other]
 
         if len(nodes):
             chain = self.graph.add_chain(*nodes, _input=self.last)
