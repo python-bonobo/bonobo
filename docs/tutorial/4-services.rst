@@ -2,9 +2,8 @@ Part 4: Services
 ================
 
 All external dependencies (like filesystems, network clients, database connections, etc.) should be provided to
-transformations as a service. It allows great flexibility, including the ability to test your transformations isolated
-from the external world, and being friendly to the infrastructure people (and if you're one of them, it's also nice to
-treat yourself well).
+transformations as a service. This will allow for great flexibility, including the ability to test your transformations isolated
+from the external world and easily switch to production (being user-friendly for people in system administration).
 
 In the last section, we used the `fs` service to access filesystems, we'll go even further by switching our `requests`
 call to use the `http` service, so we can switch the `requests` session at runtime. We'll use it to add an http cache,
@@ -24,7 +23,7 @@ Overriding services
 :::::::::::::::::::
 
 You can override the default services, or define your own services, by providing a dictionary to the `services=`
-argument of :obj:`bonobo.run`:
+argument of :obj:`bonobo.run`. First, let's rewrite get_services:
 
 .. code-block:: python
 
@@ -50,8 +49,8 @@ Let's replace the :obj:`requests.get` call we used in the first steps to use the
     def extract_fablabs(http):
         yield from http.get(FABLABS_API_URL).json().get('records')
 
-Tadaa, done! You're not anymore tied to a specific implementation, but to whatever :obj:`requests` compatible object the
-user want to provide.
+Tadaa, done! You're no more tied to a specific implementation, but to whatever :obj:`requests` -compatible object the
+user wants to provide.
 
 Adding cache
 ::::::::::::
