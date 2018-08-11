@@ -6,7 +6,6 @@ make = require('make')
 pytest = require('pytest')
 python = require('python')
 sphinx = require('sphinx')
-yapf = require('yapf')
 
 python.setup(
     name='bonobo',
@@ -72,14 +71,29 @@ python.add_requirements(
 
 @listen(make.on_generate)
 def on_make_generate(event):
-    event.makefile['SPHINX_AUTOBUILD'] = '$(PYTHON_DIRNAME)/sphinx-autobuild'
-    event.makefile.add_target(
+    makefile = event.makefile
+    
+    # Sphinx
+    makefile['SPHINX_AUTOBUILD'] = '$(PYTHON_DIRNAME)/sphinx-autobuild'
+    makefile.add_target(
         'watch-$(SPHINX_SOURCEDIR)',
-        '''
-        $(SPHINX_AUTOBUILD) $(SPHINX_SOURCEDIR) $(shell mktemp -d)
-    ''',
+        '$(SPHINX_AUTOBUILD) $(SPHINX_SOURCEDIR) $(shell mktemp -d)',
         phony=True
     )
+
+    # Formating
+    makefile.add_target(
+        'format',
+        '''
+            black -l 120 --skip-string-normalization .
+            isort -rc -o mondrian -o whistle -y .
+        ''',
+        phony=True,
+        doc='Reformats the whole codebase using our standards (requires black and isort).'
+    )
+
+
+
 
 
 # vim: ft=python:

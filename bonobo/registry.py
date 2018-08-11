@@ -1,8 +1,7 @@
 import mimetypes
-
 import os
 
-from bonobo import JsonReader, CsvReader, PickleReader, FileReader, FileWriter, PickleWriter, CsvWriter, JsonWriter
+from bonobo import CsvReader, CsvWriter, FileReader, FileWriter, JsonReader, JsonWriter, PickleReader, PickleWriter
 
 FILETYPE_CSV = 'text/csv'
 FILETYPE_JSON = 'application/json'

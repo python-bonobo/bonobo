@@ -101,15 +101,17 @@ class ContextCurrifier:
         try:
             bound = self._bind(_input)
         except TypeError as exc:
-            raise UnrecoverableTypeError((
-                'Input of {wrapped!r} does not bind to the node signature.\n'
-                'Args: {args}\n'
-                'Input: {input}\n'
-                'Kwargs: {kwargs}\n'
-                'Signature: {sig}'
-            ).format(
-                wrapped=self.wrapped, args=self.args, input=_input, kwargs=self.kwargs, sig=signature(self.wrapped)
-            )) from exc
+            raise UnrecoverableTypeError(
+                (
+                    'Input of {wrapped!r} does not bind to the node signature.\n'
+                    'Args: {args}\n'
+                    'Input: {input}\n'
+                    'Kwargs: {kwargs}\n'
+                    'Signature: {sig}'
+                ).format(
+                    wrapped=self.wrapped, args=self.args, input=_input, kwargs=self.kwargs, sig=signature(self.wrapped)
+                )
+            ) from exc
         return self.wrapped(*bound.args, **bound.kwargs)
 
     def setup(self, *context):

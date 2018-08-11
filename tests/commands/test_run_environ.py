@@ -6,21 +6,14 @@ from bonobo.util.testing import EnvironmentTestCase
 @pytest.fixture
 def env1(tmpdir):
     env_file = tmpdir.join('.env_one')
-    env_file.write('\n'.join((
-        'SECRET=unknown',
-        'PASSWORD=sweet',
-        'PATH=first',
-    )))
+    env_file.write('\n'.join(('SECRET=unknown', 'PASSWORD=sweet', 'PATH=first')))
     return str(env_file)
 
 
 @pytest.fixture
 def env2(tmpdir):
     env_file = tmpdir.join('.env_two')
-    env_file.write('\n'.join((
-        'PASSWORD=bitter',
-        "PATH='second'",
-    )))
+    env_file.write('\n'.join(('PASSWORD=bitter', "PATH='second'")))
     return str(env_file)
 
 
@@ -71,7 +64,15 @@ class TestEnvFileCombinations(EnvironmentTestCase):
 
     def test_run_with_both_env_files_then_overrides(self, runner, target, env1, env2):
         env = self.run_environ(
-            runner, *target, '--default-env-file', env1, '--env-file', env2, '--env', 'PASSWORD=mine', '--env',
+            runner,
+            *target,
+            '--default-env-file',
+            env1,
+            '--env-file',
+            env2,
+            '--env',
+            'PASSWORD=mine',
+            '--env',
             'SECRET=s3cr3t'
         )
         assert env.get('SECRET') == 's3cr3t'

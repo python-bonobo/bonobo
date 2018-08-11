@@ -15,4 +15,4 @@ def test_resolve_options():
 
 
 def test_resolve_transformations():
-    assert _resolve_transformations(('PrettyPrinter', )) == (bonobo.PrettyPrinter, )
+    assert _resolve_transformations(('PrettyPrinter',)) == (bonobo.PrettyPrinter,)

@@ -3,10 +3,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from bonobo import Graph
-from bonobo.constants import EMPTY, NOT_MODIFIED, INHERIT
+from bonobo.constants import EMPTY, INHERIT, NOT_MODIFIED
 from bonobo.execution.contexts.node import NodeExecutionContext, split_token
 from bonobo.execution.strategies import NaiveStrategy
-from bonobo.util.testing import BufferingNodeExecutionContext, BufferingGraphExecutionContext
+from bonobo.util.testing import BufferingGraphExecutionContext, BufferingNodeExecutionContext
 
 
 def test_node_string():
@@ -18,7 +18,7 @@ def test_node_string():
         output = context.get_buffer()
 
         assert len(output) == 1
-        assert output[0] == ('foo', )
+        assert output[0] == ('foo',)
 
     def g():
         yield 'foo'
@@ -29,8 +29,8 @@ def test_node_string():
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == ('foo', )
-        assert output[1] == ('bar', )
+        assert output[0] == ('foo',)
+        assert output[1] == ('bar',)
 
 
 def test_node_bytes():
@@ -42,7 +42,7 @@ def test_node_bytes():
 
         output = context.get_buffer()
         assert len(output) == 1
-        assert output[0] == (b'foo', )
+        assert output[0] == (b'foo',)
 
     def g():
         yield b'foo'
@@ -53,8 +53,8 @@ def test_node_bytes():
         output = context.get_buffer()
 
         assert len(output) == 2
-        assert output[0] == (b'foo', )
-        assert output[1] == (b'bar', )
+        assert output[0] == (b'foo',)
+        assert output[1] == (b'bar',)
 
 
 def test_node_dict():
@@ -65,7 +65,7 @@ def test_node_dict():
         context.write_sync(EMPTY)
         output = context.get_buffer()
         assert len(output) == 1
-        assert output[0] == ({'id': 1, 'name': 'foo'}, )
+        assert output[0] == ({'id': 1, 'name': 'foo'},)
 
     def g():
         yield {'id': 1, 'name': 'foo'}
@@ -75,8 +75,8 @@ def test_node_dict():
         context.write_sync(EMPTY)
         output = context.get_buffer()
         assert len(output) == 2
-        assert output[0] == ({'id': 1, 'name': 'foo'}, )
-        assert output[1] == ({'id': 2, 'name': 'bar'}, )
+        assert output[0] == ({'id': 1, 'name': 'foo'},)
+        assert output[1] == ({'id': 2, 'name': 'bar'},)
 
 
 def test_node_dict_chained():
@@ -93,7 +93,7 @@ def test_node_dict_chained():
     output = context.get_buffer()
 
     assert len(output) == 1
-    assert output[0] == ({'id': 1, 'name': 'FOO'}, )
+    assert output[0] == ({'id': 1, 'name': 'FOO'},)
 
     def g():
         yield {'id': 1, 'name': 'foo'}
@@ -104,8 +104,8 @@ def test_node_dict_chained():
     output = context.get_buffer()
 
     assert len(output) == 2
-    assert output[0] == ({'id': 1, 'name': 'FOO'}, )
-    assert output[1] == ({'id': 2, 'name': 'BAR'}, )
+    assert output[0] == ({'id': 1, 'name': 'FOO'},)
+    assert output[1] == ({'id': 2, 'name': 'BAR'},)
 
 
 def test_node_tuple():
@@ -229,7 +229,7 @@ def test_node_lifecycle_with_kill():
 def test_split_token():
     assert split_token(('foo', 'bar')) == (set(), ('foo', 'bar'))
     assert split_token(()) == (set(), ())
-    assert split_token('') == (set(), ('', ))
+    assert split_token('') == (set(), ('',))
 
 
 def test_split_token_duplicate():
@@ -249,10 +249,10 @@ def test_split_token_not_modified():
     with pytest.raises(ValueError):
         split_token((INHERIT, NOT_MODIFIED))
     assert split_token(NOT_MODIFIED) == ({NOT_MODIFIED}, ())
-    assert split_token((NOT_MODIFIED, )) == ({NOT_MODIFIED}, ())
+    assert split_token((NOT_MODIFIED,)) == ({NOT_MODIFIED}, ())
 
 
 def test_split_token_inherit():
     assert split_token(INHERIT) == ({INHERIT}, ())
-    assert split_token((INHERIT, )) == ({INHERIT}, ())
+    assert split_token((INHERIT,)) == ({INHERIT}, ())
     assert split_token((INHERIT, 'foo', 'bar')) == ({INHERIT}, ('foo', 'bar'))

@@ -4,10 +4,9 @@ from unittest import TestCase
 
 import pytest
 
-from bonobo import JsonReader, JsonWriter
-from bonobo import LdjsonReader, LdjsonWriter
+from bonobo import JsonReader, JsonWriter, LdjsonReader, LdjsonWriter
 from bonobo.constants import EMPTY
-from bonobo.util.testing import WriterTest, ReaderTest, ConfigurableNodeTest
+from bonobo.util.testing import ConfigurableNodeTest, ReaderTest, WriterTest
 
 FOOBAR = {'foo': 'bar'}
 OD_ABC = OrderedDict((('a', 'A'), ('b', 'B'), ('c', 'C')))
@@ -34,14 +33,7 @@ class JsonReaderDictsTest(Json, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ({
-                "foo": "bar"
-            }, ),
-            ({
-                "baz": "boz"
-            }, ),
-        ]
+        assert context.get_buffer() == [({"foo": "bar"},), ({"baz": "boz"},)]
 
 
 class JsonReaderListsTest(Json, ReaderTest, TestCase):
@@ -52,20 +44,14 @@ class JsonReaderListsTest(Json, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ([1, 2, 3], ),
-            ([4, 5, 6], ),
-        ]
+        assert context.get_buffer() == [([1, 2, 3],), ([4, 5, 6],)]
 
     @incontext(output_type=tuple)
     def test_output_type(self, context):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ([1, 2, 3], ),
-            ([4, 5, 6], ),
-        ]
+        assert context.get_buffer() == [([1, 2, 3],), ([4, 5, 6],)]
 
 
 class JsonReaderStringsTest(Json, ReaderTest, TestCase):
@@ -76,22 +62,14 @@ class JsonReaderStringsTest(Json, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ('foo', ),
-            ('bar', ),
-            ('baz', ),
-        ]
+        assert context.get_buffer() == [('foo',), ('bar',), ('baz',)]
 
     @incontext(output_type=tuple)
     def test_output_type(self, context):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ('foo', ),
-            ('bar', ),
-            ('baz', ),
-        ]
+        assert context.get_buffer() == [('foo',), ('bar',), ('baz',)]
 
 
 class JsonWriterTest(Json, WriterTest, TestCase):
@@ -101,10 +79,7 @@ class JsonWriterTest(Json, WriterTest, TestCase):
         context.write_sync(('a', 'b'), ('c', 'd'))
         context.stop()
 
-        assert self.readlines() == (
-            '[{"foo": "a", "bar": "b"},',
-            '{"foo": "c", "bar": "d"}]',
-        )
+        assert self.readlines() == ('[{"foo": "a", "bar": "b"},', '{"foo": "c", "bar": "d"}]')
 
     @incontext()
     def test_fields_from_type(self, context):
@@ -112,10 +87,7 @@ class JsonWriterTest(Json, WriterTest, TestCase):
         context.write_sync((1, 2), (3, 4))
         context.stop()
 
-        assert self.readlines() == (
-            '[{"x": 1, "y": 2},',
-            '{"x": 3, "y": 4}]',
-        )
+        assert self.readlines() == ('[{"x": 1, "y": 2},', '{"x": 3, "y": 4}]')
 
     @incontext()
     def test_nofields_multiple_args(self, context):
@@ -144,11 +116,7 @@ class JsonWriterTest(Json, WriterTest, TestCase):
         context.write_sync(FOOBAR, OD_ABC, FOOBAZ)
         context.stop()
 
-        assert self.readlines() == (
-            '[{"foo": "bar"},',
-            '{"a": "A", "b": "B", "c": "C"},',
-            '{"foo": "baz"}]',
-        )
+        assert self.readlines() == ('[{"foo": "bar"},', '{"a": "A", "b": "B", "c": "C"},', '{"foo": "baz"}]')
 
     @incontext()
     def test_nofields_empty_args(self, context):
@@ -156,7 +124,7 @@ class JsonWriterTest(Json, WriterTest, TestCase):
         context.write_sync(EMPTY, EMPTY, EMPTY)
         context.stop()
 
-        assert self.readlines() == ('[]', )
+        assert self.readlines() == ('[]',)
 
 
 ###
@@ -178,14 +146,7 @@ class LdjsonReaderDictsTest(Ldjson, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ({
-                "foo": "bar"
-            }, ),
-            ({
-                "baz": "boz"
-            }, ),
-        ]
+        assert context.get_buffer() == [({"foo": "bar"},), ({"baz": "boz"},)]
 
 
 class LdjsonReaderListsTest(Ldjson, ReaderTest, TestCase):
@@ -196,20 +157,14 @@ class LdjsonReaderListsTest(Ldjson, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ([1, 2, 3], ),
-            ([4, 5, 6], ),
-        ]
+        assert context.get_buffer() == [([1, 2, 3],), ([4, 5, 6],)]
 
     @incontext(output_type=tuple)
     def test_output_type(self, context):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ([1, 2, 3], ),
-            ([4, 5, 6], ),
-        ]
+        assert context.get_buffer() == [([1, 2, 3],), ([4, 5, 6],)]
 
 
 class LdjsonReaderStringsTest(Ldjson, ReaderTest, TestCase):
@@ -220,22 +175,14 @@ class LdjsonReaderStringsTest(Ldjson, ReaderTest, TestCase):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ('foo', ),
-            ('bar', ),
-            ('baz', ),
-        ]
+        assert context.get_buffer() == [('foo',), ('bar',), ('baz',)]
 
     @incontext(output_type=tuple)
     def test_output_type(self, context):
         context.write_sync(EMPTY)
         context.stop()
 
-        assert context.get_buffer() == [
-            ('foo', ),
-            ('bar', ),
-            ('baz', ),
-        ]
+        assert context.get_buffer() == [('foo',), ('bar',), ('baz',)]
 
 
 class LdjsonWriterTest(Ldjson, WriterTest, TestCase):
@@ -253,10 +200,7 @@ class LdjsonWriterTest(Ldjson, WriterTest, TestCase):
         context.write_sync((1, 2), (3, 4))
         context.stop()
 
-        assert self.readlines() == (
-            '{"x": 1, "y": 2}',
-            '{"x": 3, "y": 4}',
-        )
+        assert self.readlines() == ('{"x": 1, "y": 2}', '{"x": 3, "y": 4}')
 
     @incontext()
     def test_nofields_multiple_args(self, context):
@@ -285,11 +229,7 @@ class LdjsonWriterTest(Ldjson, WriterTest, TestCase):
         context.write_sync(FOOBAR, OD_ABC, FOOBAZ)
         context.stop()
 
-        assert self.readlines() == (
-            '{"foo": "bar"}',
-            '{"a": "A", "b": "B", "c": "C"}',
-            '{"foo": "baz"}',
-        )
+        assert self.readlines() == ('{"foo": "bar"}', '{"a": "A", "b": "B", "c": "C"}', '{"foo": "baz"}')
 
     @incontext()
     def test_nofields_empty_args(self, context):

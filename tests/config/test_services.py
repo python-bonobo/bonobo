@@ -4,11 +4,11 @@ import time
 import pytest
 
 from bonobo.config import Configurable, Container, Exclusive, Service, use
-from bonobo.config.services import validate_service_name, create_container
+from bonobo.config.services import create_container, validate_service_name
 from bonobo.util import get_name
 
 
-class PrinterInterface():
+class PrinterInterface:
     def print(self, *args):
         raise NotImplementedError()
 
@@ -21,14 +21,11 @@ class ConcretePrinter(PrinterInterface):
         return ';'.join((self.prefix, *args))
 
 
-SERVICES = Container(
-    printer0=ConcretePrinter(prefix='0'),
-    printer1=ConcretePrinter(prefix='1'),
-)
+SERVICES = Container(printer0=ConcretePrinter(prefix='0'), printer1=ConcretePrinter(prefix='1'))
 
 
 class MyServiceDependantConfigurable(Configurable):
-    printer = Service(PrinterInterface, )
+    printer = Service(PrinterInterface)
 
     def __call__(self, *args, printer: PrinterInterface):
         return printer.print(*args)
@@ -80,7 +77,7 @@ def test_exclusive():
                 vcr.append(' '.join((prefix, str(i))))
                 time.sleep(0.05)
 
-    threads = [threading.Thread(target=record, args=(str(i), )) for i in range(5)]
+    threads = [threading.Thread(target=record, args=(str(i),)) for i in range(5)]
 
     for thread in threads:
         thread.start()
@@ -90,8 +87,32 @@ def test_exclusive():
         thread.join()
 
     assert vcr.tape == [
-        'hello', '0 0', '0 1', '0 2', '0 3', '0 4', '1 0', '1 1', '1 2', '1 3', '1 4', '2 0', '2 1', '2 2', '2 3',
-        '2 4', '3 0', '3 1', '3 2', '3 3', '3 4', '4 0', '4 1', '4 2', '4 3', '4 4'
+        'hello',
+        '0 0',
+        '0 1',
+        '0 2',
+        '0 3',
+        '0 4',
+        '1 0',
+        '1 1',
+        '1 2',
+        '1 3',
+        '1 4',
+        '2 0',
+        '2 1',
+        '2 2',
+        '2 3',
+        '2 4',
+        '3 0',
+        '3 1',
+        '3 2',
+        '3 3',
+        '3 4',
+        '4 0',
+        '4 1',
+        '4 2',
+        '4 3',
+        '4 4',
     ]
 
 
@@ -118,10 +139,7 @@ def test_create_container_empty_values(services):
 
 
 def test_create_container_override():
-    c = create_container({
-        'http': 'http',
-        'fs': 'fs',
-    })
+    c = create_container({'http': 'http', 'fs': 'fs'})
     assert len(c) == 2
     assert 'fs' in c and c['fs'] == 'fs'
     assert 'http' in c and c['http'] == 'http'

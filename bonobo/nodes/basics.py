@@ -3,14 +3,15 @@ import html
 import itertools
 import pprint
 
+from mondrian import term
+
 from bonobo import settings
-from bonobo.config import Configurable, Option, Method, use_raw_input, use_context, use_no_input
+from bonobo.config import Configurable, Method, Option, use_context, use_no_input, use_raw_input
 from bonobo.config.functools import transformation_factory
 from bonobo.config.processors import ContextProcessor, use_context_processor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
-from mondrian import term
 
 __all__ = [
     'FixedWindow',
@@ -43,6 +44,7 @@ class Limit(Configurable):
     TODO: simplify into a closure building factory?
 
     """
+
     limit = Option(positional=True, default=10)
 
     @ContextProcessor
@@ -69,7 +71,7 @@ def Tee(f):
 
 def _shorten(s, w):
     if w and len(s) > w:
-        s = s[0:w - 3] + '...'
+        s = s[0 : w - 3] + '...'
     return s
 
 
@@ -80,17 +82,19 @@ class PrettyPrinter(Configurable):
         required=False,
         __doc__='''
         If set, truncates the output values longer than this to this width.
-    '''
+    ''',
     )
 
     filter = Method(
-        default=
-        (lambda self, index, key, value: (value is not None) and (not isinstance(key, str) or not key.startswith('_'))),
+        default=(
+            lambda self, index, key, value: (value is not None)
+            and (not isinstance(key, str) or not key.startswith('_'))
+        ),
         __doc__='''
             A filter that determine what to print.
             
             Default is to ignore any key starting with an underscore and none values.
-        '''
+        ''',
     )
 
     @ContextProcessor
@@ -99,6 +103,7 @@ class PrettyPrinter(Configurable):
         yield context
         if context._jupyter_html is not None:
             from IPython.display import display, HTML
+
             display(HTML('\n'.join(['<table>'] + context._jupyter_html + ['</table>'])))
 
     def __call__(self, context, *args, **kwargs):
@@ -153,16 +158,11 @@ class PrettyPrinter(Configurable):
         if not context._jupyter_html:
             context._jupyter_html = [
                 '<thead><tr>',
-                *map('<th>{}</th>'.format, map(html.escape, map(str,
-                                                                context.get_input_fields() or range(len(args))))),
+                *map('<th>{}</th>'.format, map(html.escape, map(str, context.get_input_fields() or range(len(args))))),
                 '</tr></thead>',
             ]
 
-        context._jupyter_html += [
-            '<tr>',
-            *map('<td>{}</td>'.format, map(html.escape, map(repr, args))),
-            '</tr>',
-        ]
+        context._jupyter_html += ['<tr>', *map('<td>{}</td>'.format, map(html.escape, map(repr, args))), '</tr>']
 
 
 @use_no_input

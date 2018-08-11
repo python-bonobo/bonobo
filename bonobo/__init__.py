@@ -31,9 +31,7 @@ def _repr_html_():
         '  <div style="float: left; width: 20px; height: 20px;">{}</div>'
         '  <pre style="white-space: nowrap; padding-left: 8px">{}</pre>'
         '</div>'
-    ).format(
-        __logo__, '<br/>'.join(get_versions(all=True))
-    )
+    ).format(__logo__, '<br/>'.join(get_versions(all=True)))
 
 
 del sys

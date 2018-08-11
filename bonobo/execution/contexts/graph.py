@@ -1,12 +1,13 @@
 from functools import partial
 from time import sleep
 
+from whistle import EventDispatcher
+
 from bonobo.config import create_container
 from bonobo.constants import BEGIN, END
 from bonobo.execution import events
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
-from whistle import EventDispatcher
 
 
 class GraphExecutionContext:

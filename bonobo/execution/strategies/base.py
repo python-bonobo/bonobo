@@ -6,6 +6,7 @@ class Strategy:
     Base class for execution strategies.
 
     """
+
     GraphExecutionContextType = GraphExecutionContext
 
     def __init__(self, GraphExecutionContextType=None):

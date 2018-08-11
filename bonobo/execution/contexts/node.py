@@ -7,11 +7,11 @@ from types import GeneratorType
 
 from bonobo.config import create_container
 from bonobo.config.processors import ContextCurrifier
-from bonobo.constants import NOT_MODIFIED, BEGIN, END, TICK_PERIOD, Token, Flag, INHERIT
+from bonobo.constants import BEGIN, END, INHERIT, NOT_MODIFIED, TICK_PERIOD, Flag, Token
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.structs.inputs import Input
-from bonobo.util import get_name, isconfigurabletype, ensure_tuple
+from bonobo.util import ensure_tuple, get_name, isconfigurabletype
 from bonobo.util.bags import BagType
 from bonobo.util.statistics import WithStatistics
 
@@ -105,10 +105,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             except Empty:
                 sleep(TICK_PERIOD)  # XXX: How do we determine this constant?
                 continue
-            except (
-                    NotImplementedError,
-                    UnrecoverableError,
-            ):
+            except (NotImplementedError, UnrecoverableError):
                 self.fatal(sys.exc_info())  # exit loop
             except Exception:  # pylint: disable=broad-except
                 self.error(sys.exc_info())  # does not exit loop

@@ -16,10 +16,7 @@ class InactiveWritableError(InactiveIOError):
 class ValidationError(RuntimeError):
     def __init__(self, inst, message):
         super(ValidationError, self).__init__(
-            'Validation error in {class_name}: {message}'.format(
-                class_name=type(inst).__name__,
-                message=message,
-            )
+            'Validation error in {class_name}: {message}'.format(class_name=type(inst).__name__, message=message)
         )
 
 
@@ -42,8 +39,7 @@ class AbstractError(UnrecoverableError, NotImplementedError):
     def __init__(self, method):
         super().__init__(
             'Call to abstract method {class_name}.{method_name}(...): missing implementation.'.format(
-                class_name=get_name(method.__self__),
-                method_name=get_name(method),
+                class_name=get_name(method.__self__), method_name=get_name(method)
             )
         )
 

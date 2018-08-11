@@ -1,5 +1,4 @@
 import logging
-
 import os
 
 from bonobo.errors import ValidationError
@@ -92,17 +91,14 @@ LOGGING_LEVEL = Setting(
     'LOGGING_LEVEL',
     formatter=logging._checkLevel,
     validator=logging._checkLevel,
-    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO
+    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO,
 )
 
 # Input/Output format for transformations
 IOFORMAT_ARG0 = 'arg0'
 IOFORMAT_KWARGS = 'kwargs'
 
-IOFORMATS = {
-    IOFORMAT_ARG0,
-    IOFORMAT_KWARGS,
-}
+IOFORMATS = {IOFORMAT_ARG0, IOFORMAT_KWARGS}
 
 IOFORMAT = Setting('IOFORMAT', default=IOFORMAT_KWARGS, validator=IOFORMATS.__contains__)
 

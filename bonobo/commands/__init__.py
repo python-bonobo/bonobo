@@ -42,6 +42,7 @@ def entrypoint(args=None):
             logger.exception('Error while loading command {}.'.format(ext.name))
 
     from stevedore import ExtensionManager
+
     mgr = ExtensionManager(namespace='bonobo.commands')
     mgr.map(register_extension)
 

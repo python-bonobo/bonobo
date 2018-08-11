@@ -1,8 +1,9 @@
 # flake8: noqa
 
 from pygments.style import Style
-from pygments.token import Keyword, Name, Comment, String, Error, \
-     Number, Operator, Generic, Whitespace, Punctuation, Other, Literal
+from pygments.token import (
+    Comment, Error, Generic, Keyword, Literal, Name, Number, Operator, Other, Punctuation, String, Whitespace
+)
 
 
 # Originally based on FlaskyStyle which was based on 'tango'.
@@ -12,7 +13,7 @@ class Alabaster(Style):
 
     styles = {
         # No corresponding class for the following:
-        #Text:                     "", # class:  ''
+        # Text:                     "", # class:  ''
         Whitespace: "underline #f8f8f8",  # class: 'w'
         Error: "#a40000 border:#ef2929",  # class: 'err'
         Other: "#000000",  # class 'x'
@@ -28,7 +29,6 @@ class Alabaster(Style):
         Operator: "#582800",  # class: 'o'
         Operator.Word: "bold #004461",  # class: 'ow' - like keywords
         Punctuation: "bold #000000",  # class: 'p'
-
         # because special names such as Name.Class, Name.Function, etc.
         # are not recognized as such later in the parsing, we choose them
         # to look the same as ordinary variables.

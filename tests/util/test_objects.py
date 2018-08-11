@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from bonobo.util.objects import Wrapper, get_name, ValueHolder, get_attribute_or_create
+from bonobo.util.objects import ValueHolder, Wrapper, get_attribute_or_create, get_name
 from bonobo.util.testing import optional_contextmanager
 
 
@@ -65,10 +65,7 @@ def test_valueholder_notequal():
     assert not (x != 42)
 
 
-@pytest.mark.parametrize('rlo,rhi', [
-    (1, 2),
-    ('a', 'b'),
-])
+@pytest.mark.parametrize('rlo,rhi', [(1, 2), ('a', 'b')])
 def test_valueholder_ordering(rlo, rhi):
     vlo, vhi = ValueHolder(rlo), ValueHolder(rhi)
 
@@ -129,15 +126,27 @@ def test_get_attribute_or_create():
 unsupported_operations = {
     int: {operator.matmul},
     str: {
-        operator.sub, operator.mul, operator.matmul, operator.floordiv, operator.truediv, operator.mod, divmod,
-        operator.pow, operator.lshift, operator.rshift, operator.and_, operator.xor, operator.or_
+        operator.sub,
+        operator.mul,
+        operator.matmul,
+        operator.floordiv,
+        operator.truediv,
+        operator.mod,
+        divmod,
+        operator.pow,
+        operator.lshift,
+        operator.rshift,
+        operator.and_,
+        operator.xor,
+        operator.or_,
     },
 }
 
 
 @pytest.mark.parametrize('x,y', [(5, 3), (0, 10), (0, 0), (1, 1), ('foo', 'bar'), ('', 'baz!')])
 @pytest.mark.parametrize(
-    'operation,inplace_operation', [
+    'operation,inplace_operation',
+    [
         (operator.add, operator.iadd),
         (operator.sub, operator.isub),
         (operator.mul, operator.imul),
@@ -152,7 +161,7 @@ unsupported_operations = {
         (operator.and_, operator.iand),
         (operator.xor, operator.ixor),
         (operator.or_, operator.ior),
-    ]
+    ],
 )
 def test_valueholder_integer_operations(x, y, operation, inplace_operation):
     v = ValueHolder(x)

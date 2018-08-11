@@ -8,11 +8,11 @@ to another is maximal.
 """
 
 from bonobo.execution.strategies import create_strategy
-from bonobo.nodes import __all__ as _all_nodes
 from bonobo.nodes import *
+from bonobo.nodes import __all__ as _all_nodes
 from bonobo.structs import Graph
 from bonobo.util.api import ApiHelper
-from bonobo.util.environ import parse_args, get_argument_parser
+from bonobo.util.environ import get_argument_parser, parse_args
 
 __all__ = []
 
@@ -44,14 +44,17 @@ def run(graph, *, plugins=None, services=None, strategy=None):
     plugins = plugins or []
 
     from bonobo import settings
+
     settings.check()
 
     if not settings.QUIET.get():  # pragma: no cover
         if _is_interactive_console():
             import mondrian
+
             mondrian.setup(excepthook=True)
 
             from bonobo.plugins.console import ConsoleOutputPlugin
+
             if ConsoleOutputPlugin not in plugins:
                 plugins.append(ConsoleOutputPlugin)
 
@@ -60,6 +63,7 @@ def run(graph, *, plugins=None, services=None, strategy=None):
                 from bonobo.contrib.jupyter import JupyterOutputPlugin
             except ImportError:
                 import logging
+
                 logging.warning(
                     'Failed to load jupyter widget. Easiest way is to install the optional "jupyter" '
                     'dependencies with «pip install bonobo[jupyter]», but you can also install a specific '
@@ -70,6 +74,7 @@ def run(graph, *, plugins=None, services=None, strategy=None):
                     plugins.append(JupyterOutputPlugin)
 
     import logging
+
     logging.getLogger().setLevel(settings.LOGGING_LEVEL.get())
     strategy = create_strategy(strategy)
     return strategy.execute(graph, plugins=plugins, services=services)
@@ -158,6 +163,7 @@ api.register_group(
 
 def _is_interactive_console():
     import sys
+
     return sys.stdout.isatty()
 
 
@@ -172,6 +178,7 @@ def _is_jupyter_notebook():
 def get_examples_path(*pathsegments):
     import os
     import pathlib
+
     return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
 
 

@@ -1,6 +1,6 @@
 import os
 
-from jinja2 import Environment, DictLoader
+from jinja2 import DictLoader, Environment
 
 __path__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), '..'))
 
@@ -18,11 +18,7 @@ class Module:
         return '<{} ({})>'.format(self.title, self.name)
 
     def asdict(self):
-        return {
-            'name': self.name,
-            'title': self.title,
-            'automodule_options': self.automodule_options,
-        }
+        return {'name': self.name, 'title': self.title, 'automodule_options': self.automodule_options}
 
     def get_path(self):
         return os.path.join(__path__, apidoc_root, *self.name.split('.')) + '.rst'
@@ -45,9 +41,9 @@ def underlined_filter(txt, chr):
 
 
 env = Environment(
-    loader=DictLoader({
-        'module':
-        '''
+    loader=DictLoader(
+        {
+            'module': '''
 {{ (':mod:`'~title~' <'~name~'>`') | underlined('=') }}
 
 .. currentmodule:: {{ name }}
@@ -56,8 +52,12 @@ env = Environment(
 
 .. automodule:: {{ name }}
 {% for opt in automodule_options %}   :{{ opt }}:{{ "\n" }}{% endfor %}
-    ''' [1:-1] + '\n'
-    })
+    '''[
+                1:-1
+            ]
+            + '\n'
+        }
+    )
 )
 env.filters['underlined'] = underlined_filter
 

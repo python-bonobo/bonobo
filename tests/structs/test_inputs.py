@@ -19,7 +19,7 @@ from queue import Empty
 import pytest
 
 from bonobo.constants import BEGIN, END
-from bonobo.errors import InactiveWritableError, InactiveReadableError
+from bonobo.errors import InactiveReadableError, InactiveWritableError
 from bonobo.structs.inputs import Input
 
 

@@ -44,15 +44,9 @@ class OpenDataSoftAPI(Configurable):
                 break
 
             for row in records:
-                yield {
-                    **row.get('fields', {}),
-                    'geometry': row.get('geometry', {}),
-                    'recordid': row.get('recordid'),
-                }
+                yield {**row.get('fields', {}), 'geometry': row.get('geometry', {}), 'recordid': row.get('recordid')}
 
             start += self.rows
 
 
-__all__ = [
-    'OpenDataSoftAPI',
-]
+__all__ = ['OpenDataSoftAPI']

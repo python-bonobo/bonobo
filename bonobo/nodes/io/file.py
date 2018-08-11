@@ -1,4 +1,4 @@
-from bonobo.config import Option, ContextProcessor, use_context
+from bonobo.config import ContextProcessor, Option, use_context
 from bonobo.constants import NOT_MODIFIED
 from bonobo.errors import UnrecoverableError
 from bonobo.nodes.io.base import FileHandler, Reader, Writer
@@ -12,9 +12,13 @@ class FileReader(Reader, FileHandler):
     present. Extending it is usually the right way to create more specific file readers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='r', __doc__='''
+    mode = Option(
+        str,
+        default='r',
+        __doc__='''
         What mode to use for open() call.
-    ''')  # type: str
+    ''',
+    )  # type: str
 
     output_fields = Option(
         ensure_tuple,
@@ -22,14 +26,14 @@ class FileReader(Reader, FileHandler):
         __doc__='''
         Specify the field names of output lines.
         Mutually exclusive with "output_type".
-    '''
+    ''',
     )
     output_type = Option(
         required=False,
         __doc__='''
         Specify the type of output lines.
         Mutually exclusive with "output_fields".
-    '''
+    ''',
     )
 
     @ContextProcessor
@@ -72,9 +76,13 @@ class FileWriter(Writer, FileHandler):
     usually the right way to create more specific file writers (like json, csv, etc.)
     """
 
-    mode = Option(str, default='w+', __doc__='''
+    mode = Option(
+        str,
+        default='w+',
+        __doc__='''
         What mode to use for open() call.
-    ''')  # type: str
+    ''',
+    )  # type: str
 
     def write(self, file, context, line, *, fs):
         """

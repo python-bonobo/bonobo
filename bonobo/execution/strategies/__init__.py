@@ -9,9 +9,7 @@ at home if you want to give it a shot.
 from bonobo.execution.strategies.executor import ProcessPoolExecutorStrategy, ThreadPoolExecutorStrategy
 from bonobo.execution.strategies.naive import NaiveStrategy
 
-__all__ = [
-    'create_strategy',
-]
+__all__ = ['create_strategy']
 
 STRATEGIES = {
     'naive': NaiveStrategy,

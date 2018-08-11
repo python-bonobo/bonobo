@@ -4,12 +4,12 @@ import io
 import os
 import runpy
 import sys
-from contextlib import contextmanager, redirect_stdout, redirect_stderr
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 import pytest
 
-from bonobo import open_fs, __main__, get_examples_path
+from bonobo import __main__, get_examples_path, open_fs
 from bonobo.commands import entrypoint
 from bonobo.constants import Token
 from bonobo.execution.contexts.graph import GraphExecutionContext
@@ -112,19 +112,13 @@ def runner_module(args):
 
 all_runners = pytest.mark.parametrize('runner', [runner_entrypoint, runner_module])
 all_environ_targets = pytest.mark.parametrize(
-    'target', [
-        (get_examples_path('environ.py'), ),
-        (
-            '-m',
-            'bonobo.examples.environ',
-        ),
-    ]
+    'target', [(get_examples_path('environ.py'),), ('-m', 'bonobo.examples.environ')]
 )
 
 
 @all_runners
 @all_environ_targets
-class EnvironmentTestCase():
+class EnvironmentTestCase:
     def run_quiet(self, runner, *args):
         return runner('run', '--quiet', *args)
 
@@ -216,12 +210,12 @@ class ReaderTest(ConfigurableNodeTest):
         self.tmpdir = tmpdir
 
     def get_create_args(self, *args):
-        return (self.filename, ) + args
+        return (self.filename,) + args
 
     def test_customizable_output_type_transform_not_a_type(self):
         context = self.NodeExecutionContextType(
             self.create(*self.get_create_args(), output_type=str.upper, **self.get_create_kwargs()),
-            services=self.services
+            services=self.services,
         )
         with pytest.raises(TypeError):
             context.start()
@@ -229,9 +223,9 @@ class ReaderTest(ConfigurableNodeTest):
     def test_customizable_output_type_transform_not_a_tuple(self):
         context = self.NodeExecutionContextType(
             self.create(
-                *self.get_create_args(), output_type=type('UpperString', (str, ), {}), **self.get_create_kwargs()
+                *self.get_create_args(), output_type=type('UpperString', (str,), {}), **self.get_create_kwargs()
             ),
-            services=self.services
+            services=self.services,
         )
         with pytest.raises(TypeError):
             context.start()
@@ -256,7 +250,7 @@ class WriterTest(ConfigurableNodeTest):
         self.tmpdir = tmpdir
 
     def get_create_args(self, *args):
-        return (self.filename, ) + args
+        return (self.filename,) + args
 
     def readlines(self):
         with self.fs.open(self.filename) as fp:

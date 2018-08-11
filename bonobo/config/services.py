@@ -112,10 +112,12 @@ def create_container(services=None, factory=Container):
 
     if not 'fs' in container:
         import bonobo
+
         container.setdefault('fs', bonobo.open_fs())
 
     if not 'http' in container:
         import requests
+
         container.setdefault('http', requests)
 
     return container
@@ -139,6 +141,7 @@ class Exclusive(ContextDecorator):
     ensure that.
 
     """
+
     _locks = {}
 
     def __init__(self, wrapped):

@@ -9,13 +9,7 @@ def test_entrypoint():
     for command in pkg_resources.iter_entry_points('bonobo.commands'):
         commands[command.name] = command
 
-    assert not {
-        'convert',
-        'init',
-        'inspect',
-        'run',
-        'version',
-    }.difference(set(commands))
+    assert not {'convert', 'init', 'inspect', 'run', 'version'}.difference(set(commands))
 
 
 @all_runners

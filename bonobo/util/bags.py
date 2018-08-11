@@ -73,7 +73,9 @@ class {typename}(tuple):
 
 _field_template = '''\
     {name} = _property(_itemgetter({index:d}), doc={doc!r})
-'''.strip('\n')
+'''.strip(
+    '\n'
+)
 
 _reserved = frozenset(
     ['_', '_cls', '_attrs', '_fields', 'get', '_asdict', '_replace', '_make', 'self', '_self', 'tuple'] + dir(tuple)
@@ -150,16 +152,19 @@ def BagType(typename, fields, *, verbose=False, module=None):
         attrs=attrs,
         num_fields=len(fields),
         arg_list=repr(attrs).replace("'", "")[1:-1],
-        repr_fmt=', '.join(('%r' if isinstance(fields[index], int) else '{name}=%r').format(name=name)
-                           for index, name in enumerate(attrs)),
+        repr_fmt=', '.join(
+            ('%r' if isinstance(fields[index], int) else '{name}=%r').format(name=name)
+            for index, name in enumerate(attrs)
+        ),
         field_defs='\n'.join(
             _field_template.format(
                 index=index,
                 name=name,
-                doc='Alias for ' +
-                ('field #{}'.format(index) if isinstance(fields[index], int) else repr(fields[index]))
-            ) for index, name in enumerate(attrs)
-        )
+                doc='Alias for '
+                + ('field #{}'.format(index) if isinstance(fields[index], int) else repr(fields[index])),
+            )
+            for index, name in enumerate(attrs)
+        ),
     )
 
     # Execute the template string in a temporary namespace and support

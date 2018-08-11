@@ -1,13 +1,14 @@
 from logging import getLogger
 from types import GeneratorType
 
-import bonobo
-from bonobo.plugins.console import ConsoleOutputPlugin
-from bonobo.util.term import CLEAR_EOL
-from colorama import Fore, Back, Style
+from colorama import Back, Fore, Style
 from django.core.management import BaseCommand
 from django.core.management.base import OutputWrapper
 from mondrian import term
+
+import bonobo
+from bonobo.plugins.console import ConsoleOutputPlugin
+from bonobo.util.term import CLEAR_EOL
 
 from .utils import create_or_update
 
@@ -55,7 +56,7 @@ class ETLCommand(BaseCommand):
             graph_coll = self.get_graph(*args, **options)
 
             if not isinstance(graph_coll, GeneratorType):
-                graph_coll = (graph_coll, )
+                graph_coll = (graph_coll,)
 
             for i, graph in enumerate(graph_coll):
                 assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'

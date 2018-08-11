@@ -1,6 +1,7 @@
-import bonobo
 import datetime
 import time
+
+import bonobo
 
 
 def extract():
@@ -13,10 +14,7 @@ def extract():
 
 def get_graph():
     graph = bonobo.Graph()
-    graph.add_chain(
-        extract,
-        print,
-    )
+    graph.add_chain(extract, print)
 
     return graph
 
