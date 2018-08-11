@@ -16,7 +16,7 @@ from bonobo.util.inspect import (
     istuple,
     istype,
 )
-from bonobo.util.objects import (get_name, get_attribute_or_create, ValueHolder)
+from bonobo.util.objects import get_name, get_attribute_or_create, ValueHolder
 
 # Bonobo's util API
 __all__ = [

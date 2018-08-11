@@ -41,14 +41,14 @@ def get_credentials(*, scopes):
     return credentials
 
 
-def get_google_spreadsheets_api_client(scopes=('https://www.googleapis.com/auth/spreadsheets', )):
+def get_google_spreadsheets_api_client(scopes=('https://www.googleapis.com/auth/spreadsheets',)):
     credentials = get_credentials(scopes=scopes)
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = 'https://sheets.googleapis.com/$discovery/rest?version=v4'
     return discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl, cache_discovery=False)
 
 
-def get_google_people_api_client(scopes=('https://www.googleapis.com/auth/contacts', )):
+def get_google_people_api_client(scopes=('https://www.googleapis.com/auth/contacts',)):
     credentials = get_credentials(scopes=scopes)
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = 'https://people.googleapis.com/$discovery/rest?version=v1'

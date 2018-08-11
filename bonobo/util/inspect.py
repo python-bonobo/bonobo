@@ -9,6 +9,7 @@ def isconfigurable(mixed):
     :return: bool
     """
     from bonobo.config.configurables import Configurable
+
     return isinstance(mixed, Configurable)
 
 
@@ -47,6 +48,7 @@ def isoption(mixed):
     """
 
     from bonobo.config.options import Option
+
     return isinstance(mixed, Option)
 
 
@@ -58,6 +60,7 @@ def ismethod(mixed):
     :return: bool
     """
     from bonobo.config.options import Method
+
     return isinstance(mixed, Method)
 
 
@@ -69,6 +72,7 @@ def iscontextprocessor(x):
     :return: bool
     """
     from bonobo.config.processors import ContextProcessor
+
     return isinstance(x, ContextProcessor)
 
 
@@ -102,15 +106,7 @@ def istuple(mixed):
     return isinstance(mixed, tuple)
 
 
-ConfigurableInspection = namedtuple(
-    'ConfigurableInspection', [
-        'type',
-        'instance',
-        'options',
-        'processors',
-        'partial',
-    ]
-)
+ConfigurableInspection = namedtuple('ConfigurableInspection', ['type', 'instance', 'options', 'processors', 'partial'])
 
 ConfigurableInspection.__enter__ = lambda self: self
 ConfigurableInspection.__exit__ = lambda *exc_details: None
@@ -141,10 +137,4 @@ def inspect_node(mixed, *, _partial=None):
             'Not a Configurable, nor a Configurable instance and not even a partially configured Configurable. Check your inputs.'
         )
 
-    return ConfigurableInspection(
-        typ,
-        inst,
-        list(typ.__options__),
-        list(typ.__processors__),
-        _partial,
-    )
+    return ConfigurableInspection(typ, inst, list(typ.__options__), list(typ.__processors__), _partial)

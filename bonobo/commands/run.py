@@ -19,6 +19,7 @@ class RunCommand(BaseGraphCommand):
 
     def parse_options(self, *, quiet=False, verbose=False, install=False, **options):
         from bonobo import settings
+
         settings.QUIET.set_if_true(quiet)
         settings.DEBUG.set_if_true(verbose)
         self.install = install
@@ -65,4 +66,5 @@ def _install_requirements(requirements):
     # python interpreter.
     pip.utils.pkg_resources = importlib.reload(pip.utils.pkg_resources)
     import site
+
     importlib.reload(site)

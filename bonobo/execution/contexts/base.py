@@ -13,7 +13,7 @@ from bonobo.util.objects import Wrapper, get_name
 def recoverable(error_handler):
     try:
         yield
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         error_handler(*sys.exc_info(), level=ERROR)
 
 
@@ -21,7 +21,7 @@ def recoverable(error_handler):
 def unrecoverable(error_handler):
     try:
         yield
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         error_handler(*sys.exc_info(), level=ERROR)
         raise  # raise unrecoverableerror from x ?
 

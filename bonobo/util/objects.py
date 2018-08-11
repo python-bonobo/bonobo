@@ -24,7 +24,7 @@ class ValueHolder:
     For the sake of concistency, all operator methods have been implemented (see https://docs.python.org/3/reference/datamodel.html) or
     at least all in a certain category, but it feels like a more correct method should exist, like with a getattr-something on the
     value. Let's see later.
-    
+
     """
 
     def __init__(self, value):
@@ -142,10 +142,10 @@ class ValueHolder:
         return divmod(other, self._value)
 
     def __pow__(self, other):
-        return self._value**other
+        return self._value ** other
 
     def __rpow__(self, other):
-        return other**self._value
+        return other ** self._value
 
     def __ipow__(self, other):
         self._value **= other

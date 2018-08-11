@@ -27,8 +27,9 @@ def test_download_works_for_examples(runner):
     fout = io.BytesIO()
     fout.close = lambda: None
 
-    with patch('bonobo.commands.download._open_url') as mock_open_url, \
-            patch('bonobo.commands.download.open') as mock_open:
+    with patch('bonobo.commands.download._open_url') as mock_open_url, patch(
+        'bonobo.commands.download.open'
+    ) as mock_open:
         mock_open_url.return_value = MockResponse()
         mock_open.return_value = fout
         runner('download', 'examples/datasets/coffeeshops.txt')

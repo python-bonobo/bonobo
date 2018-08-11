@@ -7,7 +7,8 @@
 
 import sys
 
-assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
+if sys.version_info < (3, 5):
+    raise RuntimeError('Python 3.5+ is required to use Bonobo.')
 
 from bonobo._api import *
 from bonobo._api import __all__
@@ -22,7 +23,6 @@ __version__ = __version__
 
 def _repr_html_():
     """This allows to easily display a version snippet in Jupyter."""
-    from bonobo.util.pkgs import bonobo_packages
     from bonobo.commands.version import get_versions
 
     return (
@@ -30,9 +30,7 @@ def _repr_html_():
         '  <div style="float: left; width: 20px; height: 20px;">{}</div>'
         '  <pre style="white-space: nowrap; padding-left: 8px">{}</pre>'
         '</div>'
-    ).format(
-        __logo__, '<br/>'.join(get_versions(all=True))
-    )
+    ).format(__logo__, '<br/>'.join(get_versions(all=True)))
 
 
 del sys

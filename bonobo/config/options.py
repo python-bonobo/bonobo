@@ -113,8 +113,9 @@ class RemovedOption(Option):
     def clean(self, value):
         if value != self.value:
             raise ValueError(
-                'Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.'.
-                format(self.name, self.value)
+                'Removed options cannot change value, {!r} must now be {!r} (and you should remove setting the value explicitely, as it is deprecated and will be removed quite soon.'.format(
+                    self.name, self.value
+                )
             )
         return self.value
 
@@ -195,9 +196,7 @@ class Method(Option):
         if not callable(value):
             raise TypeError(
                 'Option {!r} ({}) is expecting a callable value, got {!r} object: {!r}.'.format(
-                    self.name,
-                    type(self).__name__,
-                    type(value).__name__, value
+                    self.name, type(self).__name__, type(value).__name__, value
                 )
             )
         inst._options_values[self.name] = self.type(value) if self.type else value

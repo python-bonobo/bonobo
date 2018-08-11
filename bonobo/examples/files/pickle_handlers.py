@@ -35,9 +35,7 @@ from bonobo import examples
 
 def cleanse_sms(category, sms):
     if category == 'spam':
-        sms_clean = '**MARKED AS SPAM** ' + sms[0:50] + (
-            '...' if len(sms) > 50 else ''
-        )
+        sms_clean = '**MARKED AS SPAM** ' + sms[0:50] + ('...' if len(sms) > 50 else '')
     elif category == 'ham':
         sms_clean = sms
     else:
@@ -62,16 +60,11 @@ def get_graph(*, _limit=(), _print=()):
 
 def get_services():
     from ._services import get_services
-    return {
-        **get_services(), 'fs':
-        TarFS(bonobo.get_examples_path('datasets/spam.tgz'))
-    }
+
+    return {**get_services(), 'fs': TarFS(bonobo.get_examples_path('datasets/spam.tgz'))}
 
 
 if __name__ == '__main__':
     parser = examples.get_argument_parser()
     with bonobo.parse_args(parser) as options:
-        bonobo.run(
-            get_graph(**examples.get_graph_options(options)),
-            services=get_services()
-        )
+        bonobo.run(get_graph(**examples.get_graph_options(options)), services=get_services())

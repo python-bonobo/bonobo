@@ -1,12 +1,11 @@
 import csv
 
-from bonobo.config import Option, use_raw_input, use_context
+from bonobo.config import Option, use_context
 from bonobo.config.options import Method, RenamedOption
 from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.util import ensure_tuple
-from bonobo.util.bags import BagType
 
 
 class CsvHandler(FileHandler):
@@ -62,7 +61,7 @@ class CsvReader(FileReader, CsvHandler):
         default=0,
         __doc__='''
         If set and greater than zero, the reader will skip this amount of lines.
-    '''
+    ''',
     )
 
     @Method(
@@ -72,7 +71,7 @@ class CsvReader(FileReader, CsvHandler):
             iterable.
             
             Defaults to builtin csv.reader(...), but can be overriden to fit your special needs.
-        '''
+        ''',
     )
     def reader_factory(self, file):
         return csv.reader(file, **self.get_dialect_kwargs())

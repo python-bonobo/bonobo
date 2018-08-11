@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from bonobo.config import Configurable
-from bonobo.config.processors import ContextProcessor, resolve_processors, ContextCurrifier, use_context_processor
+from bonobo.config.processors import ContextCurrifier, ContextProcessor, resolve_processors, use_context_processor
 
 
 class CP1(Configurable):

@@ -26,7 +26,9 @@ def entrypoint(args=None):
 
     commands = {}
 
-    def register_extension(ext, commands=commands):
+    def register_extension(ext):
+        nonlocal commands
+
         try:
             parser = subparsers.add_parser(ext.name)
             if isinstance(ext.plugin, type) and issubclass(ext.plugin, BaseCommand):
@@ -42,6 +44,7 @@ def entrypoint(args=None):
             logger.exception('Error while loading command {}.'.format(ext.name))
 
     from stevedore import ExtensionManager
+
     mgr = ExtensionManager(namespace='bonobo.commands')
     mgr.map(register_extension)
 

@@ -57,7 +57,6 @@ def get_argument_parser(parser=None):
     :return:
     """
     if parser is None:
-        import argparse
         parser = argparse.ArgumentParser()
 
     # Store globally to be able to warn the user about the fact he's probably wrong not to pass a parser to
@@ -94,6 +93,7 @@ def parse_args(mixed=None):
             )
         # use the api from bonobo namespace, in case a command patched it.
         import bonobo
+
         mixed = bonobo.get_argument_parser()
 
     if isinstance(mixed, argparse.ArgumentParser):

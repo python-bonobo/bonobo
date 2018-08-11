@@ -21,10 +21,7 @@ def test_file_writer_contextless(tmpdir):
 
 @pytest.mark.parametrize(
     'lines,output',
-    [
-        (('ACME', ), 'ACME'),  # one line...
-        (('Foo', 'Bar', 'Baz'), 'Foo\nBar\nBaz'),  # more than one line...
-    ]
+    [(('ACME',), 'ACME'), (('Foo', 'Bar', 'Baz'), 'Foo\nBar\nBaz')],  # one line...  # more than one line...
 )
 def test_file_writer_in_context(tmpdir, lines, output):
     fs, filename, services = txt_tester.get_services_for_writer(tmpdir)
@@ -44,5 +41,5 @@ def test_file_reader(tmpdir):
 
     output = context.get_buffer()
     assert len(output) == 2
-    assert output[0] == ('Hello', )
-    assert output[1] == ('World', )
+    assert output[0] == ('Hello',)
+    assert output[1] == ('World',)

@@ -1,5 +1,4 @@
 import logging
-
 import os
 
 from bonobo.errors import ValidationError
@@ -8,7 +7,7 @@ from bonobo.errors import ValidationError
 def to_bool(s):
     if s is None:
         return False
-    if type(s) is bool:
+    if isinstance(s, bool):
         return s
     if len(s):
         if s.lower() in ('f', 'false', 'n', 'no', '0'):
@@ -32,7 +31,7 @@ class Setting:
     def __init__(self, name, default=None, validator=None, formatter=None):
         self.name = name
 
-        if default:
+        if default is not None:
             self.default = default if callable(default) else lambda: default
         else:
             self.default = lambda: None
@@ -52,7 +51,7 @@ class Setting:
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
-            raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
+            raise ValidationError(self, 'Invalid value {!r} for setting {}.'.format(value, self.name))
         self.value = value
 
     def set_if_true(self, value):
@@ -92,17 +91,14 @@ LOGGING_LEVEL = Setting(
     'LOGGING_LEVEL',
     formatter=logging._checkLevel,
     validator=logging._checkLevel,
-    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO
+    default=lambda: logging.DEBUG if DEBUG.get() else logging.INFO,
 )
 
 # Input/Output format for transformations
 IOFORMAT_ARG0 = 'arg0'
 IOFORMAT_KWARGS = 'kwargs'
 
-IOFORMATS = {
-    IOFORMAT_ARG0,
-    IOFORMAT_KWARGS,
-}
+IOFORMATS = {IOFORMAT_ARG0, IOFORMAT_KWARGS}
 
 IOFORMAT = Setting('IOFORMAT', default=IOFORMAT_KWARGS, validator=IOFORMATS.__contains__)
 

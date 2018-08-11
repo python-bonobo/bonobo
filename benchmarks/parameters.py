@@ -47,10 +47,9 @@ if __name__ == '__main__':
 
     for i in 1, 2, 3:
         print(
-            'j{}'.format(i),
-            timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i))
+            'j{}'.format(i), timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i))
         )
         print(
             'k{}'.format(i),
-            timeit.timeit("k{}(**{!r})".format(i, json_data), setup="from __main__ import k{}".format(i))
+            timeit.timeit("k{}(**{!r})".format(i, json_data), setup="from __main__ import k{}".format(i)),
         )

@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 
 import bonobo
-from bonobo.constants import NOT_MODIFIED, EMPTY
-from bonobo.util import ensure_tuple, ValueHolder
-from bonobo.util.testing import BufferingNodeExecutionContext, StaticNodeTest, ConfigurableNodeTest
+from bonobo.constants import EMPTY, NOT_MODIFIED
+from bonobo.util import ValueHolder, ensure_tuple
+from bonobo.util.testing import BufferingNodeExecutionContext, ConfigurableNodeTest, StaticNodeTest
 
 
 class CountTest(StaticNodeTest, TestCase):
@@ -26,7 +26,7 @@ class CountTest(StaticNodeTest, TestCase):
     def test_execution(self):
         with self.execute() as context:
             context.write_sync(*([EMPTY] * 42))
-        assert context.get_buffer() == [(42, )]
+        assert context.get_buffer() == [(42,)]
 
 
 class IdentityTest(StaticNodeTest, TestCase):
@@ -98,14 +98,11 @@ def test_fixedwindow():
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(2)) as context:
         context.write_sync(*range(9))
-    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (
-        8,
-        None,
-    )]
+    assert context.get_buffer() == [(0, 1), (2, 3), (4, 5), (6, 7), (8, None)]
 
     with BufferingNodeExecutionContext(bonobo.FixedWindow(1)) as context:
         context.write_sync(*range(3))
-    assert context.get_buffer() == [(0, ), (1, ), (2, )]
+    assert context.get_buffer() == [(0,), (1,), (2,)]
 
 
 def test_methodcaller():

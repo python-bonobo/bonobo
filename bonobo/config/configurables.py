@@ -1,9 +1,7 @@
 from bonobo.errors import AbstractError
-from bonobo.util import isoption, iscontextprocessor, sortedlist, get_name
+from bonobo.util import get_name, iscontextprocessor, isoption, sortedlist
 
-__all__ = [
-    'Configurable',
-]
+__all__ = ['Configurable']
 
 get_creation_counter = lambda v: v._creation_counter
 
@@ -64,15 +62,12 @@ class ConfigurableMeta(type):
         return cls.__processors_cache
 
     def __repr__(self):
-        return ' '.join((
-            '<Configurable',
-            super(ConfigurableMeta, self).__repr__().split(' ', 1)[1],
-        ))
+        return ' '.join(('<Configurable', super(ConfigurableMeta, self).__repr__().split(' ', 1)[1]))
 
 
 try:
     import _functools
-except:
+except Exception:
     import functools
 
     PartiallyConfigured = functools.partial
@@ -156,8 +151,10 @@ class Configurable(metaclass=ConfigurableMeta):
         if len(extraneous):
             raise TypeError(
                 '{}() got {} unexpected option{}: {}.'.format(
-                    cls.__name__, len(extraneous), 's'
-                    if len(extraneous) > 1 else '', ', '.join(map(repr, sorted(extraneous)))
+                    cls.__name__,
+                    len(extraneous),
+                    's' if len(extraneous) > 1 else '',
+                    ', '.join(map(repr, sorted(extraneous))),
                 )
             )
 
@@ -167,8 +164,10 @@ class Configurable(metaclass=ConfigurableMeta):
             if _final:
                 raise TypeError(
                     '{}() missing {} required option{}: {}.'.format(
-                        cls.__name__, len(missing), 's'
-                        if len(missing) > 1 else '', ', '.join(map(repr, sorted(missing)))
+                        cls.__name__,
+                        len(missing),
+                        's' if len(missing) > 1 else '',
+                        ', '.join(map(repr, sorted(missing))),
                     )
                 )
             return PartiallyConfigured(cls, *args, **kwargs)

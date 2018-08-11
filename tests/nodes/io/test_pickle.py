@@ -32,7 +32,4 @@ def test_read_pickled_list_from_file(tmpdir):
 
     output = context.get_buffer()
     assert context.get_output_fields() == ('a', 'b', 'c')
-    assert output == [
-        ('a foo', 'b foo', 'c foo'),
-        ('a bar', 'b bar', 'c bar'),
-    ]
+    assert output == [('a foo', 'b foo', 'c foo'), ('a bar', 'b bar', 'c bar')]

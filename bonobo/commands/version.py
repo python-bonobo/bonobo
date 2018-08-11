@@ -32,10 +32,11 @@ class VersionCommand(BaseCommand):
 
 def _format_version(mod, *, name=None, quiet=False):
     from bonobo.util.pkgs import bonobo_packages
+
     args = {
         'name': name or mod.__name__,
         'version': mod.__version__,
-        'location': bonobo_packages[name or mod.__name__].location
+        'location': bonobo_packages[name or mod.__name__].location,
     }
 
     if not quiet:

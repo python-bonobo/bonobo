@@ -50,10 +50,7 @@ def test_define_with_decorator():
     calls = []
 
     def my_handler(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     Concrete = MethodBasedConfigurable(my_handler)
 
@@ -77,10 +74,7 @@ def test_late_binding_method_decoration():
 
     @MethodBasedConfigurable(foo='foo')
     def Concrete(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     assert callable(Concrete.handler)
     t = Concrete(bar='baz')
@@ -95,10 +89,7 @@ def test_define_with_argument():
     calls = []
 
     def concrete_handler(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     t = MethodBasedConfigurable(concrete_handler, 'foo', bar='baz')
     assert callable(t.handler)
@@ -112,10 +103,7 @@ def test_define_with_inheritance():
 
     class Inheriting(MethodBasedConfigurable):
         def handler(self, *args, **kwargs):
-            calls.append((
-                args,
-                kwargs,
-            ))
+            calls.append((args, kwargs))
 
     t = Inheriting('foo', bar='baz')
     assert callable(t.handler)
@@ -132,10 +120,7 @@ def test_inheritance_then_decorate():
 
     @Inheriting
     def Concrete(*args, **kwargs):
-        calls.append((
-            args,
-            kwargs,
-        ))
+        calls.append((args, kwargs))
 
     assert callable(Concrete.handler)
     t = Concrete('foo', bar='baz')

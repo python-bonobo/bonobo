@@ -1,6 +1,5 @@
-from bonobo.constants import NOT_MODIFIED
-
 from bonobo.config import Configurable, Method
+from bonobo.constants import NOT_MODIFIED
 
 
 class Filter(Configurable):
@@ -12,9 +11,9 @@ class Filter(Configurable):
     .. attribute:: filter
 
         A callable used to filter lines.
-        
+
         If the callable returns a true-ish value, the input will be passed unmodified to the next items.
-        
+
         Otherwise, it'll be burnt.
 
     """
