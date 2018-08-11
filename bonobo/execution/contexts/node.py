@@ -160,7 +160,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self._stack:
             try:
                 self._stack.teardown()
-            except:
+            except Exception:
                 self.fatal(sys.exc_info())
 
         super().stop()

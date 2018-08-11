@@ -67,7 +67,7 @@ class ConfigurableMeta(type):
 
 try:
     import _functools
-except:
+except Exception:
     import functools
 
     PartiallyConfigured = functools.partial

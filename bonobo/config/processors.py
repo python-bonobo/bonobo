@@ -133,7 +133,7 @@ class ContextCurrifier:
             try:
                 # todo yield from ? how to ?
                 processor.send(self._stack_values.pop())
-            except StopIteration as exc:
+            except StopIteration:
                 # This is normal, and wanted.
                 pass
             else:
