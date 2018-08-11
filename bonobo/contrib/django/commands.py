@@ -74,6 +74,6 @@ class ETLCommand(BaseCommand):
         self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + '\n')
         self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + '!' + Style.RESET_ALL + ' ' + x
 
-        self.run(*args, **kwargs)
+        self.run(*args, **options)
 
         self.stdout, self.stderr = _stdout_backup, _stderr_backup
