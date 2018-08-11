@@ -2,3 +2,4 @@
 exclude_paths:
   - bonobo/examples/
   - bonobo/ext/
+  - tests/
