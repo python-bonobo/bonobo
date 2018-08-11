@@ -5,7 +5,19 @@ There are a few examples bundled with **bonobo**.
 
 You'll find them under the :mod:`bonobo.examples` package, and you can run them directly as modules:
 
-    $ bonobo run -m bonobo.examples...module
+.. code-block:: shell-session
+
+    $ bonobo run -m bonobo.examples.module
+
+
+or
+
+.. code-block:: shell-session
+
+    $ python -m bonobo.examples.module
+
+
+
 
 .. toctree::
     :maxdepth: 4
