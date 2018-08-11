@@ -59,7 +59,8 @@ class ETLCommand(BaseCommand):
                 graph_coll = (graph_coll,)
 
             for i, graph in enumerate(graph_coll):
-                assert isinstance(graph, bonobo.Graph), 'Invalid graph provided.'
+                if not isinstance(graph, bonobo.Graph):
+                    raise ValueError('Expected a Graph instance, got {!r}.'.format(graph))
                 print(term.lightwhite('{}. {}'.format(i + 1, graph.name)))
                 result = bonobo.run(graph, services=services, strategy=strategy)
                 results.append(result)
