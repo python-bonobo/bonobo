@@ -1,5 +1,6 @@
 ---
 exclude_paths:
+  - benchmarks/**
   - bonobo/examples/**
   - bonobo/ext/**
   - tests/**
