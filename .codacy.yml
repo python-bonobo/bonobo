@@ -1,5 +1,5 @@
 ---
 exclude_paths:
-  - bonobo/examples/
-  - bonobo/ext/
-  - tests/
+  - bonobo/examples/**
+  - bonobo/ext/**
+  - tests/**
