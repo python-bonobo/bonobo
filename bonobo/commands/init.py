@@ -1,9 +1,9 @@
 import os
 
 from jinja2 import Environment, FileSystemLoader
+from mondrian import humanizer
 
 from bonobo.commands import BaseCommand
-from mondrian import humanizer
 
 
 class InitCommand(BaseCommand):
@@ -31,16 +31,12 @@ class InitCommand(BaseCommand):
         with open(filename, "w+") as f:
             f.write(template.render(name=name))
 
-        print(
-            humanizer.Success(
-                "Generated {} using template {!r}.".format(filename, template_name)
-            )
-        )
+        print(humanizer.Success("Generated {} using template {!r}.".format(filename, template_name)))
 
     def create_package(self, *, filename):
         _, ext = os.path.splitext(filename)
-        if ext != '':
-            raise ValueError('Package names should not have an extension.')
+        if ext != "":
+            raise ValueError("Package names should not have an extension.")
 
         try:
             import medikit.commands
@@ -60,16 +56,16 @@ class InitCommand(BaseCommand):
         print(
             humanizer.Success(
                 'Package "{}" has been created.'.format(package_name),
-                '',
+                "",
                 "Install it...",
-                '',
+                "",
                 "    $ `pip install --editable {}`".format(filename),
-                '',
+                "",
                 "Then maybe run the example...",
-                '',
+                "",
                 "    $ `python -m {}`".format(package_name),
-                '',
-                "Enjoy!"
+                "",
+                "Enjoy!",
             )
         )
 

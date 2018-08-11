@@ -1,5 +1,6 @@
-from bonobo.commands import BaseCommand
 from mondrian import humanizer
+
+from bonobo.commands import BaseCommand
 
 
 def get_versions(*, all=False, quiet=None):

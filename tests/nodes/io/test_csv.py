@@ -63,9 +63,9 @@ class CsvReaderTest(Csv, ReaderTest, TestCase):
     def test_output_type(self, context):
         context.write_sync(EMPTY)
         context.stop()
-        self.check_output(context, prepend=[('id', 'name')])
+        self.check_output(context, prepend=[("id", "name")])
 
-    @incontext(output_fields=('x', 'y'), skip=1)
+    @incontext(output_fields=("x", "y"), skip=1)
     def test_output_fields(self, context):
         context.write_sync(EMPTY)
         context.stop()
@@ -103,7 +103,7 @@ class CsvWriterTest(Csv, WriterTest, TestCase):
         context.write_sync((L1, L2), (L3, L4))
         context.stop()
 
-        assert self.readlines() == ('a,hey', 'b,bee', 'c,see', 'd,dee')
+        assert self.readlines() == ("a,hey", "b,bee", "c,see", "d,dee")
 
     @incontext()
     def test_nofields_multiple_args_length_mismatch(self, context):

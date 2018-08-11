@@ -20,7 +20,6 @@ jinja2==2.10
 markupsafe==1.0
 more-itertools==4.3.0
 packaging==17.1
-pathlib2==2.3.2
 pluggy==0.7.1
 poyo==0.4.1
 py==1.5.4
