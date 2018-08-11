@@ -5,6 +5,7 @@ exclude_paths:
   - bonobo/contrib/jupyter/**.js
   - bonobo/examples/**
   - bonobo/ext/**
+  - bonobo/util/testing.py
   - docs/**
   - setup.py
   - tests/**
