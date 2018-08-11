@@ -23,7 +23,7 @@ DEFAULT_STRATEGY = 'threadpool'
 def create_strategy(name=None):
     """
     Create a strategy, or just returns it if it's already one.
-    
+
     :param name: 
     :return: Strategy
     """
