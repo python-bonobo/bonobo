@@ -2,10 +2,9 @@
 # All changes will be overriden.
 # Edit Projectfile and run “make update” (or “medikit update”) to regenerate.
 
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
-
-from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
 
@@ -45,17 +44,14 @@ else:
 setup(
     author='Romain Dorgueil',
     author_email='romain@dorgueil.net',
-    data_files=[
-        (
-            'share/jupyter/nbextensions/bonobo-jupyter',
-            [
-                'bonobo/contrib/jupyter/static/extension.js',
-                'bonobo/contrib/jupyter/static/index.js',
-                'bonobo/contrib/jupyter/static/index.js.map',
-            ],
-        )
-    ],
-    description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for ' 'python 3.5+.'),
+    data_files=[('share/jupyter/nbextensions/bonobo-jupyter', [
+        'bonobo/contrib/jupyter/static/extension.js',
+        'bonobo/contrib/jupyter/static/index.js',
+        'bonobo/contrib/jupyter/static/index.js.map'
+    ])],
+    description=(
+        'Bonobo, a simple, modern and atomic extract-transform-load toolkit for '
+        'python 3.5+.'),
     license='Apache License, Version 2.0',
     name='bonobo',
     version=version,
@@ -64,30 +60,21 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'example', 'test']),
     include_package_data=True,
     install_requires=[
-        'fs (~= 2.0)',
-        'graphviz (>= 0.8, < 0.9)',
-        'jinja2 (~= 2.9)',
-        'mondrian (~= 0.7)',
-        'packaging (~= 17.0)',
-        'psutil (~= 5.4)',
-        'python-slugify (~= 1.2.0)',
-        'requests (~= 2.0)',
-        'stevedore (~= 1.27)',
-        'whistle (~= 1.0)',
+        'fs (~= 2.0)', 'graphviz (>= 0.8, < 0.9)', 'jinja2 (~= 2.9)',
+        'mondrian (~= 0.7)', 'packaging (~= 17.0)', 'psutil (~= 5.4)',
+        'python-slugify (~= 1.2.0)', 'requests (~= 2.0)',
+        'stevedore (~= 1.27)', 'whistle (~= 1.0)'
     ],
     extras_require={
         'dev': [
-            'cookiecutter (>= 1.5, < 1.6)',
-            'coverage (~= 4.4)',
-            'pytest (~= 3.4)',
-            'pytest-cov (~= 2.5)',
-            'pytest-timeout (>= 1, < 2)',
-            'sphinx (~= 1.7)',
-            'sphinx-sitemap (>= 0.2, < 0.3)',
+            'cookiecutter (>= 1.5, < 1.6)', 'coverage (~= 4.4)',
+            'pytest (~= 3.4)', 'pytest-cov (~= 2.5)',
+            'pytest-timeout (>= 1, < 2)', 'sphinx (~= 1.7)',
+            'sphinx-sitemap (>= 0.2, < 0.3)'
         ],
         'docker': ['bonobo-docker (~= 0.6.0a1)'],
         'jupyter': ['ipywidgets (~= 6.0)', 'jupyter (~= 1.0)'],
-        'sqlalchemy': ['bonobo-sqlalchemy (~= 0.6.0a1)'],
+        'sqlalchemy': ['bonobo-sqlalchemy (~= 0.6.0a1)']
     },
     entry_points={
         'bonobo.commands': [
@@ -97,10 +84,11 @@ setup(
             'init = bonobo.commands.init:InitCommand',
             'inspect = bonobo.commands.inspect:InspectCommand',
             'run = bonobo.commands.run:RunCommand',
-            'version = bonobo.commands.version:VersionCommand',
+            'version = bonobo.commands.version:VersionCommand'
         ],
-        'console_scripts': ['bonobo = bonobo.commands:entrypoint'],
+        'console_scripts': ['bonobo = bonobo.commands:entrypoint']
     },
     url='https://www.bonobo-project.org/',
-    download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.format(version=version),
+    download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.
+    format(version=version),
 )
