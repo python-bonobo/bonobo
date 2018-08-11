@@ -66,8 +66,11 @@ class Service(Option):
 class Container(dict):
     def __new__(cls, *args, **kwargs):
         if len(args) == 1:
-            assert not len(kwargs), 'only one usage at a time, my dear.'
-            if not (args[0]):
+            if len(kwargs):
+                raise ValueError(
+                    'You can either use {} with one positional argument or with keyword arguments, not both.'
+                )
+            if not args[0]:
                 return super().__new__(cls)
             if isinstance(args[0], cls):
                 return cls
