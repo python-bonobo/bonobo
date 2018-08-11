@@ -1,6 +1,7 @@
 ---
 exclude_paths:
   - benchmarks/**
+  - bonobo/contrib/jupyter/**.js
   - bonobo/examples/**
   - bonobo/ext/**
   - tests/**
