@@ -31,7 +31,7 @@ class Setting:
     def __init__(self, name, default=None, validator=None, formatter=None):
         self.name = name
 
-        if default:
+        if default is not None:
             self.default = default if callable(default) else lambda: default
         else:
             self.default = lambda: None
@@ -51,7 +51,7 @@ class Setting:
     def set(self, value):
         value = self.formatter(value) if self.formatter else value
         if self.validator and not self.validator(value):
-            raise ValidationError('Invalid value {!r} for setting {}.'.format(value, self.name))
+            raise ValidationError(self, 'Invalid value {!r} for setting {}.'.format(value, self.name))
         self.value = value
 
     def set_if_true(self, value):
