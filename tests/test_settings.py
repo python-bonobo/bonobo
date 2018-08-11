@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from bonobo import settings
+from bonobo.errors import ValidationError
 
 TEST_SETTING = "TEST_SETTING"
 
@@ -37,6 +38,15 @@ def test_setting():
         assert s.get() == "nope"
         s.clear()
         assert s.get() == "hello"
+
+    s = settings.Setting(TEST_SETTING, default=0, validator=lambda x: x == 42)
+    with pytest.raises(ValidationError):
+        assert s.get() is 0
+
+    s.set(42)
+
+    with pytest.raises(ValidationError):
+        s.set(21)
 
 
 def test_default_settings():

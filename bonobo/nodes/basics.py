@@ -3,6 +3,8 @@ import html
 import itertools
 import pprint
 
+from mondrian import term
+
 from bonobo import settings
 from bonobo.config import Configurable, Method, Option, use_context, use_no_input, use_raw_input
 from bonobo.config.functools import transformation_factory
@@ -10,7 +12,6 @@ from bonobo.config.processors import ContextProcessor, use_context_processor
 from bonobo.constants import NOT_MODIFIED
 from bonobo.util.objects import ValueHolder
 from bonobo.util.term import CLEAR_EOL
-from mondrian import term
 
 __all__ = [
     "FixedWindow",
@@ -57,8 +58,6 @@ class Limit(Configurable):
 
 
 def Tee(f):
-    from bonobo.constants import NOT_MODIFIED
-
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         nonlocal f

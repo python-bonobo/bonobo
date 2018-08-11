@@ -2,16 +2,17 @@ import logging
 import sys
 from contextlib import contextmanager
 
+from mondrian import term
+
 from bonobo.util import deprecated
 from bonobo.util.objects import Wrapper, get_name
-from mondrian import term
 
 
 @contextmanager
 def recoverable(error_handler):
     try:
         yield
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         error_handler(*sys.exc_info(), level=logging.ERROR)
 
 
@@ -19,9 +20,9 @@ def recoverable(error_handler):
 def unrecoverable(error_handler):
     try:
         yield
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         error_handler(*sys.exc_info(), level=logging.ERROR)
-        raise  # raise unrecoverableerror from exc ?
+        raise  # raise unrecoverableerror from x ?
 
 
 class Lifecycle:

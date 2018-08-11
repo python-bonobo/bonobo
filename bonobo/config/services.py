@@ -21,32 +21,32 @@ class Service(Option):
     identifier. For example, you can create a Configurable that has a "database" Service in its attribute, meaning that
     you'll define which database to use, by name, when creating the instance of this class, then provide an
     implementation when running the graph using a strategy.
-    
+
     Example::
-    
+
         import bonobo
-    
+
         class QueryExtractor(bonobo.Configurable):
             database = bonobo.Service(default='sqlalchemy.engine.default')
-            
+
         graph = bonobo.Graph(
             QueryExtractor(database='sqlalchemy.engine.secondary'),
             *more_transformations,
         )
-        
+
         if __name__ == '__main__':
             engine = create_engine('... dsn ...')
             bonobo.run(graph, services={
                 'sqlalchemy.engine.secondary': engine
             })
-            
+
     The main goal is not to tie transformations to actual dependencies, so the same can be run in different contexts
     (stages like preprod, prod, or tenants like client1, client2, or anything you want).
 
     .. attribute:: name
 
         Service name will be used to retrieve the implementation at runtime.
-    
+
     """
 
     def __init__(self, name, __doc__=None):
@@ -66,8 +66,13 @@ class Service(Option):
 class Container(dict):
     def __new__(cls, *args, **kwargs):
         if len(args) == 1:
-            assert not len(kwargs), "only one usage at a time, my dear."
-            if not (args[0]):
+            if len(kwargs):
+                raise ValueError(
+                    'You can either use {} with one positional argument or with keyword arguments, not both.'.format(
+                        cls.__name__
+                    )
+                )
+            if not args[0]:
                 return super().__new__(cls)
             if isinstance(args[0], cls):
                 return cls

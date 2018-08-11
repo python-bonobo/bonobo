@@ -1,9 +1,7 @@
 Part 5: Projects and Packaging
 ==============================
 
-Until then, we worked with one file managing a job.
-
-Real life often involves more complicated setups, with relations and imports between different files.
+Throughout this tutorial, we have been working with one file managing a job but real life often involves more complicated setups, with relations and imports between different files.
 
 Data processing is something a wide variety of tools may want to include, and thus |bonobo| does not enforce any
 kind of project structure, as the target structure will be dictated by the hosting project. For example, a `pipelines`
@@ -17,7 +15,7 @@ Imports mechanism
 |bonobo| does not enforce anything on how the python import mechanism work. Especially, it won't add anything to your
 `sys.path`, unlike some popular projects, because we're not sure that's something you want.
 
-If you want to use imports, you should move your script in a python package, and it's up to you to have it setup
+If you want to use imports, you should move your script into a python package, and it's up to you to have it setup
 correctly.
 
 
@@ -36,8 +34,8 @@ your jobs in it. For example, it can be `mypkg.pipelines`.
 Creating a brand new package
 ::::::::::::::::::::::::::::
 
-Because you're maybe starting a project with the data-engineering part, then you may not have a python package yet. As
-it can be a bit tedious to setup right, there is an helper, using `Medikit <http://medikit.rdc.li/en/latest/>`_, that
+Because you may be starting a project involving some data-engineering, you may not have a python package yet. As
+it can be a bit tedious to setup right, there is a helper, using `Medikit <http://medikit.rdc.li/en/latest/>`_, that
 you can use to create a brand new project:
 
 .. code-block:: shell-session
@@ -72,7 +70,7 @@ created in this tutorial and extend it):
 * :doc:`/extension/jupyter`
 * :doc:`/extension/sqlalchemy`
 
-Then, you can either to jump head-first into your code, or you can have a better grasp at all concepts by
+Then, you can either jump head-first into your code, or you can have a better grasp at all concepts by
 :doc:`reading the full bonobo guide </guide/index>`.
 
 You should also `join the slack community <https://bonobo-slack.herokuapp.com/>`_ and ask all your questions there! No

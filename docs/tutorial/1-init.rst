@@ -112,7 +112,7 @@ Extract
         yield 'hello'
         yield 'world'
 
-This is a first transformation, written as a python generator, that will send some strings, one after the other, to its
+This is a first transformation, written as a `python generator <https://docs.python.org/3/glossary.html#term-generator>`_, that will send some strings, one after the other, to its
 output.
 
 Transformations that take no input and yields a variable number of outputs are usually called **extractors**. You'll

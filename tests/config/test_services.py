@@ -130,7 +130,21 @@ def test_requires():
     assert svcargs["output"] == vcr.append
 
 
-@pytest.mark.parametrize("services", [None, {}])
+def test_constructor():
+    c1 = Container(foo='foo', bar='bar')
+    assert 2 == len(c1)
+
+    c2 = Container({'foo': 'foo', 'bar': 'bar'})
+    assert 2 == len(c2)
+
+    assert c1['foo'] == c2['foo']
+    assert c1['bar'] == c2['bar']
+
+    with pytest.raises(ValueError):
+        Container({'bar': 'bar'}, foo='foo')
+
+
+@pytest.mark.parametrize('services', [None, {}])
 def test_create_container_empty_values(services):
     c = create_container(services)
     assert len(c) == 2

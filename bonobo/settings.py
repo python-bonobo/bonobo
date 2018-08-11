@@ -7,7 +7,7 @@ from bonobo.errors import ValidationError
 def to_bool(s):
     if s is None:
         return False
-    if type(s) is bool:
+    if isinstance(s, bool):
         return s
     if len(s):
         if s.lower() in ("f", "false", "n", "no", "0"):
@@ -31,7 +31,7 @@ class Setting:
     def __init__(self, name, default=None, validator=None, formatter=None):
         self.name = name
 
-        if default:
+        if default is not None:
             self.default = default if callable(default) else lambda: default
         else:
             self.default = lambda: None

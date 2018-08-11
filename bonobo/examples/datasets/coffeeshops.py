@@ -8,6 +8,11 @@ from bonobo.structs.graphs import PartialGraph
 
 
 def get_graph(graph=None, *, _limit=(), _print=()):
+    """
+    Extracts a list of cafes with on euro in Paris, renames the name, address and zipcode fields,
+    reorders the fields and formats to json and csv files.
+
+    """
     graph = graph or bonobo.Graph()
 
     producer = (
