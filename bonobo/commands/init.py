@@ -33,7 +33,7 @@ class InitCommand(BaseCommand):
         self.logger.info('Generated {} using template {!r}.'.format(filename, template_name))
 
     def create_package(self, *, filename):
-        name, ext = os.path.splitext(filename)
+        _, ext = os.path.splitext(filename)
         if ext != '':
             raise ValueError('Package names should not have an extension.')
 
