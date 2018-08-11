@@ -23,7 +23,6 @@ __version__ = __version__
 
 def _repr_html_():
     """This allows to easily display a version snippet in Jupyter."""
-    from bonobo.util.pkgs import bonobo_packages
     from bonobo.commands.version import get_versions
 
     return (
