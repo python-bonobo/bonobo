@@ -125,13 +125,13 @@ def BagType(typename, fields, *, verbose=False, module=None):
     # message or automatically replace the field name with a valid name.
 
     attrs = tuple(map(_uniquify(_make_valid_attr_name), fields))
-    if type(fields) is str:
+    if isinstance(fields, str):
         raise TypeError('BagType does not support providing fields as a string.')
     fields = list(map(str, fields))
     typename = str(typename)
 
     for i, name in enumerate([typename] + fields):
-        if type(name) is not str:
+        if not isinstance(name, str):
             raise TypeError('Type names and field names must be strings, got {name!r}'.format(name=name))
         if not i:
             if not name.isidentifier():

@@ -7,7 +7,7 @@ from bonobo.errors import ValidationError
 def to_bool(s):
     if s is None:
         return False
-    if type(s) is bool:
+    if isinstance(s, bool):
         return s
     if len(s):
         if s.lower() in ('f', 'false', 'n', 'no', '0'):
