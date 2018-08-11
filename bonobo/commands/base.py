@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import bonobo.util.environ
 from bonobo.util import get_name
 from bonobo.util.environ import get_argument_parser, parse_args
+from mondrian import humanizer
 
 
 class BaseCommand:
@@ -60,7 +61,8 @@ class BaseGraphCommand(BaseCommand):
         return options
 
     def handle(self, file, mod, **options):
-        options = self.parse_options(**options)
+        with humanizer.humanize():
+            options = self.parse_options(**options)
         with self.read(file, mod, **options) as (graph, graph_execution_options, options):
             return self.do_handle(graph, **graph_execution_options, **options)
 

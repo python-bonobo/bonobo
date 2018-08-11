@@ -3,6 +3,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 
 from bonobo.commands import BaseCommand
+from mondrian import humanizer
 
 
 class InitCommand(BaseCommand):
@@ -30,12 +31,16 @@ class InitCommand(BaseCommand):
         with open(filename, "w+") as f:
             f.write(template.render(name=name))
 
-        self.logger.info("Generated {} using template {!r}.".format(filename, template_name))
+        print(
+            humanizer.Success(
+                "Generated {} using template {!r}.".format(filename, template_name)
+            )
+        )
 
     def create_package(self, *, filename):
-        name, ext = os.path.splitext(filename)
-        if ext != "":
-            raise ValueError("Package names should not have an extension.")
+        _, ext = os.path.splitext(filename)
+        if ext != '':
+            raise ValueError('Package names should not have an extension.')
 
         try:
             import medikit.commands
@@ -52,18 +57,23 @@ class InitCommand(BaseCommand):
         self.logger.info('Generated "{}" package with medikit.'.format(package_name))
         self.create_file_from_template(template="default", filename=os.path.join(filename, package_name, "__main__.py"))
 
-        print('Your "{}" package has been created.'.format(package_name))
-        print()
-        print("Install it...")
-        print()
-        print("    pip install --editable {}".format(filename))
-        print()
-        print("Then maybe run the example...")
-        print()
-        print("    python -m {}".format(package_name))
-        print()
-        print("Enjoy!")
+        print(
+            humanizer.Success(
+                'Package "{}" has been created.'.format(package_name),
+                '',
+                "Install it...",
+                '',
+                "    $ `pip install --editable {}`".format(filename),
+                '',
+                "Then maybe run the example...",
+                '',
+                "    $ `python -m {}`".format(package_name),
+                '',
+                "Enjoy!"
+            )
+        )
 
+    @humanizer.humanize()
     def handle(self, *, template, filename, package=False, force=False):
         if os.path.exists(filename) and not force:
             raise FileExistsError("Target filename already exists, use --force to override.")

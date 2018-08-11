@@ -1,4 +1,5 @@
 from bonobo.commands import BaseCommand
+from mondrian import humanizer
 
 
 def get_versions(*, all=False, quiet=None):
@@ -21,6 +22,7 @@ def get_versions(*, all=False, quiet=None):
 
 
 class VersionCommand(BaseCommand):
+    @humanizer.humanize()
     def handle(self, *, all=False, quiet=False):
         for line in get_versions(all=all, quiet=quiet):
             print(line)

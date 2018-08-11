@@ -8,7 +8,7 @@ entrypoints==0.2.3
 html5lib==1.0.1
 ipykernel==4.8.2
 ipython-genutils==0.2.0
-ipython==6.4.0
+ipython==6.5.0
 ipywidgets==6.0.1
 jedi==0.12.1
 jinja2==2.10
@@ -26,12 +26,12 @@ pandocfilters==1.4.2
 parso==0.3.1
 pexpect==4.6.0
 pickleshare==0.7.4
-prometheus-client==0.3.0
+prometheus-client==0.3.1
 prompt-toolkit==1.0.15
 ptyprocess==0.6.0
 pygments==2.2.0
 python-dateutil==2.7.3
-pyzmq==17.1.0
+pyzmq==17.1.2
 qtconsole==4.3.1
 send2trash==1.5.0
 simplegeneric==0.8.1

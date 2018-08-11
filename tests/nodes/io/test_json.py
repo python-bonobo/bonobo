@@ -14,6 +14,7 @@ FOOBAZ = {"foo": "baz"}
 
 incontext = ConfigurableNodeTest.incontext
 
+
 ###
 # Standard JSON Readers / Writers
 ###

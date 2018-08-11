@@ -1,5 +1,5 @@
 """
-Extracts a list of fablabs in the world, restrict to the ones in france, then format it both for a nice console output
+Extracts a list of fablabs in the world, restricted to the ones in france, then format its both for a nice console output
 and a flat txt file.
 
 .. graphviz::

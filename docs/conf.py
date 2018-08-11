@@ -5,10 +5,11 @@ import datetime
 import os
 import sys
 
+import bonobo
+
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('_themes'))
 
-import bonobo
 
 # -- General configuration ------------------------------------------------
 
@@ -63,11 +64,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 autoclass_content = 'both'
 autodoc_member_order = 'groupwise'
-autodoc_default_flags = [
-    'members',
-    'undoc-members',
-    'show-inheritance',
-]
+autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance']
 
 add_module_names = False
 pygments_style = 'sphinx'
@@ -112,7 +109,7 @@ html_sidebars = {
         'sourcelink.html',
         'searchbox.html',
         'sidebarinfos.html',
-    ]
+    ],
 }
 
 html_theme_path = ['_themes']
@@ -137,15 +134,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -154,9 +148,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual'),
-]
+latex_documents = [(master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual')]
 
 # -- Options for manual page output ---------------------------------------
 
@@ -171,9 +163,14 @@ man_pages = [(master_doc, 'bonobo', 'Bonobo Documentation', [author], 1)]
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        master_doc, 'Bonobo', 'Bonobo Documentation', author, 'Bonobo', 'One line description of project.',
-        'Miscellaneous'
-    ),
+        master_doc,
+        'Bonobo',
+        'Bonobo Documentation',
+        author,
+        'Bonobo',
+        'One line description of project.',
+        'Miscellaneous',
+    )
 ]
 
 # -- Options for Epub output ----------------------------------------------
@@ -209,4 +206,6 @@ rst_epilog = """
 
 .. |longversion| replace:: v.{version}
 
-""".format(version=version, )
+""".format(
+    version=version
+)

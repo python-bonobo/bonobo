@@ -36,7 +36,6 @@ class GraphCursor:
                 "Expected something looking like a node, but got an Ellipsis (...). Did you forget to complete the graph?"
             )
 
-
         if len(nodes):
             chain = self.graph.add_chain(*nodes, _input=self.last)
             return GraphCursor(chain.graph, first=self.first, last=chain.output)

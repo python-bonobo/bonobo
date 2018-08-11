@@ -2,6 +2,7 @@ import bonobo
 from bonobo.commands import BaseCommand
 from bonobo.registry import READER, WRITER, default_registry
 from bonobo.util.resolvers import _resolve_options, _resolve_transformations
+from mondrian import humanizer
 
 
 class ConvertCommand(BaseCommand):
@@ -48,6 +49,7 @@ class ConvertCommand(BaseCommand):
             help="Add a named option to the writer factory.",
         )
 
+    @humanizer.humanize()
     def handle(
         self,
         input_filename,
@@ -60,6 +62,8 @@ class ConvertCommand(BaseCommand):
         limit=None,
         transformation=None,
     ):
+        graph = bonobo.Graph()
+
         reader_factory = default_registry.get_reader_factory_for(input_filename, format=reader)
         reader_kwargs = _resolve_options((option or []) + (reader_option or []))
 
@@ -78,7 +82,6 @@ class ConvertCommand(BaseCommand):
 
         transformations += _resolve_transformations(transformation)
 
-        graph = bonobo.Graph()
         graph.add_chain(
             reader_factory(input_filename, **reader_kwargs),
             *transformations,

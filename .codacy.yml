@@ -1,4 +1,11 @@
 ---
 exclude_paths:
-  - bonobo/examples/
-  - bonobo/ext/
+  - benchmarks/**
+  - bin/**
+  - bonobo/contrib/jupyter/**.js
+  - bonobo/examples/**
+  - bonobo/ext/**
+  - bonobo/util/testing.py
+  - docs/**
+  - setup.py
+  - tests/**

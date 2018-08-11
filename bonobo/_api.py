@@ -187,7 +187,7 @@ def get_examples_path(*pathsegments):
     import os
     import pathlib
 
-    return str(pathlib.Path(os.path.dirname(__file__), "examples", *pathsegments))
+    return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
 
 
 @api.register

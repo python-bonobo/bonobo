@@ -24,7 +24,7 @@ class ValueHolder:
     For the sake of concistency, all operator methods have been implemented (see https://docs.python.org/3/reference/datamodel.html) or
     at least all in a certain category, but it feels like a more correct method should exist, like with a getattr-something on the
     value. Let's see later.
-    
+
     """
 
     def __init__(self, value):
