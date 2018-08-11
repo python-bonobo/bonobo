@@ -177,7 +177,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self._input_type is not None:
             raise RuntimeError('Cannot override input type, already have %r.', self._input_type)
 
-        if type(input_type) is not type:
+        if not isinstance(input_type, type):
             raise UnrecoverableTypeError('Input types must be regular python types.')
 
         if not issubclass(input_type, tuple):
