@@ -7,7 +7,8 @@
 
 import sys
 
-assert (sys.version_info >= (3, 5)), 'Python 3.5+ is required to use Bonobo.'
+if sys.version_info < (3, 5):
+    raise RuntimeError('Python 3.5+ is required to use Bonobo.')
 
 from bonobo._api import *
 from bonobo._api import __all__
