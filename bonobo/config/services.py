@@ -1,5 +1,3 @@
-import inspect
-import pprint
 import re
 import threading
 import types

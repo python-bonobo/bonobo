@@ -58,8 +58,6 @@ class Limit(Configurable):
 
 
 def Tee(f):
-    from bonobo.constants import NOT_MODIFIED
-
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         nonlocal f
