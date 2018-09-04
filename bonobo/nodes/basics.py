@@ -314,6 +314,26 @@ def Format(**formats):
     return _Format
 
 
+@transformation_factory
+def UpdateAllFields(updateType):
+
+    def _upperAll(input):
+        if isinstance(str, input):
+            return str.upper(input)
+        else:
+            return input
+
+    def _updateAllFields(bag):
+        nonlocal updateType
+
+        if updateType == 'upper':
+            return map(_upperAll(), bag)
+        else:
+            return bag
+
+    return _updateAllFields
+
+
 def _count(self, context):
     counter = yield ValueHolder(0)
     context.send(counter.get())
