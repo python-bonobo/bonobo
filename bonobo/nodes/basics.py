@@ -23,6 +23,7 @@ __all__ = [
     "SetFields",
     "Tee",
     "UnpackItems",
+    "UpdateAllFields",
     "count",
     "identity",
     "noop",
@@ -315,19 +316,20 @@ def Format(**formats):
 
 
 @transformation_factory
-def UpdateAllFields(updateType):
+def UpdateAllFields(updatetype):
 
     def _upperAll(input):
-        if isinstance(str, input):
+        if isinstance(input, str):
             return str.upper(input)
         else:
             return input
 
+    @use_raw_input
     def _updateAllFields(bag):
-        nonlocal updateType
+        nonlocal updatetype
 
-        if updateType == 'upper':
-            return map(_upperAll(), bag)
+        if updatetype == 'upper':
+            return {key: _upperAll(value) for key, value in bag._asdict().items()}
         else:
             return bag
 

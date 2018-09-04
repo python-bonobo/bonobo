@@ -159,6 +159,7 @@ api.register_group(
     SetFields,
     Tee,
     UnpackItems,
+    UpdateAllFields,
     count,
     identity,
     noop,
