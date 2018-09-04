@@ -317,6 +317,13 @@ def Format(**formats):
 
 @transformation_factory
 def UpdateAllFields(updatetype):
+    """
+    TODO:
+    We need to better define what types of operations we want to apply to all fields in a row.
+    Something that might be more universal across all data types would be a function that identifies the encodings of
+    the data in each field. Or, maybe another function that can replace one character with another, in case we need to
+    prepare the data prior to writing it to a file.
+    """
 
     def _upperAll(input):
         if isinstance(input, str):
