@@ -37,7 +37,7 @@ from bonobo._api import (
     SetFields,
     Tee,
     UnpackItems,
-    UpdateAllFields,
+    MapFields,
     count,
     identity,
     noop,
