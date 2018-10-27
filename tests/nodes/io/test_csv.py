@@ -100,7 +100,7 @@ class CsvWriterTest(Csv, WriterTest, TestCase):
     @incontext()
     def test_nofields_multiple_args(self, context):
         # multiple args are iterated onto and flattened in output
-        context.write_sync((L1, L2), (L3, L4))
+        context.write_sync(L1, L2, L3, L4)
         context.stop()
 
         assert self.readlines() == ("a,hey", "b,bee", "c,see", "d,dee")
@@ -112,17 +112,9 @@ class CsvWriterTest(Csv, WriterTest, TestCase):
             context.write_sync((L1, L2), (L3,))
 
     @incontext()
-    def test_nofields_single_arg(self, context):
-        # single args are just dumped, shapes can vary.
-        context.write_sync((L1,), (LL,), (L3,))
-        context.stop()
-
-        assert self.readlines() == ("a,hey", "i,have,more,values", "c,see")
-
-    @incontext()
     def test_nofields_empty_args(self, context):
         # empty calls are ignored
         context.write_sync(EMPTY, EMPTY, EMPTY)
         context.stop()
 
-        assert self.readlines() == ()
+        assert self.readlines() == ('', '', '')
