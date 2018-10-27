@@ -59,6 +59,8 @@ To inspect the graph of your first transformation:
 
     You must `install the graphviz software first <https://www.graphviz.org/download/>`_. It is _not_ the python's graphviz
     package, you must install it using your system's package manager (apt, brew, ...).
+    
+    For Windows users: you might need to add an entry to the Path environment variable for the `dot` command to be             recognized
 
 .. code-block:: shell-session
 
