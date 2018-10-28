@@ -126,8 +126,7 @@ class CsvWriter(FileWriter, CsvHandler):
                 )
             context.writer(values)
         else:
-            for arg in values:
-                context.writer(ensure_tuple(arg))
+            context.writer(ensure_tuple(values))
 
         return NOT_MODIFIED
 
