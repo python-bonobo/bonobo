@@ -89,7 +89,7 @@ of your python interpreter.
 
 .. note:: Once again, we use `develop` here. New features should go to `develop`, while bugfixes can go to `master`.
 
-If you can't find the "source" directory, try trunning this:
+If you can't find the "source" directory, try running this:
 
 .. code-block:: shell-session
 
@@ -122,7 +122,7 @@ Preview versions
 ----------------
 
 Sometimes, there are pre-versions available (before a major release, for example). By default, pip does not target
-pre-versions to avoid accidental upgrades to a potentially instable software, but you can easily opt-in:
+pre-versions to avoid accidental upgrades to a potentially unstable version, but you can easily opt-in:
 
 .. code-block:: shell-session
 
@@ -135,10 +135,10 @@ Supported platforms
 Linux, OSX and other Unixes
 ---------------------------
 
-Bonobo test suite runs continuously on Linux, and core developpers use both OSX and Linux machines. Also, there are jobs
+Bonobo test suite runs continuously on Linux, and core developers use both OSX and Linux machines. Also, there are jobs
 running on production linux machines everyday, so the support for those platforms should be quite excellent.
 
-If you're using some esotheric UNIX machine, there can be surprises (although we're not aware, yet). We do not support
+If you're using some esoteric UNIX machine, there can be surprises (although we're not aware, yet). We do not support
 officially those platforms, but if you can actually fix the problems on those systems, we'll be glad to integrate
 your patches (as long as it is tested, for both existing linux environments and your strange systems).
 
