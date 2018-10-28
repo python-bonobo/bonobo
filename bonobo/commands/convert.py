@@ -1,8 +1,9 @@
+from mondrian import humanizer
+
 import bonobo
 from bonobo.commands import BaseCommand
 from bonobo.registry import READER, WRITER, default_registry
 from bonobo.util.resolvers import _resolve_options, _resolve_transformations
-from mondrian import humanizer
 
 
 class ConvertCommand(BaseCommand):
