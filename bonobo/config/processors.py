@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from contextlib import contextmanager
 from functools import partial
 from inspect import signature
