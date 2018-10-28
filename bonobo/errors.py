@@ -48,6 +48,10 @@ class UnrecoverableTypeError(UnrecoverableError, TypeError):
     pass
 
 
+class UnrecoverableAttributeError(UnrecoverableError, AttributeError):
+    pass
+
+
 class UnrecoverableValueError(UnrecoverableError, ValueError):
     pass
 

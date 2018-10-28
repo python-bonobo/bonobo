@@ -7,6 +7,7 @@ import pytest
 import bonobo
 from bonobo.constants import EMPTY, NOT_MODIFIED
 from bonobo.util import ValueHolder, ensure_tuple
+from bonobo.util.bags import BagType
 from bonobo.util.testing import BufferingNodeExecutionContext, ConfigurableNodeTest, StaticNodeTest
 
 
@@ -113,3 +114,26 @@ def test_methodcaller():
     with BufferingNodeExecutionContext(methodcaller("zfill", 5)) as context:
         context.write_sync("a", "bb", "ccc")
     assert context.get_buffer() == list(map(ensure_tuple, ["0000a", "000bb", "00ccc"]))
+
+
+MyBag = BagType("MyBag", ["a", "b", "c"])
+
+
+@pytest.mark.parametrize("input_, key, expected", [
+    (MyBag(1, 2, 3), True, MyBag(1, 4, 9)),
+    (MyBag(1, 2, 3), False, MyBag(1, 2, 3)),
+    (MyBag(1, 2, 3), lambda x: x == 'c', MyBag(1, 2, 9)),
+])
+def test_map_fields(input_, key, expected):
+    with BufferingNodeExecutionContext(bonobo.MapFields(lambda x: x**2, key)) as context:
+        context.write_sync(input_)
+    assert context.status == '-'
+    [got] = context.get_buffer()
+    assert expected == got
+
+
+def test_map_fields_error():
+    with BufferingNodeExecutionContext(bonobo.MapFields(lambda x: x**2)) as context:
+        context.write_sync(tuple())
+    assert context.status == '!'
+    assert context.defunct
