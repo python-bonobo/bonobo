@@ -1,3 +1,4 @@
+import collections
 import functools
 import html
 import itertools
@@ -23,6 +24,7 @@ __all__ = [
     "SetFields",
     "Tee",
     "UnpackItems",
+    "MapFields",
     "count",
     "identity",
     "noop",
@@ -312,6 +314,32 @@ def Format(**formats):
         )
 
     return _Format
+
+
+@transformation_factory
+def MapFields(callFunc):
+    # TODO: Figure out how to more intelligently handle correctable errors
+    # Use this wrapper to call the function that we pass in and handle the error
+    # For now, handle the error by returning the unmodified value
+    def _wrapfunc(func, val):
+        try:
+            retval = func(val)  # Attempt to use the function
+        except:
+            retval = val  # If we get any error, return the value unmodified
+
+        return retval
+
+    @use_raw_input
+    def _MapFields(bag):
+        nonlocal callFunc
+
+        b = {key: _wrapfunc(callFunc, value) for key, value in bag._asdict().items()}  # iterate the wrapped callable
+        makenamedtuple = collections.namedtuple('Bag', ' '.join((b.keys())))  # constructor of the returned tuple
+        rettuple = makenamedtuple(**b)  # use the constructor to create the returned tuple
+
+        return rettuple
+
+    return _MapFields
 
 
 def _count(self, context):
