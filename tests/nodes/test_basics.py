@@ -123,6 +123,8 @@ MyBag = BagType("MyBag", ["a", "b", "c"])
     (MyBag(1, 2, 3), True, MyBag(1, 4, 9)),
     (MyBag(1, 2, 3), False, MyBag(1, 2, 3)),
     (MyBag(1, 2, 3), lambda x: x == 'c', MyBag(1, 2, 9)),
+    ((1, 2, 3), True, (1, 4, 9)),
+    ((1, 2, 3), False, (1, 2, 3)),
 ])
 def test_map_fields(input_, key, expected):
     with BufferingNodeExecutionContext(bonobo.MapFields(lambda x: x**2, key)) as context:
@@ -133,7 +135,7 @@ def test_map_fields(input_, key, expected):
 
 
 def test_map_fields_error():
-    with BufferingNodeExecutionContext(bonobo.MapFields(lambda x: x**2)) as context:
+    with BufferingNodeExecutionContext(bonobo.MapFields(lambda x: x**2, lambda x: x == 'c')) as context:
         context.write_sync(tuple())
     assert context.status == '!'
     assert context.defunct

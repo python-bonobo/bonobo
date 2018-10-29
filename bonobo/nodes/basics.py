@@ -334,13 +334,19 @@ def MapFields(function, key=True):
     def _MapFields(bag):
         try:
             factory = type(bag)._make
-        except AttributeError as e:
-            raise UnrecoverableAttributeError('This transformation works only on objects with named'
-                                              ' fields (namedtuple, BagType, ...).') from e
+        except AttributeError:
+            factory = type(bag)
 
         if callable(key):
+            try:
+                fields = bag._fields
+            except AttributeError as e:
+                raise UnrecoverableAttributeError(
+                    'This transformation works only on objects with named'
+                    ' fields (namedtuple, BagType, ...).') from e
+
             return factory(
-                function(value) if key(key_) else value for key_, value in zip(bag._fields, bag)
+                function(value) if key(key_) else value for key_, value in zip(fields, bag)
             )
         elif key:
             return factory(function(value) for value in bag)
