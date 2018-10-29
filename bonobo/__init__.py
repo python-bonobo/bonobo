@@ -29,6 +29,7 @@ from bonobo._api import (
     LdjsonReader,
     LdjsonWriter,
     Limit,
+    MapFields,
     OrderFields,
     PickleReader,
     PickleWriter,
