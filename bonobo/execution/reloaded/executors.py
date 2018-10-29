@@ -92,6 +92,14 @@ class AsyncIOExecutor(AsyncExecutor):
         self.loop.run_until_complete(asyncio.wait(futures))
 
 
+class UVLoopAsyncIOExecutor(AsyncIOExecutor):
+    def __init__(self):
+        import asyncio, uvloop
+
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+        super().__init__()
+
+
 class TrioExecutor(AsyncExecutor):
     def __init__(self):
         import trio

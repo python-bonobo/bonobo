@@ -1,7 +1,7 @@
 import argparse
 
 import bonobo
-from bonobo.execution.reloaded.executors import AsyncIOExecutor, TrioExecutor
+from bonobo.execution.reloaded.executors import AsyncIOExecutor, TrioExecutor, UVLoopAsyncIOExecutor
 from bonobo.execution.reloaded.jobs import Job
 
 if __name__ == '__main__':
@@ -11,6 +11,7 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group()
     group.required = True
     group.add_argument('--asyncio', action='store_const', const=AsyncIOExecutor, dest='executor')
+    group.add_argument('--asyncio-uvloop', action='store_const', const=UVLoopAsyncIOExecutor, dest='executor')
     group.add_argument('--trio', action='store_const', const=TrioExecutor, dest='executor')
     options = parser.parse_args()
 
@@ -28,4 +29,6 @@ if __name__ == '__main__':
     graph = bonobo.Graph()
     graph.get_cursor() >> produce_something >> make_it_awesome >> reverse >> print
     job = Job(graph)
-    options.executor().execute(job)
+    import cProfile
+
+    cProfile.run('options.executor().execute(job)', sort='tottime')
