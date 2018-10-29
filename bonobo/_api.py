@@ -6,7 +6,6 @@ All objects in this module are considered very safe to use, and backward compati
 to another is maximal.
 
 """
-
 from bonobo.execution.strategies import create_strategy
 from bonobo.nodes import *
 from bonobo.nodes import __all__ as _all_nodes
@@ -187,7 +186,7 @@ def get_examples_path(*pathsegments):
     import os
     import pathlib
 
-    return str(pathlib.Path(os.path.dirname(__file__), 'examples', *pathsegments))
+    return str(pathlib.Path(os.path.dirname(__file__), "examples", *pathsegments))
 
 
 @api.register
@@ -196,3 +195,4 @@ def open_examples_fs(*pathsegments):
 
 
 api.register_group(get_argument_parser, parse_args)
+

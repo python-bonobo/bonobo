@@ -134,7 +134,7 @@ def BagType(typename, fields, *, verbose=False, module=None):
         if type(name) is not str:
             raise TypeError("Type names and field names must be strings, got {name!r}".format(name=name))
         if not isinstance(name, str):
-            raise TypeError('Type names and field names must be strings, got {name!r}'.format(name=name))
+            raise TypeError("Type names and field names must be strings, got {name!r}".format(name=name))
         if not i:
             if not name.isidentifier():
                 raise ValueError("Type names must be valid identifiers: {name!r}".format(name=name))

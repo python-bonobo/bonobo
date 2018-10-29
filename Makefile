@@ -120,7 +120,7 @@ watch-$(SPHINX_SOURCEDIR):   ##
 	$(SPHINX_AUTOBUILD) $(SPHINX_SOURCEDIR) $(shell mktemp -d)
 
 format:   ## Reformats the whole codebase using our standards (requires black and isort).
-	black -l 120 --skip-string-normalization .
+	black -l 120 .
 	isort -rc -o mondrian -o whistle -y .
 
 medikit:   # Checks installed medikit version and updates it if it is outdated.

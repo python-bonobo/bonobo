@@ -16,11 +16,11 @@ import timeit
 
 
 def j1(d):
-    return {'prepend': 'foo', **d, 'append': 'bar'}
+    return {"prepend": "foo", **d, "append": "bar"}
 
 
 def k1(**d):
-    return {'prepend': 'foo', **d, 'append': 'bar'}
+    return {"prepend": "foo", **d, "append": "bar"}
 
 
 def j2(d):
@@ -39,17 +39,17 @@ def k3(**d):
     return None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import timeit
 
-    with open('person.json') as f:
+    with open("person.json") as f:
         json_data = json.load(f)
 
     for i in 1, 2, 3:
         print(
-            'j{}'.format(i), timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i))
+            "j{}".format(i), timeit.timeit("j{}({!r})".format(i, json_data), setup="from __main__ import j{}".format(i))
         )
         print(
-            'k{}'.format(i),
+            "k{}".format(i),
             timeit.timeit("k{}(**{!r})".format(i, json_data), setup="from __main__ import k{}".format(i)),
         )

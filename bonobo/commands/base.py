@@ -4,10 +4,11 @@ import runpy
 import sys
 from contextlib import contextmanager
 
+from mondrian import humanizer
+
 import bonobo.util.environ
 from bonobo.util import get_name
 from bonobo.util.environ import get_argument_parser, parse_args
-from mondrian import humanizer
 
 
 class BaseCommand:

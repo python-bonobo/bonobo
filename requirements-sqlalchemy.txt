@@ -21,7 +21,6 @@ requests==2.19.1
 six==1.11.0
 sqlalchemy==1.2.10
 stevedore==1.29.0
-typing==3.6.4
 unidecode==1.0.22
 urllib3==1.23
 whistle==1.0.1

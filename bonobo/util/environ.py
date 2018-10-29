@@ -6,7 +6,7 @@ import warnings
 from contextlib import contextmanager
 
 __escape_decoder = codecs.getdecoder("unicode_escape")
-__posix_variable = re.compile("\$\{[^\}]*\}")
+__posix_variable = re.compile(r"\$\{[^\}]*\}")
 
 
 def parse_var(var):
