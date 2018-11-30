@@ -96,6 +96,15 @@ class CsvReader(FileReader, CsvHandler):
 
 @use_context
 class CsvWriter(FileWriter, CsvHandler):
+
+    skip_header = Option(
+        bool,
+        default=False,
+        __doc__="""
+        If true, the writer will not produce a file header
+    """,
+    )
+
     @Method(
         __doc__="""
             Builds the CSV writer, a.k.a an object we can pass a field collection to be written as one line in the
@@ -114,7 +123,7 @@ class CsvWriter(FileWriter, CsvHandler):
         if not context.lineno:
             context.writer = self.writer_factory(file)
 
-            if fields:
+            if fields and not self.skip_header:
                 context.writer(fields)
                 context.lineno += 1
 
