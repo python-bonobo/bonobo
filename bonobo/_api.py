@@ -149,6 +149,7 @@ api.register_group(
     LdjsonReader,
     LdjsonWriter,
     Limit,
+    MapFields,
     OrderFields,
     PickleReader,
     PickleWriter,

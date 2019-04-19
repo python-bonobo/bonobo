@@ -1,5 +1,6 @@
 import bisect
 import functools
+from collections import Sequence
 
 
 class sortedlist(list):
@@ -30,6 +31,16 @@ def _with_length_check(f):
         return result
 
     return _wrapped
+
+
+def tuple_or_const(tuple_or_mixed, *, consts=(None, False), **kwargs):
+    if tuple_or_mixed in consts:
+        return tuple_or_mixed
+    if isinstance(tuple_or_mixed, str):
+        pass
+    elif isinstance(tuple_or_mixed, Sequence):
+        tuple_or_mixed = tuple(tuple_or_mixed)
+    return ensure_tuple(tuple_or_mixed, **kwargs)
 
 
 @_with_length_check
