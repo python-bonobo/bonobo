@@ -117,4 +117,4 @@ class CsvWriterTest(Csv, WriterTest, TestCase):
         context.write_sync(EMPTY, EMPTY, EMPTY)
         context.stop()
 
-        assert self.readlines() == ('', '', '')
+        assert self.readlines() == ("", "", "")

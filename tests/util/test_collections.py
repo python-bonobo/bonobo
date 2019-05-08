@@ -1,7 +1,7 @@
 import pytest
 
 from bonobo.util import ensure_tuple, sortedlist
-from bonobo.util.collections import cast, tuplize, tuple_or_const
+from bonobo.util.collections import cast, tuple_or_const, tuplize
 
 
 def test_sortedlist():
@@ -15,10 +15,11 @@ def test_sortedlist():
 
 def test_tuple_or_const():
     assert tuple_or_const(()) == ()
-    assert tuple_or_const((1, )) == (1, )
-    assert tuple_or_const((1, 2, )) == (1, 2, )
-    assert tuple_or_const([1, 2, ]) == (1, 2, )
-    assert tuple_or_const("aaa") == ('aaa', )
+    assert tuple_or_const((1,)) == (1,)
+    assert tuple_or_const((1, 2)) == (1, 2)
+    assert tuple_or_const([1, 2]) == (1, 2)
+    assert tuple_or_const("aaa") == ("aaa",)
+
 
 def test_ensure_tuple():
     assert ensure_tuple("a") == ("a",)
