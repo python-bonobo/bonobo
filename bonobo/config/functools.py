@@ -23,5 +23,6 @@ class partial(functools.partial):
     @property
     def __name__(self):
         return get_name(self.func)
+
     def using(self, *service_names):
         return use(*service_names)(self)

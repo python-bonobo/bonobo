@@ -196,4 +196,3 @@ def open_examples_fs(*pathsegments):
 
 
 api.register_group(get_argument_parser, parse_args)
-
