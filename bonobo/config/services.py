@@ -146,14 +146,19 @@ class Exclusive(ContextDecorator):
     """
 
     _locks = {}
+    lock = threading.Lock()
 
     def __init__(self, wrapped):
         self._wrapped = wrapped
 
     def get_lock(self):
         _id = id(self._wrapped)
-        if not _id in Exclusive._locks:
-            Exclusive._locks[_id] = threading.RLock()
+        Exclusive.lock.acquire()
+        try:
+            if not _id in Exclusive._locks:
+                Exclusive._locks[_id] = threading.RLock()
+        finally:
+            Exclusive.lock.release()
         return Exclusive._locks[_id]
 
     def __enter__(self):
