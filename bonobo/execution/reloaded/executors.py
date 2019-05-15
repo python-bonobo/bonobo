@@ -8,7 +8,7 @@ from bonobo.execution.reloaded.tokens import begin, end
 
 class AsyncExecutor:
     def run_in_thread(self, x, *args, **kwargs):
-        raise NotImplementedError('Concrete implementations should define this.')
+        raise NotImplementedError("Concrete implementations should define this.")
 
     def create_async_generator_for(self, handler):
         # async generator
@@ -49,7 +49,7 @@ class AsyncExecutor:
         raise NotImplementedError(repr(handler))
 
     def create_channel(self):
-        raise NotImplementedError('Concrete implementations should define this.')
+        raise NotImplementedError("Concrete implementations should define this.")
 
     def create_channels(self, job):
         inputs = {i: self.create_channel() for i in range(len(job.nodes))}
@@ -60,8 +60,16 @@ class AsyncExecutor:
         for queue in queues:
             await queue.put(value)
 
+    def execute(self, job):
+        raise NotImplementedError("Abstract.")
+
 
 class AsyncIOExecutor(AsyncExecutor):
+    """
+    Standard asyncio-based executor, using the default (tied to the underlying system) event loop policy.
+
+    """
+
     def __init__(self, *, loop=None):
         import asyncio
 
@@ -93,6 +101,12 @@ class AsyncIOExecutor(AsyncExecutor):
 
 
 class UVLoopAsyncIOExecutor(AsyncIOExecutor):
+    """
+    Extends the standard asyncio-based executor to overide the event loop policy to use libuv event loop. Note that
+    this is not necessarily faster than the parent class, it's up to you to benchmark for your own use case.
+
+    """
+
     def __init__(self):
         import asyncio, uvloop
 
@@ -101,6 +115,21 @@ class UVLoopAsyncIOExecutor(AsyncIOExecutor):
 
 
 class TrioExecutor(AsyncExecutor):
+    """
+    Experimental trio-based executor.
+
+    At our last benchmark point (end of 2018), it was about twice slower on a simple case than the asyncio/uvloop
+    variants. Trio brings some great error handling capabilities, so it may still be worth it, it's also important
+    to note that the benchmarks are using near-to-free operations, making the underlying loop overhead a big part
+    of the execution time, while your real world case should spend a lot more cpu, making the overhead non-important.
+
+    Help needed: some trio experts may help us having a better integration, or at least explain why it is so much
+    slower than asyncio based executions.
+
+    TODO: upgrade to latest trio version
+
+    """
+
     def __init__(self):
         import trio
 
