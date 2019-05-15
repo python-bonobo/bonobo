@@ -68,7 +68,7 @@ class Container(dict):
         if len(args) == 1:
             if len(kwargs):
                 raise ValueError(
-                    'You can either use {} with one positional argument or with keyword arguments, not both.'.format(
+                    "You can either use {} with one positional argument or with keyword arguments, not both.".format(
                         cls.__name__
                     )
                 )

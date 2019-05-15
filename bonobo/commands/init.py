@@ -35,8 +35,8 @@ class InitCommand(BaseCommand):
 
     def create_package(self, *, filename):
         _, ext = os.path.splitext(filename)
-        if ext != '':
-            raise ValueError('Package names should not have an extension.')
+        if ext != "":
+            raise ValueError("Package names should not have an extension.")
 
         try:
             import medikit.commands
@@ -56,15 +56,15 @@ class InitCommand(BaseCommand):
         print(
             humanizer.Success(
                 'Package "{}" has been created.'.format(package_name),
-                '',
+                "",
                 "Install it...",
-                '',
+                "",
                 "    $ `pip install --editable {}`".format(filename),
-                '',
+                "",
                 "Then maybe run the example...",
-                '',
+                "",
                 "    $ `python -m {}`".format(package_name),
-                '',
+                "",
                 "Enjoy!",
             )
         )

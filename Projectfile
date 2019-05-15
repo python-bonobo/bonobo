@@ -87,7 +87,7 @@ def on_make_generate(event):
     makefile.add_target(
         'format',
         '''
-            black -l 120 --skip-string-normalization .
+            black -l 120 .
             isort -rc -o mondrian -o whistle -y .
         ''',
         phony=True,

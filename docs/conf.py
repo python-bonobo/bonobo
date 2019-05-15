@@ -7,43 +7,43 @@ import sys
 
 import bonobo
 
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('_themes'))
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("_themes"))
 
 
 # -- General configuration ------------------------------------------------
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.graphviz',
-    'sphinx_sitemap',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.graphviz",
+    "sphinx_sitemap",
 ]
 
-site_url = 'http://docs.bonobo-project.org/en/master/'
+site_url = "http://docs.bonobo-project.org/en/master/"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'Bonobo'
-author = 'Romain Dorgueil'
-copyright = '2012-{}, {}'.format(datetime.datetime.now().year, author)
+project = "Bonobo"
+author = "Romain Dorgueil"
+copyright = "2012-{}, {}".format(datetime.datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -60,14 +60,14 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-autoclass_content = 'both'
-autodoc_member_order = 'groupwise'
-autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance']
+autoclass_content = "both"
+autodoc_member_order = "groupwise"
+autodoc_default_flags = ["members", "undoc-members", "show-inheritance"]
 
 add_module_names = False
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
@@ -77,56 +77,56 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'github_user': 'python-bonobo',
-    'github_repo': 'bonobo',
-    'github_button': 'true',
-    'github_banner': 'true',
-    'show_powered_by': 'false',
-    'show_related': 'true',
+    "github_user": "python-bonobo",
+    "github_repo": "bonobo",
+    "github_button": "true",
+    "github_banner": "true",
+    "show_powered_by": "false",
+    "show_related": "true",
 }
 
 html_sidebars = {
-    'index': [
-        'sidebarlogo.html',
-        'navigation.html',
-        'localtoc.html',
-        'sidebarintro.html',
-        'sourcelink.html',
-        'searchbox.html',
-        'sidebarinfos.html',
+    "index": [
+        "sidebarlogo.html",
+        "navigation.html",
+        "localtoc.html",
+        "sidebarintro.html",
+        "sourcelink.html",
+        "searchbox.html",
+        "sidebarinfos.html",
     ],
-    '**': [
-        'sidebarlogo.html',
-        'navigation.html',
-        'localtoc.html',
-        'relations.html',
-        'sourcelink.html',
-        'searchbox.html',
-        'sidebarinfos.html',
+    "**": [
+        "sidebarlogo.html",
+        "navigation.html",
+        "localtoc.html",
+        "relations.html",
+        "sourcelink.html",
+        "searchbox.html",
+        "sidebarinfos.html",
     ],
 }
 
-html_theme_path = ['_themes']
-html_additional_pages = {'index': 'index.html'}
+html_theme_path = ["_themes"]
+html_additional_pages = {"index": "index.html"}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_show_sphinx = False
 
-graphviz_output_format = 'svg'
+graphviz_output_format = "svg"
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Bonobodoc'
+htmlhelp_basename = "Bonobodoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -148,13 +148,13 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [(master_doc, 'Bonobo.tex', 'Bonobo Documentation', 'Romain Dorgueil', 'manual')]
+latex_documents = [(master_doc, "Bonobo.tex", "Bonobo Documentation", "Romain Dorgueil", "manual")]
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'bonobo', 'Bonobo Documentation', [author], 1)]
+man_pages = [(master_doc, "bonobo", "Bonobo Documentation", [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -164,12 +164,12 @@ man_pages = [(master_doc, 'bonobo', 'Bonobo Documentation', [author], 1)]
 texinfo_documents = [
     (
         master_doc,
-        'Bonobo',
-        'Bonobo Documentation',
+        "Bonobo",
+        "Bonobo Documentation",
         author,
-        'Bonobo',
-        'One line description of project.',
-        'Miscellaneous',
+        "Bonobo",
+        "One line description of project.",
+        "Miscellaneous",
     )
 ]
 
@@ -191,14 +191,14 @@ epub_copyright = copyright
 # epub_uid = ''
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
+epub_exclude_files = ["search.html"]
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'django': ('https://docs.djangoproject.com/en/2.0/', 'https://docs.djangoproject.com/en/2.0/_objects/'),
-    'fs': ('https://docs.pyfilesystem.org/en/latest/', None),
-    'python': ('https://docs.python.org/3', None),
-    'requests': ('http://docs.python-requests.org/en/master/', None),
+    "django": ("https://docs.djangoproject.com/en/2.0/", "https://docs.djangoproject.com/en/2.0/_objects/"),
+    "fs": ("https://docs.pyfilesystem.org/en/latest/", None),
+    "python": ("https://docs.python.org/3", None),
+    "requests": ("http://docs.python-requests.org/en/master/", None),
 }
 
 rst_epilog = """

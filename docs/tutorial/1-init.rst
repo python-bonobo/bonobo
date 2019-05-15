@@ -59,6 +59,8 @@ To inspect the graph of your first transformation:
 
     You must `install the graphviz software first <https://www.graphviz.org/download/>`_. It is _not_ the python's graphviz
     package, you must install it using your system's package manager (apt, brew, ...).
+    
+    For Windows users: you might need to add an entry to the Path environment variable for the `dot` command to be             recognized
 
 .. code-block:: shell-session
 
@@ -203,11 +205,16 @@ Main Block
                 get_graph(**options),
                 services=get_services(**options)
             )
-
+            
 Here, the real thing happens.
 
 Without diving into too much details for now, using the :func:`bonobo.parse_args` context manager will allow our job to
 be configurable, later, and although we don't really need it right now, it does not harm neither.
+
+.. note::
+
+    This is intended to run in a console terminal. If you're working in a jupyter notebook, you need to adapt the thing to
+    avoid trying to parse arguments, or you'll get into trouble.
 
 Reading the output
 ::::::::::::::::::

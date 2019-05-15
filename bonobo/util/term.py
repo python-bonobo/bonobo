@@ -1,2 +1,2 @@
 CLEAR_EOL = "\033[0K"
-MOVE_CURSOR_UP = '\033[{}A'.format
+MOVE_CURSOR_UP = "\033[{}A".format

@@ -1,6 +1,9 @@
 import functools
 import itertools
 
+from bonobo.config.services import use
+from bonobo.util import get_name
+
 
 def transformation_factory(f):
     @functools.wraps(f)
@@ -14,3 +17,12 @@ def transformation_factory(f):
     _transformation_factory._partial = True
 
     return _transformation_factory
+
+
+class partial(functools.partial):
+    @property
+    def __name__(self):
+        return get_name(self.func)
+
+    def using(self, *service_names):
+        return use(*service_names)(self)

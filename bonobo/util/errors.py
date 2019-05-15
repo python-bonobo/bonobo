@@ -24,7 +24,7 @@ def sweeten_errors():
             length = len(pre_re.sub("\\1\\2\\3", arg))
 
             arg = pre_re.sub(w("\\1") + term.bold("\\2") + w("\\3"), arg)
-            arg = re.sub("^  \$ (.*)", term.lightblack("  $ ") + term.reset("\\1"), arg)
+            arg = re.sub(r"^  \$ (.*)", term.lightblack("  $ ") + term.reset("\\1"), arg)
 
             return (arg, length)
 

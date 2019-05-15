@@ -135,7 +135,6 @@ Now let's see how to do it correctly:
         }
 
     def new_dict_and_yield():
-        d = {}
         for i in range(100):
             # Different dict each time.
             yield {

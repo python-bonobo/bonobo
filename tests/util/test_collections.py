@@ -18,7 +18,7 @@ def test_tuple_or_const():
     assert tuple_or_const((1,)) == (1,)
     assert tuple_or_const((1, 2)) == (1, 2)
     assert tuple_or_const([1, 2]) == (1, 2)
-    assert tuple_or_const("aaa") == ('aaa',)
+    assert tuple_or_const("aaa") == ("aaa",)
 
 
 def test_ensure_tuple():

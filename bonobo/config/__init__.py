@@ -5,7 +5,7 @@ configurable transformations, either class-based or function-based.
 """
 
 from bonobo.config.configurables import Configurable
-from bonobo.config.functools import transformation_factory
+from bonobo.config.functools import transformation_factory, partial
 from bonobo.config.options import Method, Option
 from bonobo.config.processors import ContextProcessor, use_context, use_context_processor, use_raw_input, use_no_input
 from bonobo.config.services import Container, Exclusive, Service, use, create_container
@@ -23,6 +23,7 @@ __all__ = [
     "Option",
     "Service",
     "create_container",
+    "partial",
     "requires",
     "transformation_factory",
     "use",
