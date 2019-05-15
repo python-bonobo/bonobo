@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from bonobo.constants import BEGIN
 from bonobo.execution.reloaded.tokens import begin, end
+from bonobo.execution.reloaded.meta import get_meta
 
 
 class AsyncExecutor:
@@ -46,7 +47,7 @@ class AsyncExecutor:
 
             return _asyncgen_consumer
 
-        raise NotImplementedError(repr(handler))
+        raise NotImplementedError("Could not create an async generator wrapping {!r}.".format(handler))
 
     def create_channel(self):
         raise NotImplementedError("Concrete implementations should define this.")
