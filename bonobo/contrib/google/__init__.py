@@ -1,13 +1,14 @@
 import os
 
-# https://developers.google.com/api-client-library/python/guide/aaa_oauth
-# pip install google-api-python-client (1.6.4)
-
 import httplib2
 from apiclient import discovery
 from oauth2client import client, tools
 from oauth2client.file import Storage
 from oauth2client.tools import argparser
+
+# https://developers.google.com/api-client-library/python/guide/aaa_oauth
+# pip install google-api-python-client (1.6.4)
+
 
 HOME_DIR = os.path.expanduser("~")
 GOOGLE_SECRETS = os.path.join(HOME_DIR, ".cache/secrets/client_secrets.json")
