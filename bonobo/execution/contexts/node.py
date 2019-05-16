@@ -259,7 +259,9 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         """
         for message in messages:
             if not isinstance(message, Token):
-                message = ensure_tuple(message, cls=self._input_type, length=self._input_length)
+                message = ensure_tuple(
+                    message, cls=self._input_type, length=self._input_length
+                )  # lgtm [py/call/wrong-named-argument]
                 if self._input_length is None:
                     self._input_length = len(message)
             self.input.put(message)

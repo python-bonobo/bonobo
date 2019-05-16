@@ -56,8 +56,8 @@ from bonobo._version import __version__
 __all__ = ["__version__"] + __all__
 with (Path(__file__).parent / "bonobo.svg").open() as f:
     __logo__ = f.read()
-__doc__ = __doc__
-__version__ = __version__
+__doc__ = __doc__  # lgtm [py/redundant-assignment]
+__version__ = __version__  # lgtm [py/redundant-assignment]
 
 
 def _repr_html_():

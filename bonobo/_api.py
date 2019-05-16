@@ -125,14 +125,13 @@ def open_fs(fs_url=None, *args, **kwargs):
     :param str default_protocol: The protocol to use if one is not supplied in the FS URL (defaults to ``"osfs"``).
     :returns: :class:`fs.base.FS` object
     """
+    import os
     from fs.opener import open_fs as _open_fs
-    from os.path import expanduser
-    from os import getcwd
 
     if fs_url is None:
-        fs_url = getcwd()
+        fs_url = os.getcwd()
 
-    return _open_fs(expanduser(str(fs_url)), *args, **kwargs)
+    return _open_fs(os.path.expanduser(str(fs_url)), *args, **kwargs)
 
 
 # standard transformations

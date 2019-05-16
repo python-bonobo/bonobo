@@ -74,7 +74,7 @@ class Lifecycle:
         self.start()
         return self
 
-    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):  # lgtm [py/special-method-wrong-signature]
         self.stop()
 
     def get_flags_as_string(self):
