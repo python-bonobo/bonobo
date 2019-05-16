@@ -7,7 +7,7 @@ bleach==3.1.0
 decorator==4.4.0
 defusedxml==0.6.0
 entrypoints==0.3
-ipykernel==5.1.0
+ipykernel==5.1.1
 ipython-genutils==0.2.0
 ipython==7.5.0
 ipywidgets==6.0.1
@@ -30,8 +30,8 @@ pickleshare==0.7.5
 prometheus-client==0.6.0
 prompt-toolkit==2.0.9
 ptyprocess==0.6.0
-pygments==2.3.1
-pyrsistent==0.15.1
+pygments==2.4.0
+pyrsistent==0.15.2
 python-dateutil==2.8.0
 pyzmq==18.0.1
 qtconsole==4.4.4
