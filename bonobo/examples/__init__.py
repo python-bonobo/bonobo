@@ -1,7 +1,7 @@
 import os
 
 import bonobo
-from bonobo.execution.strategies import STRATEGIES, DEFAULT_STRATEGY
+from bonobo.execution.strategies import DEFAULT_STRATEGY, STRATEGIES
 from bonobo.util.statistics import Timer
 
 

@@ -330,6 +330,7 @@ def MapFields(function, key=True):
     :param key: bool or callable
     :return: callable
     """
+
     @use_raw_input
     def _MapFields(bag):
         try:
@@ -342,12 +343,10 @@ def MapFields(function, key=True):
                 fields = bag._fields
             except AttributeError as e:
                 raise UnrecoverableAttributeError(
-                    'This transformation works only on objects with named'
-                    ' fields (namedtuple, BagType, ...).') from e
+                    "This transformation works only on objects with named" " fields (namedtuple, BagType, ...)."
+                ) from e
 
-            return factory(
-                function(value) if key(key_) else value for key_, value in zip(fields, bag)
-            )
+            return factory(function(value) if key(key_) else value for key_, value in zip(fields, bag))
         elif key:
             return factory(function(value) for value in bag)
         else:
