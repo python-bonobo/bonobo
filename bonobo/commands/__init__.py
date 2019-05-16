@@ -2,6 +2,7 @@ import argparse
 import logging
 
 import mondrian
+
 from bonobo import settings
 from bonobo.commands.base import BaseCommand, BaseGraphCommand
 
