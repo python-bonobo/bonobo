@@ -2,13 +2,13 @@ from logging import getLogger
 from types import GeneratorType
 
 from colorama import Back, Fore, Style
-from django.core.management import BaseCommand
-from django.core.management.base import OutputWrapper
 from mondrian import term
 
 import bonobo
 from bonobo.plugins.console import ConsoleOutputPlugin
 from bonobo.util.term import CLEAR_EOL
+from django.core.management import BaseCommand
+from django.core.management.base import OutputWrapper
 
 from .utils import create_or_update
 
@@ -77,6 +77,7 @@ class ETLCommand(BaseCommand):
         self.stderr = OutputWrapper(ConsoleOutputPlugin._stderr, ending=CLEAR_EOL + "\n")
         self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + "!" + Style.RESET_ALL + " " + x
 
-        results = self.run(*args, **options)
-
-        self.stdout, self.stderr = _stdout_backup, _stderr_backup
+        try:
+            return self.run(*args, **options)
+        finally:
+            self.stdout, self.stderr = _stdout_backup, _stderr_backup

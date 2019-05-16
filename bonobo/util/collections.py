@@ -34,6 +34,10 @@ def _with_length_check(f):
 
 
 def tuple_or_const(tuple_or_mixed, *, consts=(None, False), **kwargs):
+    """
+    Like ensure_tuple, but also accept as valid outputs a list of constants.
+    """
+
     if tuple_or_mixed in consts:
         return tuple_or_mixed
     if isinstance(tuple_or_mixed, str):
@@ -49,10 +53,13 @@ def ensure_tuple(tuple_or_mixed, *, cls=None):
     If it's not a tuple, let's make a tuple of one item.
     Otherwise, not changed.
 
-    :param tuple_or_mixed:
-    :return: tuple
-
+    :param tuple_or_mixed: material to work on.
+    :param cls: type of the resulting tuple, or `tuple` if not provided.
+    :param length: provided by `_with_length_check` decorator, if specified, make sure that the tuple is of this
+                   length (and raise a `TypeError` if not), otherwise, do nothing.
+    :return: tuple (or something of type `cls`, if provided)
     """
+
     if cls is None:
         cls = tuple
 

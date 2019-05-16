@@ -8,56 +8,23 @@
 import sys
 from pathlib import Path
 
+from bonobo._api import (
+    CsvReader, CsvWriter, FileReader, FileWriter, Filter, FixedWindow, Format, Graph, JsonReader, JsonWriter,
+    LdjsonReader, LdjsonWriter, Limit, MapFields, OrderFields, PickleReader, PickleWriter, PrettyPrinter, RateLimited,
+    Rename, SetFields, Tee, UnpackItems, __all__, __doc__, count, create_reader, create_strategy, create_writer,
+    get_argument_parser, get_examples_path, identity, inspect, noop, open_examples_fs, open_fs, parse_args, run
+)
+from bonobo._version import __version__
+
 if sys.version_info < (3, 5):
     raise RuntimeError("Python 3.5+ is required to use Bonobo.")
 
-from bonobo._api import (
-    run,
-    inspect,
-    Graph,
-    create_strategy,
-    open_fs,
-    CsvReader,
-    CsvWriter,
-    FileReader,
-    FileWriter,
-    Filter,
-    FixedWindow,
-    Format,
-    JsonReader,
-    JsonWriter,
-    LdjsonReader,
-    LdjsonWriter,
-    Limit,
-    MapFields,
-    OrderFields,
-    PickleReader,
-    PickleWriter,
-    PrettyPrinter,
-    RateLimited,
-    Rename,
-    SetFields,
-    Tee,
-    UnpackItems,
-    count,
-    identity,
-    noop,
-    create_reader,
-    create_writer,
-    get_examples_path,
-    open_examples_fs,
-    get_argument_parser,
-    parse_args,
-    __all__,
-    __doc__,
-)
-from bonobo._version import __version__
 
 __all__ = ["__version__"] + __all__
 with (Path(__file__).parent / "bonobo.svg").open() as f:
     __logo__ = f.read()
-__doc__ = __doc__
-__version__ = __version__
+__doc__ = __doc__  # lgtm [py/redundant-assignment]
+__version__ = __version__  # lgtm [py/redundant-assignment]
 
 
 def _repr_html_():

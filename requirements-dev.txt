@@ -20,11 +20,10 @@ jinja2==2.10.1
 markupsafe==1.1.1
 more-itertools==7.0.0
 packaging==19.0
-pathlib2==2.3.3
 pluggy==0.11.0
 poyo==0.4.2
 py==1.8.0
-pygments==2.3.1
+pygments==2.4.0
 pyparsing==2.4.0
 pytest-cov==2.7.1
 pytest-timeout==1.3.3

@@ -26,7 +26,7 @@ class Timer:
         self.__start = time.time()
         return self
 
-    def __exit__(self, type=None, value=None, traceback=None):
+    def __exit__(self, type=None, value=None, traceback=None):  # lgtm [py/special-method-wrong-signature]
         # Error handling here
         self.__finish = time.time()
 
