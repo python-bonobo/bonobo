@@ -74,7 +74,8 @@ setup(
         ],
         'docker': ['bonobo-docker (~= 0.6.0a1)'],
         'jupyter': ['ipywidgets (~= 6.0)', 'jupyter (~= 1.0)'],
-        'sqlalchemy': ['bonobo-sqlalchemy (~= 0.6.0a1)']
+        'sqlalchemy': ['bonobo-sqlalchemy (~= 0.6.0a1)'],
+        'slack': ['slackclient (>= 1.2)']
     },
     entry_points={
         'bonobo.commands': [
