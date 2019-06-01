@@ -7,7 +7,9 @@ at home if you want to give it a shot.
 
 """
 from bonobo.execution.strategies.executor import (
-    AsyncThreadPoolExecutorStrategy, ProcessPoolExecutorStrategy, ThreadPoolExecutorStrategy
+    AsyncThreadPoolExecutorStrategy,
+    ProcessPoolExecutorStrategy,
+    ThreadPoolExecutorStrategy,
 )
 from bonobo.execution.strategies.naive import NaiveStrategy
 
