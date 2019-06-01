@@ -5,6 +5,9 @@
 
 :Module: :mod:`bonobo.config`
 
+
 .. automodule:: bonobo.config
+
+
 
    

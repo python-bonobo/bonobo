@@ -5,6 +5,9 @@
 
 :Module: :mod:`bonobo.util`
 
+
 .. automodule:: bonobo.util
+
+
 
    

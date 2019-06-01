@@ -1,6 +1,9 @@
 """
-Contains all the tools you need to get started with the framework, including (but not limited to) generic
-transformations, readers, writers, and tools for writing and executing graphs and jobs.
+The root :mod:`bonobo` package contains all the tools you need to get started with the framework, including (but not
+limited to) generic transformations, readers, writers, and tools for writing and executing graphs and jobs.
+
+Mostly, it exposes objects found in sub-packages, and although you can access them directly here, you should refer to
+the matching documentation pages when using them.
 
 All objects in this module are considered very safe to use, and backward compatibility when moving up from one version
 to another is maximal.
