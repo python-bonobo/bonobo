@@ -59,13 +59,14 @@ class Graph:
         self.edges = {BEGIN: set()}
         self.named = {}
         self.nodes = []
-        self.add_chain(*chain)
+        if len(chain):
+            self.add_chain(*chain)
 
     def __iter__(self):
         yield from self.nodes
 
     def __len__(self):
-        """ Node count.
+        """Node count.
         """
         return len(self.nodes)
 
@@ -73,51 +74,112 @@ class Graph:
         return self.nodes[key]
 
     def get_cursor(self, ref=BEGIN):
-        return GraphCursor(self, last=self._resolve_index(ref))
+        return GraphCursor(self, last=self.index_of(ref))
 
-    def outputs_of(self, idx, create=False):
-        """ Get a set of the outputs for a given node index.
+    def index_of(self, mixed):
         """
-        if create and not idx in self.edges:
-            self.edges[idx] = set()
-        return self.edges[idx]
+        Find the index based on various strategies for a node, probably an input or output of chain. Supported
+        inputs are indexes, node values or names.
 
-    def add_node(self, c):
-        """ Add a node without connections in this graph and returns its index.
+        """
+        if mixed is None:
+            return None
+
+        if type(mixed) is int or mixed in self.edges:
+            return mixed
+
+        if isinstance(mixed, str) and mixed in self.named:
+            return self.named[mixed]
+
+        if mixed in self.nodes:
+            return self.nodes.index(mixed)
+
+        raise ValueError("Cannot find node matching {!r}.".format(mixed))
+
+    def outputs_of(self, idx_or_node, create=False):
+        """Get a set of the outputs for a given node, node index or name.
+        """
+        idx_or_node = self.index_of(idx_or_node)
+
+        if create and not idx_or_node in self.edges:
+            self.edges[idx_or_node] = set()
+        return self.edges[idx_or_node]
+
+    def add_node(self, c, *, _name=None):
+        """Add a node without connections in this graph and returns its index.
+        If _name is specified, name this node (string reference for  further usage).
         """
         idx = len(self.nodes)
         self.edges[idx] = set()
         self.nodes.append(c)
+
+        if _name:
+            if _name in self.named:
+                raise KeyError("Duplicate name {!r} in graph.".format(_name))
+            self.named[_name] = idx
+
         return idx
 
     def add_chain(self, *nodes, _input=BEGIN, _output=None, _name=None):
-        """ Add a chain in this graph.
+        """Add `nodes` as a chain in this graph.
+
+        **Input rules**
+
+        * By default, this chain will be connected to `BEGIN`, a.k.a the special node that kickstarts transformations.
+        * If `_input` is set to `None`, then this chain won't receive any input unless you connect it manually to
+          something.
+        * If `_input` is something that can resolve to another node using `index_of` rules, then the chain will
+          receive the output stream of referenced node.
+        
+        **Output rules**
+
+        * By default, this chain won't send its output anywhere. This is, most of the time, what you want.
+        * If `_output` is set to something (that can resolve to a node), then the last node in the chain will send its
+          outputs to the given node. This means you can provide an object, a name, or an index.
+
+        **Naming**
+
+        * If a `_name` is given, the first node in the chain will be named this way (same effect as providing a `_name`
+          to add_node).
+
+        **Special cases**
+
+        * You can use this method to connect two other chains (in fact, two nodes) by not giving any `nodes`, but
+          still providing values to `_input` and `_output`.
+
         """
-        if len(nodes):
-            _input = self._resolve_index(_input)
-            _output = self._resolve_index(_output)
-            _first = None
-            _last = None
+        _input = self.index_of(_input)
+        _output = self.index_of(_output)
+        _first = None
+        _last = None
 
-            for i, node in enumerate(nodes):
-                _last = self.add_node(node)
-                if not i and _name:
-                    if _name in self.named:
-                        raise KeyError("Duplicate name {!r} in graph.".format(_name))
-                    self.named[_name] = _last
-                if _first is None:
-                    _first = _last
-                self.outputs_of(_input, create=True).add(_last)
-                _input = _last
+        # Sanity checks.
+        if not len(nodes):
+            if _input is None or _output is None:
+                raise ValueError(
+                    "Using add_chain(...) without nodes is only possible if you provide both _input and _output values."
+                )
 
-            if _output is not None:
-                self.outputs_of(_input, create=True).add(_output)
+            if _name is not None:
+                raise RuntimeError("Using add_chain(...) without nodes does not allow to use the _name parameter.")
 
-            if hasattr(self, "_topologcally_sorted_indexes_cache"):
-                del self._topologcally_sorted_indexes_cache
+        for i, node in enumerate(nodes):
+            _last = self.add_node(node, _name=_name if not i else None)
 
-            return GraphRange(self, _first, _last)
-        return GraphRange(self, None, None)
+            if _first is None:
+                _first = _last
+
+            self.outputs_of(_input, create=True).add(_last)
+
+            _input = _last
+
+        if _output is not None:
+            self.outputs_of(_input, create=True).add(_output)
+
+        if hasattr(self, "_topologcally_sorted_indexes_cache"):
+            del self._topologcally_sorted_indexes_cache
+
+        return GraphRange(self, _first, _last)
 
     def copy(self):
         g = Graph()
@@ -190,26 +252,6 @@ class Graph:
             return "<div>{}</div><pre>{}</pre>".format(self.graphviz._repr_svg_(), html.escape(repr(self)))
         except (ExecutableNotFound, FileNotFoundError) as exc:
             return "<strong>{}</strong>: {}".format(type(exc).__name__, str(exc))
-
-    def _resolve_index(self, mixed):
-        """
-        Find the index based on various strategies for a node, probably an input or output of chain. Supported
-        inputs are indexes, node values or names.
-
-        """
-        if mixed is None:
-            return None
-
-        if type(mixed) is int or mixed in self.edges:
-            return mixed
-
-        if isinstance(mixed, str) and mixed in self.named:
-            return self.named[mixed]
-
-        if mixed in self.nodes:
-            return self.nodes.index(mixed)
-
-        raise ValueError("Cannot find node matching {!r}.".format(mixed))
 
 
 def _get_graphviz_node_id(graph, i):
