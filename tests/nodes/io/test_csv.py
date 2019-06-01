@@ -89,6 +89,22 @@ class CsvWriterTest(Csv, WriterTest, TestCase):
 
         assert self.readlines() == ("foo,bar", "a,b", "c,d")
 
+    @incontext(skip_header=False)
+    def test_fields_with_headers(self, context):
+        context.set_input_fields(["foo", "bar"])
+        context.write_sync(("a", "b"), ("c", "d"))
+        context.stop()
+
+        assert self.readlines() == ("foo,bar", "a,b", "c,d")
+
+    @incontext(skip_header=True)
+    def test_fields_without_headers(self, context):
+        context.set_input_fields(["foo", "bar"])
+        context.write_sync(("a", "b"), ("c", "d"))
+        context.stop()
+
+        assert self.readlines() == ("a,b", "c,d")
+
     @incontext()
     def test_fields_from_type(self, context):
         context.set_input_type(namedtuple("Point", "x y"))
