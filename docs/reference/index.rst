@@ -11,8 +11,9 @@ means that the api is not yet 1.0-proof.
     api/bonobo/config
     api/bonobo/constants
     api/bonobo/execution
+    api/bonobo/nodes
+    api/bonobo/structs/graphs
     api/bonobo/util
     commands
     settings
     examples
-    private
