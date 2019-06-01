@@ -1,6 +1,15 @@
 from bonobo.config import Configurable, ContextProcessor, Option, Service
 
 
+def filesystem_path(path: str):
+    if path.startswith("/"):
+        raise ValueError(
+            "File path should not be absolute. If you really need to provide absolute paths, then you must pass a "
+            "filesystem instance that is bound to your filesystem root and provide a relative path from there."
+        )
+    return str(path)
+
+
 class FileHandler(Configurable):
     """Abstract component factory for file-related components.
 
@@ -13,39 +22,12 @@ class FileHandler(Configurable):
     """
 
     path = Option(
-        str,
-        required=True,
-        positional=True,
-        __doc__="""
-        Path to use within the provided filesystem.
-    """,
+        filesystem_path, required=True, positional=True, __doc__="Path to use within the provided filesystem."
     )  # type: str
-    eol = Option(
-        str,
-        default="\n",
-        __doc__="""
-        Character to use as line separator.
-    """,
-    )  # type: str
-    mode = Option(
-        str,
-        __doc__="""
-        What mode to use for open() call.
-    """,
-    )  # type: str
-    encoding = Option(
-        str,
-        default="utf-8",
-        __doc__="""
-        Encoding.
-    """,
-    )  # type: str
-    fs = Service(
-        "fs",
-        __doc__="""
-        The filesystem instance to use.
-    """,
-    )  # type: str
+    eol = Option(str, default="\n", __doc__="Character to use as line separator.")  # type: str
+    mode = Option(str, __doc__="What mode to use for open() call.")  # type: str
+    encoding = Option(str, default="utf-8", __doc__="Encoding.")  # type: str
+    fs = Service("fs", __doc__="The filesystem instance to use.")  # type: str
 
     @ContextProcessor
     def file(self, context, *, fs):
