@@ -23,6 +23,27 @@ def test_graph_outputs_of():
     assert len(g.outputs_of(0)) == 0
 
 
+def test_graph_index_of():
+    g = Graph()
+
+    g.add_node(sentinel.foo)
+    g.add_node(sentinel.bar)
+
+    # sequential, can resolve objects
+    assert g.index_of(sentinel.foo) == 0
+    assert g.index_of(sentinel.bar) == 1
+
+    # calling on an index should return the index
+    assert g.index_of(sentinel.bar) == g.index_of(g.index_of(sentinel.bar))
+
+    # not existing should raise value error
+    with pytest.raises(ValueError):
+        g.index_of(sentinel.not_there)
+
+    # tokens resolve to themselves
+    assert g.index_of(BEGIN) == BEGIN
+
+
 def test_graph_add_component():
     g = Graph()
 
@@ -33,6 +54,19 @@ def test_graph_add_component():
 
     g.add_node(identity)
     assert len(g.nodes) == 2
+
+
+def test_invalid_graph_usage():
+    g = Graph()
+
+    with pytest.raises(ValueError):
+        g.add_chain()
+
+    g.add_node(sentinel.foo)
+    g.add_node(sentinel.bar)
+
+    with pytest.raises(RuntimeError):
+        g.add_chain(_input=sentinel.bar, _output=sentinel.foo, _name="this_is_not_possible")
 
 
 def test_graph_add_chain():
@@ -61,6 +95,41 @@ def test_graph_topological_sort():
     assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)
     assert g[3] == sentinel.b1
     assert g[4] == sentinel.b2
+
+
+def test_connect_two_chains():
+    g = Graph()
+
+    g.add_chain(sentinel.a1, sentinel.a2, _input=None, _output=None)
+    g.add_chain(sentinel.b1, sentinel.b2, _input=None, _output=None)
+    assert len(g.outputs_of(sentinel.a2)) == 0
+
+    g.add_chain(_input=sentinel.a2, _output=sentinel.b1)
+    assert g.outputs_of(sentinel.a2) == {g.index_of(sentinel.b1)}
+
+
+def test_connect_two_anonymous_nodes():
+    g = Graph()
+
+    # Create two "anonymous" nodes
+    g.add_node(sentinel.a)
+    g.add_node(sentinel.b)
+
+    # Connect them
+    g.add_chain(_input=sentinel.a, _output=sentinel.b)
+
+
+def test_named_nodes():
+    g = Graph()
+
+    a, b, c, d, e, f = sentinel.a, sentinel.b, sentinel.c, sentinel.d, sentinel.e, sentinel.f
+
+    # Here we mark _input to None, so normalize won't get the "begin" impulsion.
+    g.add_chain(e, f, _input=None, _name="load")
+
+    # Add two different chains
+    g.add_chain(a, b, _output="load")
+    g.add_chain(c, d, _output="load")
 
 
 def test_copy():

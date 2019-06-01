@@ -213,10 +213,9 @@ Named nodes
 
 Using above code to create convergences often leads to code which is hard to read, because you have to define the "target" stream
 before the streams that logically goes to the beginning of the transformation graph. To overcome that, one can use
-"named" nodes:
+"named" nodes.
 
-    graph.add_chain(x, y, z, _name='zed')
-    graph.add_chain(f, g, h, _input='zed')
+Please note that naming a chain is exactly the same thing as naming the first node of a chain.
 
 .. code-block:: python
 
@@ -224,13 +223,12 @@ before the streams that logically goes to the beginning of the transformation gr
 
     graph = bonobo.Graph()
 
-    # Add two different chains
-    graph.add_chain(a, b, _output="load")
-    graph.add_chain(f, g, _output="load")
-
     # Here we mark _input to None, so normalize won't get the "begin" impulsion.
     graph.add_chain(normalize, store, _input=None, _name="load")
 
+    # Add two different chains that will output to the "load" node
+    graph.add_chain(a, b, _output="load")
+    graph.add_chain(f, g, _output="load")
 
 Resulting graph:
 
@@ -248,6 +246,43 @@ Resulting graph:
 
         "normalize (load)" -> "store"
     }
+
+You can also create single nodes, and the api provide the same capability on single nodes. 
+
+.. code-block:: python
+
+    import bonobo
+
+    graph = bonobo.Graph()
+
+    # Create a node without any connection, name it.
+    graph.add_node(foo, _name="foo")
+
+    # Use it somewhere else as the data source.
+    graph.add_chain(..., _input="foo")
+
+    # ... or as the data sink.
+    graph.add_chain(..., _output="foo")
+
+
+Connecting two nodes
+::::::::::::::::::::
+
+You may want to connect two nodes at some point. You can use `add_chain` without nodes to achieve it.
+
+.. code-block:: python
+
+    import bonobo
+
+    graph = bonobo.Graph()
+
+    # Create two "anonymous" nodes
+    graph.add_node(a)
+    graph.add_node(b)
+
+    # Connect them
+    graph.add_chain(_input=a, _output=b)
+
 
 
 Inspecting graphs
