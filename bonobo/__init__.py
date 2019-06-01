@@ -9,11 +9,49 @@ import sys
 from pathlib import Path
 
 from bonobo._api import (
-    CsvReader, CsvWriter, FileReader, FileWriter, Filter, FixedWindow, Format, Graph, JsonReader, JsonWriter,
-    LdjsonReader, LdjsonWriter, Limit, MapFields, OrderFields, PickleReader, PickleWriter, PrettyPrinter, RateLimited,
-    Rename, SetFields, Tee, UnpackItems, __all__, __doc__, count, create_reader, create_strategy, create_writer,
-    get_argument_parser, get_examples_path, identity, inspect, noop, open_examples_fs, open_fs, parse_args, run
+    CsvReader,
+    CsvWriter,
+    FileReader,
+    FileWriter,
+    Filter,
+    FixedWindow,
+    Format,
+    Graph,
+    JsonReader,
+    JsonWriter,
+    LdjsonReader,
+    LdjsonWriter,
+    Limit,
+    MapFields,
+    OrderFields,
+    PickleReader,
+    PickleWriter,
+    PrettyPrinter,
+    RateLimited,
+    Rename,
+    SetFields,
+    Tee,
+    UnpackItems,
+    __all__,
+    __doc__,
+    count,
+    create_reader,
+    create_strategy,
+    create_writer,
+    get_argument_parser,
+    get_examples_path,
+    identity,
+    inspect,
+    noop,
+    open_examples_fs,
+    open_fs,
+    parse_args,
+    run,
 )
+from bonobo._version import __version__
+
+from bonobo._api import *
+from bonobo._api import __all__, __doc__
 from bonobo._version import __version__
 
 if sys.version_info < (3, 5):
