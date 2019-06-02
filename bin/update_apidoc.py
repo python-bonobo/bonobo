@@ -1,3 +1,4 @@
+import inspect
 import os
 
 from jinja2 import DictLoader, Environment
@@ -29,8 +30,6 @@ class Module:
     def get_path(self):
         return os.path.join(__path__, apidoc_root, *self.name.split(".")) + ".rst"
 
-
-import inspect
 
 bonobo = __import__("bonobo")
 assert bonobo.__version__

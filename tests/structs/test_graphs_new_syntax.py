@@ -1,17 +1,10 @@
 from operator import attrgetter
-from unittest.mock import sentinel
 
 import pytest
 
 from bonobo.constants import BEGIN
 from bonobo.structs.graphs import Graph, GraphCursor
-from bonobo.util import tuplize
-
-
-@tuplize
-def get_pseudo_nodes(*names):
-    for name in names:
-        yield getattr(sentinel, name)
+from bonobo.util.testing import get_pseudo_nodes
 
 
 def test_get_cursor():
@@ -127,3 +120,23 @@ def test_cursor_merge():
     assert g.outputs_of(c) == set()
 
     assert c1 == c2
+
+
+def test_cursor_merge_orphan_in_between():
+    a, b, c, v, w, x, y = get_pseudo_nodes(*"abcdefg")
+    g = Graph()
+    g >> a >> b >> c
+    assert len(g) == 3
+    g.orphan() >> v >> w >> b
+    assert len(g) == 5
+    g.orphan() >> x >> y >> b
+    assert len(g) == 7
+
+    assert g.outputs_of(BEGIN) == g.indexes_of(a)
+    assert g.outputs_of(a) == g.indexes_of(b)
+    assert g.outputs_of(b) == g.indexes_of(c)
+    assert g.outputs_of(c) == set()
+    assert g.outputs_of(v) == g.indexes_of(w)
+    assert g.outputs_of(w) == g.indexes_of(b)
+    assert g.outputs_of(x) == g.indexes_of(y)
+    assert g.outputs_of(y) == g.indexes_of(b)

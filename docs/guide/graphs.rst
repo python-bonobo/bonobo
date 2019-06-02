@@ -201,8 +201,11 @@ positional parameters as you want.
 .. note::
 
     As of |bonobo| 0.7, a new syntax is available that we believe is more powerfull and more readable than the legacy
-    `add_chain` method. The former API is here to stay and it's perfectly safe to use it, but if it is an option, you
-    should consider the new syntax. During the transition period, we'll document both.
+    `add_chain` method. The former API is here to stay and it's perfectly safe to use it (in fact, the new syntax uses
+    `add_chain` under the hood).
+    
+    If it is an option for you, we suggest you consider the new syntax. During the transition period, we'll document
+    both but the new syntax will eventually become default.
 
 .. code-block:: python
 
@@ -391,6 +394,33 @@ You can also create single nodes, and the api provide the same capability on sin
 
     # ... or as the data sink.
     graph.add_chain(..., _output="foo")
+
+
+Orphan nodes / chains
+:::::::::::::::::::::
+
+The default behaviour of `add_chain` (or `get_cursor`) is to connect the first node to the special `BEGIN` token, which
+instruct |bonobo| to call the connected node once without parameter to kickstart the data stream.
+
+This is normally what you want, but there are ways to override it, as you may want to add "orphan" nodes or chains to your graph.
+
+.. code-block:: python
+
+    import bonobo
+
+    graph = bonobo.Graph()
+
+    # using add_node will naturally add a node as "orphan"   
+    graph.add_node(a)
+
+    # using add_chain with "None" as the input will create an orphan chain
+    graph.add_chain(a, b, c, _input=None)
+
+    # using the new syntax, you can use either get_cursor(None) or the orphan() shortcut
+    graph.get_cursor(None) >> a >> b >> c
+    
+    # ... using the shortcut ...
+    graph.orphan() >> a >> b >> c
 
 
 Connecting two nodes
