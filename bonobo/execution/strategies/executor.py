@@ -3,10 +3,8 @@ import logging
 import sys
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 
-from bonobo import settings
 from bonobo.constants import BEGIN, END
 from bonobo.execution.strategies.base import Strategy
-from bonobo.util import get_name
 
 logger = logging.getLogger(__name__)
 
