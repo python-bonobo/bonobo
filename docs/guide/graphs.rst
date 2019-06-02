@@ -448,6 +448,49 @@ Or using the new syntax:
     graph.get_cursor(a) >> b
 
 
+Cursors
+:::::::
+
+Cursors are simple structures that references a graph, a starting point and a finishing point. They can be used to
+manipulate graphs using the `>>` operator in an intuitive way.
+
+To grab a cursor from a graph, you have different options:
+
+.. code-block:: python
+
+    # the most obvious way to get a cursor, its starting point will be "BEGIN"
+    cursor = graph.get_cursor()
+
+    # same thing, explicitely
+    cursor = graph.get_cursor(BEGIN)
+
+    # if you try to use a graph with the `>>` operator, it will create a cursor for you, from "BEGIN"
+    cursor = graph >> ...  # same as `graph.get_cursor(BEGIN) >> ...`
+
+    # get a cursor pointing to nothing
+    cursor = graph.get_cursor(None)
+
+    # ... or in a more readable way
+    cursor = graph.orphan()    
+
+Once you get a cursor, you can use it to add nodes, concatenate it with othe cursors, etc. Everytime you call something
+that should result in a changed cursor, you'll get a new instance so your old cursor will still be available if you need
+it.
+
+.. code-block:: python
+
+    c1 = graph.orphan()
+
+    # append a node, get a new cursor
+    c2 = c1 >> node1
+
+    # create an orphan chain
+    c3 = graph.orphan() >> normalize
+
+    # concatenate a chain to an existing cursor
+    c4 = c2 >> c3
+
+
 Inspecting graphs
 :::::::::::::::::
 
