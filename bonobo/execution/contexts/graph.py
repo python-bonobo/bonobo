@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from queue import Empty
+from queue import Empty, Queue
 from time import sleep
 
 from whistle import EventDispatcher
@@ -10,7 +10,7 @@ from bonobo.constants import BEGIN, EMPTY, END
 from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.execution.contexts.node import AsyncNodeExecutionContext, NodeExecutionContext
+from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
 
 logger = logging.getLogger(__name__)
@@ -58,6 +58,7 @@ class BaseGraphExecutionContext(BaseContext):
         super(BaseGraphExecutionContext, self).__init__(graph)
         self.dispatcher = dispatcher or EventDispatcher()
         self.graph = graph
+        self.errors = Queue(maxsize=0)
         self.nodes = [self.create_node_execution_context_for(node) for node in self.graph]
         self.plugins = [self.create_plugin_execution_context_for(plugin) for plugin in plugins or ()]
         self.services = create_container(services)
@@ -82,8 +83,12 @@ class BaseGraphExecutionContext(BaseContext):
     def __iter__(self):
         yield from self.nodes
 
+    @classmethod
+    def create_queue(cls, *args, **kwargs):
+        return cls.NodeExecutionContextType.create_queue(*args, **kwargs)
+
     def create_node_execution_context_for(self, node):
-        return self.NodeExecutionContextType(node, parent=self)
+        return self.NodeExecutionContextType(node, parent=self, _errors=self.errors)
 
     def create_plugin_execution_context_for(self, plugin):
         if isinstance(plugin, type):
@@ -167,14 +172,3 @@ class GraphExecutionContext(BaseGraphExecutionContext):
     def run_until_complete(self):
         self.write(BEGIN, EMPTY, END)
         self.loop()
-
-
-class AsyncGraphExecutionContext(GraphExecutionContext):
-    NodeExecutionContextType = AsyncNodeExecutionContext
-
-    def __init__(self, *args, loop, **kwargs):
-        self._event_loop = loop
-        super().__init__(*args, **kwargs)
-
-    def create_node_execution_context_for(self, node):
-        return self.NodeExecutionContextType(node, parent=self, loop=self._event_loop)

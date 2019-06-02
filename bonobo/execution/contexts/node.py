@@ -1,7 +1,7 @@
 import logging
 import sys
 from collections import namedtuple
-from queue import Empty
+from queue import Empty, Queue
 from time import sleep
 from types import GeneratorType
 
@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 UnboundArguments = namedtuple("UnboundArguments", ["args", "kwargs"])
 
+ErrorBag = namedtuple("ErrorBag", ["context", "level", "type", "value", "traceback"])
+
 
 class NodeExecutionContext(BaseContext, WithStatistics):
     """
@@ -35,7 +37,11 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     QueueType = Input
 
-    def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
+    @classmethod
+    def create_queue(cls, *args, **kwargs):
+        return cls.QueueType(*args, **kwargs)
+
+    def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None, _errors=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
 
@@ -59,8 +65,9 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self.services = None
 
         # Input / Output: how the wrapped node will communicate
-        self.input = _input or self.QueueType()
+        self.input = _input or self.create_queue()
         self.outputs = _outputs or []
+        self.errors = _errors or Queue(maxsize=0)
 
         # Types
         self._input_type, self._input_length = None, None
@@ -273,10 +280,14 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def error(self, exc_info, *, level=logging.ERROR):
         self.increment("err")
+        if self.errors:
+            self.errors.put(ErrorBag(self, level, *exc_info))
         super().error(exc_info, level=level)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
         self.increment("err")
+        if self.errors:
+            self.errors.put(ErrorBag(self, level, *exc_info))
         super().fatal(exc_info, level=level)
         self.input.shutdown()
 
@@ -377,53 +388,6 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self.services:
             return UnboundArguments((), self.services.kwargs_for(self.wrapped))
         return UnboundArguments((), {})
-
-
-class AsyncNodeExecutionContext(NodeExecutionContext):
-    QueueType = AioInput
-
-    def __init__(self, *args, loop, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._event_loop = loop
-
-    async def _get(self):
-        """
-        Read from the input queue.
-
-        If Queue raises (like Timeout or Empty), stat won't be changed.
-
-        """
-        input_bag = await self.input.get()
-
-        # Store or check input type
-        if self._input_type is None:
-            self._input_type = type(input_bag)
-        elif type(input_bag) != self._input_type:
-            try:
-                if self._input_type == tuple:
-                    input_bag = self._input_type(input_bag)
-                else:
-                    input_bag = self._input_type(*input_bag)
-            except Exception as exc:
-                raise UnrecoverableTypeError(
-                    "Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.".format(
-                        self.wrapped, input_bag, self._input_type
-                    )
-                ) from exc
-
-        # Store or check input length, which is a soft fallback in case we're just using tuples
-        if self._input_length is None:
-            self._input_length = len(input_bag)
-        elif len(input_bag) != self._input_length:
-            raise UnrecoverableTypeError(
-                "Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.".format(
-                    self.wrapped, self._input_length, len(input_bag), input_bag
-                )
-            )
-
-        self.increment("in")  # XXX should that go before type check ?
-
-        return input_bag
 
 
 def isflag(param):
