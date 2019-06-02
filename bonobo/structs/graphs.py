@@ -12,6 +12,15 @@ from bonobo.util import get_name
 GraphRange = namedtuple("GraphRange", ["graph", "input", "output"])
 
 
+def coalesce(*values):
+    if not len(values):
+        raise ValueError("Cannot coalesce an empty list of arguments.")
+    for value in values:
+        if value is not None:
+            return value
+    return values[-1]
+
+
 class GraphCursor:
     @property
     def input(self):
@@ -21,9 +30,13 @@ class GraphCursor:
     def output(self):
         return self.last
 
+    @property
+    def range(self):
+        return self.first, self.last
+
     def __init__(self, graph, *, first=None, last=None):
         self.graph = graph
-        self.first = first or last
+        self.first = coalesce(first, last)
         self.last = last
 
     def __rshift__(self, other):
@@ -46,7 +59,7 @@ class GraphCursor:
         # If there are nodes to add, create a new cursor after the chain is added to the graph.
         if len(nodes):
             chain = self.graph.add_chain(*nodes, _input=self.last, use_existing_nodes=True)
-            return GraphCursor(chain.graph, first=self.first, last=chain.output)
+            return GraphCursor(chain.graph, first=coalesce(self.first, chain.input), last=chain.output)
 
         # If we add nothing, then nothing changed.
         return self
@@ -143,12 +156,12 @@ class Graph:
 
         raise ValueError("Cannot find node matching {!r}.".format(mixed))
 
-    def indexes_of(self, *things):
+    def indexes_of(self, *things, _type=set):
         """
         Returns the set of indexes of the things passed as arguments.
 
         """
-        return set(map(self.index_of, things))
+        return _type(map(self.index_of, things))
 
     def outputs_of(self, idx_or_node, create=False):
         """

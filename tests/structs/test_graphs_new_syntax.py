@@ -168,5 +168,53 @@ def test_concat_branches():
     c1 = g >> c >> d
     c2 = c1 >> c0
 
+    assert c0.first == g.index_of(a)
     assert c2.first == BEGIN
     assert c2.last == g.index_of(b)
+
+    assert g.outputs_of(BEGIN) == g.indexes_of(c)
+    assert g.outputs_of(a) == g.indexes_of(b)
+    assert g.outputs_of(b) == set()
+    assert g.outputs_of(c) == g.indexes_of(d)
+    assert g.outputs_of(d) == g.indexes_of(a)
+
+
+def test_add_branch_inbetween():
+    a, b, c, d, e, f = get_pseudo_nodes(6)
+    g = Graph()
+    c0 = g.orphan() >> a >> b
+    c1 = g.orphan() >> c >> d
+    c2 = g.orphan() >> e >> f
+    c3 = c0 >> c1 >> c2
+
+    assert c0.range == g.indexes_of(a, b, _type=tuple)
+    assert c1.range == g.indexes_of(c, d, _type=tuple)
+    assert c2.range == g.indexes_of(e, f, _type=tuple)
+    assert c3.range == g.indexes_of(a, f, _type=tuple)
+
+    assert g.outputs_of(b) == g.indexes_of(c)
+    assert g.outputs_of(d) == g.indexes_of(e)
+    assert g.outputs_of(f) == set()
+
+
+def test_add_more_branches_inbetween():
+    a, b, c, d, e, f, x, y = get_pseudo_nodes(8)
+    g = Graph()
+    c0 = g.orphan() >> a >> b
+    c1 = g.orphan() >> c >> d
+    c2 = g.orphan() >> e >> f
+    c3 = g.orphan() >> x >> y
+    c4 = c0 >> c1 >> c3
+    c5 = c0 >> c2 >> c3
+
+    assert c0.range == g.indexes_of(a, b, _type=tuple)
+    assert c1.range == g.indexes_of(c, d, _type=tuple)
+    assert c2.range == g.indexes_of(e, f, _type=tuple)
+    assert c3.range == g.indexes_of(x, y, _type=tuple)
+    assert c4.range == g.indexes_of(a, y, _type=tuple)
+    assert c5.range == g.indexes_of(a, y, _type=tuple)
+
+    assert g.outputs_of(b) == g.indexes_of(c, e)
+    assert g.outputs_of(d) == g.indexes_of(x)
+    assert g.outputs_of(f) == g.indexes_of(x)
+    assert g.outputs_of(y) == set()
