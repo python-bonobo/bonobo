@@ -105,3 +105,17 @@ iterator-returning function to force return value to be a tuple.
 >>> my_generator()
 (1, 2, 3)
 """
+
+
+def coalesce(*values):
+    """
+    Returns the first argument which is not None, or None if all arguments are None.
+
+    """
+
+    if not len(values):
+        raise ValueError("Cannot coalesce an empty list of arguments.")
+    for value in values:
+        if value is not None:
+            return value
+    return None
