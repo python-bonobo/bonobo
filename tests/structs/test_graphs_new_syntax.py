@@ -140,3 +140,21 @@ def test_cursor_merge_orphan_in_between():
     assert g.outputs_of(w) == g.indexes_of(b)
     assert g.outputs_of(x) == g.indexes_of(y)
     assert g.outputs_of(y) == g.indexes_of(b)
+
+
+def test_using_same_cursor_many_times_for_fork():
+    a, b, c, d, e = get_pseudo_nodes(5)
+    g = Graph()
+
+    c0 = g >> a >> b
+
+    c0 >> c
+    c0 >> d
+    c0 >> e
+
+    assert g.outputs_of(BEGIN) == g.indexes_of(a)
+    assert g.outputs_of(a) == g.indexes_of(b)
+    assert g.outputs_of(b) == g.indexes_of(c, d, e)
+    assert g.outputs_of(c) == set()
+    assert g.outputs_of(d) == set()
+    assert g.outputs_of(e) == set()

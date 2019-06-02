@@ -297,6 +297,14 @@ def get_pseudo_nodes(*names):
     
     >>> a, b, c = get_pseudo_nodes(*"abc")
 
+    Alternate syntax:
+
+    >>> a, b, c = get_pseudo_nodes(3)
+
     """
+    if len(names) == 1 and isinstance(names[0], int):
+        yield from get_pseudo_nodes(*map(chr, range(ord("a"), ord("a") + names[0])))
+        return
+
     for name in names:
         yield getattr(sentinel, name)
