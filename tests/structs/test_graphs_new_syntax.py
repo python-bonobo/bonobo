@@ -1,17 +1,10 @@
 from operator import attrgetter
-from unittest.mock import sentinel
 
 import pytest
 
 from bonobo.constants import BEGIN
 from bonobo.structs.graphs import Graph, GraphCursor
-from bonobo.util import tuplize
-
-
-@tuplize
-def get_pseudo_nodes(*names):
-    for name in names:
-        yield getattr(sentinel, name)
+from bonobo.util.testing import get_pseudo_nodes
 
 
 def test_get_cursor():

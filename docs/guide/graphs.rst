@@ -201,8 +201,11 @@ positional parameters as you want.
 .. note::
 
     As of |bonobo| 0.7, a new syntax is available that we believe is more powerfull and more readable than the legacy
-    `add_chain` method. The former API is here to stay and it's perfectly safe to use it, but if it is an option, you
-    should consider the new syntax. During the transition period, we'll document both.
+    `add_chain` method. The former API is here to stay and it's perfectly safe to use it (in fact, the new syntax uses
+    `add_chain` under the hood).
+    
+    If it is an option for you, we suggest you consider the new syntax. During the transition period, we'll document
+    both but the new syntax will eventually become default.
 
 .. code-block:: python
 

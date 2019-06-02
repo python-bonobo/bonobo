@@ -59,7 +59,11 @@ class PartialGraph:
 
 class Graph:
     """
-    Represents a directed graph of nodes.
+    Core structure representing a directed graph of nodes. It will be used to create data streaming queues between your
+    objects during the job execution.
+
+    This is how the data flows are defined.
+
     """
 
     name = ""
@@ -75,7 +79,9 @@ class Graph:
         yield from self.nodes
 
     def __len__(self):
-        """Node count.
+        """
+        The graph length is defined as its node count.
+        
         """
         return len(self.nodes)
 
@@ -92,6 +98,10 @@ class Graph:
         return self.get_cursor().__rshift__(other)
 
     def get_cursor(self, ref=BEGIN):
+        """
+        Create a `GraphCursor` to use the operator-based syntax to build graph, starting at `ref`.
+
+        """
         return GraphCursor(self, last=self.index_of(ref))
 
     def index_of(self, mixed):
@@ -115,10 +125,16 @@ class Graph:
         raise ValueError("Cannot find node matching {!r}.".format(mixed))
 
     def indexes_of(self, *things):
+        """
+        Returns the set of indexes of the things passed as arguments.
+
+        """
         return set(map(self.index_of, things))
 
     def outputs_of(self, idx_or_node, create=False):
-        """Get a set of the outputs for a given node, node index or name.
+        """
+        Get a set of the outputs for a given node, node index or name.
+        
         """
         idx_or_node = self.index_of(idx_or_node)
 
@@ -127,8 +143,10 @@ class Graph:
         return self.edges[idx_or_node]
 
     def add_node(self, new_node, *, _name=None):
-        """Add a node without connections in this graph and returns its index.
+        """
+        Add a node without connections in this graph and returns its index.
         If _name is specified, name this node (string reference for  further usage).
+        
         """
         idx = len(self.nodes)
         self.edges[idx] = set()
@@ -149,7 +167,8 @@ class Graph:
         return self.add_node(new_node, _name=_name)
 
     def add_chain(self, *nodes, _input=BEGIN, _output=None, _name=None, use_existing_nodes=False):
-        """Add `nodes` as a chain in this graph.
+        """
+        Add `nodes` as a chain in this graph.
 
         **Input rules**
 
@@ -222,7 +241,9 @@ class Graph:
 
     @property
     def topologically_sorted_indexes(self):
-        """Iterate in topological order, based on networkx's topological_sort() function.
+        """
+        Iterate in topological order, based on networkx's topological_sort() function.
+        
         """
         try:
             return self._topologcally_sorted_indexes_cache

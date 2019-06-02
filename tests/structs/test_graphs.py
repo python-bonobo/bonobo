@@ -4,6 +4,7 @@ import pytest
 
 from bonobo.constants import BEGIN
 from bonobo.structs.graphs import Graph
+from bonobo.util.testing import get_pseudo_nodes
 
 identity = lambda x: x
 
@@ -26,19 +27,21 @@ def test_graph_outputs_of():
 def test_graph_index_of():
     g = Graph()
 
-    g.add_node(sentinel.foo)
-    g.add_node(sentinel.bar)
+    foo, bar, not_there = get_pseudo_nodes("foo", "bar", "not_there")
+
+    g.add_node(foo)
+    g.add_node(bar)
 
     # sequential, can resolve objects
-    assert g.index_of(sentinel.foo) == 0
-    assert g.index_of(sentinel.bar) == 1
+    assert g.index_of(foo) == 0
+    assert g.index_of(bar) == 1
 
     # calling on an index should return the index
-    assert g.index_of(sentinel.bar) == g.index_of(g.index_of(sentinel.bar))
+    assert g.index_of(bar) == g.index_of(g.index_of(bar))
 
     # not existing should raise value error
     with pytest.raises(ValueError):
-        g.index_of(sentinel.not_there)
+        g.index_of(not_there)
 
     # tokens resolve to themselves
     assert g.index_of(BEGIN) == BEGIN
@@ -58,15 +61,16 @@ def test_graph_add_component():
 
 def test_invalid_graph_usage():
     g = Graph()
+    foo, bar = get_pseudo_nodes("foo", "bar")
 
     with pytest.raises(ValueError):
         g.add_chain()
 
-    g.add_node(sentinel.foo)
-    g.add_node(sentinel.bar)
+    g.add_node(foo)
+    g.add_node(bar)
 
     with pytest.raises(RuntimeError):
-        g.add_chain(_input=sentinel.bar, _output=sentinel.foo, _name="this_is_not_possible")
+        g.add_chain(_input=bar, _output=foo, _name="this_is_not_possible")
 
 
 def test_graph_add_chain():
@@ -81,48 +85,51 @@ def test_graph_add_chain():
 
 def test_graph_topological_sort():
     g = Graph()
+    a1, a2, a3, b1, b2 = get_pseudo_nodes("a1", "a2", "a3", "b1", "b2")
 
-    g.add_chain(sentinel.a1, sentinel.a2, sentinel.a3, _input=None, _output=None)
+    g.add_chain(a1, a2, a3, _input=None, _output=None)
 
     assert g.topologically_sorted_indexes == (0, 1, 2)
-    assert g[0] == sentinel.a1
-    assert g[1] == sentinel.a2
-    assert g[2] == sentinel.a3
+    assert g[0] == a1
+    assert g[1] == a2
+    assert g[2] == a3
 
-    g.add_chain(sentinel.b1, sentinel.b2, _output=sentinel.a2)
+    g.add_chain(b1, b2, _output=a2)
 
     assert g.topologically_sorted_indexes[-2:] == (1, 2)
     assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)
-    assert g[3] == sentinel.b1
-    assert g[4] == sentinel.b2
+    assert g[3] == b1
+    assert g[4] == b2
 
 
 def test_connect_two_chains():
     g = Graph()
+    a1, a2, b1, b2 = get_pseudo_nodes("a1", "a2", "b1", "b2")
 
-    g.add_chain(sentinel.a1, sentinel.a2, _input=None, _output=None)
-    g.add_chain(sentinel.b1, sentinel.b2, _input=None, _output=None)
-    assert len(g.outputs_of(sentinel.a2)) == 0
+    g.add_chain(a1, a2, _input=None, _output=None)
+    g.add_chain(b1, b2, _input=None, _output=None)
+    assert len(g.outputs_of(a2)) == 0
 
-    g.add_chain(_input=sentinel.a2, _output=sentinel.b1)
-    assert g.outputs_of(sentinel.a2) == {g.index_of(sentinel.b1)}
+    g.add_chain(_input=a2, _output=b1)
+    assert g.outputs_of(a2) == g.indexes_of(b1)
 
 
 def test_connect_two_anonymous_nodes():
     g = Graph()
+    a, b = get_pseudo_nodes(*"ab")
 
     # Create two "anonymous" nodes
-    g.add_node(sentinel.a)
-    g.add_node(sentinel.b)
+    g.add_node(a)
+    g.add_node(b)
 
     # Connect them
-    g.add_chain(_input=sentinel.a, _output=sentinel.b)
+    g.add_chain(_input=a, _output=b)
 
 
 def test_named_nodes():
     g = Graph()
 
-    a, b, c, d, e, f = sentinel.a, sentinel.b, sentinel.c, sentinel.d, sentinel.e, sentinel.f
+    a, b, c, d, e, f = get_pseudo_nodes(*"abcdef")
 
     # Here we mark _input to None, so normalize won't get the "begin" impulsion.
     g.add_chain(e, f, _input=None, _name="load")

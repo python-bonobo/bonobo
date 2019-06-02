@@ -5,7 +5,7 @@ import os
 import runpy
 import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
-from unittest.mock import patch
+from unittest.mock import patch, sentinel
 
 import pytest
 
@@ -14,6 +14,7 @@ from bonobo.commands import entrypoint
 from bonobo.execution.contexts.graph import GraphExecutionContext
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.structs.tokens import Token
+from bonobo.util import tuplize
 
 
 @contextmanager
@@ -26,6 +27,11 @@ def optional_contextmanager(cm, *, ignore=False):
 
 
 class FilesystemTester:
+    """
+    Helper that create temporary filesystem service to be used in unit tests.
+    
+    """
+
     def __init__(self, extension="txt", mode="w", *, input_data=""):
         self.extension = extension
         self.input_data = input_data
@@ -43,6 +49,12 @@ class FilesystemTester:
 
 
 class QueueList(list):
+    """
+    A list that behave like a queue (or is it the oposite?).
+
+    The datastructure is not smart at all, but it's quite useful for testing.
+    """
+
     def append(self, item):
         if not isinstance(item, Token):
             super(QueueList, self).append(item)
@@ -51,6 +63,11 @@ class QueueList(list):
 
 
 class BufferingContext:
+    """
+    Base class to add a buffer to a context.
+
+    """
+
     def __init__(self, buffer=None):
         if buffer is None:
             buffer = QueueList()
@@ -64,12 +81,22 @@ class BufferingContext:
 
 
 class BufferingNodeExecutionContext(BufferingContext, NodeExecutionContext):
+    """
+    Node execution context that actually stores the node outputs in a buffer, so one can test it afterward.
+    
+    """
+
     def __init__(self, *args, buffer=None, **kwargs):
         BufferingContext.__init__(self, buffer)
         NodeExecutionContext.__init__(self, *args, **kwargs, _outputs=[self.buffer])
 
 
 class BufferingGraphExecutionContext(BufferingContext, GraphExecutionContext):
+    """
+    Graph execution context that uses buffering node execution contexts, all nodes buffering to the same buffer.
+    
+    """
+
     NodeExecutionContextType = BufferingNodeExecutionContext
 
     def __init__(self, *args, buffer=None, **kwargs):
@@ -99,13 +126,13 @@ def runner(f):
 
 @runner
 def runner_entrypoint(args):
-    """ Run bonobo using the python command entrypoint directly (bonobo.commands.entrypoint). """
+    """Run bonobo using the python command entrypoint directly (bonobo.commands.entrypoint). """
     return entrypoint(args)
 
 
 @runner
 def runner_module(args):
-    """ Run bonobo using the bonobo.__main__ file, which is equivalent as doing "python -m bonobo ..."."""
+    """Run bonobo using the bonobo.__main__ file, which is equivalent as doing "python -m bonobo ..."."""
     with patch.object(sys, "argv", ["bonobo", *args]):
         return runpy.run_path(__main__.__file__, run_name="__main__")
 
@@ -192,7 +219,10 @@ class ConfigurableNodeTest:
 
 
 class ReaderTest(ConfigurableNodeTest):
-    """ Helper class to test reader transformations. """
+    """
+    Helper class to test reader transformations.
+    
+    """
 
     ReaderNodeType = None
 
@@ -232,7 +262,10 @@ class ReaderTest(ConfigurableNodeTest):
 
 
 class WriterTest(ConfigurableNodeTest):
-    """ Helper class to test writer transformations. """
+    """
+    Helper class to test writer transformations.
+    
+    """
 
     WriterNodeType = None
 
@@ -255,3 +288,15 @@ class WriterTest(ConfigurableNodeTest):
     def readlines(self):
         with self.fs.open(self.filename) as fp:
             return tuple(map(str.strip, fp.readlines()))
+
+
+@tuplize
+def get_pseudo_nodes(*names):
+    """
+    Generates a serie of named sentinels to test graph APIs.
+    
+    >>> a, b, c = get_pseudo_nodes(*"abc")
+
+    """
+    for name in names:
+        yield getattr(sentinel, name)
