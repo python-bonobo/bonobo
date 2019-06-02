@@ -104,6 +104,13 @@ class Graph:
         """
         return GraphCursor(self, last=self.index_of(ref))
 
+    def orphan(self):
+        """
+        Create a `GraphCursor` attached to nothing.
+
+        """
+        return self.get_cursor(None)
+
     def index_of(self, mixed):
         """
         Find the index based on various strategies for a node, probably an input or output of chain. Supported

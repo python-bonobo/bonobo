@@ -31,7 +31,6 @@ class Module:
         return os.path.join(__path__, apidoc_root, *self.name.split(".")) + ".rst"
 
 
-
 bonobo = __import__("bonobo")
 assert bonobo.__version__
 
