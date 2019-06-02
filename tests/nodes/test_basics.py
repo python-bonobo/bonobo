@@ -142,3 +142,14 @@ def test_map_fields_error():
         context.write_sync(tuple())
     assert context.status == "!"
     assert context.defunct
+
+
+def test_set_fields():
+    with BufferingNodeExecutionContext(bonobo.SetFields(["x", "y"])) as context:
+        context.write_sync((1, 2))
+
+    output = context.get_buffer()
+    assert len(output) == 1
+    assert output[0]._fields == ("x", "y")
+    assert output[0].x == 1
+    assert output[0].y == 2
