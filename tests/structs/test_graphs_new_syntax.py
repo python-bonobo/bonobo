@@ -158,3 +158,15 @@ def test_using_same_cursor_many_times_for_fork():
     assert g.outputs_of(c) == set()
     assert g.outputs_of(d) == set()
     assert g.outputs_of(e) == set()
+
+
+def test_concat_branches():
+    a, b, c, d = get_pseudo_nodes(4)
+    g = Graph()
+
+    c0 = g.orphan() >> a >> b
+    c1 = g >> c >> d
+    c2 = c1 >> c0
+
+    assert c2.first == BEGIN
+    assert c2.last == g.index_of(b)
