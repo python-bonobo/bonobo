@@ -10,7 +10,7 @@ from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.inputs import AioInput, Input
+from bonobo.structs.inputs import Input
 from bonobo.structs.tokens import Flag, Token
 from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype
 from bonobo.util.bags import BagType

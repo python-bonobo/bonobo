@@ -1,10 +1,7 @@
-import asyncio
 import functools
 import logging
 import sys
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
-
-from cached_property import cached_property
 
 from bonobo import settings
 from bonobo.constants import BEGIN, END

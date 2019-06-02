@@ -15,7 +15,6 @@
 # limitations under the License.
 
 from abc import ABCMeta, abstractmethod
-from asyncio.queues import Queue as AioQueue
 from queue import Queue
 
 from bonobo.constants import BEGIN, END
@@ -116,7 +115,3 @@ class Input(Queue, Readable, Writable):
     @property
     def alive(self):
         return self._runlevel > 0
-
-
-class AioInput(AioQueue):
-    pass
