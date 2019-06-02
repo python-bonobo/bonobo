@@ -342,6 +342,8 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             # TODO: parse flags to check constraints are respected (like not modified alone, etc.)
 
             if F_NOT_MODIFIED in _flags:
+                if self._output_type:
+                    return ensure_tuple(_input, cls=self._output_type)
                 return _input
 
             if F_INHERIT in _flags:

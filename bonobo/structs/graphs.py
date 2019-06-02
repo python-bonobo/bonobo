@@ -8,17 +8,9 @@ from graphviz.dot import Digraph
 
 from bonobo.constants import BEGIN
 from bonobo.util import get_name
+from bonobo.util.collections import coalesce
 
 GraphRange = namedtuple("GraphRange", ["graph", "input", "output"])
-
-
-def coalesce(*values):
-    if not len(values):
-        raise ValueError("Cannot coalesce an empty list of arguments.")
-    for value in values:
-        if value is not None:
-            return value
-    return values[-1]
 
 
 class GraphCursor:

@@ -6,7 +6,7 @@ from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
 from bonobo.util import ensure_tuple
-from bonobo.util.collections import tuple_or_const
+from bonobo.util.collections import coalesce, tuple_or_const
 
 
 class CsvHandler(FileHandler):
@@ -105,7 +105,7 @@ class CsvWriter(FileWriter, CsvHandler):
 
     def write(self, file, context, *values, fs):
         context.setdefault("lineno", 0)
-        fields = context.get_input_fields() if self.fields is None else self.fields
+        fields = coalesce(self.fields, context.get_input_fields())
 
         if not context.lineno:
             context.writer = self.writer_factory(file)
