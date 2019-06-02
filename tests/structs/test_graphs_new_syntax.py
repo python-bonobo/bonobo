@@ -218,3 +218,22 @@ def test_add_more_branches_inbetween():
     assert g.outputs_of(d) == g.indexes_of(x)
     assert g.outputs_of(f) == g.indexes_of(x)
     assert g.outputs_of(y) == set()
+
+
+def test_add_nodes_inbetween_branches():
+    a, b, c, d, e, f, x, y = get_pseudo_nodes(8)
+    g = Graph()
+    c0 = g.orphan() >> a >> b
+    c1 = g.orphan() >> x >> y
+    c2 = c0 >> c >> d >> c1
+    c3 = c0 >> e >> f >> c1
+
+    assert c0.range == g.indexes_of(a, b, _type=tuple)
+    assert c1.range == g.indexes_of(x, y, _type=tuple)
+    assert c2.range == g.indexes_of(a, y, _type=tuple)
+    assert c3.range == g.indexes_of(a, y, _type=tuple)
+
+    assert g.outputs_of(b) == g.indexes_of(c, e)
+    assert g.outputs_of(d) == g.indexes_of(x)
+    assert g.outputs_of(f) == g.indexes_of(x)
+    assert g.outputs_of(y) == set()
