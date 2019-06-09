@@ -13,7 +13,7 @@ environment:
       PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.7
+      PYTHON_VERSION: "3.5.7"
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python36"
