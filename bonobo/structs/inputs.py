@@ -19,7 +19,6 @@ from queue import Queue
 
 from bonobo.constants import BEGIN, END
 from bonobo.errors import AbstractError, InactiveReadableError, InactiveWritableError
-from bonobo.nodes import noop
 
 BUFFER_SIZE = 8192
 

@@ -12,7 +12,7 @@ from bonobo.errors import InactiveReadableError, UnrecoverableError, Unrecoverab
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.structs.inputs import Input, Pipe
 from bonobo.structs.tokens import Flag, Token
-from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype, tuplize
+from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype
 from bonobo.util.bags import BagType
 from bonobo.util.envelopes import F_INHERIT, F_NOT_MODIFIED, isenvelope
 from bonobo.util.statistics import WithStatistics
@@ -298,7 +298,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         try:
             self.errors.put(ErrorBag(self, level, *exc_info))
         except Exception:
-            logger.exception('An exception occurred while trying to send an error in the error stream.')
+            logger.exception("An exception occurred while trying to send an error in the error stream.")
 
         if not (self.errors and isinstance(self.errors, Pipe) and len(self.errors)):
             super().error(exc_info, level=level)
@@ -308,7 +308,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         try:
             self.errors.put(ErrorBag(self, level, *exc_info))
         except Exception:
-            logger.exception('An exception occurred while trying to send an unrecoverable error in the error stream.')
+            logger.exception("An exception occurred while trying to send an unrecoverable error in the error stream.")
 
         super().fatal(exc_info, level=level)
         self.input.shutdown()
