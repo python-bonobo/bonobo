@@ -81,6 +81,12 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         # Stack: context decorators for the execution
         self._stack = None
 
+    def get_statistics(self, *args, **kwargs):
+        return super(NodeExecutionContext, self).get_statistics(*args, **kwargs) + (
+            ("rrl", self.input._runlevel),
+            ("wrl", self.input._writable_runlevel),
+        )
+
     def __str__(self):
         return self.__name__ + self.get_statistics_as_string(prefix=" ")
 
@@ -289,16 +295,21 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def error(self, exc_info, *, level=logging.ERROR):
         self.increment("err")
-        if self.errors:
+        try:
             self.errors.put(ErrorBag(self, level, *exc_info))
+        except Exception:
+            logger.exception('An exception occurred while trying to send an error in the error stream.')
 
         if not (self.errors and isinstance(self.errors, Pipe) and len(self.errors)):
             super().error(exc_info, level=level)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
         self.increment("err")
-        if self.errors:
+        try:
             self.errors.put(ErrorBag(self, level, *exc_info))
+        except Exception:
+            logger.exception('An exception occurred while trying to send an unrecoverable error in the error stream.')
+
         super().fatal(exc_info, level=level)
         self.input.shutdown()
 

@@ -103,8 +103,8 @@ class BufferingGraphExecutionContext(BufferingContext, GraphExecutionContext):
         BufferingContext.__init__(self, buffer)
         GraphExecutionContext.__init__(self, *args, **kwargs)
 
-    def create_node_execution_context_for(self, node):
-        return self.NodeExecutionContextType(node, parent=self, buffer=self.buffer)
+    def create_node_execution_context_for(self, node, *args, **kwargs):
+        return self.NodeExecutionContextType(node, *args, parent=self, buffer=self.buffer, **kwargs)
 
 
 def runner(f):
