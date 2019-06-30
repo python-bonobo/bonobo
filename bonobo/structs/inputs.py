@@ -15,12 +15,10 @@
 # limitations under the License.
 
 from abc import ABCMeta, abstractmethod
-from asyncio.queues import Queue as AioQueue
 from queue import Queue
 
 from bonobo.constants import BEGIN, END
 from bonobo.errors import AbstractError, InactiveReadableError, InactiveWritableError
-from bonobo.nodes import noop
 
 BUFFER_SIZE = 8192
 
@@ -44,32 +42,40 @@ class Writable(metaclass=ABCMeta):
 
 
 class Input(Queue, Readable, Writable):
-    def __init__(self, maxsize=BUFFER_SIZE):
+    def __init__(self, maxsize=BUFFER_SIZE, *, daemon=False):
         Queue.__init__(self, maxsize)
 
+        self._daemon = bool(daemon)
         self._runlevel = 0
         self._writable_runlevel = 0
-        self.on_initialize = noop
-        self.on_begin = noop
-        self.on_end = noop
-        self.on_finalize = noop
+        self.on_initialize = []
+        self.on_begin = []
+        self.on_end = []
+        self.on_finalize = []
+
+    def daemonize(self, daemon=True):
+        self._daemon = bool(daemon)
+
+    def call_event_handlers(self, handlers):
+        for handler in handlers:
+            handler()
 
     def put(self, data, block=True, timeout=None):
         # Begin token is a metadata to raise the input runlevel.
         if data == BEGIN:
             if not self._runlevel:
-                self.on_initialize()
+                self.call_event_handlers(self.on_initialize)
 
             self._runlevel += 1
             self._writable_runlevel += 1
 
             # callback
-            self.on_begin()
+            self.call_event_handlers(self.on_begin)
 
             return
 
         # Check we are actually able to receive data.
-        if self._writable_runlevel < 1:
+        if self._writable_runlevel < 1 and not self._daemon:
             raise InactiveWritableError("Cannot put() on an inactive {}.".format(Writable.__name__))
 
         if data == END:
@@ -79,9 +85,9 @@ class Input(Queue, Readable, Writable):
 
     def _decrement_runlevel(self):
         if self._runlevel == 1:
-            self.on_finalize()
+            self.call_event_handlers(self.on_finalize)
         self._runlevel -= 1
-        self.on_end()
+        self.call_event_handlers(self.on_end)
 
     def get(self, block=True, timeout=None):
         if not self.alive:
@@ -115,8 +121,23 @@ class Input(Queue, Readable, Writable):
 
     @property
     def alive(self):
-        return self._runlevel > 0
+        return self._daemon or self._runlevel > 0
 
 
-class AioInput(AioQueue):
-    pass
+class Pipe(Input):
+    def __init__(self, maxsize=0, **kwargs):
+        super().__init__(maxsize=maxsize, **kwargs)
+        self.targets = []
+
+    def put(self, item, block=True, timeout=None):
+        if len(self.targets):
+            for target in self.targets:
+                target.put(item, block=block, timeout=timeout)
+        else:
+            super().put(item, block=block, timeout=timeout)
+
+    def __len__(self):
+        return len(self.targets)
+
+    def __bool__(self):
+        return True

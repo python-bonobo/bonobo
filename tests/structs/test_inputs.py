@@ -20,7 +20,7 @@ import pytest
 
 from bonobo.constants import BEGIN, END
 from bonobo.errors import InactiveReadableError, InactiveWritableError
-from bonobo.structs.inputs import Input
+from bonobo.structs.inputs import Input, Pipe
 
 
 def test_input_runlevels():
@@ -64,3 +64,15 @@ def test_input_runlevels():
     assert q.get() == "baz"
     with pytest.raises(InactiveReadableError):
         q.get()
+
+
+def test_input_runlevels_daemonized(*, queue=None):
+    queue = queue or Input(daemon=True)
+
+    assert queue.alive
+    queue.put("hi, daemon")
+
+
+def test_pipes():
+    queue = Pipe(daemon=True)
+    test_input_runlevels_daemonized()

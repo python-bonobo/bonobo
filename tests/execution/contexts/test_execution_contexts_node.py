@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import MagicMock
 
 import pytest
@@ -261,3 +262,19 @@ def test_split_token_inherit():
         assert split_token(F_INHERIT) == ({F_INHERIT}, ())
         assert split_token((F_INHERIT,)) == ({F_INHERIT}, ())
         assert split_token((F_INHERIT, "foo", "bar")) == ({F_INHERIT}, ("foo", "bar"))
+
+
+def test_nonfatal_error():
+    def f():
+        raise RuntimeError("woops")
+        yield "not a chance"
+
+    with BufferingNodeExecutionContext(f) as context:
+        context.write_sync(EMPTY)
+
+    error = context.errors.get_nowait()
+    assert error.context is context
+    assert error.level == logging.ERROR
+    assert error.type is RuntimeError
+    assert error.value.args[0] == "woops"
+    assert error.traceback

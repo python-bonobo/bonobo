@@ -1,7 +1,7 @@
 import logging
 import sys
 from collections import namedtuple
-from queue import Empty
+from queue import Empty, Queue
 from time import sleep
 from types import GeneratorType
 
@@ -10,7 +10,7 @@ from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.inputs import AioInput, Input
+from bonobo.structs.inputs import Input, Pipe
 from bonobo.structs.tokens import Flag, Token
 from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype
 from bonobo.util.bags import BagType
@@ -20,6 +20,7 @@ from bonobo.util.statistics import WithStatistics
 logger = logging.getLogger(__name__)
 
 UnboundArguments = namedtuple("UnboundArguments", ["args", "kwargs"])
+ErrorBag = namedtuple("ErrorBag", ["context", "level", "type", "value", "traceback"])
 
 
 class NodeExecutionContext(BaseContext, WithStatistics):
@@ -35,7 +36,17 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     QueueType = Input
 
-    def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None):
+    @classmethod
+    def create_queue(cls, *args, **kwargs):
+        return cls.QueueType(*args, **kwargs)
+
+    @property
+    def should_loop(self):
+        if self.parent.should_loop:
+            return super(NodeExecutionContext, self).should_loop
+        return not self.input.empty()
+
+    def __init__(self, wrapped, *, parent=None, services=None, daemon=False, _input=None, _outputs=None, _errors=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
 
@@ -45,7 +56,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param _input: input queue (optional)
         :param _outputs: output queues (optional)
         """
-        BaseContext.__init__(self, wrapped, parent=parent)
+        BaseContext.__init__(self, wrapped, parent=parent, daemon=daemon)
         WithStatistics.__init__(self, "in", "out", "err", "warn")
 
         # Services: how we'll access external dependencies
@@ -59,8 +70,9 @@ class NodeExecutionContext(BaseContext, WithStatistics):
             self.services = None
 
         # Input / Output: how the wrapped node will communicate
-        self.input = _input or self.QueueType()
+        self.input = _input or self.create_queue()
         self.outputs = _outputs or []
+        self.errors = _errors or Queue(maxsize=0)
 
         # Types
         self._input_type, self._input_length = None, None
@@ -68,6 +80,12 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
         # Stack: context decorators for the execution
         self._stack = None
+
+    def get_statistics(self, *args, **kwargs):
+        return super(NodeExecutionContext, self).get_statistics(*args, **kwargs) + (
+            ("rrl", self.input._runlevel),
+            ("wrl", self.input._writable_runlevel),
+        )
 
     def __str__(self):
         return self.__name__ + self.get_statistics_as_string(prefix=" ")
@@ -195,6 +213,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
         super().stop()
 
+    def daemonize(self, daemon=True):
+        super(NodeExecutionContext, self).daemonize(daemon)
+        self.input.daemonize(daemon)
+
     def send(self, *_output, _input=None):
         return self._put(self._cast(_input, _output))
 
@@ -273,10 +295,21 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
     def error(self, exc_info, *, level=logging.ERROR):
         self.increment("err")
-        super().error(exc_info, level=level)
+        try:
+            self.errors.put(ErrorBag(self, level, *exc_info))
+        except Exception:
+            logger.exception("An exception occurred while trying to send an error in the error stream.")
+
+        if not (self.errors and isinstance(self.errors, Pipe) and len(self.errors)):
+            super().error(exc_info, level=level)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
         self.increment("err")
+        try:
+            self.errors.put(ErrorBag(self, level, *exc_info))
+        except Exception:
+            logger.exception("An exception occurred while trying to send an unrecoverable error in the error stream.")
+
         super().fatal(exc_info, level=level)
         self.input.shutdown()
 
@@ -379,53 +412,6 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         if self.services:
             return UnboundArguments((), self.services.kwargs_for(self.wrapped))
         return UnboundArguments((), {})
-
-
-class AsyncNodeExecutionContext(NodeExecutionContext):
-    QueueType = AioInput
-
-    def __init__(self, *args, loop, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._event_loop = loop
-
-    async def _get(self):
-        """
-        Read from the input queue.
-
-        If Queue raises (like Timeout or Empty), stat won't be changed.
-
-        """
-        input_bag = await self.input.get()
-
-        # Store or check input type
-        if self._input_type is None:
-            self._input_type = type(input_bag)
-        elif type(input_bag) != self._input_type:
-            try:
-                if self._input_type == tuple:
-                    input_bag = self._input_type(input_bag)
-                else:
-                    input_bag = self._input_type(*input_bag)
-            except Exception as exc:
-                raise UnrecoverableTypeError(
-                    "Input type changed to incompatible type between calls to {!r}.\nGot {!r} which is not of type {!r}.".format(
-                        self.wrapped, input_bag, self._input_type
-                    )
-                ) from exc
-
-        # Store or check input length, which is a soft fallback in case we're just using tuples
-        if self._input_length is None:
-            self._input_length = len(input_bag)
-        elif len(input_bag) != self._input_length:
-            raise UnrecoverableTypeError(
-                "Input length changed between calls to {!r}.\nExpected {} but got {}: {!r}.".format(
-                    self.wrapped, self._input_length, len(input_bag), input_bag
-                )
-            )
-
-        self.increment("in")  # XXX should that go before type check ?
-
-        return input_bag
 
 
 def isflag(param):
