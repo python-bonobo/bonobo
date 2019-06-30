@@ -1,12 +1,13 @@
 import html
 import json
+import types
 from collections import namedtuple
 from copy import copy
 
 from graphviz import ExecutableNotFound
 from graphviz.dot import Digraph
 
-from bonobo.constants import BEGIN
+from bonobo.constants import BEGIN, ERROR
 from bonobo.util import get_name
 from bonobo.util.collections import coalesce
 
@@ -86,7 +87,7 @@ class Graph:
     name = ""
 
     def __init__(self, *chain):
-        self.edges = {BEGIN: set()}
+        self.edges = {BEGIN: set(), ERROR: set()}
         self.named = {}
         self.nodes = []
         if len(chain):
@@ -94,6 +95,10 @@ class Graph:
 
     def __iter__(self):
         yield from self.nodes
+
+    def items(self):
+        for i in range(len(self.nodes)):
+            yield i, self.nodes[i]
 
     def __len__(self):
         """
@@ -127,6 +132,13 @@ class Graph:
 
         """
         return self.get_cursor(None)
+
+    def errors(self):
+        """
+        Create a `GraphCursor` that starts at the special `ERROR` pointer so one can add custom error handling chains.
+        
+        """
+        return self.get_cursor(ERROR)
 
     def index_of(self, mixed):
         """
@@ -184,7 +196,7 @@ class Graph:
         return idx
 
     def get_or_add_node(self, new_node, *, _name=None):
-        if new_node in self.nodes:
+        if not isinstance(new_node, types.BuiltinFunctionType) and new_node in self.nodes:
             if _name is not None:
                 raise RuntimeError("Cannot name a node that is already present in the graph.")
             return self.index_of(new_node)

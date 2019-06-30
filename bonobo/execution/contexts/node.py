@@ -10,9 +10,9 @@ from bonobo.config.processors import ContextCurrifier
 from bonobo.constants import BEGIN, END, TICK_PERIOD
 from bonobo.errors import InactiveReadableError, UnrecoverableError, UnrecoverableTypeError
 from bonobo.execution.contexts.base import BaseContext
-from bonobo.structs.inputs import Input
+from bonobo.structs.inputs import Input, Pipe
 from bonobo.structs.tokens import Flag, Token
-from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype
+from bonobo.util import deprecated, ensure_tuple, get_name, isconfigurabletype, tuplize
 from bonobo.util.bags import BagType
 from bonobo.util.envelopes import F_INHERIT, F_NOT_MODIFIED, isenvelope
 from bonobo.util.statistics import WithStatistics
@@ -20,7 +20,6 @@ from bonobo.util.statistics import WithStatistics
 logger = logging.getLogger(__name__)
 
 UnboundArguments = namedtuple("UnboundArguments", ["args", "kwargs"])
-
 ErrorBag = namedtuple("ErrorBag", ["context", "level", "type", "value", "traceback"])
 
 
@@ -41,7 +40,13 @@ class NodeExecutionContext(BaseContext, WithStatistics):
     def create_queue(cls, *args, **kwargs):
         return cls.QueueType(*args, **kwargs)
 
-    def __init__(self, wrapped, *, parent=None, services=None, _input=None, _outputs=None, _errors=None):
+    @property
+    def should_loop(self):
+        if self.parent.should_loop:
+            return super(NodeExecutionContext, self).should_loop
+        return not self.input.empty()
+
+    def __init__(self, wrapped, *, parent=None, services=None, daemon=False, _input=None, _outputs=None, _errors=None):
         """
         Node execution context has the responsibility fo storing the state of a transformation during its execution.
 
@@ -51,7 +56,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         :param _input: input queue (optional)
         :param _outputs: output queues (optional)
         """
-        BaseContext.__init__(self, wrapped, parent=parent)
+        BaseContext.__init__(self, wrapped, parent=parent, daemon=daemon)
         WithStatistics.__init__(self, "in", "out", "err", "warn")
 
         # Services: how we'll access external dependencies
@@ -202,6 +207,10 @@ class NodeExecutionContext(BaseContext, WithStatistics):
 
         super().stop()
 
+    def daemonize(self, daemon=True):
+        super(NodeExecutionContext, self).daemonize(daemon)
+        self.input.daemonize(daemon)
+
     def send(self, *_output, _input=None):
         return self._put(self._cast(_input, _output))
 
@@ -282,7 +291,9 @@ class NodeExecutionContext(BaseContext, WithStatistics):
         self.increment("err")
         if self.errors:
             self.errors.put(ErrorBag(self, level, *exc_info))
-        super().error(exc_info, level=level)
+
+        if not (self.errors and isinstance(self.errors, Pipe) and len(self.errors)):
+            super().error(exc_info, level=level)
 
     def fatal(self, exc_info, *, level=logging.CRITICAL):
         self.increment("err")

@@ -1,17 +1,18 @@
 import logging
 from functools import partial
-from queue import Empty, Queue
+from queue import Empty
 from time import sleep
 
 from whistle import EventDispatcher
 
 from bonobo.config import create_container
-from bonobo.constants import BEGIN, EMPTY, END
+from bonobo.constants import BEGIN, EMPTY, END, ERROR
 from bonobo.errors import InactiveReadableError
 from bonobo.execution import events
 from bonobo.execution.contexts.base import BaseContext
 from bonobo.execution.contexts.node import NodeExecutionContext
 from bonobo.execution.contexts.plugin import PluginExecutionContext
+from bonobo.structs.inputs import Pipe
 
 logger = logging.getLogger(__name__)
 
@@ -32,19 +33,19 @@ class BaseGraphExecutionContext(BaseContext):
     def started(self):
         if not len(self.nodes):
             return super(BaseGraphExecutionContext, self).started
-        return any(node.started for node in self.nodes)
+        return any(node.started for node in self.nodes if not node.daemon)
 
     @property
     def stopped(self):
         if not len(self.nodes):
             return super(BaseGraphExecutionContext, self).stopped
-        return all(node.started and node.stopped for node in self.nodes)
+        return all(node.started and node.stopped for node in self.nodes if not node.daemon)
 
     @property
     def alive(self):
         if not len(self.nodes):
             return super(BaseGraphExecutionContext, self).alive
-        return any(node.alive for node in self.nodes)
+        return any(node.alive for node in self.nodes if not node.daemon)
 
     @property
     def xstatus(self):
@@ -58,21 +59,41 @@ class BaseGraphExecutionContext(BaseContext):
         super(BaseGraphExecutionContext, self).__init__(graph)
         self.dispatcher = dispatcher or EventDispatcher()
         self.graph = graph
-        self.errors = Queue(maxsize=0)
-        self.nodes = [self.create_node_execution_context_for(node) for node in self.graph]
+        self.errors = Pipe()
+        errors = self.graph.outputs_of(ERROR)
+        self.nodes = [
+            self.create_node_execution_context_for(
+                node, **({"daemon": True} if i in errors else {"_errors": self.errors})
+            )
+            for i, node in self.graph.items()
+        ]
         self.plugins = [self.create_plugin_execution_context_for(plugin) for plugin in plugins or ()]
         self.services = create_container(services)
 
         # Probably not a good idea to use it unless you really know what you're doing. But you can access the context.
         self.services["__graph_context"] = self
 
+        # Plug our error handlers if there are any
+        for i in self.graph.outputs_of(ERROR):
+            self[i].input.daemonize()
+            self.errors.targets.append(self[i].input)
+
         for i, node_context in enumerate(self):
             outputs = self.graph.outputs_of(i)
             if len(outputs):
                 node_context.outputs = [self[j].input for j in outputs]
-            node_context.input.on_begin = partial(node_context._put, BEGIN, _control=True)
-            node_context.input.on_end = partial(node_context._put, END, _control=True)
-            node_context.input.on_finalize = partial(node_context.stop)
+
+                # We should propagate the "daemon" property to the next nodes in line
+                if node_context.daemon:
+                    for j in outputs:
+                        self[j].daemonize()
+
+            # When a signal token is sent to an input, pass it to the node context outputs so it cascade through the
+            # graph.
+            if not node_context.daemon:
+                node_context.input.on_begin.append(partial(node_context._put, BEGIN, _control=True))
+                node_context.input.on_end.append(partial(node_context._put, END, _control=True))
+                node_context.input.on_finalize.append(partial(node_context.stop))
 
     def __getitem__(self, item):
         return self.nodes[item]
@@ -87,8 +108,8 @@ class BaseGraphExecutionContext(BaseContext):
     def create_queue(cls, *args, **kwargs):
         return cls.NodeExecutionContextType.create_queue(*args, **kwargs)
 
-    def create_node_execution_context_for(self, node):
-        return self.NodeExecutionContextType(node, parent=self, _errors=self.errors)
+    def create_node_execution_context_for(self, node, **kwargs):
+        return self.NodeExecutionContextType(node, parent=self, **kwargs)
 
     def create_plugin_execution_context_for(self, plugin):
         if isinstance(plugin, type):
@@ -113,6 +134,7 @@ class GraphExecutionContext(BaseGraphExecutionContext):
 
         self.register_plugins()
         self.dispatch(events.START)
+
         self.tick(pause=False)
 
         for node in self.nodes:
@@ -138,6 +160,7 @@ class GraphExecutionContext(BaseGraphExecutionContext):
             else:
                 stopper(node_context)
         self.tick(pause=False)
+
         self.dispatch(events.STOPPED)
         self.unregister_plugins()
 
@@ -153,8 +176,8 @@ class GraphExecutionContext(BaseGraphExecutionContext):
         """Push a list of messages in the inputs of this graph's inputs, matching the output of special node "BEGIN" in
         our graph."""
 
-        for i in self.graph.outputs_of(BEGIN):
-            for message in messages:
+        for message in messages:
+            for i in self.graph.outputs_of(BEGIN):
                 self[i].write(message)
 
     def loop(self):
@@ -167,6 +190,7 @@ class GraphExecutionContext(BaseGraphExecutionContext):
                 except Empty:
                     continue
                 except InactiveReadableError:
+                    logger.debug("Discarding node {!r}.".format(node))
                     nodes.discard(node)
 
     def run_until_complete(self):

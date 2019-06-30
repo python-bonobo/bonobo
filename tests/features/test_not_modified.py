@@ -13,5 +13,4 @@ def test_not_modified():
         context.write_sync(*input_messages)
 
     result = context.get_buffer()
-    print(result)
     assert result == input_messages

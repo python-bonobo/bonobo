@@ -89,12 +89,16 @@ class ConsoleOutputPlugin(Plugin):
 
         alive_color = Style.BRIGHT
         dead_color = Style.BRIGHT + Fore.BLACK
+        daemon_color = alive_color if context.alive else dead_color
 
         for i in context.graph.topologically_sorted_indexes:
             node = context[i]
             name_suffix = "({})".format(i) if settings.DEBUG.get() else ""
 
             liveliness_color = alive_color if node.alive else dead_color
+            if node.daemon:
+                liveliness_color = daemon_color
+
             liveliness_prefix = " {}{}{} ".format(liveliness_color, node.status, Style.RESET_ALL)
             _line = "".join(
                 (

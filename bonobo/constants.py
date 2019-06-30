@@ -24,6 +24,7 @@ from bonobo.structs.tokens import Token
 from bonobo.util.envelopes import UnchangedEnvelope
 
 BEGIN = Token("Begin")
+ERROR = Token("Error")
 END = Token("End")
 
 NOT_MODIFIED = UnchangedEnvelope()

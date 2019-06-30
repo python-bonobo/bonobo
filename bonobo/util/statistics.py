@@ -1,11 +1,14 @@
 import time
 
+from bonobo.util import tuplize
+
 
 class WithStatistics:
     def __init__(self, *names):
         self.statistics_names = names
         self.statistics = {name: 0 for name in names}
 
+    @tuplize
     def get_statistics(self, *args, **kwargs):
         return ((name, self.statistics[name]) for name in self.statistics_names)
 
