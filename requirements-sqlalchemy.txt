@@ -1,7 +1,7 @@
 -e .[sqlalchemy]
 -r requirements.txt
 appdirs==1.4.3
-bonobo-sqlalchemy==0.6.0
+bonobo-sqlalchemy==0.6.1
 certifi==2019.6.16
 chardet==3.0.4
 colorama==0.3.9

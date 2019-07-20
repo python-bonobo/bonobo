@@ -6,7 +6,15 @@ and inspect transformations, graphs, and nodes.
 from bonobo.util.collections import cast, ensure_tuple, sortedlist, tuplize
 from bonobo.util.compat import deprecated, deprecated_alias
 from bonobo.util.inspect import (
-    inspect_node, isconfigurable, isconfigurabletype, iscontextprocessor, isdict, ismethod, isoption, istuple, istype
+    inspect_node,
+    isconfigurable,
+    isconfigurabletype,
+    iscontextprocessor,
+    isdict,
+    ismethod,
+    isoption,
+    istuple,
+    istype,
 )
 from bonobo.util.objects import ValueHolder, get_attribute_or_create, get_name
 

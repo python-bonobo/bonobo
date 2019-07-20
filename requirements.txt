@@ -5,7 +5,7 @@ certifi==2019.6.16
 chardet==3.0.4
 colorama==0.3.9
 fs==2.4.8
-graphviz==0.8.4
+graphviz==0.11.1
 idna==2.8
 jinja2==2.10.1
 markupsafe==1.1.1
@@ -14,12 +14,12 @@ packaging==19.0
 pbr==5.4.1
 psutil==5.6.3
 pyparsing==2.4.0
-python-slugify==1.2.6
+python-slugify==3.0.2
 pytz==2019.1
 requests==2.22.0
 six==1.12.0
 stevedore==1.30.1
+text-unidecode==1.2
 typing==3.7.4
-unidecode==1.1.1
 urllib3==1.25.3
 whistle==1.0.1
