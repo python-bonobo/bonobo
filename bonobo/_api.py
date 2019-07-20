@@ -83,6 +83,9 @@ def run(graph, *, plugins=None, services=None, strategy=None):
 
     from bonobo.util.errors import sweeten_errors
 
+    if not isinstance(graph, Graph) and hasattr(graph, 'graph'):
+        graph = graph.graph
+
     with sweeten_errors():
         return strategy.execute(graph, plugins=plugins, services=services)
 
