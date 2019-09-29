@@ -174,7 +174,7 @@ class NodeExecutionContext(BaseContext, WithStatistics):
                 else:
                     # Push data (in case of an iterator)
                     self._put(self._cast(input_bag, result))
-        elif results:
+        elif results is not None:
             # Push data (returned value)
             self._put(self._cast(input_bag, results))
         else:

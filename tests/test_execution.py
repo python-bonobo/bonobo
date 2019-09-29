@@ -43,7 +43,7 @@ def test_execution():
     strategy = NaiveStrategy()
     ctx = strategy.execute(graph)
 
-    assert ctx.results == [1, 4, 9, 16, 25, 36, 49, 64, 81]
+    assert ctx.results == [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 
 def test_simple_execution_context():
