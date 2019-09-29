@@ -87,7 +87,12 @@ def run(graph, *, plugins=None, services=None, strategy=None):
         graph = graph.graph
 
     with sweeten_errors():
-        return strategy.execute(graph, plugins=plugins, services=services)
+        ctx = strategy.execute(graph, plugins=plugins, services=services)
+
+        if any(n.statistics['err'] for n in ctx.nodes):
+            exit(1)
+
+        return ctx
 
 
 def _inspect_as_graph(graph):

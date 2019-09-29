@@ -15,3 +15,12 @@ def test_run_graph_noop():
         result = bonobo.run(graph)
 
     assert isinstance(result, GraphExecutionContext)
+
+
+def test_run_graph_failed():
+    graph = bonobo.Graph(lambda: 1/0)
+    assert len(graph) == 1
+
+    with pytest.raises(SystemExit):
+        with patch("bonobo._api._is_interactive_console", side_effect=lambda: False):
+            bonobo.run(graph)
