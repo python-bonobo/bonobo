@@ -4,6 +4,7 @@ from .csv import CsvReader, CsvWriter
 from .file import FileReader, FileWriter
 from .json import JsonReader, JsonWriter, LdjsonReader, LdjsonWriter
 from .pickle import PickleReader, PickleWriter
+from .avro import AvroReader, AvroWriter
 
 __all__ = [
     "CsvReader",
@@ -16,4 +17,6 @@ __all__ = [
     "LdjsonWriter",
     "PickleReader",
     "PickleWriter",
+    "AvroReader",
+    "AvroWriter",
 ]
