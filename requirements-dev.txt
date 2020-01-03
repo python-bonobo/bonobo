@@ -12,6 +12,7 @@ click==7.0
 cookiecutter==1.5.1
 coverage==4.5.3
 docutils==0.14
+fastavro>=0.22.9
 future==0.17.1
 idna==2.8
 imagesize==1.1.0

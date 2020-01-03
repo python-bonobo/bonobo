@@ -57,6 +57,7 @@ python.add_requirements(
         'cookiecutter >=1.5,<1.6',
         'pytest-timeout >=1,<2',
         'sphinx-sitemap >=0.2,<0.3',
+        'fastavro>=0.22.9',
     ],
     docker=[
         'bonobo-docker ~=0.6.0a1',
