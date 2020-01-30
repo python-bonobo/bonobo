@@ -1,13 +1,12 @@
-import fastavro
-from collections import OrderedDict
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, time
+from decimal import Decimal
 
 from bonobo.config import Option, use_context
-from bonobo.constants import NOT_MODIFIED
 from bonobo.nodes.io.base import FileHandler
 from bonobo.nodes.io.file import FileReader, FileWriter
-from bonobo.util import ensure_tuple
-from bonobo.util.collections import coalesce, tuple_or_const
+from bonobo.util.collections import coalesce
+
+import fastavro
 
 
 class AvroHandler(FileHandler):
@@ -79,7 +78,17 @@ class AvroWriter(FileWriter, AvroHandler):
     def build_schema_from_types(self, props):
         schema_fields = []
         for p, t in zip(props, self.types):
-            f = {'name': p, 'type': t}
+            if  isinstance(t, dict):
+                f = t
+                f['name'] = p
+            elif t == "date":
+                f = {'name': p, 'type': 'int', "logicalType": "date"}
+            elif t == "time-micros":
+                f = {'name': p, 'type': 'long', "logicalType": "time-micros"}
+            elif t == "timestamp-micros":
+                f = {'name': p, 'type': 'long', "logicalType": "timestamp-micros"}
+            else:
+                f = {'name': p, 'type': t}
             schema_fields.append(f)
         return schema_fields
 
@@ -89,19 +98,71 @@ class AvroWriter(FileWriter, AvroHandler):
         schema_fields = []
         for p, v in zip(props, values):
             if isinstance(v, int):
-                f = {'name': p, 'type': 'int'}
+                f = {'name': p, 'type': 'long'}
             elif isinstance(v, bool):
                 f = {'name': p, 'type': 'boolean'}
             elif isinstance(v, float):
                 f = {'name': p, 'type': 'double'}
-            elif isinstance(v, datetime):
-                f = {'name': p, 'type': 'long', "logicalType": "timestamp-millis"}
             elif isinstance(v, date):
                 f = {'name': p, 'type': 'int', "logicalType": "date"}
+            elif isinstance(v, timedelta) or isinstance(v, time):
+                f = {'name': p, 'type': 'long', "logicalType": "time-micros"}
+            elif isinstance(v, datetime):
+                f = {'name': p, 'type': 'long', "logicalType": "timestamp-micros"}
+            elif isinstance(v, Decimal):
+                f = {'name': p, 'type': 'double'}
+            elif isinstance(v, bytes):
+                f = {'name': p, 'type': 'bytes'}
             else:
                 f = {'name': p, 'type': 'string'}
             schema_fields.append(f)
         return schema_fields
+
+    def build_converters_from_values(self, values):
+        converters = []
+        for v in values:
+            if isinstance(v, datetime):
+                f = AvroWriter.get_value_as_datetime
+            elif isinstance(v, time):
+                f = AvroWriter.get_value_as_time
+            elif isinstance(v, timedelta):
+                f = AvroWriter.get_value_as_timedelta
+            elif isinstance(v, date):
+                f = AvroWriter.get_value_as_date
+            elif isinstance(v, Decimal):
+                f = AvroWriter.get_value_as_float
+            else:
+                f = AvroWriter.get_same_value
+            converters.append(f)
+        return converters
+
+    @staticmethod
+    def get_same_value(value):
+        return value
+
+    @staticmethod
+    def get_value_as_date(value):
+        diff = value - date(1970,1,1)
+        return diff.days
+
+    @staticmethod
+    def get_value_as_datetime(value):
+        elapsed = value.timestamp()
+        return int(elapsed)
+
+    @staticmethod
+    def get_value_as_timedelta(value):
+        elapsed = (value.days * 86400000) + (value.seconds * 1000) + value.microseconds
+        return elapsed
+
+    @staticmethod
+    def get_value_as_time(value):
+        elapsed = (value.hour * 3600000) + (value.minute * 60000) + (value.second * 1000) + value.microsecond
+        return elapsed
+
+    @staticmethod
+    def get_value_as_float(value):
+        return float(value)
 
     def build_schema(self, props, values):
 
@@ -135,7 +196,12 @@ class AvroWriter(FileWriter, AvroHandler):
             parsed_schema = fastavro.parse_schema(aschema)
             context.schema = parsed_schema
 
-        kv = {k: v for k, v in zip(props, values)}
+        context.setdefault("converters", None)
+        if not context.converters:
+            context.converters = self.build_converters_from_values(values)
+
+        kv = {k: conv(v) for k, v, conv in zip(props, values, context.converters)}
+
         row = [kv]
         fastavro.writer(fo=file, schema=context.schema, records=row, codec=self.codec)
 

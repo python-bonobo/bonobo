@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, date, timedelta
 
 from bonobo import AvroReader, AvroWriter
 from bonobo.constants import EMPTY
@@ -12,10 +13,13 @@ avro_tester = FilesystemTester("avro", mode="wb")
 def test_write_records_to_avro_file(tmpdir):
     fs, filename, services = avro_tester.get_services_for_writer(tmpdir)
 
+    john = ("john", 7, date(2012,10,11), datetime(2012,10,11,15,16,17))
+    jane = ("jane", 17, date(2002,10,11), datetime(2002,10,13,15,16,17))
+
     writav = AvroWriter(filename)
     with NodeExecutionContext(writav, services=services) as context:
-        context.set_input_fields(["foo", "bar"])
-        context.write_sync(("a", "b"), ("c", "d"))
+        context.set_input_fields(["name", "age", "birthday", "registered"])
+        context.write_sync(john, jane)
 
     # with fs.open(filename, "rb") as fp:
         # assert pickle.loads(fp.read()) == {"foo": "bar"}
