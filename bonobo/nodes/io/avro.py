@@ -42,12 +42,8 @@ class AvroReader(FileReader, AvroHandler):
             self.name = aschema['name']
         if 'namespace' in aschema:
             self.namespace = aschema['namespace']
-        props = context.get_input_fields()
         src = aschema['fields']
-        dst = []
-        for f in src:
-            fname = f['name']
-            dst.append(fname)
+        dst = [f['name'] for f in src]
         tfields = tuple(dst)
         context.set_output_fields(tfields)
 
