@@ -13,7 +13,7 @@ def is_fastavro_missing():
     try:
         import fastavro
         return False
-    except ModuleNotFoundError:
+    except ImportError:
         return True
 
 
