@@ -21,20 +21,53 @@ def test_write_records_to_avro_file(tmpdir):
     if is_fastavro_missing():
         return
     fs, filename, services = avro_tester.get_services_for_writer(tmpdir)
-    writav = AvroWriter(filename)
+    writav = AvroWriter(
+        filename, 
+        codec = 'deflate', 
+        compression_level = 6
+        )
+    john = ("john", 7, date(2012,10,11), datetime(2018,9,14,15,16,17))
+    jane = ("jane", 17, date(2002,11,12), datetime(2015,12,13,14,15,16))
+    jack = ("jack", 27, date(1992,12,13), datetime(2010,11,12,13,14,15))
+    joel = ("joel", 37, date(1982,12,25), datetime(2009,10,11,12,13,14))
     with NodeExecutionContext(writav, services=services) as context:
-        john = ("john", 7, date(2012,10,11), datetime(2018,9,14,15,16,17))
-        jane = ("jane", 17, date(2002,11,12), datetime(2015,12,13,14,15,16))
-        jack = ("jack", 27, date(1992,12,13), datetime(2010,11,12,13,14,15))
-        joel = ("joel", 37, date(1982,12,25), datetime(2009,10,11,12,13,14))
-
         context.set_input_fields(["name", "age", "birthday", "registered"])
         context.write_sync(john, jane, jack, joel)
 
 
+def test_write_with_schema_to_avro_file(tmpdir):
+    if is_fastavro_missing():
+        return
+    fs, filename, services = avro_tester.get_services_for_writer(tmpdir)
+    custom_schema = {
+        'doc': 'Some random people.',
+        'name': 'Crowd',
+        'namespace': 'test',
+        'type': 'record',
+        'fields': [
+            {'name': 'pete', 'type': 'string'},
+            {'name': 'age', 'type': 'int'},
+            {'name': 'birthday', 'type': 'int', 'logicalType': 'date'},
+            {'name': 'registered', 'type': 'long', 'logicalType': 'timestamp-micros'},
+        ],
+    }
+    writav = AvroWriter(
+        filename, 
+        schema = custom_schema, 
+        codec = 'deflate', 
+        compression_level = 6
+        )
+    pete = ("pete", 7, date(2012,10,11), datetime(2018,9,14,15,16,17))
+    mike = ("mike", 17, date(2002,11,12), datetime(2015,12,13,14,15,16))
+    zack = ("zack", 27, date(1992,12,13), datetime(2010,11,12,13,14,15))
+    gene = ("gene", 37, date(1982,12,25), datetime(2009,10,11,12,13,14))
+    with NodeExecutionContext(writav, services=services) as context:
+        context.set_input_fields(["name", "age", "birthday", "registered"])
+        context.write_sync(pete, mike, zack, gene)
+
+
 def create_avro_example(path):
     import fastavro
-
     schema = {
         'doc': 'A weather reading.',
         'name': 'Weather',
@@ -68,7 +101,5 @@ def test_read_records_from_avro_file(tmpdir):
         context.write_sync(EMPTY)
     props = context.get_output_fields()
     assert props == ("station", "time", "temp")
-    # output = context.get_buffer()
-    # assert output == [("a foo", "b foo", "c foo"), ("a bar", "b bar", "c bar")]
 
 # end of test file
