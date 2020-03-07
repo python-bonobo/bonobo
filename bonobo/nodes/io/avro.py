@@ -17,7 +17,7 @@ def assure_same_len(props, values):
     if len(props) != len(values):
         m = "Values length differs from input fields length. Expected: {}. Got: {}. Values: {!r}."
         f = m.format(len(props), len(values), values)
-        raise ValueError(m)
+        raise ValueError(f)
 
 
 def build_schema_from_values(props, values):

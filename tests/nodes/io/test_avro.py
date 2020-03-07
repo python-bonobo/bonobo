@@ -26,12 +26,12 @@ def test_write_records_to_avro_file(tmpdir):
         codec = 'deflate', 
         compression_level = 6
         )
-    john = ("john", 7, date(2012,10,11), datetime(2018,9,14,15,16,17))
-    jane = ("jane", 17, date(2002,11,12), datetime(2015,12,13,14,15,16))
-    jack = ("jack", 27, date(1992,12,13), datetime(2010,11,12,13,14,15))
-    joel = ("joel", 37, date(1982,12,25), datetime(2009,10,11,12,13,14))
+    john = ("john", 7, 0.7, False, date(2012,10,11), datetime(2018,9,14,15,16,17))
+    jane = ("jane", 17, 1.7, True, date(2002,11,12), datetime(2015,12,13,14,15,16))
+    jack = ("jack", 27, 2.7, True, date(1992,12,13), datetime(2010,11,12,13,14,15))
+    joel = ("joel", 37, 3.7, True, date(1982,12,25), datetime(2009,10,11,12,13,14))
     with NodeExecutionContext(writav, services=services) as context:
-        context.set_input_fields(["name", "age", "birthday", "registered"])
+        context.set_input_fields(["name", "age", "score", "smart", "birthday", "registered"])
         context.write_sync(john, jane, jack, joel)
 
 
