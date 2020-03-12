@@ -15,7 +15,7 @@ markupsafe==1.1.1
 mondrian==0.8.0
 packaging==19.0
 pbr==5.4.1
-psutil==5.6.3
+psutil==5.6.6
 pyparsing==2.4.0
 python-slugify==1.2.6
 pytz==2019.1
