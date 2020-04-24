@@ -102,8 +102,8 @@ class Graph:
         """
         return len(self.nodes)
 
-    def __getitem__(self, key):
-        return self.nodes[key]
+    def __getitem__(self, ref):
+        return self.get_cursor(ref)
 
     def __enter__(self):
         return self.get_cursor().__enter__()
