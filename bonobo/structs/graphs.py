@@ -313,7 +313,7 @@ class Graph:
             for i in self.outputs_of(BEGIN):
                 g.edge("BEGIN", str(i))
             for ix in self.topologically_sorted_indexes:
-                g.node(str(ix), label=get_name(self[ix]))
+                g.node(str(ix), label=get_name(self.nodes[ix]))
                 for iy in self.outputs_of(ix):
                     g.edge(str(ix), str(iy))
             self._graphviz = g
