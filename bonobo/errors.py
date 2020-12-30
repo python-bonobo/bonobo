@@ -30,7 +30,7 @@ class ConfigurationError(Exception):
 
 class UnrecoverableError(Exception):
     """Flag for errors that must interrupt the workflow, either because they will happen for sure on each node run, or
-    because you know that your transformation has no point continuing runnning after a bad event."""
+    because you know that your transformation has no point continuing running after a bad event."""
 
 
 class AbstractError(UnrecoverableError, NotImplementedError):
