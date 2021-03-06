@@ -98,7 +98,7 @@ Accessing Environment Variables from within the Graph Context
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 Environment variables, whether set globally or only for the scope of the graph,
-can be can be accessed using any of the normal means. It is important to note
+can be accessed using any of the normal means. It is important to note
 that whether set globally for the system or just for the graph context,
 environment variables are accessed by bonobo in the same way. In the example
 below the database user and password are accessed via the ``os`` module's ``getenv``
