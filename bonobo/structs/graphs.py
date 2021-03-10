@@ -102,8 +102,8 @@ class Graph:
         """
         return len(self.nodes)
 
-    def __getitem__(self, key):
-        return self.nodes[key]
+    def __getitem__(self, ref):
+        return self.get_cursor(ref)
 
     def __enter__(self):
         return self.get_cursor().__enter__()
@@ -313,7 +313,7 @@ class Graph:
             for i in self.outputs_of(BEGIN):
                 g.edge("BEGIN", str(i))
             for ix in self.topologically_sorted_indexes:
-                g.node(str(ix), label=get_name(self[ix]))
+                g.node(str(ix), label=get_name(self.nodes[ix]))
                 for iy in self.outputs_of(ix):
                     g.edge(str(ix), str(iy))
             self._graphviz = g
@@ -331,5 +331,5 @@ class Graph:
 
 def _get_graphviz_node_id(graph, i):
     escaped_index = str(i)
-    escaped_name = json.dumps(get_name(graph[i]))
+    escaped_name = json.dumps(get_name(graph.nodes[i]))
     return "{{{} [label={}]}}".format(escaped_index, escaped_name)

@@ -18,7 +18,7 @@ def test_get_cursor():
 
 def test_get_cursor_in_a_vacuum():
     g = Graph()
-    cursor = g.get_cursor(None)
+    cursor = g[None]
 
     assert cursor.graph is g
     assert cursor.first is None
@@ -71,7 +71,7 @@ def test_cursor_to_fork_a_graph():
 
     g = Graph()
     g >> a >> b >> c
-    g.get_cursor(b) >> d >> e
+    g[b] >> d >> e
 
     assert len(g) == 5
     assert g.outputs_of(BEGIN) == {g.index_of(a)}

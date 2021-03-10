@@ -90,16 +90,16 @@ def test_graph_topological_sort():
     g.add_chain(a1, a2, a3, _input=None, _output=None)
 
     assert g.topologically_sorted_indexes == (0, 1, 2)
-    assert g[0] == a1
-    assert g[1] == a2
-    assert g[2] == a3
+    assert g.nodes[0] == a1
+    assert g.nodes[1] == a2
+    assert g.nodes[2] == a3
 
     g.add_chain(b1, b2, _output=a2)
 
     assert g.topologically_sorted_indexes[-2:] == (1, 2)
     assert g.topologically_sorted_indexes.index(3) < g.topologically_sorted_indexes.index(4)
-    assert g[3] == b1
-    assert g[4] == b2
+    assert g.nodes[3] == b1
+    assert g.nodes[4] == b2
 
 
 def test_connect_two_chains():
