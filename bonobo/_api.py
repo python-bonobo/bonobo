@@ -142,6 +142,8 @@ def open_fs(fs_url=None, *args, **kwargs):
 
 # standard transformations
 api.register_group(
+    AvroReader,
+    AvroWriter,
     CsvReader,
     CsvWriter,
     FileReader,
