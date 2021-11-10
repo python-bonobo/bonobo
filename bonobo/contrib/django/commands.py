@@ -78,6 +78,6 @@ class ETLCommand(BaseCommand):
         self.stderr.style_func = lambda x: Fore.LIGHTRED_EX + Back.RED + "!" + Style.RESET_ALL + " " + x
 
         try:
-            return self.run(*args, **options)
+            self.run(*args, **options)
         finally:
             self.stdout, self.stderr = _stdout_backup, _stderr_backup
