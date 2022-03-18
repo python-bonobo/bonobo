@@ -68,7 +68,7 @@ Let's write our extractor:
 
     import requests
 
-    FABLABS_API_URL = 'https://public-us.opendatasoft.com/api/records/1.0/search/?dataset=fablabs&rows=1000'
+    FABLABS_API_URL = 'https://public.opendatasoft.com/api/records/1.0/search/?dataset=georef-world-country&rows=1000'
 
     def extract_fablabs():
         yield from requests.get(FABLABS_API_URL).json().get('records')
