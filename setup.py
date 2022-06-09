@@ -68,7 +68,7 @@ setup(
     ],
     extras_require={
         'dev': [
-            'cookiecutter >= 1.5, < 1.6', 'coverage ~= 4.5', 'pytest ~= 4.6',
+            'cookiecutter >= 1.5, < 2.2', 'coverage ~= 4.5', 'pytest ~= 4.6',
             'pytest-cov ~= 2.7', 'pytest-timeout >= 1, < 2', 'sphinx ~= 1.7',
             'sphinx-sitemap >= 0.2, < 0.3'
         ],
