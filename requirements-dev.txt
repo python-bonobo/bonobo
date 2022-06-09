@@ -9,7 +9,7 @@ binaryornot==0.4.4
 certifi==2019.6.16
 chardet==3.0.4
 click==7.0
-cookiecutter==1.5.1
+cookiecutter==2.1.1
 coverage==4.5.3
 docutils==0.14
 future==0.17.1
