@@ -131,17 +131,35 @@ def get_requirements():
 def main():
     setup(name='bonobo',
         version=version,
-        description='Python SDK for Civis Integration.',
+        description=('Bonobo, a simple, modern and atomic extract-transform-load toolkit for python 3.10+.'),
         long_description=readme,
-        url='https://github.com/civisanalytics/civis-integrations-sdk',
+        python_requires='>=3.10.5',
         author="Civis Analytics Inc",
         author_email="asirifi@civisanalytics.com",
-        packages=find_packages(),
+        packages=find_packages(exclude=['ez_setup', 'example', 'test']),
         license=license,
-        install_requires=get_requirements(),
+        install_requires=[
+            'cached-property ~= 1.5.2', 'fs ~= 2.4.16', 'graphviz >= 0.20',
+            'jinja2 ~= 3.1.2', 'mondrian ~= 0.8.1', 'packaging ~= 21.3',
+            'psutil ~= 5.9.1', 'python-slugify ~= 6.1.2', 'requests ~= 2.28.1',
+            'stevedore ~= 4.0.0', 'whistle ~= 1.0.1'
+        ],
         entry_points={
-        'console_scripts': ['civis-integration=civis_integration._cmdtools:main']
-    })
+            'bonobo.commands': [
+                'convert = bonobo.commands.convert:ConvertCommand',
+                'download = bonobo.commands.download:DownloadCommand',
+                'examples = bonobo.commands.examples:ExamplesCommand',
+                'init = bonobo.commands.init:InitCommand',
+                'inspect = bonobo.commands.inspect:InspectCommand',
+                'run = bonobo.commands.run:RunCommand',
+                'version = bonobo.commands.version:VersionCommand'
+            ],
+            'console_scripts': ['bonobo = bonobo.commands:entrypoint']
+        },
+        url='https://www.bonobo-project.org/',
+        download_url='https://github.com/python-bonobo/bonobo/tarball/{version}'.
+        format(version=version),
+    )
 
 
 if __name__ == "__main__":
