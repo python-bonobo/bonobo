@@ -64,7 +64,7 @@ setup(
         'cached-property ~= 1.4', 'fs ~= 2.0', 'graphviz >= 0.8, < 0.9',
         'jinja2 ~= 2.9', 'mondrian ~= 0.8', 'packaging ~= 19.0',
         'psutil ~= 5.4', 'python-slugify ~= 1.2.0', 'requests ~= 2.0',
-        'stevedore ~= 1.27', 'whistle ~= 1.0'
+        'stevedore ~= 1.27', 'whistle ~= 1.0', 'markupsafe==2.0.1'
     ],
     extras_require={
         'dev': [

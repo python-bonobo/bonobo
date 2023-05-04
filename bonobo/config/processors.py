@@ -1,4 +1,7 @@
-from collections.abc import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 from contextlib import contextmanager
 from functools import partial
 from inspect import signature
