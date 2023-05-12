@@ -163,7 +163,7 @@ class EnvironmentTestCase:
                 assert os.environ["PATH"] == _environ["PATH"]
 
         assert err == ""
-        return dict(map(lambda line: line.split(" ", 1), filter(None, out.split("\n"))))
+        return dict(filter(None, map(lambda line: line.strip().split(" ", 1) if " " in line.strip() else None, out.split("\n"))))
 
 
 class StaticNodeTest:
