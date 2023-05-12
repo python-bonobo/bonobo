@@ -19,6 +19,7 @@ def env2(tmpdir):
 
 class TestDefaultEnvFile(EnvironmentTestCase):
     def test_run_with_default_env_file(self, runner, target, env1):
+        print(f"{self} {runner} {target} {env1}")
         env = self.run_environ(runner, *target, "--default-env-file", env1)
         assert env.get("SECRET") == "unknown"
         assert env.get("PASSWORD") == "sweet"

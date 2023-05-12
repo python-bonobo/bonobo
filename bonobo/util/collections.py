@@ -1,6 +1,9 @@
 import bisect
 import functools
-from collections import Sequence
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
 
 class sortedlist(list):
