@@ -89,7 +89,7 @@ def parse_args(mixed=None):
         global _parser
         if _parser is not None:
             warnings.warn(
-                "You are calling bonobo.parse_args() without a parser argument, but it looks like you created a parser before. You probably want to pass your parser to this call, or if creating a new parser here is really what you want to do, please create a new one explicitely to silence this warning."
+                "You are calling bonobo.parse_args() without a parser argument, but it looks like you created a parser before. You probably want to pass your parser to this call, or if creating a new parser here is really what you want to do, please create a new one explicitly to silence this warning."
             )
         # use the api from bonobo namespace, in case a command patched it.
         import bonobo
