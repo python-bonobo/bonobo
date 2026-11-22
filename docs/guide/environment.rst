@@ -59,9 +59,9 @@ The Examples below demonstrate setting one or multiple variables using both of t
 
 .. code-block:: bash
 
-    # Using one environment variable via a --env or --defualt-env flag:
+    # Using one environment variable via a --env or --default-env flag:
     bonobo run csvsanitizer --env SECRET_TOKEN=secret123
-    bonobo run csvsanitizer --defaul-env SECRET_TOKEN=secret123
+    bonobo run csvsanitizer --default-env SECRET_TOKEN=secret123
 
     # Using multiple environment variables via -e (env) and --default-env flags:
     bonobo run csvsanitizer -e SRC_FILE=inventory.txt -e DST_FILE=inventory_processed.csv
@@ -98,7 +98,7 @@ Accessing Environment Variables from within the Graph Context
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 Environment variables, whether set globally or only for the scope of the graph,
-can be can be accessed using any of the normal means. It is important to note
+can be accessed using any of the normal means. It is important to note
 that whether set globally for the system or just for the graph context,
 environment variables are accessed by bonobo in the same way. In the example
 below the database user and password are accessed via the ``os`` module's ``getenv``
